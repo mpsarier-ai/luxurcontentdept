@@ -141,7 +141,14 @@ html,body{background:var(--cream);color:var(--black);font-family:'Outfit',sans-s
 .parrilla-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;background:var(--cream-dark);padding:6px;border:1px solid var(--black)}
 .tile{aspect-ratio:1;background:#fff;position:relative;display:flex;flex-direction:column;overflow:hidden;transition:transform .15s,box-shadow .15s}
 .tile:hover{z-index:2;transform:scale(1.02);box-shadow:0 4px 16px rgba(0,0,0,.15)}
-.tile-color{height:6px;width:100%;flex-shrink:0}
+.tile-photo{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:0;background:var(--cream-dark)}
+.tile.has-photo{color:#fff}
+.tile.has-photo .tile-meta{position:relative;z-index:2;background:linear-gradient(180deg,rgba(0,0,0,.6) 0%,transparent 100%);padding-bottom:14px}
+.tile.has-photo .tile-day{color:#fff !important;text-shadow:0 1px 2px rgba(0,0,0,.6)}
+.tile.has-photo .tile-type{color:var(--rosa);text-shadow:0 1px 2px rgba(0,0,0,.6)}
+.tile.has-photo .tile-title{position:absolute;bottom:36px;left:0;right:0;padding:24px 12px 12px;background:linear-gradient(0deg,rgba(0,0,0,.75) 30%,transparent 100%);color:#fff;z-index:2;text-shadow:0 1px 3px rgba(0,0,0,.6);align-items:flex-end}
+.tile.has-photo .tile-bottom{position:relative;z-index:2;background:rgba(255,255,255,.94);backdrop-filter:blur(4px);margin-top:auto}
+.tile-color{height:6px;width:100%;flex-shrink:0;position:relative;z-index:2}
 .tile-color.launch{background:var(--black)}
 .tile-color.preorden{background:var(--rosa)}
 .tile-color.push{background:var(--cream-dark)}
@@ -156,9 +163,13 @@ html,body{background:var(--cream);color:var(--black);font-family:'Outfit',sans-s
 .tile-title:focus{background:rgba(232,165,173,.12)}
 .tile-actions{position:absolute;top:6px;right:6px;display:flex;gap:4px;opacity:0;transition:opacity .15s}
 .tile:hover .tile-actions{opacity:1}
-.tile-btn{width:22px;height:22px;border-radius:50%;border:none;background:rgba(255,255,255,.95);color:var(--black);font-size:14px;line-height:1;cursor:pointer;display:flex;align-items:center;justify-content:center;font-weight:600;box-shadow:0 1px 4px rgba(0,0,0,.18);padding:0}
+.tile-btn{width:24px;height:24px;border-radius:50%;border:none;background:rgba(255,255,255,.95);color:var(--black);font-size:13px;line-height:1;cursor:pointer;display:flex;align-items:center;justify-content:center;font-weight:600;box-shadow:0 1px 4px rgba(0,0,0,.18);padding:0}
 .tile-btn:hover{background:var(--black);color:var(--cream)}
 .tile-btn.delete:hover{background:var(--red-out);color:#fff}
+.tile-btn.upload:hover{background:var(--rosa-deep);color:#fff}
+.tile-uploading{position:absolute;inset:0;background:rgba(255,255,255,.85);display:flex;align-items:center;justify-content:center;z-index:5;font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.15em;text-transform:uppercase;color:var(--rosa-deep);flex-direction:column;gap:8px}
+.tile-uploading::before{content:'';width:24px;height:24px;border:2px solid var(--rosa);border-top-color:var(--rosa-deep);border-radius:50%;animation:spin .8s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
 .tile-bottom{display:flex;gap:5px;padding:6px 10px 8px;flex-wrap:wrap;align-items:center}
 .color-dot{width:13px;height:13px;border-radius:50%;cursor:pointer;border:2px solid transparent;transition:border-color .15s,transform .1s}
 .color-dot:hover{transform:scale(1.2)}
@@ -723,6 +734,7 @@ html,body{background:var(--cream);color:var(--black);font-family:'Outfit',sans-s
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
 import { getFirestore, doc, onSnapshot, setDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+import { getStorage, ref as storageRef, uploadBytes, getDownloadURL, deleteObject } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-storage.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyDffXb-q5KloYzoPwMA3rU9eEXg8ht9yUE",
@@ -762,6 +774,7 @@ const DEFAULT_PARRILLA = [
 const state = {
   docRef: null,
   user: null,
+  storage: null,
   lastWrite: 0,
   parrilla: [],
   parrillaInitialized: false
@@ -784,6 +797,7 @@ if (firebaseConfig.apiKey.startsWith("REEMPLAZAR")){
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
     const auth = getAuth(app);
+    state.storage = getStorage(app);
     setSync('','Conectando…');
 
     signInAnonymously(auth).catch(err => {
@@ -890,6 +904,83 @@ function applyRemoteFields(fields){
 function escapeHtml(s){
   return String(s||'').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 }
+function escapeAttr(s){ return String(s||'').replace(/"/g,'&quot;'); }
+
+// === PHOTO UPLOAD ===
+async function compressImage(file, maxDim = 1200, quality = 0.82){
+  return new Promise((resolve, reject) => {
+    const img = new Image();
+    const reader = new FileReader();
+    reader.onload = e => { img.src = e.target.result; };
+    reader.onerror = reject;
+    img.onload = () => {
+      let { width, height } = img;
+      if (width > maxDim || height > maxDim){
+        const r = Math.min(maxDim/width, maxDim/height);
+        width = Math.round(width*r); height = Math.round(height*r);
+      }
+      const canvas = document.createElement('canvas');
+      canvas.width = width; canvas.height = height;
+      const ctx = canvas.getContext('2d');
+      ctx.drawImage(img, 0, 0, width, height);
+      canvas.toBlob(blob => blob ? resolve(blob) : reject(new Error('canvas blob fail')), 'image/jpeg', quality);
+    };
+    img.onerror = reject;
+    reader.readAsDataURL(file);
+  });
+}
+
+function triggerUpload(tileId){
+  if (!state.storage){ alert('Firebase Storage no está disponible. Verifica que esté habilitado en Firebase Console.'); return; }
+  const input = document.createElement('input');
+  input.type = 'file';
+  input.accept = 'image/*';
+  input.onchange = async () => {
+    const file = input.files && input.files[0];
+    if (!file) return;
+    if (!file.type.startsWith('image/')){ alert('Selecciona una imagen'); return; }
+    await uploadPhotoForTile(tileId, file);
+  };
+  input.click();
+}
+
+async function uploadPhotoForTile(tileId, file){
+  const tileEl = document.querySelector(`[data-tile-id="${tileId}"]`);
+  if (tileEl && !tileEl.querySelector('.tile-uploading')){
+    const overlay = document.createElement('div');
+    overlay.className = 'tile-uploading';
+    overlay.textContent = 'Subiendo…';
+    tileEl.appendChild(overlay);
+  }
+  flashSaving();
+  try {
+    const blob = await compressImage(file);
+    const tile = state.parrilla.find(t => t.id === tileId);
+    const oldPath = tile && tile.imagePath;
+    const ext = 'jpg';
+    const path = `calendars/${DOC_ID}/${tileId}-${Date.now()}.${ext}`;
+    const fileRef = storageRef(state.storage, path);
+    await uploadBytes(fileRef, blob, { contentType: 'image/jpeg' });
+    const url = await getDownloadURL(fileRef);
+    state.parrilla = state.parrilla.map(t => t.id === tileId ? {...t, imageUrl: url, imagePath: path} : t);
+    await saveParrillaRemote();
+    if (oldPath) deleteStoredPhoto(oldPath).catch(()=>{});
+    renderParrilla();
+  } catch(err){
+    console.error('Upload error', err);
+    alert('No se pudo subir la foto. Verifica que Firebase Storage esté habilitado y que las reglas permitan escritura autenticada.\n\n' + (err.message || err));
+    setSync('offline','Error al subir foto');
+    if (tileEl){
+      const o = tileEl.querySelector('.tile-uploading'); if (o) o.remove();
+    }
+  }
+}
+
+async function deleteStoredPhoto(path){
+  if (!state.storage || !path) return;
+  try { await deleteObject(storageRef(state.storage, path)); }
+  catch(err){ console.warn('Delete photo (non-fatal)', err); }
+}
 
 function renderParrilla(){
   const grid = document.getElementById('parrillaGrid');
@@ -904,7 +995,8 @@ function renderParrilla(){
   }
 
   grid.innerHTML = state.parrilla.map(t => `
-    <div class="tile" data-tile-id="${t.id}">
+    <div class="tile ${t.imageUrl ? 'has-photo' : ''}" data-tile-id="${t.id}">
+      ${t.imageUrl ? `<img class="tile-photo" src="${escapeAttr(t.imageUrl)}" alt="" loading="lazy">` : ''}
       <div class="tile-color ${t.color || 'push'}"></div>
       <div class="tile-meta">
         <span class="tile-day" contenteditable="true" data-edit="day">${escapeHtml(t.day)}</span>
@@ -915,6 +1007,8 @@ function renderParrilla(){
         ${COLOR_OPTIONS.map(c => `<span class="color-dot ${c} ${c===t.color?'active':''}" data-color="${c}" title="${c}"></span>`).join('')}
       </div>
       <div class="tile-actions">
+        <button class="tile-btn upload" data-action="upload" title="${t.imageUrl ? 'Cambiar foto' : 'Subir foto'}">${t.imageUrl ? '↻' : '📷'}</button>
+        ${t.imageUrl ? '<button class="tile-btn" data-action="remove-photo" title="Quitar foto">⌫</button>' : ''}
         <button class="tile-btn delete" data-action="delete" title="Eliminar">×</button>
       </div>
     </div>
@@ -925,15 +1019,37 @@ function renderParrilla(){
   grid.querySelectorAll('.tile').forEach(tileEl => {
     const id = tileEl.getAttribute('data-tile-id');
 
-    tileEl.querySelector('[data-action="delete"]').addEventListener('click', (e) => {
+    tileEl.querySelector('[data-action="delete"]').addEventListener('click', async (e) => {
       e.stopPropagation();
       const t = state.parrilla.find(x => x.id === id);
       if (!t) return;
       if (!confirm(`¿Eliminar "${t.title}"?`)) return;
+      if (t.imagePath) await deleteStoredPhoto(t.imagePath).catch(()=>{});
       state.parrilla = state.parrilla.filter(x => x.id !== id);
       saveParrillaRemote();
       renderParrilla();
     });
+
+    const uploadBtn = tileEl.querySelector('[data-action="upload"]');
+    if (uploadBtn){
+      uploadBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        triggerUpload(id);
+      });
+    }
+
+    const removePhotoBtn = tileEl.querySelector('[data-action="remove-photo"]');
+    if (removePhotoBtn){
+      removePhotoBtn.addEventListener('click', async (e) => {
+        e.stopPropagation();
+        const t = state.parrilla.find(x => x.id === id);
+        if (!t || !t.imageUrl) return;
+        if (t.imagePath) await deleteStoredPhoto(t.imagePath).catch(()=>{});
+        state.parrilla = state.parrilla.map(x => x.id === id ? {...x, imageUrl:null, imagePath:null} : x);
+        saveParrillaRemote();
+        renderParrilla();
+      });
+    }
 
     tileEl.querySelectorAll('.color-dot').forEach(dot => {
       dot.addEventListener('click', (e) => {
