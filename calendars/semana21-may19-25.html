@@ -133,6 +133,48 @@ html,body{background:var(--cream);color:var(--black);font-family:'Outfit',sans-s
 .midcheck-block li{font-size:13px;line-height:1.6;padding-left:14px;position:relative}
 .midcheck-block li::before{content:'—';position:absolute;left:0;color:var(--rosa-hot)}
 
+/* PARRILLA DE CONTENIDO */
+.parrilla-section{margin-bottom:64px}
+.parrilla-toolbar{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--grey);flex-wrap:wrap;gap:12px}
+.parrilla-stats{display:flex;gap:18px}
+.parrilla-stats .stat-item strong{color:var(--black);font-weight:500;margin-right:4px;font-size:13px}
+.parrilla-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;background:var(--cream-dark);padding:6px;border:1px solid var(--black)}
+.tile{aspect-ratio:1;background:#fff;position:relative;display:flex;flex-direction:column;overflow:hidden;transition:transform .15s,box-shadow .15s}
+.tile:hover{z-index:2;transform:scale(1.02);box-shadow:0 4px 16px rgba(0,0,0,.15)}
+.tile-color{height:6px;width:100%;flex-shrink:0}
+.tile-color.launch{background:var(--black)}
+.tile-color.preorden{background:var(--rosa)}
+.tile-color.push{background:var(--cream-dark)}
+.tile-color.recap{background:linear-gradient(90deg,var(--rosa) 0%,var(--cream-dark) 100%)}
+.tile-color.cross{background:var(--rosa-hot)}
+.tile-color.admin{background:var(--grey)}
+.tile-meta{display:flex;justify-content:space-between;padding:8px 10px 4px;gap:6px;font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:.1em;text-transform:uppercase}
+.tile-day{color:var(--black);font-weight:500;outline:none}
+.tile-type{color:var(--rosa-deep);outline:none}
+.tile-day:focus,.tile-type:focus{background:rgba(232,165,173,.15)}
+.tile-title{padding:0 10px;font-family:'Cormorant Garamond',serif;font-weight:700;font-size:15px;line-height:1.18;flex:1;display:flex;align-items:center;outline:none;color:var(--black)}
+.tile-title:focus{background:rgba(232,165,173,.12)}
+.tile-actions{position:absolute;top:6px;right:6px;display:flex;gap:4px;opacity:0;transition:opacity .15s}
+.tile:hover .tile-actions{opacity:1}
+.tile-btn{width:22px;height:22px;border-radius:50%;border:none;background:rgba(255,255,255,.95);color:var(--black);font-size:14px;line-height:1;cursor:pointer;display:flex;align-items:center;justify-content:center;font-weight:600;box-shadow:0 1px 4px rgba(0,0,0,.18);padding:0}
+.tile-btn:hover{background:var(--black);color:var(--cream)}
+.tile-btn.delete:hover{background:var(--red-out);color:#fff}
+.tile-bottom{display:flex;gap:5px;padding:6px 10px 8px;flex-wrap:wrap;align-items:center}
+.color-dot{width:13px;height:13px;border-radius:50%;cursor:pointer;border:2px solid transparent;transition:border-color .15s,transform .1s}
+.color-dot:hover{transform:scale(1.2)}
+.color-dot.active{border-color:var(--black)}
+.color-dot.launch{background:var(--black)}
+.color-dot.preorden{background:var(--rosa)}
+.color-dot.push{background:var(--cream-dark);border-color:var(--grey)}
+.color-dot.push.active{border-color:var(--black)}
+.color-dot.recap{background:linear-gradient(135deg,var(--rosa),var(--cream-dark))}
+.color-dot.cross{background:var(--rosa-hot)}
+.color-dot.admin{background:var(--grey)}
+.tile-add{aspect-ratio:1;border:2px dashed var(--rosa-deep);background:transparent;display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;color:var(--rosa-deep);transition:background .15s}
+.tile-add:hover{background:var(--rosa);color:var(--black)}
+.tile-add .plus{font-family:'Cormorant Garamond',serif;font-size:48px;line-height:1;font-weight:300}
+.tile-add .add-label{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.15em;text-transform:uppercase;margin-top:4px}
+
 /* FOOTER */
 .footer{display:flex;justify-content:space-between;align-items:center;border-top:1px solid var(--black);padding-top:24px;margin-top:48px;font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.15em;text-transform:uppercase;color:var(--grey)}
 .footer a{color:var(--rosa-deep);text-decoration:none;border-bottom:1px solid var(--rosa-deep)}
@@ -145,7 +187,10 @@ html,body{background:var(--cream);color:var(--black);font-family:'Outfit',sans-s
   .metrics-strip{grid-template-columns:repeat(2,1fr)}
   .midcheck-grid{grid-template-columns:1fr}
   .sellers-grid{grid-template-columns:1fr}
-  .bars{grid-template-columns:repeat(8,1fr);height:100px}
+  .bars{grid-template-columns:repeat(8,1fr)}
+  .bar-track{height:120px}
+  .parrilla-grid{grid-template-columns:repeat(3,1fr)}
+  .tile-title{font-size:12px}
 }
 </style>
 </head>
@@ -267,6 +312,26 @@ html,body{background:var(--cream);color:var(--black);font-family:'Outfit',sans-s
       </div>
     </div>
 
+  </section>
+
+  <!-- PARRILLA DE CONTENIDO -->
+  <section class="parrilla-section">
+    <h2 class="section-title">
+      <span>Parrilla de Contenido</span>
+      <span class="meta">Vista feed · agregar / eliminar / editar</span>
+    </h2>
+    <div class="parrilla-toolbar">
+      <div class="parrilla-stats">
+        <span class="stat-item"><strong id="statTotal">—</strong>piezas</span>
+        <span class="stat-item"><strong id="statPosts">—</strong>posts</span>
+        <span class="stat-item"><strong id="statReels">—</strong>reels</span>
+        <span class="stat-item"><strong id="statStories">—</strong>stories</span>
+      </div>
+      <div>Click cualquier campo para editar · × eliminar · + agregar</div>
+    </div>
+    <div class="parrilla-grid" id="parrillaGrid">
+      <!-- tiles renderizados por JS -->
+    </div>
   </section>
 
   <!-- TOP SELLERS -->
@@ -656,7 +721,7 @@ html,body{background:var(--cream);color:var(--black);font-family:'Outfit',sans-s
 <!-- ============================================================ -->
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-import { getFirestore, doc, onSnapshot, setDoc, updateDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+import { getFirestore, doc, onSnapshot, setDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 
 const firebaseConfig = {
@@ -670,110 +735,278 @@ const firebaseConfig = {
 
 const DOC_ID = "semana21-may19-25";
 const COLLECTION = "calendars";
+const COLOR_OPTIONS = ['launch','preorden','push','recap','cross','admin'];
+
+const DEFAULT_PARRILLA = [
+  { id:'p1',  day:'Mar 19', type:'Post · 5',    color:'recap',    title:'Recap trío lanzamiento' },
+  { id:'p2',  day:'Mar 19', type:'Reel · 15s',  color:'launch',   title:'Try-on 3 jeans nuevos' },
+  { id:'p3',  day:'Mar 19', type:'Stories · 4', color:'push',     title:'Tallas live + link' },
+  { id:'p4',  day:'Mié 20', type:'Post · 5',    color:'launch',   title:'YA LLEGÓ Deserve Less Azul' },
+  { id:'p5',  day:'Mié 20', type:'Reel · 20s',  color:'launch',   title:'Unboxing + try-on' },
+  { id:'p6',  day:'Mié 20', type:'Stories · 6', color:'push',     title:'Para quienes esperaron' },
+  { id:'p7',  day:'Jue 21', type:'Post · 6',    color:'launch',   title:'Wide Leg Trio editorial' },
+  { id:'p8',  day:'Jue 21', type:'Reel · 30s',  color:'launch',   title:'Styling con Tank Tops' },
+  { id:'p9',  day:'Jue 21', type:'Stories · 4', color:'cross',    title:'Día / Noche outfits' },
+  { id:'p10', day:'Vie 22', type:'Post · 6',    color:'launch',   title:'Black Stars editorial' },
+  { id:'p11', day:'Vie 22', type:'Reel · 25s',  color:'launch',   title:'Estrellas en movimiento' },
+  { id:'p12', day:'Vie 22', type:'Stories · 5', color:'preorden', title:'Black live + Pink teaser' },
+  { id:'p13', day:'Sáb 23', type:'Post · 5',    color:'launch',   title:'Red Riders último S' },
+  { id:'p14', day:'Sáb 23', type:'Reel · 20s',  color:'launch',   title:'BTS Red Riders' },
+  { id:'p15', day:'Sáb 23', type:'Stories · 4', color:'push',     title:'Inventario crítico' },
+  { id:'p16', day:'Dom 24', type:'Stories · 6', color:'cross',    title:'Combos jean + tops' },
+  { id:'p17', day:'Lun 25', type:'Post · 4',    color:'recap',    title:'Recap + Destroyed teaser' },
+  { id:'p18', day:'Lun 25', type:'Stories · 4', color:'admin',    title:'Agradecimiento + sneak' }
+];
+
+// === STATE ===
+const state = {
+  docRef: null,
+  user: null,
+  lastWrite: 0,
+  parrilla: [],
+  parrillaInitialized: false
+};
 
 const syncDot = document.getElementById('syncDot');
 const syncLabel = document.getElementById('syncLabel');
 const editorList = document.getElementById('editorList');
 
-function setSync(state, label){
-  syncDot.className = 'sync-dot ' + state;
-  syncLabel.textContent = label;
-}
+function setSync(s, label){ syncDot.className = 'sync-dot ' + s; syncLabel.textContent = label; }
+function flashSaving(){ setSync('editing','Guardando…'); }
+function flashSaved(){ setSync('connected', `Guardado · ${new Date().toLocaleTimeString('es-CO',{hour:'2-digit',minute:'2-digit'})}`); }
 
-// Si no se configuró Firebase, modo offline (localStorage)
+// === FIREBASE BOOT ===
 if (firebaseConfig.apiKey.startsWith("REEMPLAZAR")){
-  setSync('offline', 'Firebase no configurado · modo local');
+  setSync('offline','Firebase no configurado · modo local');
   initLocalOnly();
 } else {
   try {
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
     const auth = getAuth(app);
-
-    setSync('', 'Conectando…');
+    setSync('','Conectando…');
 
     signInAnonymously(auth).catch(err => {
       console.error('Auth error', err);
-      setSync('offline', 'Error auth · modo local');
+      setSync('offline','Error auth · modo local');
       initLocalOnly();
     });
 
     onAuthStateChanged(auth, async (user) => {
       if (!user) return;
-      const docRef = doc(db, COLLECTION, DOC_ID);
-      let lastWrite = 0;
-      let suppressNext = false;
+      state.user = user;
+      state.docRef = doc(db, COLLECTION, DOC_ID);
 
-      // Subscribe a cambios remotos
-      onSnapshot(docRef, (snap) => {
-        if (!snap.exists()) {
-          setSync('connected', 'Sincronizado · primera edición');
+      onSnapshot(state.docRef, (snap) => {
+        if (!snap.exists()){
+          setSync('connected','Sincronizado · primera edición');
+          // seed parrilla
+          state.parrilla = JSON.parse(JSON.stringify(DEFAULT_PARRILLA));
+          state.parrillaInitialized = true;
+          renderParrilla();
+          saveParrillaRemote();
           return;
         }
         const data = snap.data();
-        if (Date.now() - lastWrite < 800){
-          // Acabamos de escribir, ignorar el echo
-          return;
+        if (Date.now() - state.lastWrite < 800) return;
+
+        applyRemoteFields(data.fields || {});
+
+        if (Array.isArray(data.parrilla)){
+          state.parrilla = data.parrilla;
+          state.parrillaInitialized = true;
+          renderParrilla();
+        } else if (!state.parrillaInitialized){
+          state.parrilla = JSON.parse(JSON.stringify(DEFAULT_PARRILLA));
+          state.parrillaInitialized = true;
+          renderParrilla();
+          saveParrillaRemote();
         }
-        applyRemote(data.fields || {});
+
         setSync('connected', `Sincronizado · ${formatTime(data.updatedAt)}`);
         renderEditors(data.activeEditors || {});
       }, (err) => {
         console.error('Snapshot error', err);
-        setSync('offline', 'Sin conexión · modo local');
+        setSync('offline','Sin conexión · modo local');
       });
 
-      // Capturar ediciones locales
-      document.querySelectorAll('[data-field]').forEach(el => {
-        if (el.getAttribute('contenteditable') !== 'true' && !el.classList.contains('evt')) return;
-        // Eventos de la grid también editables
-        if (el.classList.contains('evt')) el.setAttribute('contenteditable','true');
-
-        let debounce;
-        el.addEventListener('input', () => {
-          clearTimeout(debounce);
-          setSync('editing', 'Guardando…');
-          debounce = setTimeout(async () => {
-            const field = el.getAttribute('data-field');
-            const value = el.innerHTML;
-            try {
-              lastWrite = Date.now();
-              await setDoc(docRef, {
-                fields: { [field]: value },
-                updatedAt: serverTimestamp(),
-                lastEditor: user.uid.slice(0,6)
-              }, { merge: true });
-              setSync('connected', `Guardado · ${new Date().toLocaleTimeString('es-CO',{hour:'2-digit',minute:'2-digit'})}`);
-            } catch(err){
-              console.error('Write error', err);
-              setSync('offline', 'Error al guardar');
-            }
-          }, 500);
-        });
-
-        el.addEventListener('focus', async () => {
-          try {
-            await setDoc(docRef, {
-              activeEditors: { [user.uid.slice(0,6)]: { last: serverTimestamp(), field } }
-            }, { merge: true });
-          } catch(e){}
-        });
-      });
+      bindFieldEditors();
     });
   } catch(err){
     console.error('Firebase init error', err);
-    setSync('offline', 'Error config · modo local');
+    setSync('offline','Error config · modo local');
     initLocalOnly();
   }
 }
 
-function applyRemote(fields){
+// === FIELD EDITORS (existing contenteditable) ===
+function bindFieldEditors(){
+  document.querySelectorAll('[data-field]').forEach(el => {
+    if (el.getAttribute('contenteditable') !== 'true' && !el.classList.contains('evt')) return;
+    if (el.classList.contains('evt')) el.setAttribute('contenteditable','true');
+
+    let debounce;
+    el.addEventListener('input', () => {
+      clearTimeout(debounce);
+      flashSaving();
+      debounce = setTimeout(async () => {
+        const field = el.getAttribute('data-field');
+        try {
+          state.lastWrite = Date.now();
+          await setDoc(state.docRef, {
+            fields: { [field]: el.innerHTML },
+            updatedAt: serverTimestamp(),
+            lastEditor: state.user.uid.slice(0,6)
+          }, { merge: true });
+          flashSaved();
+        } catch(err){
+          console.error('Write error', err);
+          setSync('offline','Error al guardar');
+        }
+      }, 500);
+    });
+
+    el.addEventListener('focus', async () => {
+      if (!state.docRef) return;
+      try {
+        await setDoc(state.docRef, {
+          activeEditors: { [state.user.uid.slice(0,6)]: { last: serverTimestamp() } }
+        }, { merge: true });
+      } catch(e){}
+    });
+  });
+}
+
+function applyRemoteFields(fields){
   Object.entries(fields).forEach(([id, html]) => {
     const el = document.querySelector(`[data-field="${id}"]`);
     if (!el) return;
-    if (document.activeElement === el) return; // no sobrescribir mientras edita
+    if (document.activeElement === el) return;
     if (el.innerHTML !== html) el.innerHTML = html;
   });
+}
+
+// === PARRILLA ===
+function escapeHtml(s){
+  return String(s||'').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+
+function renderParrilla(){
+  const grid = document.getElementById('parrillaGrid');
+  if (!grid) return;
+
+  // Si el usuario está editando un tile, evitar re-render desde remoto
+  const active = document.activeElement;
+  if (active && active.closest && active.closest('.tile')){
+    // posponer re-render — intentar de nuevo en blur
+    active.addEventListener('blur', () => renderParrilla(), { once:true });
+    return;
+  }
+
+  grid.innerHTML = state.parrilla.map(t => `
+    <div class="tile" data-tile-id="${t.id}">
+      <div class="tile-color ${t.color || 'push'}"></div>
+      <div class="tile-meta">
+        <span class="tile-day" contenteditable="true" data-edit="day">${escapeHtml(t.day)}</span>
+        <span class="tile-type" contenteditable="true" data-edit="type">${escapeHtml(t.type)}</span>
+      </div>
+      <div class="tile-title" contenteditable="true" data-edit="title">${escapeHtml(t.title)}</div>
+      <div class="tile-bottom">
+        ${COLOR_OPTIONS.map(c => `<span class="color-dot ${c} ${c===t.color?'active':''}" data-color="${c}" title="${c}"></span>`).join('')}
+      </div>
+      <div class="tile-actions">
+        <button class="tile-btn delete" data-action="delete" title="Eliminar">×</button>
+      </div>
+    </div>
+  `).join('') + `
+    <button class="tile-add" id="tileAdd"><span class="plus">+</span><span class="add-label">Agregar</span></button>
+  `;
+
+  grid.querySelectorAll('.tile').forEach(tileEl => {
+    const id = tileEl.getAttribute('data-tile-id');
+
+    tileEl.querySelector('[data-action="delete"]').addEventListener('click', (e) => {
+      e.stopPropagation();
+      const t = state.parrilla.find(x => x.id === id);
+      if (!t) return;
+      if (!confirm(`¿Eliminar "${t.title}"?`)) return;
+      state.parrilla = state.parrilla.filter(x => x.id !== id);
+      saveParrillaRemote();
+      renderParrilla();
+    });
+
+    tileEl.querySelectorAll('.color-dot').forEach(dot => {
+      dot.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const newColor = dot.getAttribute('data-color');
+        state.parrilla = state.parrilla.map(x => x.id === id ? {...x, color:newColor} : x);
+        saveParrillaRemote();
+        renderParrilla();
+      });
+    });
+
+    tileEl.querySelectorAll('[data-edit]').forEach(field => {
+      let dbnce;
+      field.addEventListener('input', () => {
+        clearTimeout(dbnce);
+        flashSaving();
+        dbnce = setTimeout(() => {
+          const k = field.getAttribute('data-edit');
+          const v = field.textContent.trim();
+          state.parrilla = state.parrilla.map(x => x.id === id ? {...x, [k]: v} : x);
+          saveParrillaRemote();
+        }, 500);
+      });
+    });
+  });
+
+  const addBtn = document.getElementById('tileAdd');
+  if (addBtn){
+    addBtn.addEventListener('click', () => {
+      const newId = 'p' + Date.now().toString(36);
+      state.parrilla.push({ id:newId, day:'Lun 25', type:'Post', color:'push', title:'Nueva pieza' });
+      saveParrillaRemote();
+      renderParrilla();
+      setTimeout(() => {
+        const t = document.querySelector(`[data-tile-id="${newId}"] .tile-title`);
+        if (t){ t.focus();
+          const range = document.createRange(); range.selectNodeContents(t);
+          const sel = window.getSelection(); sel.removeAllRanges(); sel.addRange(range);
+        }
+      }, 80);
+    });
+  }
+
+  updateStats();
+}
+
+function updateStats(){
+  const total = state.parrilla.length;
+  const posts = state.parrilla.filter(t => /post/i.test(t.type)).length;
+  const reels = state.parrilla.filter(t => /reel/i.test(t.type)).length;
+  const stories = state.parrilla.filter(t => /stor/i.test(t.type)).length;
+  const set = (id, n) => { const e = document.getElementById(id); if (e) e.textContent = n; };
+  set('statTotal', total); set('statPosts', posts); set('statReels', reels); set('statStories', stories);
+}
+
+async function saveParrillaRemote(){
+  updateStats();
+  if (!state.docRef){
+    localStorage.setItem('luxur-' + DOC_ID + '-parrilla', JSON.stringify(state.parrilla));
+    return;
+  }
+  try {
+    state.lastWrite = Date.now();
+    await setDoc(state.docRef, {
+      parrilla: state.parrilla,
+      updatedAt: serverTimestamp(),
+      lastEditor: state.user.uid.slice(0,6)
+    }, { merge: true });
+    flashSaved();
+  } catch(err){
+    console.error('Parrilla save err', err);
+    setSync('offline','Error al guardar parrilla');
+  }
 }
 
 function renderEditors(editors){
@@ -787,7 +1020,9 @@ function formatTime(ts){
   return ts.toDate().toLocaleTimeString('es-CO',{hour:'2-digit',minute:'2-digit'});
 }
 
+// === LOCAL FALLBACK ===
 function initLocalOnly(){
+  // Fields
   document.querySelectorAll('[data-field]').forEach(el => {
     if (el.classList.contains('evt')) el.setAttribute('contenteditable','true');
     const field = el.getAttribute('data-field');
@@ -797,6 +1032,11 @@ function initLocalOnly(){
       localStorage.setItem('luxur-' + DOC_ID + '-' + field, el.innerHTML);
     });
   });
+  // Parrilla
+  const stored = localStorage.getItem('luxur-' + DOC_ID + '-parrilla');
+  state.parrilla = stored ? JSON.parse(stored) : JSON.parse(JSON.stringify(DEFAULT_PARRILLA));
+  state.parrillaInitialized = true;
+  renderParrilla();
 }
 </script>
 
