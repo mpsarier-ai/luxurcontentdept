@@ -1,0 +1,781 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LUXUR — Semana 21 · May 19-25, 2026</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;0,900;1,400&family=Outfit:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --cream:#edebe6;
+  --cream-dark:#dedad3;
+  --rosa:#f2d4d7;
+  --rosa-hot:#e8a5ad;
+  --rosa-deep:#d4848e;
+  --black:#1a1a1a;
+  --grey:#7a7570;
+  --green-ok:#5a7a4f;
+  --yellow-low:#c4a04a;
+  --red-out:#b8504a;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{background:var(--cream);color:var(--black);font-family:'Outfit',sans-serif;font-weight:300;line-height:1.5}
+[contenteditable="true"]{outline:none;border-bottom:1px dashed transparent;transition:border-color .15s ease,background .15s ease;cursor:text}
+[contenteditable="true"]:hover{border-bottom-color:var(--rosa-deep)}
+[contenteditable="true"]:focus{background:rgba(232,165,173,.12);border-bottom-color:var(--rosa-deep)}
+.container{max-width:1400px;margin:0 auto;padding:48px 32px 96px}
+
+/* HEADER */
+.brand-header{display:flex;justify-content:space-between;align-items:flex-end;border-bottom:1px solid var(--black);padding-bottom:24px;margin-bottom:48px}
+.brand-block .logo{font-family:'Cormorant Garamond',serif;font-weight:900;font-size:42px;letter-spacing:.18em;line-height:1}
+.brand-block .tagline{font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:var(--grey);margin-top:8px}
+.week-block{text-align:right}
+.week-block .week-num{font-family:'Cormorant Garamond',serif;font-weight:700;font-size:64px;line-height:.9;font-style:italic}
+.week-block .week-range{font-family:'JetBrains Mono',monospace;font-size:12px;letter-spacing:.16em;text-transform:uppercase;margin-top:4px}
+
+/* COLLAB BAR */
+.collab-bar{display:flex;justify-content:space-between;align-items:center;background:var(--cream-dark);padding:12px 20px;margin-bottom:32px;border-radius:2px;font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.1em;text-transform:uppercase}
+.sync-status{display:flex;align-items:center;gap:10px}
+.sync-dot{width:8px;height:8px;border-radius:50%;background:var(--grey);transition:background .3s ease}
+.sync-dot.connected{background:var(--green-ok);box-shadow:0 0 0 0 rgba(90,122,79,.5);animation:pulse 2s infinite}
+.sync-dot.editing{background:var(--rosa-deep)}
+.sync-dot.offline{background:var(--red-out)}
+@keyframes pulse{0%{box-shadow:0 0 0 0 rgba(90,122,79,.4)}70%{box-shadow:0 0 0 8px rgba(90,122,79,0)}100%{box-shadow:0 0 0 0 rgba(90,122,79,0)}}
+.editor-list{display:flex;align-items:center;gap:8px;color:var(--grey)}
+.editor-chip{background:var(--rosa);padding:3px 8px;border-radius:10px;color:var(--black);font-weight:500}
+
+/* METRICS STRIP */
+.metrics-strip{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--black);margin-bottom:48px;border:1px solid var(--black)}
+.metric{background:var(--cream);padding:20px}
+.metric .label{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:var(--grey)}
+.metric .value{font-family:'Cormorant Garamond',serif;font-weight:700;font-size:28px;margin-top:6px;line-height:1}
+.metric .delta{font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--green-ok);margin-top:6px;letter-spacing:.05em}
+
+/* SECTION TITLES */
+.section-title{font-family:'Cormorant Garamond',serif;font-weight:700;font-style:italic;font-size:32px;margin-bottom:24px;border-bottom:1px solid var(--black);padding-bottom:8px;display:flex;justify-content:space-between;align-items:baseline}
+.section-title .meta{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:var(--grey);font-style:normal;font-weight:400}
+
+/* WEEK GRID */
+.week-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:1px;background:var(--black);border:1px solid var(--black);margin-bottom:64px}
+.day-cell{background:var(--cream);min-height:200px;display:flex;flex-direction:column}
+.day-head{padding:10px 12px 8px;border-bottom:1px solid var(--cream-dark);display:flex;justify-content:space-between;align-items:baseline}
+.day-head .dow{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:var(--grey)}
+.day-head .dnum{font-family:'Cormorant Garamond',serif;font-weight:700;font-size:24px}
+.day-events{padding:8px;display:flex;flex-direction:column;gap:6px;flex:1}
+.evt{font-family:'Outfit',sans-serif;font-size:11px;padding:6px 8px;border-radius:2px;line-height:1.3}
+.evt-launch{background:var(--black);color:var(--cream)}
+.evt-preorden{background:var(--rosa);color:var(--black)}
+.evt-push{background:var(--cream-dark);color:var(--black)}
+.evt-recap{background:linear-gradient(135deg,var(--rosa) 0%,var(--cream-dark) 100%);color:var(--black);border:1px solid var(--rosa-deep)}
+.evt-admin{border:1px dashed var(--grey);color:var(--grey);background:transparent}
+.evt-cross{background:var(--rosa-hot);color:var(--cream)}
+.evt-tag{font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:.1em;text-transform:uppercase;opacity:.7;display:block;margin-bottom:2px}
+
+/* DAY DETAIL CARDS */
+.day-cards{display:flex;flex-direction:column;gap:24px;margin-bottom:64px}
+.day-card{background:#fff;border:1px solid var(--black);padding:32px;display:grid;grid-template-columns:160px 1fr 280px;gap:32px}
+.day-card .day-marker .dow-large{font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:var(--grey)}
+.day-card .day-marker .dnum-large{font-family:'Cormorant Garamond',serif;font-weight:900;font-size:88px;line-height:.85;font-style:italic;margin-top:4px}
+.day-card .day-marker .focus{font-family:'Outfit',sans-serif;font-size:11px;text-transform:uppercase;letter-spacing:.12em;margin-top:12px;color:var(--rosa-deep);font-weight:500}
+.day-card .content-block .ctype{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:var(--rosa-deep);margin-bottom:6px}
+.day-card .content-block h3{font-family:'Cormorant Garamond',serif;font-weight:700;font-size:24px;margin-bottom:14px;line-height:1.15}
+.day-card .content-block .copy{font-size:14px;line-height:1.55;margin-bottom:16px;color:#333}
+.piece-list{display:flex;flex-direction:column;gap:14px;margin-top:18px;border-top:1px solid var(--cream-dark);padding-top:18px}
+.piece{display:grid;grid-template-columns:80px 1fr;gap:14px;align-items:start}
+.piece .ptype{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--grey);padding-top:2px}
+.piece .pdetail{font-size:13px;line-height:1.5}
+.piece .pdetail strong{font-weight:600}
+
+/* SHOPIFY SIDE PANEL */
+.shopify-panel{background:var(--cream);padding:20px;border-left:3px solid var(--rosa-deep)}
+.shopify-panel .panel-title{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:var(--grey);margin-bottom:14px;display:flex;align-items:center;gap:6px}
+.shopify-panel .panel-title::before{content:'●';color:var(--rosa-deep);font-size:14px}
+.product-row{margin-bottom:14px;padding-bottom:14px;border-bottom:1px dotted var(--cream-dark)}
+.product-row:last-child{border-bottom:none;margin-bottom:0;padding-bottom:0}
+.product-row .pname{font-family:'Outfit',sans-serif;font-weight:500;font-size:12px;line-height:1.3;margin-bottom:6px}
+.product-row .pprice{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--rosa-deep);margin-bottom:6px}
+.size-chips{display:flex;flex-wrap:wrap;gap:4px;margin-top:6px}
+.size-chip{font-family:'JetBrains Mono',monospace;font-size:10px;padding:2px 6px;border-radius:2px;border:1px solid currentColor;letter-spacing:.05em}
+.size-chip.ok{color:var(--green-ok)}
+.size-chip.low{color:var(--yellow-low)}
+.size-chip.out{color:var(--red-out)}
+.action-tag{display:inline-block;font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:.1em;text-transform:uppercase;background:var(--black);color:var(--cream);padding:3px 6px;margin-top:6px;border-radius:2px}
+
+/* TOP SELLERS BLOCK */
+.sellers-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:1px;background:var(--black);border:1px solid var(--black);margin-bottom:48px}
+.seller{background:#fff;padding:18px 20px;display:flex;justify-content:space-between;align-items:center;gap:16px}
+.seller .left{flex:1}
+.seller .rank{font-family:'Cormorant Garamond',serif;font-weight:900;font-size:32px;font-style:italic;color:var(--rosa-deep);line-height:1;margin-right:10px;display:inline-block}
+.seller .pname{font-family:'Outfit',sans-serif;font-weight:500;font-size:13px;line-height:1.3}
+.seller .right{text-align:right}
+.seller .sales{font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:500;color:var(--green-ok)}
+.seller .orders{font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--grey);letter-spacing:.1em}
+
+/* DAILY SALES CHART */
+.sales-chart{background:#fff;border:1px solid var(--black);padding:24px;margin-bottom:48px}
+.bars{display:grid;grid-template-columns:repeat(8,1fr);gap:8px;align-items:end;height:160px;margin-top:16px}
+.bar-col{display:flex;flex-direction:column;align-items:center;gap:6px}
+.bar{width:100%;background:var(--rosa-hot);border-radius:1px;transition:background .2s}
+.bar.peak{background:var(--rosa-deep)}
+.bar-label{font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--grey);letter-spacing:.06em}
+.bar-value{font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--black);font-weight:500}
+
+/* MIDCHECK */
+.midcheck{background:var(--black);color:var(--cream);padding:32px;margin-bottom:48px}
+.midcheck h3{font-family:'Cormorant Garamond',serif;font-weight:700;font-style:italic;font-size:28px;margin-bottom:8px}
+.midcheck .midcheck-meta{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:var(--rosa);margin-bottom:20px}
+.midcheck-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:24px}
+.midcheck-block h4{font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.15em;text-transform:uppercase;color:var(--rosa-hot);margin-bottom:10px}
+.midcheck-block ul{list-style:none}
+.midcheck-block li{font-size:13px;line-height:1.6;padding-left:14px;position:relative}
+.midcheck-block li::before{content:'—';position:absolute;left:0;color:var(--rosa-hot)}
+
+/* FOOTER */
+.footer{display:flex;justify-content:space-between;align-items:center;border-top:1px solid var(--black);padding-top:24px;margin-top:48px;font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.15em;text-transform:uppercase;color:var(--grey)}
+.footer a{color:var(--rosa-deep);text-decoration:none;border-bottom:1px solid var(--rosa-deep)}
+.footer a:hover{color:var(--black);border-bottom-color:var(--black)}
+
+/* RESPONSIVE */
+@media (max-width: 980px){
+  .week-grid{grid-template-columns:repeat(2,1fr)}
+  .day-card{grid-template-columns:1fr;gap:20px}
+  .metrics-strip{grid-template-columns:repeat(2,1fr)}
+  .midcheck-grid{grid-template-columns:1fr}
+  .sellers-grid{grid-template-columns:1fr}
+  .bars{grid-template-columns:repeat(8,1fr);height:100px}
+}
+</style>
+</head>
+<body>
+<div class="container">
+
+  <!-- HEADER -->
+  <header class="brand-header">
+    <div class="brand-block">
+      <div class="logo">L U X U R</div>
+      <div class="tagline">Content Calendar · United Brand</div>
+    </div>
+    <div class="week-block">
+      <div class="week-num">Semana 21</div>
+      <div class="week-range">Mar 19 — Lun 25 · Mayo 2026</div>
+    </div>
+  </header>
+
+  <!-- COLLAB BAR -->
+  <div class="collab-bar">
+    <div class="sync-status">
+      <span class="sync-dot" id="syncDot"></span>
+      <span id="syncLabel">Conectando…</span>
+    </div>
+    <div class="editor-list">
+      <span>Editores activos:</span>
+      <span id="editorList"><span class="editor-chip">—</span></span>
+    </div>
+  </div>
+
+  <!-- METRICS STRIP -->
+  <section class="metrics-strip">
+    <div class="metric">
+      <div class="label">Gross Sales · 7d</div>
+      <div class="value">$27.15M</div>
+      <div class="delta">COP · vs prev week</div>
+    </div>
+    <div class="metric">
+      <div class="label">Órdenes · 7d</div>
+      <div class="value">106</div>
+      <div class="delta">avg 13/día</div>
+    </div>
+    <div class="metric">
+      <div class="label">Best Day</div>
+      <div class="value">Mié 13</div>
+      <div class="delta">$5.82M · 15 órdenes</div>
+    </div>
+    <div class="metric">
+      <div class="label">Top Seller</div>
+      <div class="value">Red Riders</div>
+      <div class="delta">$1.47M · 8 órdenes</div>
+    </div>
+  </section>
+
+  <!-- WEEK GRID -->
+  <h2 class="section-title">
+    <span>Vista Semanal</span>
+    <span class="meta">7 días · 16 piezas</span>
+  </h2>
+  <section class="week-grid">
+
+    <div class="day-cell">
+      <div class="day-head"><span class="dow">Mar</span><span class="dnum">19</span></div>
+      <div class="day-events">
+        <div class="evt evt-recap" data-field="grid-mar-1"><span class="evt-tag">Post · 5 slides</span>Recap lanzamiento trío</div>
+        <div class="evt evt-launch" data-field="grid-mar-2"><span class="evt-tag">Reel · 15s</span>Try-on 3 jeans nuevos</div>
+        <div class="evt evt-push" data-field="grid-mar-3"><span class="evt-tag">Stories · 4</span>Tallas live + link</div>
+      </div>
+    </div>
+
+    <div class="day-cell">
+      <div class="day-head"><span class="dow">Mié</span><span class="dnum">20</span></div>
+      <div class="day-events">
+        <div class="evt evt-preorden" data-field="grid-mie-1"><span class="evt-tag">Post · 4 slides</span>Pre-orden Men Deserve Less Azul</div>
+        <div class="evt evt-push" data-field="grid-mie-2"><span class="evt-tag">Stories · 5</span>Demanda real + countdown</div>
+      </div>
+    </div>
+
+    <div class="day-cell">
+      <div class="day-head"><span class="dow">Jue</span><span class="dnum">21</span></div>
+      <div class="day-events">
+        <div class="evt evt-launch" data-field="grid-jue-1"><span class="evt-tag">Post · 6 slides</span>Wide Leg Trio: Rosado/Verde/Azul</div>
+        <div class="evt evt-launch" data-field="grid-jue-2"><span class="evt-tag">Reel · 30s</span>Styling con Tank Tops</div>
+        <div class="evt evt-cross" data-field="grid-jue-3"><span class="evt-tag">Stories · 4</span>Día / Noche outfits</div>
+      </div>
+    </div>
+
+    <div class="day-cell">
+      <div class="day-head"><span class="dow">Vie</span><span class="dnum">22</span></div>
+      <div class="day-events">
+        <div class="evt evt-preorden" data-field="grid-vie-1"><span class="evt-tag">Post · 1 slide</span>Friday teaser Pink Stars restock</div>
+        <div class="evt evt-push" data-field="grid-vie-2"><span class="evt-tag">Stories · 5</span>Sneak peek + fecha</div>
+      </div>
+    </div>
+
+    <div class="day-cell">
+      <div class="day-head"><span class="dow">Sáb</span><span class="dnum">23</span></div>
+      <div class="day-events">
+        <div class="evt evt-launch" data-field="grid-sab-1"><span class="evt-tag">Post · 5 slides</span>Top fin de semana: Red Riders</div>
+        <div class="evt evt-launch" data-field="grid-sab-2"><span class="evt-tag">Reel · 20s</span>BTS Red Riders</div>
+        <div class="evt evt-push" data-field="grid-sab-3"><span class="evt-tag">Stories · 4</span>Inventario crítico</div>
+      </div>
+    </div>
+
+    <div class="day-cell">
+      <div class="day-head"><span class="dow">Dom</span><span class="dnum">24</span></div>
+      <div class="day-events">
+        <div class="evt evt-cross" data-field="grid-dom-1"><span class="evt-tag">Stories · 6</span>Combos jean + tops + tees</div>
+      </div>
+    </div>
+
+    <div class="day-cell">
+      <div class="day-head"><span class="dow">Lun</span><span class="dnum">25</span></div>
+      <div class="day-events">
+        <div class="evt evt-recap" data-field="grid-lun-1"><span class="evt-tag">Post · 4 slides</span>Recap semana + teaser Destroyed</div>
+        <div class="evt evt-admin" data-field="grid-lun-2"><span class="evt-tag">Stories · 4</span>Agradecimiento + drop preview</div>
+      </div>
+    </div>
+
+  </section>
+
+  <!-- TOP SELLERS -->
+  <h2 class="section-title">
+    <span>Top Sellers · Última semana</span>
+    <span class="meta">Live · Shopify</span>
+  </h2>
+  <section class="sellers-grid">
+    <div class="seller"><div class="left"><span class="rank">01</span><span class="pname">Red Riders Azul Dirty</span></div><div class="right"><div class="sales">$1.47M</div><div class="orders">8 órdenes</div></div></div>
+    <div class="seller"><div class="left"><span class="rank">02</span><span class="pname">Wide Leg Fully Blush Rosado</span></div><div class="right"><div class="sales">$1.27M</div><div class="orders">7 órdenes</div></div></div>
+    <div class="seller"><div class="left"><span class="rank">03</span><span class="pname">Wide Leg Light Wash Azul Claro</span></div><div class="right"><div class="sales">$1.27M</div><div class="orders">7 órdenes</div></div></div>
+    <div class="seller"><div class="left"><span class="rank">04</span><span class="pname">Wide Leg Tone Washed Azul Oscuro</span></div><div class="right"><div class="sales">$1.27M</div><div class="orders">7 órdenes</div></div></div>
+    <div class="seller"><div class="left"><span class="rank">05</span><span class="pname">Deserve Less Azul Claro</span></div><div class="right"><div class="sales">$1.23M</div><div class="orders">7 órdenes</div></div></div>
+    <div class="seller"><div class="left"><span class="rank">06</span><span class="pname">Deserve Less Negro</span></div><div class="right"><div class="sales">$1.23M</div><div class="orders">6 órdenes</div></div></div>
+  </section>
+
+  <!-- DAILY SALES CHART -->
+  <h2 class="section-title">
+    <span>Ventas Diarias · Últimos 7 días</span>
+    <span class="meta">May 7 — May 14 · COP</span>
+  </h2>
+  <section class="sales-chart">
+    <div class="bars">
+      <div class="bar-col"><div class="bar-value">$2.7M</div><div class="bar" style="height:46%"></div><div class="bar-label">Jue 7</div></div>
+      <div class="bar-col"><div class="bar-value">$3.4M</div><div class="bar" style="height:58%"></div><div class="bar-label">Vie 8</div></div>
+      <div class="bar-col"><div class="bar-value">$4.8M</div><div class="bar" style="height:83%"></div><div class="bar-label">Sáb 9</div></div>
+      <div class="bar-col"><div class="bar-value">$1.6M</div><div class="bar" style="height:28%"></div><div class="bar-label">Dom 10</div></div>
+      <div class="bar-col"><div class="bar-value">$3.3M</div><div class="bar" style="height:57%"></div><div class="bar-label">Lun 11</div></div>
+      <div class="bar-col"><div class="bar-value">$4.0M</div><div class="bar" style="height:69%"></div><div class="bar-label">Mar 12</div></div>
+      <div class="bar-col"><div class="bar-value">$5.8M</div><div class="bar peak" style="height:100%"></div><div class="bar-label">Mié 13</div></div>
+      <div class="bar-col"><div class="bar-value">$1.4M</div><div class="bar" style="height:25%"></div><div class="bar-label">Jue 14</div></div>
+    </div>
+  </section>
+
+  <!-- DAY-BY-DAY DETAIL -->
+  <h2 class="section-title">
+    <span>Detalle Día a Día</span>
+    <span class="meta">Click cualquier campo para editar · sync live</span>
+  </h2>
+
+  <div class="day-cards">
+
+    <!-- MARTES 19 -->
+    <article class="day-card">
+      <div class="day-marker">
+        <div class="dow-large">Martes</div>
+        <div class="dnum-large">19</div>
+        <div class="focus">Recap + Push</div>
+      </div>
+      <div class="content-block">
+        <div class="ctype" data-field="d19-ctype" contenteditable="true">Lanzamiento · Recap</div>
+        <h3 data-field="d19-title" contenteditable="true">Recap Lanzamiento — El Trío Mayo</h3>
+        <p class="copy" data-field="d19-copy" contenteditable="true">Arrancamos la semana mostrando el trío que voló: Men Deserve Less Negro, Wide Leg Dirty Azul y Wide Leg Washed Verde. Carrusel con vibes de calle, try-on real, y la prueba social de las primeras compradoras.</p>
+
+        <div class="piece-list">
+          <div class="piece"><div class="ptype">Post · 5 slides</div><div class="pdetail" data-field="d19-p1" contenteditable="true"><strong>Slide 1:</strong> Cover trío con tipografía editorial · <strong>Slide 2-4:</strong> Cada jean en flat lay + detalle · <strong>Slide 5:</strong> CTA "tallas en bio"</div></div>
+          <div class="piece"><div class="ptype">Reel · 15s</div><div class="pdetail" data-field="d19-p2" contenteditable="true"><strong>Try-on transition:</strong> 3 outfits, 1 modelo, cambio rápido. Audio trending del momento. Caption: "Mayo en 3 piezas 🤍"</div></div>
+          <div class="piece"><div class="ptype">Stories · 4</div><div class="pdetail" data-field="d19-p3" contenteditable="true"><strong>1:</strong> Inventario por talla · <strong>2:</strong> Reseña cliente real · <strong>3:</strong> Link directo · <strong>4:</strong> Sticker "¿cuál te llevas?"</div></div>
+        </div>
+      </div>
+      <aside class="shopify-panel">
+        <div class="panel-title">Shopify Live</div>
+        <div class="product-row">
+          <div class="pname">Men Deserve Less Negro</div>
+          <div class="pprice">$219,000 COP</div>
+          <div class="size-chips">
+            <span class="size-chip ok">S:8</span>
+            <span class="size-chip ok">M:8</span>
+            <span class="size-chip ok">L:7</span>
+          </div>
+          <span class="action-tag">Push libre</span>
+        </div>
+        <div class="product-row">
+          <div class="pname">Wide Leg Dirty Azul</div>
+          <div class="pprice">$229,000 COP</div>
+          <div class="size-chips">
+            <span class="size-chip low">XS:4</span>
+            <span class="size-chip low">S:4</span>
+            <span class="size-chip low">M:4</span>
+            <span class="size-chip low">L:3</span>
+            <span class="size-chip low">XL:2</span>
+          </div>
+          <span class="action-tag">Tracking demanda</span>
+        </div>
+        <div class="product-row">
+          <div class="pname">Wide Leg Washed Verde</div>
+          <div class="pprice">$229,000 COP</div>
+          <div class="size-chips">
+            <span class="size-chip low">XS:4</span>
+            <span class="size-chip low">S:4</span>
+            <span class="size-chip low">M:4</span>
+            <span class="size-chip low">L:3</span>
+            <span class="size-chip low">XL:2</span>
+          </div>
+          <span class="action-tag">Tracking demanda</span>
+        </div>
+      </aside>
+    </article>
+
+    <!-- MIÉRCOLES 20 -->
+    <article class="day-card">
+      <div class="day-marker">
+        <div class="dow-large">Miércoles</div>
+        <div class="dnum-large">20</div>
+        <div class="focus">Pre-orden</div>
+      </div>
+      <div class="content-block">
+        <div class="ctype" data-field="d20-ctype" contenteditable="true">Pre-Orden · Pauta</div>
+        <h3 data-field="d20-title" contenteditable="true">Pre-Orden Men Deserve Less Azul Claro</h3>
+        <p class="copy" data-field="d20-copy" contenteditable="true">Lo pidieron tanto que aparece en negativo en sistema (-9 unidades = demanda real). Abrimos pre-orden por 15 días con entrega ~ Jun 4. Comunicación transparente: el inventario habla, no inventamos hype.</p>
+
+        <div class="piece-list">
+          <div class="piece"><div class="ptype">Post · 4 slides</div><div class="pdetail" data-field="d20-p1" contenteditable="true"><strong>Slide 1:</strong> "PRE-ORDEN ABIERTA" tipografía grande · <strong>Slide 2:</strong> Producto en flat · <strong>Slide 3:</strong> Detalles + tallas · <strong>Slide 4:</strong> Cómo funciona pre-orden + fecha entrega</div></div>
+          <div class="piece"><div class="ptype">Stories · 5</div><div class="pdetail" data-field="d20-p2" contenteditable="true"><strong>1-2:</strong> Screenshot del pedido en negativo (prueba real) · <strong>3:</strong> Cómo reservar · <strong>4:</strong> Countdown 15d · <strong>5:</strong> Sticker pregunta "¿qué talla?"</div></div>
+        </div>
+      </div>
+      <aside class="shopify-panel">
+        <div class="panel-title">Shopify Live</div>
+        <div class="product-row">
+          <div class="pname">Men Deserve Less Azul Claro</div>
+          <div class="pprice">$219,000 COP</div>
+          <div class="size-chips">
+            <span class="size-chip out">XS:0</span>
+            <span class="size-chip out">S:-2</span>
+            <span class="size-chip out">M:-1</span>
+            <span class="size-chip out">L:0</span>
+          </div>
+          <span class="action-tag">Convertir a pre-orden</span>
+        </div>
+      </aside>
+    </article>
+
+    <!-- JUEVES 21 -->
+    <article class="day-card">
+      <div class="day-marker">
+        <div class="dow-large">Jueves</div>
+        <div class="dnum-large">21</div>
+        <div class="focus">Wide Leg Trio</div>
+      </div>
+      <div class="content-block">
+        <div class="ctype" data-field="d21-ctype" contenteditable="true">Push · Editorial</div>
+        <h3 data-field="d21-title" contenteditable="true">Wide Leg Trio — Rosado · Verde · Azul Dirty</h3>
+        <p class="copy" data-field="d21-copy" contenteditable="true">Tres siluetas, una semana. Posicionar el Wide Leg como el fit de la temporada con un editorial de 6 slides. Reel de styling combina los jeans con los Tank Top Double Taches que vienen empujando bien.</p>
+
+        <div class="piece-list">
+          <div class="piece"><div class="ptype">Post · 6 slides</div><div class="pdetail" data-field="d21-p1" contenteditable="true"><strong>Slide 1:</strong> Editorial cover B&W · <strong>2-4:</strong> Cada wide leg en outfit completo · <strong>5:</strong> Detalle textura denim · <strong>6:</strong> "Pick your blue, pick your green, pick your pink"</div></div>
+          <div class="piece"><div class="ptype">Reel · 30s</div><div class="pdetail" data-field="d21-p2" contenteditable="true"><strong>Concept:</strong> 3 outfits con misma base (Tank Top Double Taches) cambiando solo el jean. Trans entre cada uno. Audio: pop alternativo.</div></div>
+          <div class="piece"><div class="ptype">Stories · 4</div><div class="pdetail" data-field="d21-p3" contenteditable="true"><strong>1:</strong> Día con Wide Leg Verde + tank · <strong>2:</strong> Tarde con Wide Leg Rosado + cropped · <strong>3:</strong> Noche con Wide Leg Dirty + body · <strong>4:</strong> "¿cuál vibe?"</div></div>
+        </div>
+      </div>
+      <aside class="shopify-panel">
+        <div class="panel-title">Shopify Live</div>
+        <div class="product-row">
+          <div class="pname">Wide Leg Fully Blush Rosado</div>
+          <div class="pprice">$229,000 COP</div>
+          <div class="size-chips">
+            <span class="size-chip out">Total:3</span>
+          </div>
+          <span class="action-tag">Top seller · low stock</span>
+        </div>
+        <div class="product-row">
+          <div class="pname">Wide Leg Washed Verde</div>
+          <div class="pprice">$229,000 COP</div>
+          <div class="size-chips">
+            <span class="size-chip low">XS:4 S:4 M:4 L:3 XL:2</span>
+          </div>
+        </div>
+        <div class="product-row">
+          <div class="pname">Wide Leg Dirty Azul</div>
+          <div class="pprice">$229,000 COP</div>
+          <div class="size-chips">
+            <span class="size-chip low">XS:4 S:4 M:4 L:3 XL:2</span>
+          </div>
+        </div>
+        <div class="product-row">
+          <div class="pname">Tank Top Double Taches Negro/Café/Blanco</div>
+          <div class="pprice">$89,000 COP</div>
+          <div class="size-chips">
+            <span class="size-chip ok">Talla única · 53 disp</span>
+          </div>
+          <span class="action-tag">Cross-sell</span>
+        </div>
+      </aside>
+    </article>
+
+    <!-- VIERNES 22 -->
+    <article class="day-card">
+      <div class="day-marker">
+        <div class="dow-large">Viernes</div>
+        <div class="dnum-large">22</div>
+        <div class="focus">Teaser</div>
+      </div>
+      <div class="content-block">
+        <div class="ctype" data-field="d22-ctype" contenteditable="true">Pre-Orden · Teaser</div>
+        <h3 data-field="d22-title" contenteditable="true">Friday Teaser — Pink Stars Restock</h3>
+        <p class="copy" data-field="d22-copy" contenteditable="true">Pink Stars está en 0 desde hace días. Calentamos el restock con un teaser visual fuerte (un solo slide, mucho impacto) y stories que generen lista de espera vía DM.</p>
+
+        <div class="piece-list">
+          <div class="piece"><div class="ptype">Post · 1 slide</div><div class="pdetail" data-field="d22-p1" contenteditable="true"><strong>Concept:</strong> Foto cercana del bordado de estrellas rosadas, fondo cream. Caption: "Volvió. Casi."</div></div>
+          <div class="piece"><div class="ptype">Stories · 5</div><div class="pdetail" data-field="d22-p2" contenteditable="true"><strong>1:</strong> Reels antiguos del Pink Stars · <strong>2:</strong> "¿Lo querías?" sticker · <strong>3:</strong> Sneak detalle · <strong>4:</strong> "DM para lista de espera" · <strong>5:</strong> Countdown próxima semana</div></div>
+        </div>
+      </div>
+      <aside class="shopify-panel">
+        <div class="panel-title">Shopify Live</div>
+        <div class="product-row">
+          <div class="pname">Jean Recto Pink Stars Retro Azul</div>
+          <div class="pprice">$229,000 COP</div>
+          <div class="size-chips">
+            <span class="size-chip out">XS:0</span>
+            <span class="size-chip out">S:0</span>
+            <span class="size-chip out">M:0</span>
+            <span class="size-chip out">L:0</span>
+          </div>
+          <span class="action-tag">Restock pendiente</span>
+        </div>
+      </aside>
+    </article>
+
+    <!-- SÁBADO 23 -->
+    <article class="day-card">
+      <div class="day-marker">
+        <div class="dow-large">Sábado</div>
+        <div class="dnum-large">23</div>
+        <div class="focus">Top weekend push</div>
+      </div>
+      <div class="content-block">
+        <div class="ctype" data-field="d23-ctype" contenteditable="true">Push · Urgencia</div>
+        <h3 data-field="d23-title" contenteditable="true">Red Riders — Última Talla S</h3>
+        <p class="copy" data-field="d23-copy" contenteditable="true">El top seller de la semana pasada (8 órdenes, $1.47M) tiene M y L agotados. Solo quedan 2 unidades en S. Push de urgencia real, no fabricada — con BTS de la pieza para reforzar deseo.</p>
+
+        <div class="piece-list">
+          <div class="piece"><div class="ptype">Post · 5 slides</div><div class="pdetail" data-field="d23-p1" contenteditable="true"><strong>Slide 1:</strong> "QUEDAN 2" tipografía dramática · <strong>2:</strong> Producto en outfit completo · <strong>3:</strong> Detalle del estampado RED RIDERS · <strong>4:</strong> Por qué fue top seller · <strong>5:</strong> CTA directo</div></div>
+          <div class="piece"><div class="ptype">Reel · 20s</div><div class="pdetail" data-field="d23-p2" contenteditable="true"><strong>BTS:</strong> Cómo se ve el detalle del bordado en cámara cercana, transición a outfit en movimiento. Caption: "El último S te está esperando"</div></div>
+          <div class="piece"><div class="ptype">Stories · 4</div><div class="pdetail" data-field="d23-p3" contenteditable="true"><strong>1:</strong> Capture del inventario S:2 M:0 L:0 · <strong>2:</strong> Outfit completo · <strong>3:</strong> Reseña cliente · <strong>4:</strong> Link + "el restock no está confirmado"</div></div>
+        </div>
+      </div>
+      <aside class="shopify-panel">
+        <div class="panel-title">Shopify Live</div>
+        <div class="product-row">
+          <div class="pname">Red Riders Azul Dirty</div>
+          <div class="pprice">$249,000 COP</div>
+          <div class="size-chips">
+            <span class="size-chip low">S:2</span>
+            <span class="size-chip out">M:0</span>
+            <span class="size-chip out">L:0</span>
+          </div>
+          <span class="action-tag">Agotar S antes restock</span>
+        </div>
+      </aside>
+    </article>
+
+    <!-- DOMINGO 24 -->
+    <article class="day-card">
+      <div class="day-marker">
+        <div class="dow-large">Domingo</div>
+        <div class="dnum-large">24</div>
+        <div class="focus">Cross-sell ligero</div>
+      </div>
+      <div class="content-block">
+        <div class="ctype" data-field="d24-ctype" contenteditable="true">Cross-Sell · Stories</div>
+        <h3 data-field="d24-title" contenteditable="true">Outfit Combos — Sunday Vibes</h3>
+        <p class="copy" data-field="d24-copy" contenteditable="true">Día de descanso comunicacional pero no comercial. Stories que muestran combos de jean + top + camiseta como "looks listos" — bajan el costo cognitivo del comprar y empujan ticket promedio.</p>
+
+        <div class="piece-list">
+          <div class="piece"><div class="ptype">Stories · 6</div><div class="pdetail" data-field="d24-p1" contenteditable="true"><strong>1:</strong> Combo Wide Leg Verde + Pretty Math Baby Tee Rosa · <strong>2:</strong> Combo Deserve Less Negro + Tank Top Negro · <strong>3:</strong> Combo Wide Leg Dirty + Iconic Baby Tee Gris · <strong>4:</strong> Combo Red Riders + Tank Café · <strong>5:</strong> Sticker "tu combo fav?" · <strong>6:</strong> Link a cada uno</div></div>
+        </div>
+      </div>
+      <aside class="shopify-panel">
+        <div class="panel-title">Shopify Live</div>
+        <div class="product-row">
+          <div class="pname">Pretty Math Baby Tee Rosa</div>
+          <div class="pprice">$79,000 COP</div>
+          <div class="size-chips"><span class="size-chip ok">21 disp</span></div>
+        </div>
+        <div class="product-row">
+          <div class="pname">Iconic Baby Tee Gris</div>
+          <div class="pprice">$79,000 COP</div>
+          <div class="size-chips"><span class="size-chip ok">28 disp</span></div>
+        </div>
+        <div class="product-row">
+          <div class="pname">Tank Top Escotado Doble Taches Negro</div>
+          <div class="pprice">$89,000 COP</div>
+          <div class="size-chips"><span class="size-chip ok">27 disp</span></div>
+        </div>
+      </aside>
+    </article>
+
+    <!-- LUNES 25 -->
+    <article class="day-card">
+      <div class="day-marker">
+        <div class="dow-large">Lunes</div>
+        <div class="dnum-large">25</div>
+        <div class="focus">Recap + Teaser Junio</div>
+      </div>
+      <div class="content-block">
+        <div class="ctype" data-field="d25-ctype" contenteditable="true">Recap · Teaser</div>
+        <h3 data-field="d25-title" contenteditable="true">Recap Semana 21 + Destroyed Drop Preview</h3>
+        <p class="copy" data-field="d25-copy" contenteditable="true">Cierre de semana con carrusel de recap (top sellers, mejores outfits, DMs destacados) y teaser sutil de la Colección Destroyed que llega ~ Jun 20. Empieza la conversación 4 semanas antes para precalentar la audiencia.</p>
+
+        <div class="piece-list">
+          <div class="piece"><div class="ptype">Post · 4 slides</div><div class="pdetail" data-field="d25-p1" contenteditable="true"><strong>Slide 1:</strong> "Semana 21 en LUXUR" cover · <strong>2:</strong> Top 3 más vendidos con números reales · <strong>3:</strong> Mejores user content tagged · <strong>4:</strong> "Algo está roto. Junio 20." (teaser Destroyed)</div></div>
+          <div class="piece"><div class="ptype">Stories · 4</div><div class="pdetail" data-field="d25-p2" contenteditable="true"><strong>1:</strong> Agradecimiento general · <strong>2:</strong> Dato de la semana ($27M en 7d) · <strong>3:</strong> Sticker "qué quieres ver más?" · <strong>4:</strong> Sneak destroyed (silhouette negra)</div></div>
+        </div>
+      </div>
+      <aside class="shopify-panel">
+        <div class="panel-title">Pipeline Junio</div>
+        <div class="product-row">
+          <div class="pname">Colección Destroyed</div>
+          <div class="pprice">~ Jun 20 · 4 colores</div>
+          <div class="size-chips">
+            <span class="size-chip ok">Negro · Azul · Azul Claro · Arena</span>
+          </div>
+          <span class="action-tag">Pre-launch start</span>
+        </div>
+        <div class="product-row">
+          <div class="pname">Jean Bordado Costado</div>
+          <div class="pprice">~ Jun 3</div>
+          <span class="action-tag">Próximo lanzamiento</span>
+        </div>
+      </aside>
+    </article>
+
+  </div>
+
+  <!-- MIDCHECK -->
+  <section class="midcheck">
+    <div class="midcheck-meta">Midcheck · Jueves 21 Mayo</div>
+    <h3>Revisión a mitad de semana</h3>
+    <div class="midcheck-grid">
+      <div class="midcheck-block">
+        <h4>Tracking</h4>
+        <ul>
+          <li data-field="mid-t1" contenteditable="true">¿Cómo respondió el carrusel de pre-orden Men Deserve Less Azul?</li>
+          <li data-field="mid-t2" contenteditable="true">¿Cuántos DMs llegaron pidiendo restock Pink Stars?</li>
+          <li data-field="mid-t3" contenteditable="true">Engagement vs semana 20 — comparar reels</li>
+        </ul>
+      </div>
+      <div class="midcheck-block">
+        <h4>Decisiones</h4>
+        <ul>
+          <li data-field="mid-d1" contenteditable="true">¿Subir pauta extra a Red Riders el sábado?</li>
+          <li data-field="mid-d2" contenteditable="true">Confirmar fecha entrega Men Deserve Less Azul (15d desde hoy = Jun 4)</li>
+          <li data-field="mid-d3" contenteditable="true">Si sold-out tallas wide leg llega antes del jueves, pivot a otro hero</li>
+        </ul>
+      </div>
+      <div class="midcheck-block">
+        <h4>Próximos drops</h4>
+        <ul>
+          <li data-field="mid-n1" contenteditable="true">Pink Stars restock — semana 22</li>
+          <li data-field="mid-n2" contenteditable="true">Bordado Costado — primera semana junio</li>
+          <li data-field="mid-n3" contenteditable="true">Destroyed Collection — Jun 20 · 4 colores · campaña 4 semanas</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer class="footer">
+    <div>LUXUR Content Ops · Generado <span id="genDate">2026-05-14 16:07 -05</span></div>
+    <div>Cambios sincronizados en tiempo real · <a href="https://github.com/mpsarier-ai/luxurcontentdept/edit/main/calendars/semana21-may19-25.html" target="_blank" id="githubLink">Editar en GitHub</a></div>
+  </footer>
+
+</div>
+
+<!-- ============================================================ -->
+<!-- FIREBASE REAL-TIME COLLABORATIVE EDITING                     -->
+<!-- ============================================================ -->
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import { getFirestore, doc, onSnapshot, setDoc, updateDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyDffXb-q5KloYzoPwMA3rU9eEXg8ht9yUE",
+  authDomain: "luxur-content-ops.firebaseapp.com",
+  projectId: "luxur-content-ops",
+  storageBucket: "luxur-content-ops.firebasestorage.app",
+  messagingSenderId: "93575662760",
+  appId: "1:93575662760:web:c79a73d3a1748e9436069d"
+};
+
+const DOC_ID = "semana21-may19-25";
+const COLLECTION = "calendars";
+
+const syncDot = document.getElementById('syncDot');
+const syncLabel = document.getElementById('syncLabel');
+const editorList = document.getElementById('editorList');
+
+function setSync(state, label){
+  syncDot.className = 'sync-dot ' + state;
+  syncLabel.textContent = label;
+}
+
+// Si no se configuró Firebase, modo offline (localStorage)
+if (firebaseConfig.apiKey.startsWith("REEMPLAZAR")){
+  setSync('offline', 'Firebase no configurado · modo local');
+  initLocalOnly();
+} else {
+  try {
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+    const auth = getAuth(app);
+
+    setSync('', 'Conectando…');
+
+    signInAnonymously(auth).catch(err => {
+      console.error('Auth error', err);
+      setSync('offline', 'Error auth · modo local');
+      initLocalOnly();
+    });
+
+    onAuthStateChanged(auth, async (user) => {
+      if (!user) return;
+      const docRef = doc(db, COLLECTION, DOC_ID);
+      let lastWrite = 0;
+      let suppressNext = false;
+
+      // Subscribe a cambios remotos
+      onSnapshot(docRef, (snap) => {
+        if (!snap.exists()) {
+          setSync('connected', 'Sincronizado · primera edición');
+          return;
+        }
+        const data = snap.data();
+        if (Date.now() - lastWrite < 800){
+          // Acabamos de escribir, ignorar el echo
+          return;
+        }
+        applyRemote(data.fields || {});
+        setSync('connected', `Sincronizado · ${formatTime(data.updatedAt)}`);
+        renderEditors(data.activeEditors || {});
+      }, (err) => {
+        console.error('Snapshot error', err);
+        setSync('offline', 'Sin conexión · modo local');
+      });
+
+      // Capturar ediciones locales
+      document.querySelectorAll('[data-field]').forEach(el => {
+        if (el.getAttribute('contenteditable') !== 'true' && !el.classList.contains('evt')) return;
+        // Eventos de la grid también editables
+        if (el.classList.contains('evt')) el.setAttribute('contenteditable','true');
+
+        let debounce;
+        el.addEventListener('input', () => {
+          clearTimeout(debounce);
+          setSync('editing', 'Guardando…');
+          debounce = setTimeout(async () => {
+            const field = el.getAttribute('data-field');
+            const value = el.innerHTML;
+            try {
+              lastWrite = Date.now();
+              await setDoc(docRef, {
+                fields: { [field]: value },
+                updatedAt: serverTimestamp(),
+                lastEditor: user.uid.slice(0,6)
+              }, { merge: true });
+              setSync('connected', `Guardado · ${new Date().toLocaleTimeString('es-CO',{hour:'2-digit',minute:'2-digit'})}`);
+            } catch(err){
+              console.error('Write error', err);
+              setSync('offline', 'Error al guardar');
+            }
+          }, 500);
+        });
+
+        el.addEventListener('focus', async () => {
+          try {
+            await setDoc(docRef, {
+              activeEditors: { [user.uid.slice(0,6)]: { last: serverTimestamp(), field } }
+            }, { merge: true });
+          } catch(e){}
+        });
+      });
+    });
+  } catch(err){
+    console.error('Firebase init error', err);
+    setSync('offline', 'Error config · modo local');
+    initLocalOnly();
+  }
+}
+
+function applyRemote(fields){
+  Object.entries(fields).forEach(([id, html]) => {
+    const el = document.querySelector(`[data-field="${id}"]`);
+    if (!el) return;
+    if (document.activeElement === el) return; // no sobrescribir mientras edita
+    if (el.innerHTML !== html) el.innerHTML = html;
+  });
+}
+
+function renderEditors(editors){
+  const ids = Object.keys(editors).slice(0,5);
+  if (!ids.length){ editorList.innerHTML = '<span class="editor-chip">solo tú</span>'; return; }
+  editorList.innerHTML = ids.map(id => `<span class="editor-chip">${id}</span>`).join('');
+}
+
+function formatTime(ts){
+  if (!ts || !ts.toDate) return 'ahora';
+  return ts.toDate().toLocaleTimeString('es-CO',{hour:'2-digit',minute:'2-digit'});
+}
+
+function initLocalOnly(){
+  document.querySelectorAll('[data-field]').forEach(el => {
+    if (el.classList.contains('evt')) el.setAttribute('contenteditable','true');
+    const field = el.getAttribute('data-field');
+    const stored = localStorage.getItem('luxur-' + DOC_ID + '-' + field);
+    if (stored && document.activeElement !== el) el.innerHTML = stored;
+    el.addEventListener('input', () => {
+      localStorage.setItem('luxur-' + DOC_ID + '-' + field, el.innerHTML);
+    });
+  });
+}
+</script>
+
+</body>
+</html>
