@@ -115,9 +115,10 @@ html,body{background:var(--cream);color:var(--black);font-family:'Outfit',sans-s
 
 /* DAILY SALES CHART */
 .sales-chart{background:#fff;border:1px solid var(--black);padding:24px;margin-bottom:48px}
-.bars{display:grid;grid-template-columns:repeat(8,1fr);gap:8px;align-items:end;height:160px;margin-top:16px}
+.bars{display:grid;grid-template-columns:repeat(8,1fr);gap:8px;margin-top:16px}
 .bar-col{display:flex;flex-direction:column;align-items:center;gap:6px}
-.bar{width:100%;background:var(--rosa-hot);border-radius:1px;transition:background .2s}
+.bar-track{height:180px;width:100%;display:flex;align-items:flex-end;justify-content:center}
+.bar{width:100%;background:var(--rosa-hot);border-radius:1px;transition:background .2s,height .3s ease;min-height:4px}
 .bar.peak{background:var(--rosa-deep)}
 .bar-label{font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--grey);letter-spacing:.06em}
 .bar-value{font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--black);font-weight:500}
@@ -218,8 +219,9 @@ html,body{background:var(--cream);color:var(--black);font-family:'Outfit',sans-s
     <div class="day-cell">
       <div class="day-head"><span class="dow">Mié</span><span class="dnum">20</span></div>
       <div class="day-events">
-        <div class="evt evt-preorden" data-field="grid-mie-1"><span class="evt-tag">Post · 4 slides</span>Pre-orden Men Deserve Less Azul</div>
-        <div class="evt evt-push" data-field="grid-mie-2"><span class="evt-tag">Stories · 5</span>Demanda real + countdown</div>
+        <div class="evt evt-launch" data-field="grid-mie-1"><span class="evt-tag">Post · 5 slides</span>YA LLEGÓ — Deserve Less Azul</div>
+        <div class="evt evt-launch" data-field="grid-mie-2"><span class="evt-tag">Reel · 20s</span>Unboxing + try-on</div>
+        <div class="evt evt-push" data-field="grid-mie-3"><span class="evt-tag">Stories · 6</span>Para quienes esperaron + tallas</div>
       </div>
     </div>
 
@@ -235,8 +237,9 @@ html,body{background:var(--cream);color:var(--black);font-family:'Outfit',sans-s
     <div class="day-cell">
       <div class="day-head"><span class="dow">Vie</span><span class="dnum">22</span></div>
       <div class="day-events">
-        <div class="evt evt-preorden" data-field="grid-vie-1"><span class="evt-tag">Post · 1 slide</span>Friday teaser Pink Stars restock</div>
-        <div class="evt evt-push" data-field="grid-vie-2"><span class="evt-tag">Stories · 5</span>Sneak peek + fecha</div>
+        <div class="evt evt-launch" data-field="grid-vie-1"><span class="evt-tag">Post · 6 slides</span>LANZAMIENTO Black Stars Azul Claro</div>
+        <div class="evt evt-launch" data-field="grid-vie-2"><span class="evt-tag">Reel · 25s</span>Estrellas en movimiento</div>
+        <div class="evt evt-preorden" data-field="grid-vie-3"><span class="evt-tag">Stories · 5</span>Black Stars live + Pink Stars teaser</div>
       </div>
     </div>
 
@@ -287,14 +290,14 @@ html,body{background:var(--cream);color:var(--black);font-family:'Outfit',sans-s
   </h2>
   <section class="sales-chart">
     <div class="bars">
-      <div class="bar-col"><div class="bar-value">$2.7M</div><div class="bar" style="height:46%"></div><div class="bar-label">Jue 7</div></div>
-      <div class="bar-col"><div class="bar-value">$3.4M</div><div class="bar" style="height:58%"></div><div class="bar-label">Vie 8</div></div>
-      <div class="bar-col"><div class="bar-value">$4.8M</div><div class="bar" style="height:83%"></div><div class="bar-label">Sáb 9</div></div>
-      <div class="bar-col"><div class="bar-value">$1.6M</div><div class="bar" style="height:28%"></div><div class="bar-label">Dom 10</div></div>
-      <div class="bar-col"><div class="bar-value">$3.3M</div><div class="bar" style="height:57%"></div><div class="bar-label">Lun 11</div></div>
-      <div class="bar-col"><div class="bar-value">$4.0M</div><div class="bar" style="height:69%"></div><div class="bar-label">Mar 12</div></div>
-      <div class="bar-col"><div class="bar-value">$5.8M</div><div class="bar peak" style="height:100%"></div><div class="bar-label">Mié 13</div></div>
-      <div class="bar-col"><div class="bar-value">$1.4M</div><div class="bar" style="height:25%"></div><div class="bar-label">Jue 14</div></div>
+      <div class="bar-col"><div class="bar-value">$2.7M</div><div class="bar-track"><div class="bar" style="height:46%"></div></div><div class="bar-label">Jue 7</div></div>
+      <div class="bar-col"><div class="bar-value">$3.4M</div><div class="bar-track"><div class="bar" style="height:58%"></div></div><div class="bar-label">Vie 8</div></div>
+      <div class="bar-col"><div class="bar-value">$4.8M</div><div class="bar-track"><div class="bar" style="height:83%"></div></div><div class="bar-label">Sáb 9</div></div>
+      <div class="bar-col"><div class="bar-value">$1.6M</div><div class="bar-track"><div class="bar" style="height:28%"></div></div><div class="bar-label">Dom 10</div></div>
+      <div class="bar-col"><div class="bar-value">$3.3M</div><div class="bar-track"><div class="bar" style="height:57%"></div></div><div class="bar-label">Lun 11</div></div>
+      <div class="bar-col"><div class="bar-value">$4.0M</div><div class="bar-track"><div class="bar" style="height:69%"></div></div><div class="bar-label">Mar 12</div></div>
+      <div class="bar-col"><div class="bar-value">$5.8M</div><div class="bar-track"><div class="bar peak" style="height:100%"></div></div><div class="bar-label">Mié 13</div></div>
+      <div class="bar-col"><div class="bar-value">$1.4M</div><div class="bar-track"><div class="bar" style="height:25%"></div></div><div class="bar-label">Jue 14</div></div>
     </div>
   </section>
 
@@ -368,16 +371,17 @@ html,body{background:var(--cream);color:var(--black);font-family:'Outfit',sans-s
       <div class="day-marker">
         <div class="dow-large">Miércoles</div>
         <div class="dnum-large">20</div>
-        <div class="focus">Pre-orden</div>
+        <div class="focus">Lanzamiento Restock</div>
       </div>
       <div class="content-block">
-        <div class="ctype" data-field="d20-ctype" contenteditable="true">Pre-Orden · Pauta</div>
-        <h3 data-field="d20-title" contenteditable="true">Pre-Orden Men Deserve Less Azul Claro</h3>
-        <p class="copy" data-field="d20-copy" contenteditable="true">Lo pidieron tanto que aparece en negativo en sistema (-9 unidades = demanda real). Abrimos pre-orden por 15 días con entrega ~ Jun 4. Comunicación transparente: el inventario habla, no inventamos hype.</p>
+        <div class="ctype" data-field="d20-ctype" contenteditable="true">Lanzamiento · Restock</div>
+        <h3 data-field="d20-title" contenteditable="true">YA LLEGÓ — Men Deserve Less Azul Claro</h3>
+        <p class="copy" data-field="d20-copy" contenteditable="true">El más esperado: lo pidieron tanto que estuvo en negativo en sistema. Físicamente ya está acá. Comunicación de victoria — premiar a la gente que esperó, mostrar el producto en cámara real, abrir compra inmediata. Pendiente: subir entradas a Shopify para que las tallas dejen de aparecer en negativo.</p>
 
         <div class="piece-list">
-          <div class="piece"><div class="ptype">Post · 4 slides</div><div class="pdetail" data-field="d20-p1" contenteditable="true"><strong>Slide 1:</strong> "PRE-ORDEN ABIERTA" tipografía grande · <strong>Slide 2:</strong> Producto en flat · <strong>Slide 3:</strong> Detalles + tallas · <strong>Slide 4:</strong> Cómo funciona pre-orden + fecha entrega</div></div>
-          <div class="piece"><div class="ptype">Stories · 5</div><div class="pdetail" data-field="d20-p2" contenteditable="true"><strong>1-2:</strong> Screenshot del pedido en negativo (prueba real) · <strong>3:</strong> Cómo reservar · <strong>4:</strong> Countdown 15d · <strong>5:</strong> Sticker pregunta "¿qué talla?"</div></div>
+          <div class="piece"><div class="ptype">Post · 5 slides</div><div class="pdetail" data-field="d20-p1" contenteditable="true"><strong>Slide 1:</strong> "YA LLEGÓ" tipografía editorial · <strong>Slide 2:</strong> Producto en outfit completo · <strong>Slide 3:</strong> Detalle textura + costura · <strong>Slide 4:</strong> Tallas disponibles · <strong>Slide 5:</strong> "Para los que esperaron — gracias" CTA directo</div></div>
+          <div class="piece"><div class="ptype">Reel · 20s</div><div class="pdetail" data-field="d20-p2" contenteditable="true"><strong>Concept:</strong> Unboxing real de la caja que llegó del taller + try-on en vivo. Audio: pop alternativo cálido. Caption: "Llegaron. Por fin."</div></div>
+          <div class="piece"><div class="ptype">Stories · 6</div><div class="pdetail" data-field="d20-p3" contenteditable="true"><strong>1:</strong> "Para quienes esperaron 🤍" · <strong>2:</strong> Screenshot cliente que pidió por DM · <strong>3-4:</strong> Producto en cámara real · <strong>5:</strong> Inventario por talla · <strong>6:</strong> Link directo + "no esperes esta vez"</div></div>
         </div>
       </div>
       <aside class="shopify-panel">
@@ -387,11 +391,18 @@ html,body{background:var(--cream);color:var(--black);font-family:'Outfit',sans-s
           <div class="pprice">$219,000 COP</div>
           <div class="size-chips">
             <span class="size-chip out">XS:0</span>
-            <span class="size-chip out">S:-2</span>
-            <span class="size-chip out">M:-1</span>
-            <span class="size-chip out">L:0</span>
+            <span class="size-chip out">S:-3</span>
+            <span class="size-chip out">M:-4</span>
+            <span class="size-chip out">L:-2</span>
           </div>
-          <span class="action-tag">Convertir a pre-orden</span>
+          <span class="action-tag">⚠ Subir entradas a Shopify</span>
+        </div>
+        <div class="product-row">
+          <div class="pname" style="color:var(--rosa-deep);font-weight:600">Acción operativa</div>
+          <div class="pprice" style="color:var(--black)">Antes del miércoles AM</div>
+          <div class="size-chips" style="margin-top:4px">
+            <span style="font-size:11px;line-height:1.4">Cargar inventario físico recibido en LUXUR Medellín + Pereira para que el sistema deje de mostrar negativo y la gente pueda comprar online.</span>
+          </div>
         </div>
       </aside>
     </article>
@@ -454,22 +465,34 @@ html,body{background:var(--cream);color:var(--black);font-family:'Outfit',sans-s
       <div class="day-marker">
         <div class="dow-large">Viernes</div>
         <div class="dnum-large">22</div>
-        <div class="focus">Teaser</div>
+        <div class="focus">Lanzamiento Stars</div>
       </div>
       <div class="content-block">
-        <div class="ctype" data-field="d22-ctype" contenteditable="true">Pre-Orden · Teaser</div>
-        <h3 data-field="d22-title" contenteditable="true">Friday Teaser — Pink Stars Restock</h3>
-        <p class="copy" data-field="d22-copy" contenteditable="true">Pink Stars está en 0 desde hace días. Calentamos el restock con un teaser visual fuerte (un solo slide, mucho impacto) y stories que generen lista de espera vía DM.</p>
+        <div class="ctype" data-field="d22-ctype" contenteditable="true">Lanzamiento · Editorial</div>
+        <h3 data-field="d22-title" contenteditable="true">Lanzamiento Black Stars Azul Claro + Pink Stars Teaser</h3>
+        <p class="copy" data-field="d22-copy" contenteditable="true">Black Stars Azul Claro llegó con 56 unidades en Medellín — lanzamiento Friday completo con post editorial, reel y stories. En paralelo aprovechamos el momentum de "stars" para teasear el restock de Pink Stars en stories. Doble play: venta directa + lista de espera.</p>
 
         <div class="piece-list">
-          <div class="piece"><div class="ptype">Post · 1 slide</div><div class="pdetail" data-field="d22-p1" contenteditable="true"><strong>Concept:</strong> Foto cercana del bordado de estrellas rosadas, fondo cream. Caption: "Volvió. Casi."</div></div>
-          <div class="piece"><div class="ptype">Stories · 5</div><div class="pdetail" data-field="d22-p2" contenteditable="true"><strong>1:</strong> Reels antiguos del Pink Stars · <strong>2:</strong> "¿Lo querías?" sticker · <strong>3:</strong> Sneak detalle · <strong>4:</strong> "DM para lista de espera" · <strong>5:</strong> Countdown próxima semana</div></div>
+          <div class="piece"><div class="ptype">Post · 6 slides</div><div class="pdetail" data-field="d22-p1" contenteditable="true"><strong>Slide 1:</strong> Cover editorial — modelo con jean en pose estática, fondo cream · <strong>2:</strong> Detalle estrellas negras sobre denim azul claro · <strong>3-4:</strong> Outfit completo día / noche · <strong>5:</strong> Inventario por talla · <strong>6:</strong> "Black Stars · Vie 22 May" CTA</div></div>
+          <div class="piece"><div class="ptype">Reel · 25s</div><div class="pdetail" data-field="d22-p2" contenteditable="true"><strong>Concept:</strong> Cámara cercana a las estrellas en movimiento al caminar — la textura es el héroe. Cierre con outfit completo. Audio: indie/sad girl moment.</div></div>
+          <div class="piece"><div class="ptype">Stories · 5</div><div class="pdetail" data-field="d22-p3" contenteditable="true"><strong>1:</strong> "BLACK STARS LIVE" cover · <strong>2:</strong> Producto en cámara real + tallas · <strong>3:</strong> Link directo · <strong>4:</strong> Sticker "¿pink o black?" + sneak Pink Stars · <strong>5:</strong> "Pink Stars en lista de espera — DM"</div></div>
         </div>
       </div>
       <aside class="shopify-panel">
         <div class="panel-title">Shopify Live</div>
         <div class="product-row">
-          <div class="pname">Jean Recto Pink Stars Retro Azul</div>
+          <div class="pname">Jean Black Stars Azul Claro</div>
+          <div class="pprice">$229,000 COP</div>
+          <div class="size-chips">
+            <span class="size-chip low">XS:1</span>
+            <span class="size-chip ok">S:27</span>
+            <span class="size-chip ok">M:19</span>
+            <span class="size-chip ok">L:9</span>
+          </div>
+          <span class="action-tag">🆕 Lanzamiento — push libre</span>
+        </div>
+        <div class="product-row">
+          <div class="pname">Jean Pink Stars Retro Azul</div>
           <div class="pprice">$229,000 COP</div>
           <div class="size-chips">
             <span class="size-chip out">XS:0</span>
@@ -477,7 +500,7 @@ html,body{background:var(--cream);color:var(--black);font-family:'Outfit',sans-s
             <span class="size-chip out">M:0</span>
             <span class="size-chip out">L:0</span>
           </div>
-          <span class="action-tag">Restock pendiente</span>
+          <span class="action-tag">Lista de espera vía DM</span>
         </div>
       </aside>
     </article>
@@ -596,17 +619,17 @@ html,body{background:var(--cream);color:var(--black);font-family:'Outfit',sans-s
       <div class="midcheck-block">
         <h4>Tracking</h4>
         <ul>
-          <li data-field="mid-t1" contenteditable="true">¿Cómo respondió el carrusel de pre-orden Men Deserve Less Azul?</li>
-          <li data-field="mid-t2" contenteditable="true">¿Cuántos DMs llegaron pidiendo restock Pink Stars?</li>
+          <li data-field="mid-t1" contenteditable="true">Conversión del lanzamiento Deserve Less Azul (mié) — primer día</li>
+          <li data-field="mid-t2" contenteditable="true">DMs / lista de espera generada por Pink Stars teaser</li>
           <li data-field="mid-t3" contenteditable="true">Engagement vs semana 20 — comparar reels</li>
         </ul>
       </div>
       <div class="midcheck-block">
         <h4>Decisiones</h4>
         <ul>
-          <li data-field="mid-d1" contenteditable="true">¿Subir pauta extra a Red Riders el sábado?</li>
-          <li data-field="mid-d2" contenteditable="true">Confirmar fecha entrega Men Deserve Less Azul (15d desde hoy = Jun 4)</li>
-          <li data-field="mid-d3" contenteditable="true">Si sold-out tallas wide leg llega antes del jueves, pivot a otro hero</li>
+          <li data-field="mid-d1" contenteditable="true">⚠ Subir entradas físicas Deserve Less Azul a Shopify ANTES del miércoles AM (sale en negativo)</li>
+          <li data-field="mid-d2" contenteditable="true">¿Subir pauta extra a Red Riders el sábado?</li>
+          <li data-field="mid-d3" contenteditable="true">Black Stars: si S/M se mueven rápido, planear restock antes que se agote la temporada</li>
         </ul>
       </div>
       <div class="midcheck-block">
