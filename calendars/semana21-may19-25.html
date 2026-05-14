@@ -64,7 +64,7 @@ html,body{background:var(--cream);color:var(--black);font-family:'Outfit',sans-s
 .day-head .dow{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:var(--grey)}
 .day-head .dnum{font-family:'Cormorant Garamond',serif;font-weight:700;font-size:24px}
 .day-events{padding:8px;display:flex;flex-direction:column;gap:6px;flex:1}
-.evt{font-family:'Outfit',sans-serif;font-size:11px;padding:6px 8px;border-radius:2px;line-height:1.3}
+.evt{font-family:'Outfit',sans-serif;font-size:11px;padding:6px 8px;border-radius:2px;line-height:1.3;position:relative;cursor:text}
 .evt-launch{background:var(--black);color:var(--cream)}
 .evt-preorden{background:var(--rosa);color:var(--black)}
 .evt-push{background:var(--cream-dark);color:var(--black)}
@@ -72,6 +72,14 @@ html,body{background:var(--cream);color:var(--black);font-family:'Outfit',sans-s
 .evt-admin{border:1px dashed var(--grey);color:var(--grey);background:transparent}
 .evt-cross{background:var(--rosa-hot);color:var(--cream)}
 .evt-tag{font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:.1em;text-transform:uppercase;opacity:.7;display:block;margin-bottom:2px}
+.evt-title{outline:none;display:block}
+.evt-title:focus{background:rgba(255,255,255,.15);outline:1px solid rgba(255,255,255,.3)}
+.evt-launch .evt-title:focus{outline-color:var(--rosa)}
+.evt-del{position:absolute;top:2px;right:2px;width:16px;height:16px;border-radius:50%;border:none;background:rgba(255,255,255,.85);color:var(--black);font-size:11px;line-height:1;cursor:pointer;display:none;align-items:center;justify-content:center;padding:0;font-weight:600}
+.evt:hover .evt-del{display:flex}
+.evt-del:hover{background:var(--red-out);color:#fff}
+.day-add-piece{margin:6px 8px 8px;padding:6px;background:transparent;border:1px dashed var(--rosa-deep);color:var(--rosa-deep);font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.1em;text-transform:uppercase;cursor:pointer;border-radius:2px;transition:background .15s}
+.day-add-piece:hover{background:var(--rosa);color:var(--black)}
 
 /* DAY DETAIL CARDS */
 .day-cards{display:flex;flex-direction:column;gap:24px;margin-bottom:64px}
@@ -83,10 +91,20 @@ html,body{background:var(--cream);color:var(--black);font-family:'Outfit',sans-s
 .day-card .content-block h3{font-family:'Cormorant Garamond',serif;font-weight:700;font-size:24px;margin-bottom:14px;line-height:1.15}
 .day-card .content-block .copy{font-size:14px;line-height:1.55;margin-bottom:16px;color:#333}
 .piece-list{display:flex;flex-direction:column;gap:14px;margin-top:18px;border-top:1px solid var(--cream-dark);padding-top:18px}
-.piece{display:grid;grid-template-columns:80px 1fr;gap:14px;align-items:start}
-.piece .ptype{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--grey);padding-top:2px}
+.piece{display:grid;grid-template-columns:90px 1fr 24px;gap:14px;align-items:start;position:relative}
+.piece .ptype{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--grey);padding-top:2px;outline:none}
+.piece .ptype:focus{background:rgba(232,165,173,.12);color:var(--rosa-deep)}
 .piece .pdetail{font-size:13px;line-height:1.5}
-.piece .pdetail strong{font-weight:600}
+.piece .pdetail strong{font-weight:600;color:var(--black)}
+.piece .ptitle{font-family:'Outfit',sans-serif;font-weight:600;font-size:14px;margin-bottom:4px;outline:none;color:var(--black)}
+.piece .ptitle:focus{background:rgba(232,165,173,.12)}
+.piece .pdesc{font-size:13px;line-height:1.5;color:#444;outline:none}
+.piece .pdesc:focus{background:rgba(232,165,173,.12)}
+.piece .pdel{width:24px;height:24px;border-radius:50%;border:1px solid var(--cream-dark);background:transparent;color:var(--grey);font-size:14px;cursor:pointer;display:flex;align-items:center;justify-content:center;opacity:0;transition:opacity .15s,background .15s,color .15s;padding:0}
+.piece:hover .pdel{opacity:1}
+.piece .pdel:hover{background:var(--red-out);color:#fff;border-color:var(--red-out)}
+.add-piece-btn{margin-top:14px;padding:10px;background:transparent;border:1px dashed var(--rosa-deep);color:var(--rosa-deep);font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.12em;text-transform:uppercase;cursor:pointer;border-radius:2px;transition:background .15s;width:100%}
+.add-piece-btn:hover{background:var(--rosa);color:var(--black)}
 
 /* SHOPIFY SIDE PANEL */
 .shopify-panel{background:var(--cream);padding:20px;border-left:3px solid var(--rosa-deep)}
@@ -186,6 +204,30 @@ html,body{background:var(--cream);color:var(--black);font-family:'Outfit',sans-s
 .tile-add .plus{font-family:'Cormorant Garamond',serif;font-size:48px;line-height:1;font-weight:300}
 .tile-add .add-label{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.15em;text-transform:uppercase;margin-top:4px}
 
+/* SHOPIFY REFRESH */
+.shopify-stamp{display:inline-flex;align-items:center;gap:8px;font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--grey);font-weight:400;font-style:normal}
+.shopify-stamp .live-dot{width:6px;height:6px;border-radius:50%;background:var(--yellow-low);display:inline-block}
+.shopify-stamp.fresh .live-dot{background:var(--green-ok)}
+.shopify-stamp.stale .live-dot{background:var(--red-out)}
+.refresh-btn{display:inline-flex;align-items:center;gap:6px;padding:6px 10px;background:var(--black);color:var(--cream);border:none;font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.12em;text-transform:uppercase;cursor:pointer;border-radius:2px;transition:background .15s}
+.refresh-btn:hover{background:var(--rosa-deep)}
+.refresh-btn::before{content:'⟳';font-size:13px}
+
+.modal-backdrop{position:fixed;inset:0;background:rgba(26,26,26,.65);backdrop-filter:blur(4px);display:none;align-items:center;justify-content:center;z-index:100;padding:24px}
+.modal-backdrop.open{display:flex}
+.modal{background:var(--cream);max-width:560px;width:100%;border:1px solid var(--black);padding:32px;font-family:'Outfit',sans-serif}
+.modal h3{font-family:'Cormorant Garamond',serif;font-weight:700;font-style:italic;font-size:28px;margin-bottom:8px}
+.modal .modal-meta{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:var(--grey);margin-bottom:20px}
+.modal p{font-size:14px;line-height:1.55;margin-bottom:14px}
+.modal-prompt{background:#fff;border:1px solid var(--black);padding:14px;font-family:'JetBrains Mono',monospace;font-size:12px;line-height:1.4;margin-bottom:18px;white-space:pre-wrap;word-break:break-word}
+.modal-actions{display:flex;gap:10px;justify-content:flex-end;margin-top:24px}
+.modal-btn{padding:10px 16px;font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.12em;text-transform:uppercase;cursor:pointer;border:1px solid var(--black);background:transparent;color:var(--black);transition:all .15s}
+.modal-btn:hover{background:var(--black);color:var(--cream)}
+.modal-btn.primary{background:var(--rosa-deep);color:#fff;border-color:var(--rosa-deep)}
+.modal-btn.primary:hover{background:var(--black);border-color:var(--black)}
+.copy-feedback{font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--green-ok);letter-spacing:.1em;text-transform:uppercase;margin-right:auto;align-self:center;opacity:0;transition:opacity .2s}
+.copy-feedback.show{opacity:1}
+
 /* FOOTER */
 .footer{display:flex;justify-content:space-between;align-items:center;border-top:1px solid var(--black);padding-top:24px;margin-top:48px;font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.15em;text-transform:uppercase;color:var(--grey)}
 .footer a{color:var(--rosa-deep);text-decoration:none;border-bottom:1px solid var(--rosa-deep)}
@@ -232,6 +274,15 @@ html,body{background:var(--cream);color:var(--black);font-family:'Outfit',sans-s
     </div>
   </div>
 
+  <!-- SHOPIFY DATA STAMP / REFRESH -->
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;flex-wrap:wrap;gap:12px">
+    <div class="shopify-stamp" id="shopifyStamp">
+      <span class="live-dot"></span>
+      <span>Shopify data al: <strong id="shopifyTimestamp">2026-05-14 16:07 -05</strong></span>
+    </div>
+    <button class="refresh-btn" id="refreshShopifyBtn">Refrescar Shopify</button>
+  </div>
+
   <!-- METRICS STRIP -->
   <section class="metrics-strip">
     <div class="metric">
@@ -256,74 +307,12 @@ html,body{background:var(--cream);color:var(--black);font-family:'Outfit',sans-s
     </div>
   </section>
 
-  <!-- WEEK GRID -->
+  <!-- WEEK GRID (JS-rendered desde state.pieces) -->
   <h2 class="section-title">
     <span>Vista Semanal</span>
-    <span class="meta">7 días · 16 piezas</span>
+    <span class="meta" id="weekGridMeta">7 días · cargando…</span>
   </h2>
-  <section class="week-grid">
-
-    <div class="day-cell">
-      <div class="day-head"><span class="dow">Mar</span><span class="dnum">19</span></div>
-      <div class="day-events">
-        <div class="evt evt-recap" data-field="grid-mar-1"><span class="evt-tag">Post · 5 slides</span>Recap lanzamiento trío</div>
-        <div class="evt evt-launch" data-field="grid-mar-2"><span class="evt-tag">Reel · 15s</span>Try-on 3 jeans nuevos</div>
-        <div class="evt evt-push" data-field="grid-mar-3"><span class="evt-tag">Stories · 4</span>Tallas live + link</div>
-      </div>
-    </div>
-
-    <div class="day-cell">
-      <div class="day-head"><span class="dow">Mié</span><span class="dnum">20</span></div>
-      <div class="day-events">
-        <div class="evt evt-launch" data-field="grid-mie-1"><span class="evt-tag">Post · 5 slides</span>YA LLEGÓ — Deserve Less Azul</div>
-        <div class="evt evt-launch" data-field="grid-mie-2"><span class="evt-tag">Reel · 20s</span>Unboxing + try-on</div>
-        <div class="evt evt-push" data-field="grid-mie-3"><span class="evt-tag">Stories · 6</span>Para quienes esperaron + tallas</div>
-      </div>
-    </div>
-
-    <div class="day-cell">
-      <div class="day-head"><span class="dow">Jue</span><span class="dnum">21</span></div>
-      <div class="day-events">
-        <div class="evt evt-launch" data-field="grid-jue-1"><span class="evt-tag">Post · 6 slides</span>Wide Leg Trio: Rosado/Verde/Azul</div>
-        <div class="evt evt-launch" data-field="grid-jue-2"><span class="evt-tag">Reel · 30s</span>Styling con Tank Tops</div>
-        <div class="evt evt-cross" data-field="grid-jue-3"><span class="evt-tag">Stories · 4</span>Día / Noche outfits</div>
-      </div>
-    </div>
-
-    <div class="day-cell">
-      <div class="day-head"><span class="dow">Vie</span><span class="dnum">22</span></div>
-      <div class="day-events">
-        <div class="evt evt-launch" data-field="grid-vie-1"><span class="evt-tag">Post · 6 slides</span>LANZAMIENTO Black Stars Azul Claro</div>
-        <div class="evt evt-launch" data-field="grid-vie-2"><span class="evt-tag">Reel · 25s</span>Estrellas en movimiento</div>
-        <div class="evt evt-preorden" data-field="grid-vie-3"><span class="evt-tag">Stories · 5</span>Black Stars live + Pink Stars teaser</div>
-      </div>
-    </div>
-
-    <div class="day-cell">
-      <div class="day-head"><span class="dow">Sáb</span><span class="dnum">23</span></div>
-      <div class="day-events">
-        <div class="evt evt-launch" data-field="grid-sab-1"><span class="evt-tag">Post · 5 slides</span>Top fin de semana: Red Riders</div>
-        <div class="evt evt-launch" data-field="grid-sab-2"><span class="evt-tag">Reel · 20s</span>BTS Red Riders</div>
-        <div class="evt evt-push" data-field="grid-sab-3"><span class="evt-tag">Stories · 4</span>Inventario crítico</div>
-      </div>
-    </div>
-
-    <div class="day-cell">
-      <div class="day-head"><span class="dow">Dom</span><span class="dnum">24</span></div>
-      <div class="day-events">
-        <div class="evt evt-cross" data-field="grid-dom-1"><span class="evt-tag">Stories · 6</span>Combos jean + tops + tees</div>
-      </div>
-    </div>
-
-    <div class="day-cell">
-      <div class="day-head"><span class="dow">Lun</span><span class="dnum">25</span></div>
-      <div class="day-events">
-        <div class="evt evt-recap" data-field="grid-lun-1"><span class="evt-tag">Post · 4 slides</span>Recap semana + teaser Destroyed</div>
-        <div class="evt evt-admin" data-field="grid-lun-2"><span class="evt-tag">Stories · 4</span>Agradecimiento + drop preview</div>
-      </div>
-    </div>
-
-  </section>
+  <section class="week-grid" id="weekGrid"></section>
 
   <!-- PARRILLA DE CONTENIDO -->
   <section class="parrilla-section">
@@ -397,11 +386,7 @@ html,body{background:var(--cream);color:var(--black);font-family:'Outfit',sans-s
         <h3 data-field="d19-title" contenteditable="true">Recap Lanzamiento — El Trío Mayo</h3>
         <p class="copy" data-field="d19-copy" contenteditable="true">Arrancamos la semana mostrando el trío que voló: Men Deserve Less Negro, Wide Leg Dirty Azul y Wide Leg Washed Verde. Carrusel con vibes de calle, try-on real, y la prueba social de las primeras compradoras.</p>
 
-        <div class="piece-list">
-          <div class="piece"><div class="ptype">Post · 5 slides</div><div class="pdetail" data-field="d19-p1" contenteditable="true"><strong>Slide 1:</strong> Cover trío con tipografía editorial · <strong>Slide 2-4:</strong> Cada jean en flat lay + detalle · <strong>Slide 5:</strong> CTA "tallas en bio"</div></div>
-          <div class="piece"><div class="ptype">Reel · 15s</div><div class="pdetail" data-field="d19-p2" contenteditable="true"><strong>Try-on transition:</strong> 3 outfits, 1 modelo, cambio rápido. Audio trending del momento. Caption: "Mayo en 3 piezas 🤍"</div></div>
-          <div class="piece"><div class="ptype">Stories · 4</div><div class="pdetail" data-field="d19-p3" contenteditable="true"><strong>1:</strong> Inventario por talla · <strong>2:</strong> Reseña cliente real · <strong>3:</strong> Link directo · <strong>4:</strong> Sticker "¿cuál te llevas?"</div></div>
-        </div>
+        <div class="piece-list" data-day-pieces="Mar 19"></div>
       </div>
       <aside class="shopify-panel">
         <div class="panel-title">Shopify Live</div>
@@ -454,11 +439,7 @@ html,body{background:var(--cream);color:var(--black);font-family:'Outfit',sans-s
         <h3 data-field="d20-title" contenteditable="true">YA LLEGÓ — Men Deserve Less Azul Claro</h3>
         <p class="copy" data-field="d20-copy" contenteditable="true">El más esperado: lo pidieron tanto que estuvo en negativo en sistema. Físicamente ya está acá. Comunicación de victoria — premiar a la gente que esperó, mostrar el producto en cámara real, abrir compra inmediata. Pendiente: subir entradas a Shopify para que las tallas dejen de aparecer en negativo.</p>
 
-        <div class="piece-list">
-          <div class="piece"><div class="ptype">Post · 5 slides</div><div class="pdetail" data-field="d20-p1" contenteditable="true"><strong>Slide 1:</strong> "YA LLEGÓ" tipografía editorial · <strong>Slide 2:</strong> Producto en outfit completo · <strong>Slide 3:</strong> Detalle textura + costura · <strong>Slide 4:</strong> Tallas disponibles · <strong>Slide 5:</strong> "Para los que esperaron — gracias" CTA directo</div></div>
-          <div class="piece"><div class="ptype">Reel · 20s</div><div class="pdetail" data-field="d20-p2" contenteditable="true"><strong>Concept:</strong> Unboxing real de la caja que llegó del taller + try-on en vivo. Audio: pop alternativo cálido. Caption: "Llegaron. Por fin."</div></div>
-          <div class="piece"><div class="ptype">Stories · 6</div><div class="pdetail" data-field="d20-p3" contenteditable="true"><strong>1:</strong> "Para quienes esperaron 🤍" · <strong>2:</strong> Screenshot cliente que pidió por DM · <strong>3-4:</strong> Producto en cámara real · <strong>5:</strong> Inventario por talla · <strong>6:</strong> Link directo + "no esperes esta vez"</div></div>
-        </div>
+        <div class="piece-list" data-day-pieces="Mié 20"></div>
       </div>
       <aside class="shopify-panel">
         <div class="panel-title">Shopify Live</div>
@@ -495,11 +476,7 @@ html,body{background:var(--cream);color:var(--black);font-family:'Outfit',sans-s
         <h3 data-field="d21-title" contenteditable="true">Wide Leg Trio — Rosado · Verde · Azul Dirty</h3>
         <p class="copy" data-field="d21-copy" contenteditable="true">Tres siluetas, una semana. Posicionar el Wide Leg como el fit de la temporada con un editorial de 6 slides. Reel de styling combina los jeans con los Tank Top Double Taches que vienen empujando bien.</p>
 
-        <div class="piece-list">
-          <div class="piece"><div class="ptype">Post · 6 slides</div><div class="pdetail" data-field="d21-p1" contenteditable="true"><strong>Slide 1:</strong> Editorial cover B&W · <strong>2-4:</strong> Cada wide leg en outfit completo · <strong>5:</strong> Detalle textura denim · <strong>6:</strong> "Pick your blue, pick your green, pick your pink"</div></div>
-          <div class="piece"><div class="ptype">Reel · 30s</div><div class="pdetail" data-field="d21-p2" contenteditable="true"><strong>Concept:</strong> 3 outfits con misma base (Tank Top Double Taches) cambiando solo el jean. Trans entre cada uno. Audio: pop alternativo.</div></div>
-          <div class="piece"><div class="ptype">Stories · 4</div><div class="pdetail" data-field="d21-p3" contenteditable="true"><strong>1:</strong> Día con Wide Leg Verde + tank · <strong>2:</strong> Tarde con Wide Leg Rosado + cropped · <strong>3:</strong> Noche con Wide Leg Dirty + body · <strong>4:</strong> "¿cuál vibe?"</div></div>
-        </div>
+        <div class="piece-list" data-day-pieces="Jue 21"></div>
       </div>
       <aside class="shopify-panel">
         <div class="panel-title">Shopify Live</div>
@@ -548,11 +525,7 @@ html,body{background:var(--cream);color:var(--black);font-family:'Outfit',sans-s
         <h3 data-field="d22-title" contenteditable="true">Lanzamiento Black Stars Azul Claro + Pink Stars Teaser</h3>
         <p class="copy" data-field="d22-copy" contenteditable="true">Black Stars Azul Claro llegó con 56 unidades en Medellín — lanzamiento Friday completo con post editorial, reel y stories. En paralelo aprovechamos el momentum de "stars" para teasear el restock de Pink Stars en stories. Doble play: venta directa + lista de espera.</p>
 
-        <div class="piece-list">
-          <div class="piece"><div class="ptype">Post · 6 slides</div><div class="pdetail" data-field="d22-p1" contenteditable="true"><strong>Slide 1:</strong> Cover editorial — modelo con jean en pose estática, fondo cream · <strong>2:</strong> Detalle estrellas negras sobre denim azul claro · <strong>3-4:</strong> Outfit completo día / noche · <strong>5:</strong> Inventario por talla · <strong>6:</strong> "Black Stars · Vie 22 May" CTA</div></div>
-          <div class="piece"><div class="ptype">Reel · 25s</div><div class="pdetail" data-field="d22-p2" contenteditable="true"><strong>Concept:</strong> Cámara cercana a las estrellas en movimiento al caminar — la textura es el héroe. Cierre con outfit completo. Audio: indie/sad girl moment.</div></div>
-          <div class="piece"><div class="ptype">Stories · 5</div><div class="pdetail" data-field="d22-p3" contenteditable="true"><strong>1:</strong> "BLACK STARS LIVE" cover · <strong>2:</strong> Producto en cámara real + tallas · <strong>3:</strong> Link directo · <strong>4:</strong> Sticker "¿pink o black?" + sneak Pink Stars · <strong>5:</strong> "Pink Stars en lista de espera — DM"</div></div>
-        </div>
+        <div class="piece-list" data-day-pieces="Vie 22"></div>
       </div>
       <aside class="shopify-panel">
         <div class="panel-title">Shopify Live</div>
@@ -593,11 +566,7 @@ html,body{background:var(--cream);color:var(--black);font-family:'Outfit',sans-s
         <h3 data-field="d23-title" contenteditable="true">Red Riders — Última Talla S</h3>
         <p class="copy" data-field="d23-copy" contenteditable="true">El top seller de la semana pasada (8 órdenes, $1.47M) tiene M y L agotados. Solo quedan 2 unidades en S. Push de urgencia real, no fabricada — con BTS de la pieza para reforzar deseo.</p>
 
-        <div class="piece-list">
-          <div class="piece"><div class="ptype">Post · 5 slides</div><div class="pdetail" data-field="d23-p1" contenteditable="true"><strong>Slide 1:</strong> "QUEDAN 2" tipografía dramática · <strong>2:</strong> Producto en outfit completo · <strong>3:</strong> Detalle del estampado RED RIDERS · <strong>4:</strong> Por qué fue top seller · <strong>5:</strong> CTA directo</div></div>
-          <div class="piece"><div class="ptype">Reel · 20s</div><div class="pdetail" data-field="d23-p2" contenteditable="true"><strong>BTS:</strong> Cómo se ve el detalle del bordado en cámara cercana, transición a outfit en movimiento. Caption: "El último S te está esperando"</div></div>
-          <div class="piece"><div class="ptype">Stories · 4</div><div class="pdetail" data-field="d23-p3" contenteditable="true"><strong>1:</strong> Capture del inventario S:2 M:0 L:0 · <strong>2:</strong> Outfit completo · <strong>3:</strong> Reseña cliente · <strong>4:</strong> Link + "el restock no está confirmado"</div></div>
-        </div>
+        <div class="piece-list" data-day-pieces="Sáb 23"></div>
       </div>
       <aside class="shopify-panel">
         <div class="panel-title">Shopify Live</div>
@@ -626,9 +595,7 @@ html,body{background:var(--cream);color:var(--black);font-family:'Outfit',sans-s
         <h3 data-field="d24-title" contenteditable="true">Outfit Combos — Sunday Vibes</h3>
         <p class="copy" data-field="d24-copy" contenteditable="true">Día de descanso comunicacional pero no comercial. Stories que muestran combos de jean + top + camiseta como "looks listos" — bajan el costo cognitivo del comprar y empujan ticket promedio.</p>
 
-        <div class="piece-list">
-          <div class="piece"><div class="ptype">Stories · 6</div><div class="pdetail" data-field="d24-p1" contenteditable="true"><strong>1:</strong> Combo Wide Leg Verde + Pretty Math Baby Tee Rosa · <strong>2:</strong> Combo Deserve Less Negro + Tank Top Negro · <strong>3:</strong> Combo Wide Leg Dirty + Iconic Baby Tee Gris · <strong>4:</strong> Combo Red Riders + Tank Café · <strong>5:</strong> Sticker "tu combo fav?" · <strong>6:</strong> Link a cada uno</div></div>
-        </div>
+        <div class="piece-list" data-day-pieces="Dom 24"></div>
       </div>
       <aside class="shopify-panel">
         <div class="panel-title">Shopify Live</div>
@@ -662,10 +629,7 @@ html,body{background:var(--cream);color:var(--black);font-family:'Outfit',sans-s
         <h3 data-field="d25-title" contenteditable="true">Recap Semana 21 + Destroyed Drop Preview</h3>
         <p class="copy" data-field="d25-copy" contenteditable="true">Cierre de semana con carrusel de recap (top sellers, mejores outfits, DMs destacados) y teaser sutil de la Colección Destroyed que llega ~ Jun 20. Empieza la conversación 4 semanas antes para precalentar la audiencia.</p>
 
-        <div class="piece-list">
-          <div class="piece"><div class="ptype">Post · 4 slides</div><div class="pdetail" data-field="d25-p1" contenteditable="true"><strong>Slide 1:</strong> "Semana 21 en LUXUR" cover · <strong>2:</strong> Top 3 más vendidos con números reales · <strong>3:</strong> Mejores user content tagged · <strong>4:</strong> "Algo está roto. Junio 20." (teaser Destroyed)</div></div>
-          <div class="piece"><div class="ptype">Stories · 4</div><div class="pdetail" data-field="d25-p2" contenteditable="true"><strong>1:</strong> Agradecimiento general · <strong>2:</strong> Dato de la semana ($27M en 7d) · <strong>3:</strong> Sticker "qué quieres ver más?" · <strong>4:</strong> Sneak destroyed (silhouette negra)</div></div>
-        </div>
+        <div class="piece-list" data-day-pieces="Lun 25"></div>
       </div>
       <aside class="shopify-panel">
         <div class="panel-title">Pipeline Junio</div>
@@ -727,6 +691,22 @@ html,body{background:var(--cream);color:var(--black);font-family:'Outfit',sans-s
 
 </div>
 
+<!-- REFRESH SHOPIFY MODAL -->
+<div class="modal-backdrop" id="refreshModal">
+  <div class="modal">
+    <div class="modal-meta">Refrescar data de Shopify</div>
+    <h3>Pídele a Claude que actualice</h3>
+    <p>Los datos de Shopify (inventario, top sellers, ventas diarias y métricas) están hardcodeados al snapshot que ves arriba. Para actualizarlos, copia este prompt y pégalo en tu sesión de Claude Code:</p>
+    <div class="modal-prompt" id="modalPrompt">Refresca data de Shopify para el calendario Semana 21 (calendars/semana21-may19-25.html). Pull live: ventas últimos 7d, top 12 productos, inventario por talla de Deserve Less Negro / Wide Leg Dirty Azul / Wide Leg Washed Verde / Red Riders / Deserve Less Azul Claro / Black Stars Azul Claro / Pink Stars / Pretty Math Tee / Iconic Tee Gris / Tank Tops Double Taches. Actualiza el HTML, el timestamp, y haz push.</div>
+    <p style="font-size:12px;color:var(--grey)">El HTML se actualiza, Netlify redespliega solo (~30s) y refrescas el navegador.</p>
+    <div class="modal-actions">
+      <span class="copy-feedback" id="copyFeedback">✓ Copiado</span>
+      <button class="modal-btn" id="modalClose">Cerrar</button>
+      <button class="modal-btn primary" id="modalCopy">Copiar prompt</button>
+    </div>
+  </div>
+</div>
+
 <!-- ============================================================ -->
 <!-- FIREBASE REAL-TIME COLLABORATIVE EDITING                     -->
 <!-- ============================================================ -->
@@ -748,26 +728,35 @@ const firebaseConfig = {
 const DOC_ID = "semana21-may19-25";
 const COLLECTION = "calendars";
 const COLOR_OPTIONS = ['launch','preorden','push','recap','cross','admin'];
+const DAYS = [
+  { key:'Mar 19', dow:'Mar', dnum:19 },
+  { key:'Mié 20', dow:'Mié', dnum:20 },
+  { key:'Jue 21', dow:'Jue', dnum:21 },
+  { key:'Vie 22', dow:'Vie', dnum:22 },
+  { key:'Sáb 23', dow:'Sáb', dnum:23 },
+  { key:'Dom 24', dow:'Dom', dnum:24 },
+  { key:'Lun 25', dow:'Lun', dnum:25 }
+];
 
-const DEFAULT_PARRILLA = [
-  { id:'p1',  day:'Mar 19', type:'Post · 5',    color:'recap',    title:'Recap trío lanzamiento' },
-  { id:'p2',  day:'Mar 19', type:'Reel · 15s',  color:'launch',   title:'Try-on 3 jeans nuevos' },
-  { id:'p3',  day:'Mar 19', type:'Stories · 4', color:'push',     title:'Tallas live + link' },
-  { id:'p4',  day:'Mié 20', type:'Post · 5',    color:'launch',   title:'YA LLEGÓ Deserve Less Azul' },
-  { id:'p5',  day:'Mié 20', type:'Reel · 20s',  color:'launch',   title:'Unboxing + try-on' },
-  { id:'p6',  day:'Mié 20', type:'Stories · 6', color:'push',     title:'Para quienes esperaron' },
-  { id:'p7',  day:'Jue 21', type:'Post · 6',    color:'launch',   title:'Wide Leg Trio editorial' },
-  { id:'p8',  day:'Jue 21', type:'Reel · 30s',  color:'launch',   title:'Styling con Tank Tops' },
-  { id:'p9',  day:'Jue 21', type:'Stories · 4', color:'cross',    title:'Día / Noche outfits' },
-  { id:'p10', day:'Vie 22', type:'Post · 6',    color:'launch',   title:'Black Stars editorial' },
-  { id:'p11', day:'Vie 22', type:'Reel · 25s',  color:'launch',   title:'Estrellas en movimiento' },
-  { id:'p12', day:'Vie 22', type:'Stories · 5', color:'preorden', title:'Black live + Pink teaser' },
-  { id:'p13', day:'Sáb 23', type:'Post · 5',    color:'launch',   title:'Red Riders último S' },
-  { id:'p14', day:'Sáb 23', type:'Reel · 20s',  color:'launch',   title:'BTS Red Riders' },
-  { id:'p15', day:'Sáb 23', type:'Stories · 4', color:'push',     title:'Inventario crítico' },
-  { id:'p16', day:'Dom 24', type:'Stories · 6', color:'cross',    title:'Combos jean + tops' },
-  { id:'p17', day:'Lun 25', type:'Post · 4',    color:'recap',    title:'Recap + Destroyed teaser' },
-  { id:'p18', day:'Lun 25', type:'Stories · 4', color:'admin',    title:'Agradecimiento + sneak' }
+const DEFAULT_PIECES = [
+  { id:'p1',  day:'Mar 19', type:'Post · 5',    color:'recap',    title:'Recap trío lanzamiento', description:'Slide 1: Cover trío con tipografía editorial · Slide 2-4: Cada jean en flat lay + detalle · Slide 5: CTA "tallas en bio"' },
+  { id:'p2',  day:'Mar 19', type:'Reel · 15s',  color:'launch',   title:'Try-on 3 jeans nuevos', description:'Try-on transition: 3 outfits, 1 modelo, cambio rápido. Audio trending del momento. Caption: "Mayo en 3 piezas 🤍"' },
+  { id:'p3',  day:'Mar 19', type:'Stories · 4', color:'push',     title:'Tallas live + link', description:'1: Inventario por talla · 2: Reseña cliente real · 3: Link directo · 4: Sticker "¿cuál te llevas?"' },
+  { id:'p4',  day:'Mié 20', type:'Post · 5',    color:'launch',   title:'YA LLEGÓ Deserve Less Azul', description:'Slide 1: "YA LLEGÓ" tipografía editorial · Slide 2: Producto en outfit completo · Slide 3: Detalle textura + costura · Slide 4: Tallas disponibles · Slide 5: "Para los que esperaron — gracias" CTA' },
+  { id:'p5',  day:'Mié 20', type:'Reel · 20s',  color:'launch',   title:'Unboxing + try-on', description:'Concept: Unboxing real de la caja que llegó del taller + try-on en vivo. Audio: pop alternativo cálido. Caption: "Llegaron. Por fin."' },
+  { id:'p6',  day:'Mié 20', type:'Stories · 6', color:'push',     title:'Para quienes esperaron', description:'1: "Para quienes esperaron 🤍" · 2: Screenshot cliente que pidió por DM · 3-4: Producto en cámara real · 5: Inventario por talla · 6: Link directo + "no esperes esta vez"' },
+  { id:'p7',  day:'Jue 21', type:'Post · 6',    color:'launch',   title:'Wide Leg Trio editorial', description:'Slide 1: Editorial cover B&W · 2-4: Cada wide leg en outfit completo · 5: Detalle textura denim · 6: "Pick your blue, pick your green, pick your pink"' },
+  { id:'p8',  day:'Jue 21', type:'Reel · 30s',  color:'launch',   title:'Styling con Tank Tops', description:'Concept: 3 outfits con misma base (Tank Top Double Taches) cambiando solo el jean. Trans entre cada uno. Audio: pop alternativo.' },
+  { id:'p9',  day:'Jue 21', type:'Stories · 4', color:'cross',    title:'Día / Noche outfits', description:'1: Día con Wide Leg Verde + tank · 2: Tarde con Wide Leg Rosado + cropped · 3: Noche con Wide Leg Dirty + body · 4: "¿cuál vibe?"' },
+  { id:'p10', day:'Vie 22', type:'Post · 6',    color:'launch',   title:'Black Stars editorial', description:'Slide 1: Cover editorial — modelo con jean en pose estática · 2: Detalle estrellas negras sobre denim azul claro · 3-4: Outfit completo día / noche · 5: Inventario por talla · 6: "Black Stars · Vie 22 May" CTA' },
+  { id:'p11', day:'Vie 22', type:'Reel · 25s',  color:'launch',   title:'Estrellas en movimiento', description:'Concept: Cámara cercana a las estrellas en movimiento al caminar — la textura es el héroe. Cierre con outfit completo. Audio: indie/sad girl moment.' },
+  { id:'p12', day:'Vie 22', type:'Stories · 5', color:'preorden', title:'Black live + Pink teaser', description:'1: "BLACK STARS LIVE" cover · 2: Producto en cámara real + tallas · 3: Link directo · 4: Sticker "¿pink o black?" + sneak Pink Stars · 5: "Pink Stars en lista de espera — DM"' },
+  { id:'p13', day:'Sáb 23', type:'Post · 5',    color:'launch',   title:'Red Riders último S', description:'Slide 1: "QUEDAN 2" tipografía dramática · 2: Producto en outfit completo · 3: Detalle del estampado RED RIDERS · 4: Por qué fue top seller · 5: CTA directo' },
+  { id:'p14', day:'Sáb 23', type:'Reel · 20s',  color:'launch',   title:'BTS Red Riders', description:'BTS: Cómo se ve el detalle del bordado en cámara cercana, transición a outfit en movimiento. Caption: "El último S te está esperando"' },
+  { id:'p15', day:'Sáb 23', type:'Stories · 4', color:'push',     title:'Inventario crítico', description:'1: Capture del inventario S:2 M:0 L:0 · 2: Outfit completo · 3: Reseña cliente · 4: Link + "el restock no está confirmado"' },
+  { id:'p16', day:'Dom 24', type:'Stories · 6', color:'cross',    title:'Combos jean + tops', description:'1: Combo Wide Leg Verde + Pretty Math Baby Tee Rosa · 2: Combo Deserve Less Negro + Tank Top Negro · 3: Combo Wide Leg Dirty + Iconic Baby Tee Gris · 4: Combo Red Riders + Tank Café · 5: Sticker "tu combo fav?" · 6: Link a cada uno' },
+  { id:'p17', day:'Lun 25', type:'Post · 4',    color:'recap',    title:'Recap + Destroyed teaser', description:'Slide 1: "Semana 21 en LUXUR" cover · 2: Top 3 más vendidos con números reales · 3: Mejores user content tagged · 4: "Algo está roto. Junio 20." (teaser Destroyed)' },
+  { id:'p18', day:'Lun 25', type:'Stories · 4', color:'admin',    title:'Agradecimiento + sneak', description:'1: Agradecimiento general · 2: Dato de la semana ($27M en 7d) · 3: Sticker "qué quieres ver más?" · 4: Sneak destroyed (silhouette negra)' }
 ];
 
 // === STATE ===
@@ -776,8 +765,8 @@ const state = {
   user: null,
   storage: null,
   lastWrite: 0,
-  parrilla: [],
-  parrillaInitialized: false
+  pieces: [],
+  initialized: false
 };
 
 const syncDot = document.getElementById('syncDot');
@@ -814,11 +803,10 @@ if (firebaseConfig.apiKey.startsWith("REEMPLAZAR")){
       onSnapshot(state.docRef, (snap) => {
         if (!snap.exists()){
           setSync('connected','Sincronizado · primera edición');
-          // seed parrilla
-          state.parrilla = JSON.parse(JSON.stringify(DEFAULT_PARRILLA));
-          state.parrillaInitialized = true;
-          renderParrilla();
-          saveParrillaRemote();
+          state.pieces = JSON.parse(JSON.stringify(DEFAULT_PIECES));
+          state.initialized = true;
+          renderAll();
+          savePiecesRemote();
           return;
         }
         const data = snap.data();
@@ -826,15 +814,19 @@ if (firebaseConfig.apiKey.startsWith("REEMPLAZAR")){
 
         applyRemoteFields(data.fields || {});
 
-        if (Array.isArray(data.parrilla)){
-          state.parrilla = data.parrilla;
-          state.parrillaInitialized = true;
-          renderParrilla();
-        } else if (!state.parrillaInitialized){
-          state.parrilla = JSON.parse(JSON.stringify(DEFAULT_PARRILLA));
-          state.parrillaInitialized = true;
-          renderParrilla();
-          saveParrillaRemote();
+        // Prefer new `pieces` field, fallback to legacy `parrilla`
+        const remotePieces = Array.isArray(data.pieces) ? data.pieces
+                           : Array.isArray(data.parrilla) ? data.parrilla
+                           : null;
+        if (remotePieces){
+          state.pieces = remotePieces;
+          state.initialized = true;
+          renderAll();
+        } else if (!state.initialized){
+          state.pieces = JSON.parse(JSON.stringify(DEFAULT_PIECES));
+          state.initialized = true;
+          renderAll();
+          savePiecesRemote();
         }
 
         setSync('connected', `Sincronizado · ${formatTime(data.updatedAt)}`);
@@ -900,11 +892,145 @@ function applyRemoteFields(fields){
   });
 }
 
-// === PARRILLA ===
+// === RENDERING (UNIFIED) ===
 function escapeHtml(s){
   return String(s||'').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 }
 function escapeAttr(s){ return String(s||'').replace(/"/g,'&quot;'); }
+
+function colorToEvtClass(c){ return 'evt-' + (c || 'push'); }
+
+function piecesByDay(day){
+  return state.pieces.filter(p => p.day === day);
+}
+
+function renderAll(){
+  // si el usuario está editando, defiere
+  const active = document.activeElement;
+  if (active && active.closest && (active.closest('.tile') || active.closest('.evt') || active.closest('.piece'))){
+    active.addEventListener('blur', () => renderAll(), { once:true });
+    return;
+  }
+  renderWeekGrid();
+  renderDayPieceLists();
+  renderParrilla();
+  updateStats();
+}
+
+function renderWeekGrid(){
+  const grid = document.getElementById('weekGrid');
+  if (!grid) return;
+  grid.innerHTML = DAYS.map(d => {
+    const dayPieces = piecesByDay(d.key);
+    return `
+      <div class="day-cell" data-day-cell="${d.key}">
+        <div class="day-head"><span class="dow">${d.dow}</span><span class="dnum">${d.dnum}</span></div>
+        <div class="day-events">
+          ${dayPieces.map(p => `
+            <div class="evt ${colorToEvtClass(p.color)}" data-piece-id="${p.id}">
+              <span class="evt-tag">${escapeHtml(p.type)}</span>
+              <span class="evt-title" contenteditable="true" data-piece-edit="title">${escapeHtml(p.title)}</span>
+              <button class="evt-del" data-piece-action="delete" title="Eliminar">×</button>
+            </div>
+          `).join('')}
+        </div>
+        <button class="day-add-piece" data-add-day="${d.key}">+ Pieza</button>
+      </div>
+    `;
+  }).join('');
+
+  // bind events
+  grid.querySelectorAll('.evt').forEach(evt => {
+    const pid = evt.getAttribute('data-piece-id');
+    bindPieceTextEdit(evt, pid);
+    const delBtn = evt.querySelector('[data-piece-action="delete"]');
+    if (delBtn) delBtn.addEventListener('click', e => { e.stopPropagation(); deletePiece(pid); });
+  });
+  grid.querySelectorAll('[data-add-day]').forEach(btn => {
+    btn.addEventListener('click', () => addPiece(btn.getAttribute('data-add-day')));
+  });
+
+  const meta = document.getElementById('weekGridMeta');
+  if (meta) meta.textContent = `7 días · ${state.pieces.length} piezas`;
+}
+
+function renderDayPieceLists(){
+  document.querySelectorAll('[data-day-pieces]').forEach(container => {
+    const day = container.getAttribute('data-day-pieces');
+    const dayPieces = piecesByDay(day);
+    container.innerHTML = dayPieces.map(p => `
+      <div class="piece" data-piece-id="${p.id}">
+        <div class="ptype" contenteditable="true" data-piece-edit="type">${escapeHtml(p.type)}</div>
+        <div>
+          <div class="ptitle" contenteditable="true" data-piece-edit="title">${escapeHtml(p.title)}</div>
+          <div class="pdesc" contenteditable="true" data-piece-edit="description">${escapeHtml(p.description || '')}</div>
+        </div>
+        <button class="pdel" data-piece-action="delete" title="Eliminar">×</button>
+      </div>
+    `).join('') + `
+      <button class="add-piece-btn" data-add-day="${day}">+ Agregar pieza</button>
+    `;
+
+    container.querySelectorAll('.piece').forEach(pEl => {
+      const pid = pEl.getAttribute('data-piece-id');
+      bindPieceTextEdit(pEl, pid);
+      const del = pEl.querySelector('[data-piece-action="delete"]');
+      if (del) del.addEventListener('click', e => { e.stopPropagation(); deletePiece(pid); });
+    });
+    const addBtn = container.querySelector('[data-add-day]');
+    if (addBtn) addBtn.addEventListener('click', () => addPiece(addBtn.getAttribute('data-add-day')));
+  });
+}
+
+function bindPieceTextEdit(rootEl, pid){
+  rootEl.querySelectorAll('[data-piece-edit]').forEach(field => {
+    let dbnce;
+    field.addEventListener('input', () => {
+      clearTimeout(dbnce);
+      flashSaving();
+      dbnce = setTimeout(() => {
+        const k = field.getAttribute('data-piece-edit');
+        const v = field.textContent.trim();
+        state.pieces = state.pieces.map(x => x.id === pid ? { ...x, [k]: v } : x);
+        savePiecesRemote();
+      }, 500);
+    });
+  });
+}
+
+function deletePiece(pid){
+  const p = state.pieces.find(x => x.id === pid);
+  if (!p) return;
+  if (!confirm(`¿Eliminar "${p.title}"?`)) return;
+  if (p.imagePath) deleteStoredPhoto(p.imagePath).catch(()=>{});
+  state.pieces = state.pieces.filter(x => x.id !== pid);
+  savePiecesRemote();
+  renderAll();
+}
+
+function addPiece(day){
+  const newId = 'p' + Date.now().toString(36);
+  state.pieces.push({
+    id: newId,
+    day: day || 'Lun 25',
+    type: 'Post',
+    color: 'push',
+    title: 'Nueva pieza',
+    description: ''
+  });
+  savePiecesRemote();
+  renderAll();
+  setTimeout(() => {
+    const titleEl = document.querySelector(`.tile[data-tile-id="${newId}"] .tile-title`)
+                 || document.querySelector(`.evt[data-piece-id="${newId}"] .evt-title`)
+                 || document.querySelector(`.piece[data-piece-id="${newId}"] .ptitle`);
+    if (titleEl){
+      titleEl.focus();
+      const range = document.createRange(); range.selectNodeContents(titleEl);
+      const sel = window.getSelection(); sel.removeAllRanges(); sel.addRange(range);
+    }
+  }, 80);
+}
 
 // === PHOTO UPLOAD ===
 async function compressImage(file, maxDim = 1200, quality = 0.82){
@@ -955,17 +1081,17 @@ async function uploadPhotoForTile(tileId, file){
   flashSaving();
   try {
     const blob = await compressImage(file);
-    const tile = state.parrilla.find(t => t.id === tileId);
+    const tile = state.pieces.find(t => t.id === tileId);
     const oldPath = tile && tile.imagePath;
     const ext = 'jpg';
     const path = `calendars/${DOC_ID}/${tileId}-${Date.now()}.${ext}`;
     const fileRef = storageRef(state.storage, path);
     await uploadBytes(fileRef, blob, { contentType: 'image/jpeg' });
     const url = await getDownloadURL(fileRef);
-    state.parrilla = state.parrilla.map(t => t.id === tileId ? {...t, imageUrl: url, imagePath: path} : t);
-    await saveParrillaRemote();
+    state.pieces = state.pieces.map(t => t.id === tileId ? {...t, imageUrl: url, imagePath: path} : t);
+    await savePiecesRemote();
     if (oldPath) deleteStoredPhoto(oldPath).catch(()=>{});
-    renderParrilla();
+    renderAll();
   } catch(err){
     console.error('Upload error', err);
     alert('No se pudo subir la foto. Verifica que Firebase Storage esté habilitado y que las reglas permitan escritura autenticada.\n\n' + (err.message || err));
@@ -986,23 +1112,15 @@ function renderParrilla(){
   const grid = document.getElementById('parrillaGrid');
   if (!grid) return;
 
-  // Si el usuario está editando un tile, evitar re-render desde remoto
-  const active = document.activeElement;
-  if (active && active.closest && active.closest('.tile')){
-    // posponer re-render — intentar de nuevo en blur
-    active.addEventListener('blur', () => renderParrilla(), { once:true });
-    return;
-  }
-
-  grid.innerHTML = state.parrilla.map(t => `
+  grid.innerHTML = state.pieces.map(t => `
     <div class="tile ${t.imageUrl ? 'has-photo' : ''}" data-tile-id="${t.id}">
       ${t.imageUrl ? `<img class="tile-photo" src="${escapeAttr(t.imageUrl)}" alt="" loading="lazy">` : ''}
       <div class="tile-color ${t.color || 'push'}"></div>
       <div class="tile-meta">
-        <span class="tile-day" contenteditable="true" data-edit="day">${escapeHtml(t.day)}</span>
-        <span class="tile-type" contenteditable="true" data-edit="type">${escapeHtml(t.type)}</span>
+        <span class="tile-day" contenteditable="true" data-piece-edit="day">${escapeHtml(t.day)}</span>
+        <span class="tile-type" contenteditable="true" data-piece-edit="type">${escapeHtml(t.type)}</span>
       </div>
-      <div class="tile-title" contenteditable="true" data-edit="title">${escapeHtml(t.title)}</div>
+      <div class="tile-title" contenteditable="true" data-piece-edit="title">${escapeHtml(t.title)}</div>
       <div class="tile-bottom">
         ${COLOR_OPTIONS.map(c => `<span class="color-dot ${c} ${c===t.color?'active':''}" data-color="${c}" title="${c}"></span>`).join('')}
       </div>
@@ -1019,109 +1137,72 @@ function renderParrilla(){
   grid.querySelectorAll('.tile').forEach(tileEl => {
     const id = tileEl.getAttribute('data-tile-id');
 
-    tileEl.querySelector('[data-action="delete"]').addEventListener('click', async (e) => {
+    tileEl.querySelector('[data-action="delete"]').addEventListener('click', e => {
       e.stopPropagation();
-      const t = state.parrilla.find(x => x.id === id);
-      if (!t) return;
-      if (!confirm(`¿Eliminar "${t.title}"?`)) return;
-      if (t.imagePath) await deleteStoredPhoto(t.imagePath).catch(()=>{});
-      state.parrilla = state.parrilla.filter(x => x.id !== id);
-      saveParrillaRemote();
-      renderParrilla();
+      deletePiece(id);
     });
 
     const uploadBtn = tileEl.querySelector('[data-action="upload"]');
     if (uploadBtn){
-      uploadBtn.addEventListener('click', (e) => {
-        e.stopPropagation();
-        triggerUpload(id);
-      });
+      uploadBtn.addEventListener('click', e => { e.stopPropagation(); triggerUpload(id); });
     }
 
     const removePhotoBtn = tileEl.querySelector('[data-action="remove-photo"]');
     if (removePhotoBtn){
-      removePhotoBtn.addEventListener('click', async (e) => {
+      removePhotoBtn.addEventListener('click', async e => {
         e.stopPropagation();
-        const t = state.parrilla.find(x => x.id === id);
+        const t = state.pieces.find(x => x.id === id);
         if (!t || !t.imageUrl) return;
         if (t.imagePath) await deleteStoredPhoto(t.imagePath).catch(()=>{});
-        state.parrilla = state.parrilla.map(x => x.id === id ? {...x, imageUrl:null, imagePath:null} : x);
-        saveParrillaRemote();
-        renderParrilla();
+        state.pieces = state.pieces.map(x => x.id === id ? {...x, imageUrl:null, imagePath:null} : x);
+        savePiecesRemote();
+        renderAll();
       });
     }
 
     tileEl.querySelectorAll('.color-dot').forEach(dot => {
-      dot.addEventListener('click', (e) => {
+      dot.addEventListener('click', e => {
         e.stopPropagation();
         const newColor = dot.getAttribute('data-color');
-        state.parrilla = state.parrilla.map(x => x.id === id ? {...x, color:newColor} : x);
-        saveParrillaRemote();
-        renderParrilla();
+        state.pieces = state.pieces.map(x => x.id === id ? {...x, color:newColor} : x);
+        savePiecesRemote();
+        renderAll();
       });
     });
 
-    tileEl.querySelectorAll('[data-edit]').forEach(field => {
-      let dbnce;
-      field.addEventListener('input', () => {
-        clearTimeout(dbnce);
-        flashSaving();
-        dbnce = setTimeout(() => {
-          const k = field.getAttribute('data-edit');
-          const v = field.textContent.trim();
-          state.parrilla = state.parrilla.map(x => x.id === id ? {...x, [k]: v} : x);
-          saveParrillaRemote();
-        }, 500);
-      });
-    });
+    bindPieceTextEdit(tileEl, id);
   });
 
   const addBtn = document.getElementById('tileAdd');
-  if (addBtn){
-    addBtn.addEventListener('click', () => {
-      const newId = 'p' + Date.now().toString(36);
-      state.parrilla.push({ id:newId, day:'Lun 25', type:'Post', color:'push', title:'Nueva pieza' });
-      saveParrillaRemote();
-      renderParrilla();
-      setTimeout(() => {
-        const t = document.querySelector(`[data-tile-id="${newId}"] .tile-title`);
-        if (t){ t.focus();
-          const range = document.createRange(); range.selectNodeContents(t);
-          const sel = window.getSelection(); sel.removeAllRanges(); sel.addRange(range);
-        }
-      }, 80);
-    });
-  }
-
-  updateStats();
+  if (addBtn) addBtn.addEventListener('click', () => addPiece('Lun 25'));
 }
 
 function updateStats(){
-  const total = state.parrilla.length;
-  const posts = state.parrilla.filter(t => /post/i.test(t.type)).length;
-  const reels = state.parrilla.filter(t => /reel/i.test(t.type)).length;
-  const stories = state.parrilla.filter(t => /stor/i.test(t.type)).length;
+  const total = state.pieces.length;
+  const posts = state.pieces.filter(t => /post/i.test(t.type)).length;
+  const reels = state.pieces.filter(t => /reel/i.test(t.type)).length;
+  const stories = state.pieces.filter(t => /stor/i.test(t.type)).length;
   const set = (id, n) => { const e = document.getElementById(id); if (e) e.textContent = n; };
   set('statTotal', total); set('statPosts', posts); set('statReels', reels); set('statStories', stories);
 }
 
-async function saveParrillaRemote(){
+async function savePiecesRemote(){
   updateStats();
   if (!state.docRef){
-    localStorage.setItem('luxur-' + DOC_ID + '-parrilla', JSON.stringify(state.parrilla));
+    localStorage.setItem('luxur-' + DOC_ID + '-pieces', JSON.stringify(state.pieces));
     return;
   }
   try {
     state.lastWrite = Date.now();
     await setDoc(state.docRef, {
-      parrilla: state.parrilla,
+      pieces: state.pieces,
       updatedAt: serverTimestamp(),
       lastEditor: state.user.uid.slice(0,6)
     }, { merge: true });
     flashSaved();
   } catch(err){
-    console.error('Parrilla save err', err);
-    setSync('offline','Error al guardar parrilla');
+    console.error('Pieces save err', err);
+    setSync('offline','Error al guardar piezas');
   }
 }
 
@@ -1138,9 +1219,8 @@ function formatTime(ts){
 
 // === LOCAL FALLBACK ===
 function initLocalOnly(){
-  // Fields
+  // Fields (day theme/copy)
   document.querySelectorAll('[data-field]').forEach(el => {
-    if (el.classList.contains('evt')) el.setAttribute('contenteditable','true');
     const field = el.getAttribute('data-field');
     const stored = localStorage.getItem('luxur-' + DOC_ID + '-' + field);
     if (stored && document.activeElement !== el) el.innerHTML = stored;
@@ -1148,12 +1228,49 @@ function initLocalOnly(){
       localStorage.setItem('luxur-' + DOC_ID + '-' + field, el.innerHTML);
     });
   });
-  // Parrilla
-  const stored = localStorage.getItem('luxur-' + DOC_ID + '-parrilla');
-  state.parrilla = stored ? JSON.parse(stored) : JSON.parse(JSON.stringify(DEFAULT_PARRILLA));
-  state.parrillaInitialized = true;
-  renderParrilla();
+  // Pieces
+  const stored = localStorage.getItem('luxur-' + DOC_ID + '-pieces');
+  state.pieces = stored ? JSON.parse(stored) : JSON.parse(JSON.stringify(DEFAULT_PIECES));
+  state.initialized = true;
+  renderAll();
 }
+
+// === REFRESH MODAL ===
+const refreshBtn = document.getElementById('refreshShopifyBtn');
+const refreshModal = document.getElementById('refreshModal');
+const modalClose = document.getElementById('modalClose');
+const modalCopy = document.getElementById('modalCopy');
+const modalPrompt = document.getElementById('modalPrompt');
+const copyFeedback = document.getElementById('copyFeedback');
+
+if (refreshBtn) refreshBtn.addEventListener('click', () => refreshModal.classList.add('open'));
+if (modalClose) modalClose.addEventListener('click', () => refreshModal.classList.remove('open'));
+if (refreshModal) refreshModal.addEventListener('click', e => { if (e.target === refreshModal) refreshModal.classList.remove('open'); });
+if (modalCopy) modalCopy.addEventListener('click', async () => {
+  try {
+    await navigator.clipboard.writeText(modalPrompt.textContent.trim());
+    copyFeedback.classList.add('show');
+    setTimeout(() => copyFeedback.classList.remove('show'), 2000);
+  } catch(e){
+    // Fallback selección manual
+    const range = document.createRange(); range.selectNodeContents(modalPrompt);
+    const sel = window.getSelection(); sel.removeAllRanges(); sel.addRange(range);
+  }
+});
+
+// Marca data como stale si tiene >24h
+(function flagStaleness(){
+  const stamp = document.getElementById('shopifyStamp');
+  const tsEl = document.getElementById('shopifyTimestamp');
+  if (!stamp || !tsEl) return;
+  const text = tsEl.textContent.trim();
+  const m = text.match(/(\d{4})-(\d{2})-(\d{2})\s+(\d{2}):(\d{2})/);
+  if (!m) return;
+  const dataDate = new Date(`${m[1]}-${m[2]}-${m[3]}T${m[4]}:${m[5]}:00-05:00`);
+  const hoursAgo = (Date.now() - dataDate.getTime()) / 3600000;
+  if (hoursAgo < 6) stamp.classList.add('fresh');
+  else if (hoursAgo > 48) stamp.classList.add('stale');
+})();
 </script>
 
 </body>
