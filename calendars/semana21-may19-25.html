@@ -834,6 +834,13 @@ if (firebaseConfig.apiKey.startsWith("REEMPLAZAR")){
       }, (err) => {
         console.error('Snapshot error', err);
         setSync('offline','Sin conexión · modo local');
+        // Bug fix: si Firebase falla, igual renderiza desde localStorage o defaults para que la pagina funcione
+        if (!state.initialized){
+          const stored = localStorage.getItem('luxur-' + DOC_ID + '-pieces');
+          state.pieces = stored ? JSON.parse(stored) : JSON.parse(JSON.stringify(DEFAULT_PIECES));
+          state.initialized = true;
+          renderAll();
+        }
       });
 
       bindFieldEditors();
