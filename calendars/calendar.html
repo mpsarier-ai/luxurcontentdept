@@ -351,6 +351,18 @@ select.pm-input{cursor:pointer}
 .inv-sales.zero{color:var(--red-out);font-weight:500}
 .inv-row.quedada{background:#fff5f4;border-left:4px solid var(--red-out)}
 
+/* DAY PRODUCTS PANEL */
+.product-row{position:relative}
+.dp-del{position:absolute;top:0;right:0;width:18px;height:18px;border-radius:50%;border:none;background:transparent;color:var(--grey);font-size:13px;cursor:pointer;line-height:1;padding:0}
+.dp-del:hover{background:var(--red-out);color:#fff}
+.dp-actions{display:flex;gap:6px;margin-top:12px;padding-top:10px;border-top:1px dotted var(--cream-dark)}
+.dp-btn{flex:1;padding:7px;background:transparent;border:1px dashed var(--rosa-deep);color:var(--rosa-deep);font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:.08em;text-transform:uppercase;cursor:pointer;border-radius:2px;transition:background .15s}
+.dp-btn:hover{background:var(--rosa);color:var(--black)}
+.dp-btn.recientes{border-color:var(--black);color:var(--black)}
+.dp-btn.recientes:hover{background:var(--black);color:var(--cream)}
+.dp-picker{margin-top:8px}
+.dp-picker .pm-input{width:100%;padding:7px 9px;font-size:11px}
+
 @media (max-width:980px){ .kanban-board{grid-template-columns:1fr} }
 
 /* FATAL ERROR SCREEN */
@@ -653,6 +665,7 @@ const state = {
   team: [],          // team_members rows
   catalog: [],       // shopify_catalog products [{gid,title,total,sizes}]
   comments: {},      // pieceId -> [{id,author_email,body,created_at}]
+  dayProducts: {},   // dayIndex -> [gid,...] manual products to promote that day
   channels: [],
   filterMine: false, // "Mis tareas" toggle
   initialized: false
@@ -887,14 +900,21 @@ async function loadCalendar(){
   state.initialized = true;
   renderPiecesViews();
 
+  state.dayProducts = {};
   if (fieldsRes.data){
     fieldsRes.data.forEach(f => {
+      const pm = f.field_id.match(/^d(\d+)-prods$/);
+      if (pm){
+        try { state.dayProducts[parseInt(pm[1])] = JSON.parse(f.value || '[]'); } catch(e){ state.dayProducts[parseInt(pm[1])] = []; }
+        return;
+      }
       const el = document.querySelector(`[data-field="${f.field_id}"]`);
       if (el && document.activeElement !== el) el.innerHTML = f.value || '';
     });
   }
 
   bindFieldEditors();
+  renderDayProducts();
 
   // Realtime subscriptions
   const piecesCh = supabase.channel(`calendar:${state.calendarId}:pieces`)
@@ -940,6 +960,13 @@ function handlePieceChange(payload){
 function handleFieldChange(payload){
   const f = payload.new || payload.old;
   if (!f) return;
+  const pm = f.field_id.match(/^d(\d+)-prods$/);
+  if (pm){
+    const idx = parseInt(pm[1]);
+    try { state.dayProducts[idx] = JSON.parse((payload.new && payload.new.value) || '[]'); } catch(e){ state.dayProducts[idx] = []; }
+    renderDayProducts();
+    return;
+  }
   const el = document.querySelector(`[data-field="${f.field_id}"]`);
   if (!el) return;
   if (document.activeElement === el) return;
@@ -1032,6 +1059,7 @@ function renderPiecesViews(){
   renderDayPieceLists();
   renderParrilla();
   renderKanban();
+  renderDayProducts();
   updateStats();
 }
 
@@ -1180,7 +1208,6 @@ function renderDayCards(){
   // Renders the SHELL for each day. Shopify panels and fields populate after.
   const container = document.getElementById('dayCards');
   if (!container || !state.days.length) return;
-  const featured = (state.calendar && state.calendar.featured_products) || [];
 
   container.innerHTML = state.days.map(d => `
     <article class="day-card" data-day-card="${d.key}">
@@ -1197,15 +1224,12 @@ function renderDayCards(){
       </div>
       <aside class="shopify-panel" data-day-shopify="${d.index}">
         <div class="panel-title">Shopify Live</div>
-        ${featured.length ? renderShopifyPanelEmpty() : '<div class="panel-empty">Configura productos featured en el hub para ver inventario por talla.</div>'}
+        <div class="panel-empty">Cargando…</div>
       </aside>
     </article>
   `).join('');
 }
 
-function renderShopifyPanelEmpty(){
-  return '<div class="panel-empty">Esperando data de Shopify (auto-refresh cada 12h).</div>';
-}
 
 function renderDayPieceLists(){
   document.querySelectorAll('[data-day-pieces]').forEach(container => {
@@ -1418,21 +1442,89 @@ function renderShopifyData(data){
     `).join('');
   }
 
-  // Inventory in shopify panels
-  if (data.inventory && state.calendar && Array.isArray(state.calendar.featured_products)){
-    document.querySelectorAll('[data-day-shopify]').forEach(panel => {
-      panel.innerHTML = `<div class="panel-title">Shopify Live</div>` +
-        state.calendar.featured_products.map(prod => {
-          const inv = data.inventory[prod.gid];
-          if (!inv) return '';
-          const chips = inv.map(s => `<span class="size-chip ${s.class}">${escapeHtml(s.size)}:${s.available}</span>`).join('');
-          return `<div class="product-row">
-            <div class="pname">${escapeHtml(prod.name)}</div>
-            <div class="size-chips">${chips}</div>
-          </div>`;
-        }).filter(Boolean).join('') || '<div class="panel-empty">Sin data de inventario.</div>';
+  renderDayProducts();
+}
+
+// Per-day Shopify Live panel: products from that day's pieces + manual + inventory from catalog
+function renderDayProducts(){
+  if (!state.days.length) return;
+  state.days.forEach(d => {
+    const panel = document.querySelector(`[data-day-shopify="${d.index}"]`);
+    if (!panel) return;
+    // GIDs = manual list for the day  ∪  productGid of that day's pieces
+    const manual = state.dayProducts[d.index] || [];
+    const fromPieces = state.pieces.filter(p => p.day === d.key && p.productGid).map(p => p.productGid);
+    const gids = [...new Set([...manual, ...fromPieces])];
+
+    const rows = gids.map(gid => {
+      const cp = catalogProduct(gid);
+      if (!cp) return '';
+      const chips = (cp.sizes||[]).map(s => {
+        const sc = s.available > 5 ? 'ok' : s.available >= 1 ? 'low' : 'out';
+        return `<span class="size-chip ${sc}">${escapeHtml(s.size)}:${s.available}</span>`;
+      }).join('');
+      const isManual = manual.includes(gid);
+      return `<div class="product-row" data-prod-gid="${escapeAttr(gid)}">
+        <div class="pname">${escapeHtml(cp.title)}${isManual ? '' : ' <span style="color:var(--grey);font-size:9px">(de pieza)</span>'}</div>
+        <div class="size-chips">${chips}</div>
+        ${isManual ? `<button class="dp-del" data-dp-remove="${escapeAttr(gid)}" title="Quitar">×</button>` : ''}
+      </div>`;
+    }).filter(Boolean).join('');
+
+    panel.innerHTML = `<div class="panel-title">Shopify Live</div>
+      ${rows || '<div class="panel-empty">Sin productos. Agrega abajo o asigna producto a las piezas del día.</div>'}
+      <div class="dp-actions">
+        <button class="dp-btn" data-dp-add="${d.index}">+ Producto</button>
+        <button class="dp-btn recientes" data-dp-recent="${d.index}">+ Recientes</button>
+      </div>
+      <div class="dp-picker" data-dp-picker="${d.index}" style="display:none">
+        <input list="catalogList" class="pm-input" placeholder="Busca producto…" data-dp-input="${d.index}">
+      </div>`;
+
+    panel.querySelectorAll('[data-dp-remove]').forEach(b => {
+      b.addEventListener('click', () => removeDayProduct(d.index, b.getAttribute('data-dp-remove')));
     });
-  }
+    const addBtn = panel.querySelector(`[data-dp-add="${d.index}"]`);
+    if (addBtn) addBtn.addEventListener('click', () => {
+      const pk = panel.querySelector(`[data-dp-picker="${d.index}"]`);
+      const dl = document.getElementById('catalogList');
+      if (dl) dl.innerHTML = state.catalog.map(p => `<option value="${escapeAttr(p.title)}">`).join('');
+      pk.style.display = pk.style.display === 'none' ? 'block' : 'none';
+      if (pk.style.display === 'block') panel.querySelector(`[data-dp-input="${d.index}"]`).focus();
+    });
+    const recentBtn = panel.querySelector(`[data-dp-recent="${d.index}"]`);
+    if (recentBtn) recentBtn.addEventListener('click', () => addRecentProducts(d.index));
+    const inp = panel.querySelector(`[data-dp-input="${d.index}"]`);
+    if (inp) inp.addEventListener('change', () => {
+      const match = state.catalog.find(p => p.title.toLowerCase() === inp.value.trim().toLowerCase());
+      if (match){ addDayProduct(d.index, match.gid); inp.value = ''; }
+    });
+  });
+}
+
+function saveDayProducts(idx){
+  saveField(`d${idx}-prods`, JSON.stringify(state.dayProducts[idx] || []));
+}
+function addDayProduct(idx, gid){
+  const arr = state.dayProducts[idx] = state.dayProducts[idx] || [];
+  if (!arr.includes(gid)) arr.push(gid);
+  saveDayProducts(idx);
+  renderDayProducts();
+}
+function removeDayProduct(idx, gid){
+  state.dayProducts[idx] = (state.dayProducts[idx] || []).filter(g => g !== gid);
+  saveDayProducts(idx);
+  renderDayProducts();
+}
+function addRecentProducts(idx){
+  const recent = state.catalog.slice()
+    .filter(p => p.createdAt)
+    .sort((a,b) => new Date(b.createdAt) - new Date(a.createdAt))
+    .slice(0, 5);
+  const arr = state.dayProducts[idx] = state.dayProducts[idx] || [];
+  recent.forEach(p => { if (!arr.includes(p.gid)) arr.push(p.gid); });
+  saveDayProducts(idx);
+  renderDayProducts();
 }
 
 // === PIECE MODAL ===

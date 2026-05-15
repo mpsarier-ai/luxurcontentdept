@@ -121,6 +121,7 @@ async function fetchCatalog(token: string) {
     gid: string;
     title: string;
     total: number;
+    createdAt: string;
     sizes: Array<{ size: string; available: number }>;
   }> = [];
   let cursor: string | null = null;
@@ -136,6 +137,7 @@ async function fetchCatalog(token: string) {
             node {
               id
               title
+              createdAt
               variants(first: 20) {
                 edges {
                   node {
@@ -168,7 +170,7 @@ async function fetchCatalog(token: string) {
       }
       const sizes = Object.entries(sizeMap).map(([size, available]) => ({ size, available }));
       const total = sizes.reduce((s, x) => s + x.available, 0);
-      products.push({ gid: n.id, title: n.title, total, sizes });
+      products.push({ gid: n.id, title: n.title, total, createdAt: n.createdAt, sizes });
     }
     hasNext = conn.pageInfo.hasNextPage;
     cursor = conn.pageInfo.endCursor;
