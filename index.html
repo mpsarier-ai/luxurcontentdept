@@ -226,8 +226,11 @@ header{border-bottom:1px solid var(--black);padding-bottom:24px;margin-bottom:64
       <option value="launch">Lanzamiento</option>
     </select>
 
-    <label>Fecha tentativa de entrada</label>
+    <label>Fecha tentativa — desde</label>
     <input type="date" id="entryDate">
+
+    <label>Hasta (opcional — déjalo vacío si es fecha exacta)</label>
+    <input type="date" id="entryDateEnd">
 
     <label>Notas (opcional)</label>
     <input type="text" id="entryNotes" placeholder="ej: solo S y M, viene del taller…">
@@ -347,9 +350,18 @@ function renderPipeline(){
   if (!pipeline.length){ el.innerHTML = '<div class="empty-state">Sin entradas. Click "+ Agregar entrada" para registrar un restock o lanzamiento.</div>'; return; }
   const todayStr = new Date().toISOString().slice(0,10);
   el.innerHTML = pipeline.map(e => {
-    const d = e.tentative_date ? e.tentative_date.split('-') : null;
-    const dateBox = d ? `<div class="tl-date">${parseInt(d[2])} <small>${MONTH_ABBR[parseInt(d[1])-1]}</small></div>` : `<div class="tl-date">—</div>`;
-    const overdue = e.tentative_date && e.tentative_date < todayStr && e.status === 'pendiente';
+    const fmtDM = iso => { const p = iso.split('-'); return `${parseInt(p[2])} ${MONTH_ABBR[parseInt(p[1])-1]}`; };
+    let dateBox;
+    if (e.tentative_date && e.tentative_date_end){
+      dateBox = `<div class="tl-date" style="font-size:15px">${fmtDM(e.tentative_date)}<small>a ${fmtDM(e.tentative_date_end)}</small></div>`;
+    } else if (e.tentative_date){
+      const d = e.tentative_date.split('-');
+      dateBox = `<div class="tl-date">${parseInt(d[2])} <small>${MONTH_ABBR[parseInt(d[1])-1]}</small></div>`;
+    } else {
+      dateBox = `<div class="tl-date">—</div>`;
+    }
+    const effEnd = e.tentative_date_end || e.tentative_date;
+    const overdue = effEnd && effEnd < todayStr && e.status === 'pendiente';
     return `<div class="tl-row ${overdue?'tl-overdue':''}" data-id="${e.id}">
       ${dateBox}
       <span class="tl-type ${e.entry_type}">${e.entry_type === 'launch' ? 'Lanzamiento' : 'Restock'}</span>
@@ -380,6 +392,7 @@ document.getElementById('addEntryBtn').addEventListener('click', () => {
   document.getElementById('entryProduct').value = '';
   document.getElementById('entryType').value = 'restock';
   document.getElementById('entryDate').value = '';
+  document.getElementById('entryDateEnd').value = '';
   document.getElementById('entryNotes').value = '';
   document.getElementById('entryError').textContent = '';
   entryModal.classList.add('open');
@@ -391,12 +404,15 @@ document.getElementById('entrySave').addEventListener('click', async () => {
   const name = document.getElementById('entryProduct').value.trim();
   const type = document.getElementById('entryType').value;
   const date = document.getElementById('entryDate').value || null;
+  let dateEnd = document.getElementById('entryDateEnd').value || null;
   const notes = document.getElementById('entryNotes').value.trim() || null;
   if (!name){ document.getElementById('entryError').textContent = 'Escribe el producto'; return; }
+  if (dateEnd && date && dateEnd < date){ document.getElementById('entryError').textContent = '"Hasta" no puede ser antes de "desde"'; return; }
+  if (dateEnd === date) dateEnd = null;
   const match = catalog.find(p => p.title.toLowerCase() === name.toLowerCase());
   const { error } = await supabase.from('product_pipeline').insert({
     product_name: name, product_gid: match ? match.gid : null,
-    entry_type: type, tentative_date: date, notes, status: 'pendiente'
+    entry_type: type, tentative_date: date, tentative_date_end: dateEnd, notes, status: 'pendiente'
   });
   if (error){ document.getElementById('entryError').textContent = 'Error: ' + error.message; return; }
   entryModal.classList.remove('open');
