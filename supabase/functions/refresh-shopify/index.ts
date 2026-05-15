@@ -115,6 +115,67 @@ async function getInventory(token: string, productGid: string) {
   return data.product;
 }
 
+// Fetch ALL active products with inventory by size (paginated). Compact output.
+async function fetchCatalog(token: string) {
+  const products: Array<{
+    gid: string;
+    title: string;
+    total: number;
+    sizes: Array<{ size: string; available: number }>;
+  }> = [];
+  let cursor: string | null = null;
+  let hasNext = true;
+  let pages = 0;
+  while (hasNext && pages < 15) {
+    pages++;
+    const data: any = await shopifyGQL(token, `
+      query($cursor: String) {
+        products(first: 100, after: $cursor, query: "status:active", sortKey: TITLE) {
+          pageInfo { hasNextPage endCursor }
+          edges {
+            node {
+              id
+              title
+              variants(first: 20) {
+                edges {
+                  node {
+                    title
+                    inventoryItem {
+                      inventoryLevels(first: 10) {
+                        edges { node { quantities(names: ["available"]) { name quantity } } }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    `, { cursor });
+    const conn = data.products;
+    for (const e of conn.edges) {
+      const n = e.node;
+      const sizeMap: Record<string, number> = {};
+      for (const ve of n.variants.edges) {
+        const v = ve.node;
+        let avail = 0;
+        for (const lvl of v.inventoryItem.inventoryLevels.edges) {
+          const q = lvl.node.quantities.find((x: any) => x.name === 'available');
+          if (q) avail += q.quantity || 0;
+        }
+        sizeMap[v.title] = (sizeMap[v.title] || 0) + avail;
+      }
+      const sizes = Object.entries(sizeMap).map(([size, available]) => ({ size, available }));
+      const total = sizes.reduce((s, x) => s + x.available, 0);
+      products.push({ gid: n.id, title: n.title, total, sizes });
+    }
+    hasNext = conn.pageInfo.hasNextPage;
+    cursor = conn.pageInfo.endCursor;
+  }
+  return products;
+}
+
 // === SUPABASE ===
 
 async function rpcCall(fnName: string, body: Record<string, unknown>) {
@@ -175,6 +236,16 @@ async function handler(_req: Request): Promise<Response> {
       return new Response(JSON.stringify({ status: 'no active calendars' }), {
         headers: { 'Content-Type': 'application/json' },
       });
+    }
+
+    // Refresh full product catalog (for per-piece product picker + inventory filter)
+    let catalogCount = 0;
+    try {
+      const catalog = await fetchCatalog(shopifyToken);
+      catalogCount = catalog.length;
+      await rpcCall('rpc_update_catalog', { data: catalog });
+    } catch (err) {
+      console.error('Catalog refresh failed:', (err as Error).message);
     }
 
     // Pull orders for last 7 days (shared across calendars)
@@ -285,6 +356,7 @@ async function handler(_req: Request): Promise<Response> {
     return new Response(JSON.stringify({
       active_calendars: calendars.length,
       orders_analyzed: orders.length,
+      catalog_products: catalogCount,
       results,
       duration_s: ((Date.now() - startTime) / 1000).toFixed(1),
     }, null, 2), { headers: { 'Content-Type': 'application/json' } });
