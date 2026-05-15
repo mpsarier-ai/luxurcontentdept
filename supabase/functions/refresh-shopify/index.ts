@@ -72,15 +72,14 @@ async function fetchOrders(token: string, sinceISO: string) {
     const conn = data.orders;
     for (const e of conn.edges) {
       const n = e.node;
-      orders.push({
-        id: n.id,
-        createdAt: n.createdAt,
-        total: parseFloat(n.currentTotalPriceSet?.shopMoney?.amount || "0"),
-        lineItems: n.lineItems.edges.map((le: any) => ({
-          title: le.node.title,
-          amount: parseFloat(le.node.originalTotalSet?.shopMoney?.amount || "0"),
-        })),
-      });
+      const lineItems = n.lineItems.edges.map((le: any) => ({
+        title: le.node.title,
+        amount: parseFloat(le.node.originalTotalSet?.shopMoney?.amount || "0"),
+      }));
+      // "gross sales" = suma de lineItems a precio original (antes de descuentos/
+      // impuestos/envio), para que coincida con el gross_sales de Shopify Analytics
+      const gross = lineItems.reduce((s: number, li: any) => s + li.amount, 0);
+      orders.push({ id: n.id, createdAt: n.createdAt, total: gross, lineItems });
     }
     hasNext = conn.pageInfo.hasNextPage;
     cursor = conn.pageInfo.endCursor;
