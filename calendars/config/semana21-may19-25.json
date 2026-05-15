@@ -1,0 +1,17 @@
+{
+  "calendar_id": "semana21-may19-25",
+  "status": "active",
+  "week_number": 21,
+  "start_date": "2026-05-19",
+  "end_date": "2026-05-25",
+  "html_file": "calendars/semana21-may19-25.html",
+  "featured_products": [
+    { "gid": "gid://shopify/Product/9249875296474", "name": "Men Deserve Less Negro" },
+    { "gid": "gid://shopify/Product/9249876345050", "name": "Wide Leg Dirty Azul" },
+    { "gid": "gid://shopify/Product/9249876476122", "name": "Wide Leg Washed Verde" },
+    { "gid": "gid://shopify/Product/9183246614746", "name": "Men Deserve Less Azul Claro" },
+    { "gid": "gid://shopify/Product/9226517905626", "name": "Red Riders Azul Dirty" },
+    { "gid": "gid://shopify/Product/9106479579354", "name": "Black Stars Azul Claro" },
+    { "gid": "gid://shopify/Product/9174825402586", "name": "Pink Stars" }
+  ]
+}
