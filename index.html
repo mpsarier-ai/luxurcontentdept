@@ -365,13 +365,14 @@ function renderPipeline(){
     return `<div class="tl-row ${overdue?'tl-overdue':''}" data-id="${e.id}">
       ${dateBox}
       <span class="tl-type ${e.entry_type}">${e.entry_type === 'launch' ? 'Lanzamiento' : 'Restock'}</span>
-      <div class="tl-name">${escapeHtml(e.product_name)}${e.notes ? `<small>${escapeHtml(e.notes)}</small>` : ''}${overdue ? '<small style="color:var(--red-out)">⚠ fecha pasada, aún pendiente</small>' : ''}</div>
+      <div class="tl-name" data-edit="${e.id}" style="cursor:pointer" title="Click para editar">${escapeHtml(e.product_name)} <span style="color:var(--rosa-deep);font-size:11px">✎</span>${e.notes ? `<small>${escapeHtml(e.notes)}</small>` : ''}${overdue ? '<small style="color:var(--red-out)">⚠ fecha pasada, aún pendiente</small>' : ''}</div>
       <button class="tl-status ${e.status}" data-toggle="${e.id}">${e.status === 'llego' ? '✓ Llegó' : 'Pendiente'}</button>
       <button class="tl-del" data-del="${e.id}" title="Eliminar">×</button>
     </div>`;
   }).join('');
   el.querySelectorAll('[data-toggle]').forEach(b => b.addEventListener('click', () => togglePipelineStatus(b.getAttribute('data-toggle'))));
   el.querySelectorAll('[data-del]').forEach(b => b.addEventListener('click', () => deletePipeline(b.getAttribute('data-del'))));
+  el.querySelectorAll('[data-edit]').forEach(b => b.addEventListener('click', () => openEntryModal(b.getAttribute('data-edit'))));
 }
 
 async function togglePipelineStatus(id){
@@ -386,18 +387,25 @@ async function deletePipeline(id){
   await supabase.from('product_pipeline').delete().eq('id', id);
 }
 
-// Entry modal
+// Entry modal (add + edit)
 const entryModal = document.getElementById('entryModal');
-document.getElementById('addEntryBtn').addEventListener('click', () => {
-  document.getElementById('entryProduct').value = '';
-  document.getElementById('entryType').value = 'restock';
-  document.getElementById('entryDate').value = '';
-  document.getElementById('entryDateEnd').value = '';
-  document.getElementById('entryNotes').value = '';
+let editingEntryId = null;
+
+function openEntryModal(id){
+  editingEntryId = id || null;
+  const e = id ? pipeline.find(x => x.id === id) : null;
+  document.getElementById('entryModalTitle').textContent = e ? 'Editar entrada' : 'Agregar entrada';
+  document.getElementById('entryProduct').value = e ? e.product_name : '';
+  document.getElementById('entryType').value = e ? e.entry_type : 'restock';
+  document.getElementById('entryDate').value = e && e.tentative_date ? e.tentative_date : '';
+  document.getElementById('entryDateEnd').value = e && e.tentative_date_end ? e.tentative_date_end : '';
+  document.getElementById('entryNotes').value = e && e.notes ? e.notes : '';
   document.getElementById('entryError').textContent = '';
   entryModal.classList.add('open');
   setTimeout(() => document.getElementById('entryProduct').focus(), 50);
-});
+}
+
+document.getElementById('addEntryBtn').addEventListener('click', () => openEntryModal(null));
 document.getElementById('entryCancel').addEventListener('click', () => entryModal.classList.remove('open'));
 entryModal.addEventListener('click', e => { if (e.target === entryModal) entryModal.classList.remove('open'); });
 document.getElementById('entrySave').addEventListener('click', async () => {
@@ -410,11 +418,18 @@ document.getElementById('entrySave').addEventListener('click', async () => {
   if (dateEnd && date && dateEnd < date){ document.getElementById('entryError').textContent = '"Hasta" no puede ser antes de "desde"'; return; }
   if (dateEnd === date) dateEnd = null;
   const match = catalog.find(p => p.title.toLowerCase() === name.toLowerCase());
-  const { error } = await supabase.from('product_pipeline').insert({
+  const payload = {
     product_name: name, product_gid: match ? match.gid : null,
-    entry_type: type, tentative_date: date, tentative_date_end: dateEnd, notes, status: 'pendiente'
-  });
+    entry_type: type, tentative_date: date, tentative_date_end: dateEnd, notes
+  };
+  let error;
+  if (editingEntryId){
+    ({ error } = await supabase.from('product_pipeline').update(payload).eq('id', editingEntryId));
+  } else {
+    ({ error } = await supabase.from('product_pipeline').insert({ ...payload, status: 'pendiente' }));
+  }
   if (error){ document.getElementById('entryError').textContent = 'Error: ' + error.message; return; }
+  editingEntryId = null;
   entryModal.classList.remove('open');
 });
 
