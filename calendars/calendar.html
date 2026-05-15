@@ -267,6 +267,9 @@ html,body{background:var(--cream);color:var(--black);font-family:'Outfit',sans-s
 /* PIECE MODAL */
 .modal-piece{max-width:600px;max-height:90vh;overflow-y:auto}
 .pm-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:6px}
+.pm-fmt{display:flex;flex-wrap:wrap;gap:6px 12px;padding:8px 0}
+.pm-fmt label{display:flex;align-items:center;gap:5px;font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--black);cursor:pointer;text-transform:none;letter-spacing:0}
+.pm-fmt input{accent-color:var(--rosa-deep);cursor:pointer}
 .pm-label{display:block;font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--grey);margin-bottom:6px}
 .pm-input{width:100%;padding:9px 11px;font-family:'JetBrains Mono',monospace;font-size:12px;border:1px solid var(--black);background:#fff;outline:none}
 .pm-input:focus{border-color:var(--rosa-deep)}
@@ -642,6 +645,22 @@ select.pm-input{cursor:pointer}
       <div>
         <label class="pm-label">Aprobación</label>
         <button type="button" class="pm-approve-btn" data-pm-approve>Aprobar</button>
+      </div>
+    </div>
+
+    <div class="pm-grid" style="margin-top:14px">
+      <div>
+        <label class="pm-label">Día</label>
+        <select class="pm-input" data-pm="day"></select>
+      </div>
+      <div>
+        <label class="pm-label">Formato (multi)</label>
+        <div class="pm-fmt" data-pm-fmt>
+          <label><input type="checkbox" value="Post"> Post</label>
+          <label><input type="checkbox" value="Reel"> Reel</label>
+          <label><input type="checkbox" value="Stories"> Stories</label>
+          <label><input type="checkbox" value="TikTok"> TikTok</label>
+        </div>
       </div>
     </div>
 
@@ -1718,6 +1737,16 @@ function openUrlsModal(pieceId){
   // Platform
   modal.querySelector('[data-pm="platform"]').value = piece.platform || '';
 
+  // Día (lista de los 7 días de la semana)
+  const daySel = modal.querySelector('[data-pm="day"]');
+  daySel.innerHTML = state.days.map(d => `<option value="${escapeAttr(d.key)}" ${d.key===piece.day?'selected':''}>${escapeHtml(d.fullDow)} ${d.dnum}</option>`).join('');
+
+  // Formato (multi-check desde piece.type)
+  const typeStr = (piece.type || '').toLowerCase();
+  modal.querySelectorAll('[data-pm-fmt] input').forEach(cb => {
+    cb.checked = typeStr.includes(cb.value.toLowerCase());
+  });
+
   // Status toggle
   modal.querySelectorAll('[data-pm-status] button').forEach(b => {
     b.classList.toggle('active', b.getAttribute('data-status') === (piece.status || 'pendiente'));
@@ -1820,7 +1849,13 @@ function saveUrlsModal(){
     if (match) productGid = match.gid;
   }
 
-  const updated = { ...piece, imageUrl, refUrl, assignee, platform, status, productGid };
+  // Día seleccionado
+  const day = modal.querySelector('[data-pm="day"]').value || piece.day;
+  // Formato(s) — multi: une los chequeados con " · "
+  const fmts = Array.from(modal.querySelectorAll('[data-pm-fmt] input:checked')).map(cb => cb.value);
+  const type = fmts.length ? fmts.join(' · ') : (piece.type || 'Post');
+
+  const updated = { ...piece, imageUrl, refUrl, assignee, platform, status, productGid, day, type };
   state.pieces = state.pieces.map(p => p.id === pieceId ? updated : p);
   saveOnePiece(updated);
   closeUrlsModal();
