@@ -56,7 +56,21 @@ header{border-bottom:1px solid var(--black);padding-bottom:24px;margin-bottom:64
 .wa-btn .wa-ico{font-size:18px}
 
 /* PRODUCT STATUS */
-.prod-status{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--black);border:1px solid var(--black);margin-bottom:40px}
+.prod-status{margin-bottom:40px}
+.ps-cards{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--black);border:1px solid var(--black);margin-bottom:1px}
+.ps-grid{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--black);border:1px solid var(--black);border-top:none}
+.ps-panel{background:#fff;padding:20px}
+.ps-panel h4{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--grey);margin-bottom:14px}
+.ps-empty{font-size:12px;color:var(--grey);font-style:italic}
+.ps-rank{display:flex;align-items:center;gap:10px;margin-bottom:9px}
+.ps-rk{font-family:'Cormorant Garamond',serif;font-weight:900;font-style:italic;font-size:18px;color:var(--rosa-deep);width:18px;flex-shrink:0}
+.ps-rk-name{font-family:'Outfit',sans-serif;font-size:12px;flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ps-rk-bar{width:70px;height:7px;background:var(--cream-dark);border-radius:4px;overflow:hidden;flex-shrink:0}
+.ps-rk-bar span{display:block;height:100%;background:var(--green-ok)}
+.ps-rk-val{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--green-ok);width:48px;text-align:right;flex-shrink:0}
+.ps-rec{font-size:12.5px;line-height:1.5;padding:8px 0;border-bottom:1px dotted var(--cream-dark);color:#333}
+.ps-rec:last-child{border-bottom:none}
+.ps-rec b{font-weight:600;color:var(--black)}
 .ps-card{background:#fff;padding:20px;text-align:center}
 .ps-card .ps-num{font-family:'Cormorant Garamond',serif;font-weight:900;font-size:40px;font-style:italic;line-height:1}
 .ps-card .ps-lbl{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--grey);margin-top:8px}
@@ -80,7 +94,7 @@ header{border-bottom:1px solid var(--black);padding-bottom:24px;margin-bottom:64
 .tl-del{width:24px;height:24px;border-radius:50%;border:1px solid var(--cream-dark);background:transparent;color:var(--grey);cursor:pointer;font-size:14px}
 .tl-del:hover{background:var(--red-out);color:#fff;border-color:var(--red-out)}
 .tl-overdue .tl-date{color:var(--red-out)}
-@media (max-width:980px){.prod-status{grid-template-columns:repeat(2,1fr)}.tl-row{flex-wrap:wrap;gap:10px}}
+@media (max-width:980px){.ps-cards{grid-template-columns:repeat(2,1fr)}.ps-grid{grid-template-columns:1fr}.tl-row{flex-wrap:wrap;gap:10px}}
 
 .footer{border-top:1px solid var(--black);padding:24px 32px;font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.15em;text-transform:uppercase;color:var(--grey);text-align:center;flex-wrap:wrap;gap:8px}
 .footer a{color:var(--rosa-deep);text-decoration:none}
@@ -232,6 +246,11 @@ header{border-bottom:1px solid var(--black);padding-bottom:24px;margin-bottom:64
     <label>Hasta (opcional — déjalo vacío si es fecha exacta)</label>
     <input type="date" id="entryDateEnd">
 
+    <div id="photoTaskRow" style="display:none">
+      <label>📸 Fecha para hacer las fotos <span style="color:var(--grey);text-transform:none;letter-spacing:0">(auto: 5 días antes del lanzamiento, editable)</span></label>
+      <input type="date" id="entryPhotoDate">
+    </div>
+
     <label>Notas (opcional)</label>
     <input type="text" id="entryNotes" placeholder="ej: solo S y M, viene del taller…">
 
@@ -315,6 +334,8 @@ async function loadProductStatus(){
   renderProductStatus();
 }
 
+function fmtK(n){ return n >= 1000000 ? `$${(n/1000000).toFixed(1)}M` : `$${Math.round(n/1000)}K`; }
+
 function renderProductStatus(){
   const el = document.getElementById('prodStatus');
   const meta = document.getElementById('prodStatusMeta');
@@ -325,12 +346,47 @@ function renderProductStatus(){
   const low = catalog.filter(p => (p.total||0) > 0 && (p.total||0) <= 5).length;
   const ok = total - out - low;
   const quedadas = catalog.filter(p => (p.total||0) > 3 && (p.sales7d||0) === 0).length;
-  if (meta) meta.textContent = `${total} productos activos`;
+  if (meta) meta.textContent = `${total} productos · ranking en vivo`;
+
+  // Ranking: top vendidos 7d
+  const ranked = catalog.slice().sort((a,b) => (b.sales7d||0) - (a.sales7d||0));
+  const top = ranked.filter(p => (p.sales7d||0) > 0).slice(0, 6);
+  const maxSale = Math.max(1, ...top.map(p => p.sales7d||0));
+
+  // Recomendaciones (reglas sobre data del catalogo)
+  const recs = [];
+  catalog.forEach(p => {
+    const inv = p.total||0, s = p.sales7d||0;
+    if (inv <= 0 && s > 0) recs.push({ icon:'🔴', txt:`<b>${escapeHtml(p.title)}</b> — agotado pero vendió ${fmtK(s)} esta semana. <b>Restock urgente.</b>`, w:0 });
+    else if (inv >= 10 && s === 0) recs.push({ icon:'🟡', txt:`<b>${escapeHtml(p.title)}</b> — ${inv} en stock y 0 ventas 7d. <b>Dale push / contenido.</b>`, w:1 });
+    else if (inv > 0 && inv <= 5 && s > 0) recs.push({ icon:'⚡', txt:`<b>${escapeHtml(p.title)}</b> — solo ${inv} unidades y vendiendo. <b>Contenido de urgencia / últimas tallas.</b>`, w:2 });
+  });
+  recs.sort((a,b) => a.w - b.w);
+  const topRecs = recs.slice(0, 6);
+
   el.innerHTML = `
-    <div class="ps-card ok"><div class="ps-num">${ok}</div><div class="ps-lbl">Con stock</div></div>
-    <div class="ps-card warn"><div class="ps-num">${low}</div><div class="ps-lbl">Stock bajo (≤5)</div></div>
-    <div class="ps-card crit"><div class="ps-num">${out}</div><div class="ps-lbl">Agotados</div></div>
-    <div class="ps-card crit"><div class="ps-num">${quedadas}</div><div class="ps-lbl">Quedadas (0 ventas 7d)</div></div>`;
+    <div class="ps-cards">
+      <div class="ps-card ok"><div class="ps-num">${ok}</div><div class="ps-lbl">Con stock</div></div>
+      <div class="ps-card warn"><div class="ps-num">${low}</div><div class="ps-lbl">Stock bajo (≤5)</div></div>
+      <div class="ps-card crit"><div class="ps-num">${out}</div><div class="ps-lbl">Agotados</div></div>
+      <div class="ps-card crit"><div class="ps-num">${quedadas}</div><div class="ps-lbl">Quedadas</div></div>
+    </div>
+    <div class="ps-grid">
+      <div class="ps-panel">
+        <h4>🏆 Top vendidos · últimos 7 días</h4>
+        ${top.length ? top.map((p,i) => `
+          <div class="ps-rank">
+            <span class="ps-rk">${i+1}</span>
+            <span class="ps-rk-name">${escapeHtml(p.title)}</span>
+            <span class="ps-rk-bar"><span style="width:${Math.round(((p.sales7d||0)/maxSale)*100)}%"></span></span>
+            <span class="ps-rk-val">${fmtK(p.sales7d||0)}</span>
+          </div>`).join('') : '<div class="ps-empty">Sin ventas registradas aún</div>'}
+      </div>
+      <div class="ps-panel">
+        <h4>💡 Recomendaciones de la semana</h4>
+        ${topRecs.length ? topRecs.map(r => `<div class="ps-rec">${r.icon} ${r.txt}</div>`).join('') : '<div class="ps-empty">Todo en orden — sin alertas críticas</div>'}
+      </div>
+    </div>`;
 }
 
 let pipeline = [];
@@ -362,10 +418,16 @@ function renderPipeline(){
     }
     const effEnd = e.tentative_date_end || e.tentative_date;
     const overdue = effEnd && effEnd < todayStr && e.status === 'pendiente';
+    let photoLine = '';
+    if (e.entry_type === 'launch' && e.photo_date){
+      const pd = e.photo_date.split('-');
+      const photoOverdue = e.photo_date < todayStr && e.status === 'pendiente';
+      photoLine = `<small style="color:${photoOverdue?'var(--red-out)':'var(--rosa-deep)'};font-weight:600">📸 Hacer fotos ${photoOverdue?'(¡atrasado!)':''}: ${parseInt(pd[2])} ${MONTH_ABBR[parseInt(pd[1])-1]}</small>`;
+    }
     return `<div class="tl-row ${overdue?'tl-overdue':''}" data-id="${e.id}">
       ${dateBox}
       <span class="tl-type ${e.entry_type}">${e.entry_type === 'launch' ? 'Lanzamiento' : 'Restock'}</span>
-      <div class="tl-name" data-edit="${e.id}" style="cursor:pointer" title="Click para editar">${escapeHtml(e.product_name)} <span style="color:var(--rosa-deep);font-size:11px">✎</span>${e.notes ? `<small>${escapeHtml(e.notes)}</small>` : ''}${overdue ? '<small style="color:var(--red-out)">⚠ fecha pasada, aún pendiente</small>' : ''}</div>
+      <div class="tl-name" data-edit="${e.id}" style="cursor:pointer" title="Click para editar">${escapeHtml(e.product_name)} <span style="color:var(--rosa-deep);font-size:11px">✎</span>${photoLine}${e.notes ? `<small>${escapeHtml(e.notes)}</small>` : ''}${overdue ? '<small style="color:var(--red-out)">⚠ fecha pasada, aún pendiente</small>' : ''}</div>
       <button class="tl-status ${e.status}" data-toggle="${e.id}">${e.status === 'llego' ? '✓ Llegó' : 'Pendiente'}</button>
       <button class="tl-del" data-del="${e.id}" title="Eliminar">×</button>
     </div>`;
@@ -400,10 +462,32 @@ function openEntryModal(id){
   document.getElementById('entryDate').value = e && e.tentative_date ? e.tentative_date : '';
   document.getElementById('entryDateEnd').value = e && e.tentative_date_end ? e.tentative_date_end : '';
   document.getElementById('entryNotes').value = e && e.notes ? e.notes : '';
+  document.getElementById('entryPhotoDate').value = e && e.photo_date ? e.photo_date : '';
   document.getElementById('entryError').textContent = '';
+  syncPhotoRow();
   entryModal.classList.add('open');
   setTimeout(() => document.getElementById('entryProduct').focus(), 50);
 }
+
+// Photo task row: visible only for launches; auto-suggest 5 days before launch
+function syncPhotoRow(){
+  const isLaunch = document.getElementById('entryType').value === 'launch';
+  document.getElementById('photoTaskRow').style.display = isLaunch ? '' : 'none';
+  if (isLaunch && !document.getElementById('entryPhotoDate').value){
+    const d = document.getElementById('entryDate').value;
+    if (d){
+      const dt = new Date(d + 'T00:00:00'); dt.setDate(dt.getDate() - 5);
+      document.getElementById('entryPhotoDate').value = dt.toISOString().slice(0,10);
+    }
+  }
+}
+document.getElementById('entryType').addEventListener('change', syncPhotoRow);
+document.getElementById('entryDate').addEventListener('change', () => {
+  // Re-suggest photo date when launch date changes (only if empty)
+  if (document.getElementById('entryType').value === 'launch' && !document.getElementById('entryPhotoDate').value){
+    syncPhotoRow();
+  }
+});
 
 document.getElementById('addEntryBtn').addEventListener('click', () => openEntryModal(null));
 document.getElementById('entryCancel').addEventListener('click', () => entryModal.classList.remove('open'));
@@ -417,10 +501,12 @@ document.getElementById('entrySave').addEventListener('click', async () => {
   if (!name){ document.getElementById('entryError').textContent = 'Escribe el producto'; return; }
   if (dateEnd && date && dateEnd < date){ document.getElementById('entryError').textContent = '"Hasta" no puede ser antes de "desde"'; return; }
   if (dateEnd === date) dateEnd = null;
+  const photoDate = type === 'launch' ? (document.getElementById('entryPhotoDate').value || null) : null;
   const match = catalog.find(p => p.title.toLowerCase() === name.toLowerCase());
   const payload = {
     product_name: name, product_gid: match ? match.gid : null,
-    entry_type: type, tentative_date: date, tentative_date_end: dateEnd, notes
+    entry_type: type, tentative_date: date, tentative_date_end: dateEnd, notes,
+    photo_date: photoDate
   };
   let error;
   if (editingEntryId){
