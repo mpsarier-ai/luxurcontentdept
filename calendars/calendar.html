@@ -6,7 +6,7 @@
 <title>LUXUR — Content Calendar</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;0,900;1,400&family=Outfit:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;0,900;1,400&family=Montserrat:wght@500;600;700&family=Outfit:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
 :root{
   --cream:#edebe6;
@@ -31,7 +31,7 @@ html,body{background:var(--cream);color:var(--black);font-family:'Outfit',sans-s
 
 /* HEADER */
 .brand-header{display:flex;justify-content:space-between;align-items:flex-end;border-bottom:1px solid var(--black);padding-bottom:24px;margin-bottom:48px}
-.brand-block .logo{font-family:'Cormorant Garamond',serif;font-weight:900;font-size:42px;letter-spacing:.18em;line-height:1}
+.brand-block .logo{font-family:'Montserrat',sans-serif;font-weight:600;font-size:34px;letter-spacing:normal;line-height:1}
 .brand-block .tagline{font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:var(--grey);margin-top:8px}
 .week-block{text-align:right}
 .week-block .week-num{font-family:'Cormorant Garamond',serif;font-weight:700;font-size:64px;line-height:.9;font-style:italic}
@@ -229,7 +229,7 @@ html,body{background:var(--cream);color:var(--black);font-family:'Outfit',sans-s
 .login-overlay{position:fixed;inset:0;background:var(--cream);display:none;align-items:center;justify-content:center;z-index:300;flex-direction:column;padding:24px}
 .login-overlay.show{display:flex}
 .login-card{max-width:440px;width:100%;text-align:center}
-.login-logo{font-family:'Cormorant Garamond',serif;font-weight:900;font-size:48px;letter-spacing:.18em;line-height:1}
+.login-logo{font-family:'Montserrat',sans-serif;font-weight:600;font-size:40px;letter-spacing:normal;line-height:1}
 .login-tagline{font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:var(--grey);margin-top:6px;margin-bottom:56px}
 .login-title{font-family:'Cormorant Garamond',serif;font-style:italic;font-weight:700;font-size:34px;margin-bottom:12px;line-height:1.1}
 .login-help{font-size:13px;color:var(--grey);line-height:1.55;margin-bottom:28px}
@@ -412,7 +412,7 @@ select.pm-input{cursor:pointer}
 <!-- LOGIN OVERLAY -->
 <div class="login-overlay" id="loginOverlay">
   <div class="login-card">
-    <div class="login-logo">L U X U R</div>
+    <div class="login-logo">LUXUR</div>
     <div class="login-tagline">Content Operations</div>
     <h2 class="login-title">Acceso del equipo</h2>
     <p class="login-help">Pega tu email LUXUR. Te llega un magic link al inbox — un click y entras. Cero contraseñas.</p>
@@ -436,8 +436,8 @@ select.pm-input{cursor:pointer}
   <!-- HEADER (fully dynamic) -->
   <header class="brand-header">
     <div class="brand-block">
-      <div class="logo">L U X U R</div>
-      <div class="tagline">Content Calendar · United Brand</div>
+      <div class="logo">LUXUR</div>
+      <div class="tagline">Content Calendar</div>
     </div>
     <div class="week-block">
       <div class="week-num" id="headerWeekNum">Cargando…</div>
@@ -465,7 +465,6 @@ select.pm-input{cursor:pointer}
       <span class="live-dot"></span>
       <span>Shopify data al: <strong id="shopifyTimestamp">— sin data —</strong></span>
     </div>
-    <span style="font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--grey)">Auto-refresh cada 30 min</span>
   </div>
 
   <!-- VIEW NAV -->
@@ -597,8 +596,7 @@ select.pm-input{cursor:pointer}
 
   <!-- FOOTER -->
   <footer class="footer">
-    <div>LUXUR Content Ops · <span id="footerCalendar">—</span></div>
-    <div>Sync en vivo · Supabase + Magic Link Auth</div>
+    <div><span id="footerCalendar">—</span></div>
   </footer>
 
 </div>
