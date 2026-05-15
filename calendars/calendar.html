@@ -385,9 +385,9 @@ select.pm-input{cursor:pointer}
 .dash-person{display:flex;align-items:center;gap:10px}
 .dash-person .dp-av{width:26px;height:26px;border-radius:50%;color:#fff;font-family:'JetBrains Mono',monospace;font-size:9px;font-weight:600;display:flex;align-items:center;justify-content:center;flex-shrink:0}
 .dash-person .dp-name{font-family:'Outfit',sans-serif;font-weight:500;font-size:13px;width:80px;flex-shrink:0}
-.dash-person .dp-bar-wrap{flex:1;height:8px;background:var(--cream-dark);border-radius:4px;overflow:hidden}
-.dash-person .dp-bar{height:100%;background:var(--rosa-deep)}
-.dash-person .dp-num{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--grey);width:64px;text-align:right}
+.dash-person .dp-bar-wrap{flex:1;height:10px;background:var(--cream-dark);border-radius:5px;overflow:hidden}
+.dash-person .dp-bar{height:100%;background:var(--green-ok);transition:width .3s ease;min-width:0}
+.dash-person .dp-num{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--grey);width:80px;text-align:right;flex-shrink:0}
 .tile-stockwarn{font-family:'JetBrains Mono',monospace;font-size:8px;letter-spacing:.05em;text-transform:uppercase;background:var(--red-out);color:#fff;padding:2px 5px;border-radius:2px}
 .kanban-card.dragging{opacity:.4}
 .kanban-col.dragover .kanban-cards{background:var(--rosa);outline:2px dashed var(--rosa-deep);outline-offset:-4px}
@@ -1241,7 +1241,6 @@ function renderDashboard(){
     const md = mine.filter(p => p.status === 'listo' || p.approved).length;
     return { m, count: mine.length, done: md };
   });
-  const maxCount = Math.max(1, ...people.map(p => p.count));
   const unassigned = state.pieces.filter(p => !p.assignee).length;
 
   el.innerHTML = `
@@ -1260,14 +1259,16 @@ function renderDashboard(){
     <div class="dash-block">
       <h4>Carga por persona</h4>
       <div class="dash-people">
-        ${people.map(({m, count, done}) => `
+        ${people.map(({m, count, done}) => {
+          const pct = count ? Math.round((done/count)*100) : 0;
+          return `
           <div class="dash-person">
             <span class="dp-av" style="background:${m.color}">${initials(m.name)}</span>
             <span class="dp-name">${escapeHtml(m.name)}</span>
-            <span class="dp-bar-wrap"><span class="dp-bar" style="width:${Math.round((count/maxCount)*100)}%"></span></span>
-            <span class="dp-num">${done}/${count} listas</span>
-          </div>
-        `).join('')}
+            <span class="dp-bar-wrap" title="${pct}% completado"><span class="dp-bar" style="width:${pct}%"></span></span>
+            <span class="dp-num">${done}/${count} · ${pct}%</span>
+          </div>`;
+        }).join('')}
       </div>
     </div>`;
 }
