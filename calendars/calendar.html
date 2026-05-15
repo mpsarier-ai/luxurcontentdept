@@ -197,10 +197,13 @@ html,body{background:var(--cream);color:var(--black);font-family:'Outfit',sans-s
 .tile-day:focus,.tile-type:focus{background:rgba(232,165,173,.15)}
 .tile-title{padding:0 10px;font-family:'Cormorant Garamond',serif;font-weight:700;font-size:15px;line-height:1.18;flex:1;display:flex;align-items:center;outline:none;color:var(--black)}
 .tile-title:focus{background:rgba(232,165,173,.12)}
-.tile-actions{position:absolute;top:6px;right:6px;display:flex;gap:4px;opacity:0;transition:opacity .15s}
+.tile-actions{position:absolute;top:8px;right:8px;display:flex;gap:6px;opacity:.55;transition:opacity .15s;z-index:4}
 .tile:hover .tile-actions{opacity:1}
-.tile-btn{width:24px;height:24px;border-radius:50%;border:none;background:rgba(255,255,255,.95);color:var(--black);font-size:13px;line-height:1;cursor:pointer;display:flex;align-items:center;justify-content:center;font-weight:600;box-shadow:0 1px 4px rgba(0,0,0,.18);padding:0}
-.tile-btn:hover{background:var(--black);color:var(--cream)}
+.tile.has-photo .tile-actions{opacity:1}
+.tile-btn{height:30px;min-width:30px;padding:0 10px;border-radius:15px;border:none;background:rgba(255,255,255,.97);color:var(--black);font-size:13px;line-height:1;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:5px;font-family:'JetBrains Mono',monospace;font-weight:600;letter-spacing:.06em;text-transform:uppercase;box-shadow:0 2px 8px rgba(0,0,0,.25)}
+.tile-btn.urls{background:var(--black);color:var(--cream);font-size:10px}
+.tile-btn.urls::after{content:'EDITAR'}
+.tile-btn:hover{background:var(--rosa-deep);color:#fff}
 .tile-btn.delete:hover{background:var(--red-out);color:#fff}
 .tile-btn.urls:hover{background:var(--rosa-deep);color:#fff}
 .tile-ref{position:absolute;top:12px;left:8px;z-index:3;background:rgba(255,255,255,.92);color:var(--black);font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:.12em;font-weight:600;text-transform:uppercase;padding:3px 7px;border-radius:2px;text-decoration:none;box-shadow:0 1px 3px rgba(0,0,0,.18);transition:all .15s}

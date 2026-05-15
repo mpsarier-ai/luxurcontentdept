@@ -223,6 +223,13 @@ function daysAgoISO(n: number): string {
   b.setUTCDate(b.getUTCDate() - n);
   return `${b.getUTCFullYear()}-${String(b.getUTCMonth()+1).padStart(2,'0')}-${String(b.getUTCDate()).padStart(2,'0')}`;
 }
+// Shift any YYYY-MM-DD by deltaDays (can be negative)
+function shiftISO(iso: string, deltaDays: number): string {
+  const [y, m, d] = iso.split('-').map(Number);
+  const dt = new Date(Date.UTC(y, m - 1, d));
+  dt.setUTCDate(dt.getUTCDate() + deltaDays);
+  return `${dt.getUTCFullYear()}-${String(dt.getUTCMonth()+1).padStart(2,'0')}-${String(dt.getUTCDate()).padStart(2,'0')}`;
+}
 
 // === MAIN ===
 
@@ -238,32 +245,69 @@ async function handler(_req: Request): Promise<Response> {
       });
     }
 
-    // Pull orders for last 7 days (shared across calendars)
-    const since = daysAgoISO(7);
-    const orders = await fetchOrders(shopifyToken, since);
+    // Per-calendar window = the 7 days BEFORE the calendar's start_date.
+    // Global fetch from the earliest needed date (also covers rolling -7d for catalog).
+    const todayISO = daysAgoISO(0);
+    const rollingStart = daysAgoISO(7); // last 7 days, for catalog "quedadas"
+    let earliest = rollingStart;
+    for (const cal of calendars) {
+      const ps = shiftISO(cal.start_date, -7);
+      if (ps < earliest) earliest = ps;
+    }
+    const orders = await fetchOrders(shopifyToken, earliest);
 
-    // Aggregate by day
-    const dayMap: Record<string, { gross: number; orders: number }> = {};
-    const prodMap: Record<string, { gross: number; orderIds: Set<string> }> = {};
-    for (const o of orders) {
-      const day = o.createdAt.slice(0, 10);
-      if (!dayMap[day]) dayMap[day] = { gross: 0, orders: 0 };
-      dayMap[day].gross += o.total;
-      dayMap[day].orders += 1;
-      for (const li of o.lineItems) {
-        if (!prodMap[li.title]) prodMap[li.title] = { gross: 0, orderIds: new Set() };
-        prodMap[li.title].gross += li.amount;
-        prodMap[li.title].orderIds.add(o.id);
+    // Aggregate any [startISO .. startISO+6] window from the fetched orders
+    function buildWindow(startISO: string){
+      const endISO = shiftISO(startISO, 6);
+      const dayMap: Record<string, { gross: number; orders: number }> = {};
+      const prodMap: Record<string, { gross: number; orderIds: Set<string> }> = {};
+      for (const o of orders) {
+        const day = o.createdAt.slice(0, 10);
+        if (day < startISO || day > endISO) continue;
+        if (!dayMap[day]) dayMap[day] = { gross: 0, orders: 0 };
+        dayMap[day].gross += o.total;
+        dayMap[day].orders += 1;
+        for (const li of o.lineItems) {
+          if (!prodMap[li.title]) prodMap[li.title] = { gross: 0, orderIds: new Set() };
+          prodMap[li.title].gross += li.amount;
+          prodMap[li.title].orderIds.add(o.id);
+        }
       }
+      const series: Array<{ date: string; gross: number; orders: number }> = [];
+      for (let i = 0; i < 7; i++) {
+        const d = shiftISO(startISO, i);
+        const e = dayMap[d] || { gross: 0, orders: 0 };
+        series.push({ date: d, gross: e.gross, orders: e.orders });
+      }
+      let totalGross = 0, totalOrders = 0, maxV = 0;
+      let bestDay: { date: string; gross: number; orders: number } | null = null;
+      for (const s of series) {
+        totalGross += s.gross; totalOrders += s.orders;
+        if (s.gross > maxV) { maxV = s.gross; bestDay = s; }
+      }
+      const dailyChart = series.map(s => ({
+        label: dayLabel(s.date),
+        value: fmtMshort(s.gross),
+        height_pct: maxV > 0 ? Math.round((s.gross / maxV) * 100) : 0,
+        peak: s.gross === maxV && maxV > 0,
+      }));
+      const sellersSorted = Object.entries(prodMap)
+        .map(([title, v]) => ({ title, gross: v.gross, orders: v.orderIds.size }))
+        .sort((a, b) => b.gross - a.gross);
+      const topSellers = sellersSorted.slice(0, 6).map(s => ({
+        name: shortName(s.title), sales: fmtM(s.gross), orders: s.orders,
+      }));
+      return { startISO, endISO, prodMap, series, totalGross, totalOrders, bestDay, dailyChart, topSellers, top: sellersSorted[0] };
     }
 
-    // Refresh catalog ENRICHED with last-7d sales (for picker + inventory + "quedadas")
+    // Catalog enriched with ROLLING last-7d sales (catalog is global, not per-week)
     let catalogCount = 0;
     try {
+      const rolling = buildWindow(rollingStart);
       const catalog = await fetchCatalog(shopifyToken);
       catalogCount = catalog.length;
       for (const p of catalog as any[]) {
-        const sold = prodMap[p.title];
+        const sold = rolling.prodMap[p.title];
         p.sales7d = sold ? Math.round(sold.gross) : 0;
         p.orders7d = sold ? sold.orderIds.size : 0;
       }
@@ -272,43 +316,17 @@ async function handler(_req: Request): Promise<Response> {
       console.error('Catalog refresh failed:', (err as Error).message);
     }
 
-    // Build 7-day series (oldest -> newest)
-    const series: Array<{ date: string; gross: number; orders: number }> = [];
-    for (let i = 7; i >= 1; i--) {
-      const d = daysAgoISO(i);
-      const e = dayMap[d] || { gross: 0, orders: 0 };
-      series.push({ date: d, gross: e.gross, orders: e.orders });
-    }
-    let totalGross = 0, totalOrders = 0, maxV = 0;
-    let bestDay: { date: string; gross: number; orders: number } | null = null;
-    for (const s of series) {
-      totalGross += s.gross;
-      totalOrders += s.orders;
-      if (s.gross > maxV) { maxV = s.gross; bestDay = s; }
-    }
-    const dailyChart = series.map(s => ({
-      label: dayLabel(s.date),
-      value: fmtMshort(s.gross),
-      height_pct: maxV > 0 ? Math.round((s.gross / maxV) * 100) : 0,
-      peak: s.gross === maxV && maxV > 0,
-    }));
-
-    // Top sellers
-    const sellersSorted = Object.entries(prodMap)
-      .map(([title, v]) => ({ title, gross: v.gross, orders: v.orderIds.size }))
-      .sort((a, b) => b.gross - a.gross);
-    const topSellers = sellersSorted.slice(0, 6).map(s => ({
-      name: shortName(s.title),
-      sales: fmtM(s.gross),
-      orders: s.orders,
-    }));
-    const top = sellersSorted[0];
-
     const ts = bogotaTimestamp();
     const results: Array<{ id: string; status: string }> = [];
 
     for (const cal of calendars) {
       try {
+        // This calendar's window = 7 days before its start_date
+        const winStart = shiftISO(cal.start_date, -7);
+        const w = buildWindow(winStart);
+        const rangeLabel = `${w.startISO} a ${w.endISO}`;
+        const isFuture = w.endISO >= todayISO;
+
         const featured = cal.featured_products || [];
         const inventory: Record<string, Array<{ size: string; available: number; class: string }>> = {};
         for (const fp of featured) {
@@ -335,19 +353,19 @@ async function handler(_req: Request): Promise<Response> {
 
         const shopifyData = {
           timestamp: ts,
-          data_range: "Últimos 7 días",
+          data_range: `Semana anterior (${rangeLabel})${isFuture ? ' · parcial' : ''}`,
           metrics: {
-            gross_sales: fmtM(totalGross),
-            gross_sales_sub: "COP · últimos 7 días",
-            orders: totalOrders,
-            orders_sub: `avg ${Math.round(totalOrders / 7)}/día`,
-            best_day_label: bestDay ? dayLabel(bestDay.date) : "—",
-            best_day_sub: bestDay ? `${fmtM(bestDay.gross)} · ${bestDay.orders} órdenes` : "—",
-            top_seller_name: top ? shortName(top.title).split(' ').slice(0, 3).join(' ') : "—",
-            top_seller_sub: top ? `${fmtM(top.gross)} · ${top.orders} órdenes` : "—",
+            gross_sales: fmtM(w.totalGross),
+            gross_sales_sub: `COP · ${rangeLabel}`,
+            orders: w.totalOrders,
+            orders_sub: `avg ${Math.round(w.totalOrders / 7)}/día`,
+            best_day_label: w.bestDay && w.bestDay.gross > 0 ? dayLabel(w.bestDay.date) : "—",
+            best_day_sub: w.bestDay && w.bestDay.gross > 0 ? `${fmtM(w.bestDay.gross)} · ${w.bestDay.orders} órdenes` : "—",
+            top_seller_name: w.top ? shortName(w.top.title).split(' ').slice(0, 3).join(' ') : "—",
+            top_seller_sub: w.top ? `${fmtM(w.top.gross)} · ${w.top.orders} órdenes` : "—",
           },
-          top_sellers: topSellers,
-          daily_chart: dailyChart,
+          top_sellers: w.topSellers,
+          daily_chart: w.dailyChart,
           inventory,
         };
 
