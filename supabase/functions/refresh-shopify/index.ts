@@ -238,16 +238,6 @@ async function handler(_req: Request): Promise<Response> {
       });
     }
 
-    // Refresh full product catalog (for per-piece product picker + inventory filter)
-    let catalogCount = 0;
-    try {
-      const catalog = await fetchCatalog(shopifyToken);
-      catalogCount = catalog.length;
-      await rpcCall('rpc_update_catalog', { data: catalog });
-    } catch (err) {
-      console.error('Catalog refresh failed:', (err as Error).message);
-    }
-
     // Pull orders for last 7 days (shared across calendars)
     const since = daysAgoISO(7);
     const orders = await fetchOrders(shopifyToken, since);
@@ -265,6 +255,21 @@ async function handler(_req: Request): Promise<Response> {
         prodMap[li.title].gross += li.amount;
         prodMap[li.title].orderIds.add(o.id);
       }
+    }
+
+    // Refresh catalog ENRICHED with last-7d sales (for picker + inventory + "quedadas")
+    let catalogCount = 0;
+    try {
+      const catalog = await fetchCatalog(shopifyToken);
+      catalogCount = catalog.length;
+      for (const p of catalog as any[]) {
+        const sold = prodMap[p.title];
+        p.sales7d = sold ? Math.round(sold.gross) : 0;
+        p.orders7d = sold ? sold.orderIds.size : 0;
+      }
+      await rpcCall('rpc_update_catalog', { data: catalog });
+    } catch (err) {
+      console.error('Catalog refresh failed:', (err as Error).message);
     }
 
     // Build 7-day series (oldest -> newest)

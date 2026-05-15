@@ -342,6 +342,9 @@ select.pm-input{cursor:pointer}
 .inv-row.okstock .inv-total{color:var(--green-ok)}
 .inv-row .inv-name{flex:1;font-family:'Outfit',sans-serif;font-weight:500;font-size:14px}
 .inv-row .inv-sizes{display:flex;gap:4px;flex-wrap:wrap}
+.inv-sales{display:block;font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--grey);margin-top:3px;letter-spacing:.04em}
+.inv-sales.zero{color:var(--red-out);font-weight:500}
+.inv-row.quedada{background:#fff5f4;border-left:4px solid var(--red-out)}
 
 @media (max-width:980px){ .kanban-board{grid-template-columns:1fr} }
 
@@ -544,6 +547,7 @@ select.pm-input{cursor:pointer}
       <div class="inv-sort">
         <button class="inv-sort-btn active" data-sort="asc">↑ Menos inventario</button>
         <button class="inv-sort-btn" data-sort="desc">↓ Más inventario</button>
+        <button class="inv-sort-btn" data-sort="quedadas">🔥 Quedadas — dale push</button>
       </div>
     </div>
     <div class="inv-list" id="invList"></div>
@@ -1081,17 +1085,38 @@ function renderInventory(){
   const search = (document.getElementById('invSearch')?.value || '').trim().toLowerCase();
   let items = state.catalog.slice();
   if (search) items = items.filter(p => p.title.toLowerCase().includes(search));
-  items.sort((a, b) => invSortDir === 'asc' ? a.total - b.total : b.total - a.total);
-  if (meta) meta.textContent = `${items.length} productos`;
+
+  const quedadas = invSortDir === 'quedadas';
+  if (quedadas){
+    // Producto con stock pero ventas bajas/cero en 7d = candidato a push
+    items = items.filter(p => p.total > 3);
+    // "stuck score": mucho inventario + pocas ventas primero
+    items.sort((a, b) => {
+      const sa = (a.sales7d || 0), sb = (b.sales7d || 0);
+      if (sa !== sb) return sa - sb;          // menos ventas primero
+      return (b.total || 0) - (a.total || 0); // más stock primero
+    });
+  } else {
+    items.sort((a, b) => invSortDir === 'asc' ? a.total - b.total : b.total - a.total);
+  }
+  if (meta) meta.textContent = quedadas
+    ? `${items.length} quedadas (stock >3, menos ventas primero)`
+    : `${items.length} productos`;
+
   list.innerHTML = items.map(p => {
     const cls = p.total <= 5 ? 'lowstock' : p.total <= 20 ? 'midstock' : 'okstock';
     const chips = (p.sizes||[]).map(s => {
       const sc = s.available > 5 ? 'ok' : s.available >= 1 ? 'low' : 'out';
       return `<span class="size-chip ${sc}">${escapeHtml(s.size)}:${s.available}</span>`;
     }).join('');
-    return `<div class="inv-row ${cls}">
+    const sales = typeof p.sales7d === 'number' ? p.sales7d : null;
+    const salesLabel = sales === null ? '' :
+      (sales === 0
+        ? `<span class="inv-sales zero">0 ventas 7d ⚠</span>`
+        : `<span class="inv-sales">$${(sales/1000).toFixed(0)}K · ${p.orders7d||0} órd 7d</span>`);
+    return `<div class="inv-row ${cls} ${quedadas && sales===0 ? 'quedada' : ''}">
       <div class="inv-total">${p.total}</div>
-      <div class="inv-name">${escapeHtml(p.title)}</div>
+      <div class="inv-name">${escapeHtml(p.title)}${salesLabel}</div>
       <div class="inv-sizes">${chips}</div>
     </div>`;
   }).join('') || '<div style="background:#fff;padding:32px;text-align:center;color:var(--grey);font-family:JetBrains Mono,monospace;font-size:11px">Sin productos. Corre el Edge Function para llenar el catálogo.</div>';
