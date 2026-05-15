@@ -256,8 +256,9 @@ async function handler(_req: Request): Promise<Response> {
     // Per-calendar window = the 7 days BEFORE the calendar's start_date.
     // Global fetch from the earliest needed date (also covers rolling -7d for catalog).
     const todayISO = daysAgoISO(0);
-    const rollingStart = daysAgoISO(7); // last 7 days, for catalog "quedadas"
-    let earliest = rollingStart;
+    const rollingStart = daysAgoISO(7);   // last 7 days (days 7..1 ago)
+    const prevWeekStart = daysAgoISO(14); // the 7 days BEFORE that (days 14..8 ago)
+    let earliest = prevWeekStart;
     for (const cal of calendars) {
       const ps = shiftISO(cal.start_date, -7);
       if (ps < earliest) earliest = ps;
@@ -308,16 +309,20 @@ async function handler(_req: Request): Promise<Response> {
       return { startISO, endISO, prodMap, series, totalGross, totalOrders, bestDay, dailyChart, topSellers, top: sellersSorted[0] };
     }
 
-    // Catalog enriched with ROLLING last-7d sales (catalog is global, not per-week)
+    // Catalog enriched with last-7d sales + previous-7d sales (week-over-week)
     let catalogCount = 0;
     try {
       const rolling = buildWindow(rollingStart);
+      const prev = buildWindow(prevWeekStart);
       const catalog = await fetchCatalog(shopifyToken);
       catalogCount = catalog.length;
       for (const p of catalog as any[]) {
         const sold = rolling.prodMap[p.title];
+        const soldPrev = prev.prodMap[p.title];
         p.sales7d = sold ? Math.round(sold.gross) : 0;
         p.orders7d = sold ? sold.orderIds.size : 0;
+        p.salesPrev7d = soldPrev ? Math.round(soldPrev.gross) : 0;
+        p.ordersPrev7d = soldPrev ? soldPrev.orderIds.size : 0;
       }
       await rpcCall('rpc_update_catalog', { data: catalog });
     } catch (err) {
