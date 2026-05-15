@@ -1010,6 +1010,48 @@ async function loadCalendar(){
 
   renderWeekAlerts();
   setSync('connected', 'Sincronizado');
+
+  // Auto re-sync cuando vuelves a la pestaña (recupera eventos realtime perdidos)
+  if (!window.__luxurResyncBound){
+    window.__luxurResyncBound = true;
+    document.addEventListener('visibilitychange', () => {
+      if (document.visibilityState === 'visible' && state.initialized) resyncCalendarData();
+    });
+    window.addEventListener('focus', () => { if (state.initialized) resyncCalendarData(); });
+  }
+}
+
+let __resyncBusy = false;
+async function resyncCalendarData(){
+  if (__resyncBusy || !state.calendarId) return;
+  // No pisar si alguien está editando un campo
+  const a = document.activeElement;
+  if (a && a.closest && (a.closest('.tile') || a.closest('.evt') || a.closest('.piece') || a.closest('[data-field]') || a.closest('.modal'))) return;
+  __resyncBusy = true;
+  try {
+    const [pcs, fls, pl, calRes] = await Promise.all([
+      supabase.from('calendar_pieces').select('*').eq('calendar_id', state.calendarId).order('position', { ascending: true }),
+      supabase.from('calendar_fields').select('*').eq('calendar_id', state.calendarId),
+      supabase.from('product_pipeline').select('*'),
+      supabase.from('calendars').select('shopify_data,status,featured_products').eq('id', state.calendarId).maybeSingle()
+    ]);
+    if (pcs.data){ state.pieces = pcs.data.map(rowToPiece); }
+    if (pl.data){ state.pipeline = pl.data; }
+    if (fls.data){
+      state.dayProducts = {};
+      fls.data.forEach(f => {
+        const pm = f.field_id.match(/^d(\d+)-prods$/);
+        if (pm){ try { state.dayProducts[parseInt(pm[1])] = JSON.parse(f.value||'[]'); } catch(e){ state.dayProducts[parseInt(pm[1])] = []; } return; }
+        const el = document.querySelector(`[data-field="${f.field_id}"]`);
+        if (el && document.activeElement !== el) el.innerHTML = f.value || '';
+      });
+    }
+    if (calRes.data){ state.calendar = { ...state.calendar, ...calRes.data }; renderShopifyData(calRes.data.shopify_data || {}); }
+    renderPiecesViews();
+    renderWeekAlerts();
+    setSync('connected', `Sincronizado · ${new Date().toLocaleTimeString('es-CO',{hour:'2-digit',minute:'2-digit'})}`);
+  } catch(e){ console.error('resync', e); }
+  finally { __resyncBusy = false; }
 }
 
 // Alerta de lanzamientos/llegadas/fotos cuya fecha cae en la semana del calendario
