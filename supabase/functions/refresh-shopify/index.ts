@@ -1,6 +1,6 @@
 // LUXUR Calendar - Shopify Refresh Edge Function
-// Triggered by cron every 12h, refreshes shopify_data jsonb in calendars table.
-// Auth flow: OAuth client_credentials grant against Shopify Admin API.
+// Triggered by cron every 12h. Refreshes shopify_data jsonb in calendars table.
+// Auth: OAuth client_credentials grant. Analytics: aggregated from orders (ShopifyQL removed from Admin API).
 
 const SUPABASE_URL = Deno.env.get("SUPABASE_URL") || "https://nrpgtlcdvtesjbxpkxha.supabase.co";
 const SUPABASE_ANON_KEY = Deno.env.get("SUPABASE_ANON_KEY")!;
@@ -9,7 +9,7 @@ const SHOPIFY_CLIENT_SECRET = Deno.env.get("SHOPIFY_CLIENT_SECRET")!;
 const SHOPIFY_SHOP_DOMAIN = Deno.env.get("SHOPIFY_SHOP_DOMAIN")!;
 const SHOPIFY_API_VERSION = "2025-04";
 
-const DOW_ABBR = ['Dom','Lun','Mar','Mié','Jue','Vie','Sáb'];
+const DOW_ABBR = ['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb'];
 
 // === SHOPIFY ===
 
@@ -39,32 +39,57 @@ async function shopifyGQL(token: string, query: string, variables: Record<string
   return data.data;
 }
 
-async function shopifyQL(token: string, query: string) {
-  const data = await shopifyGQL(token, `
-    query($q: String!) {
-      shopifyqlQuery(query: $q) {
-        __typename
-        ... on TableResponse {
-          tableData {
-            columns { name dataType }
-            rowData
-            unformattedData
+// Fetch paid orders since a date (ISO). Aggregates in code.
+async function fetchOrders(token: string, sinceISO: string) {
+  const orders: Array<{
+    id: string;
+    createdAt: string;
+    total: number;
+    lineItems: Array<{ title: string; amount: number }>;
+  }> = [];
+  let cursor: string | null = null;
+  let hasNext = true;
+  let pages = 0;
+  while (hasNext && pages < 10) {
+    pages++;
+    const data: any = await shopifyGQL(token, `
+      query($cursor: String) {
+        orders(first: 250, after: $cursor, query: "created_at:>=${sinceISO}", sortKey: CREATED_AT) {
+          pageInfo { hasNextPage endCursor }
+          edges {
+            node {
+              id
+              createdAt
+              currentTotalPriceSet { shopMoney { amount } }
+              lineItems(first: 50) {
+                edges { node { title originalTotalSet { shopMoney { amount } } } }
+              }
+            }
           }
         }
-        ... on ParseError {
-          parseErrors { code message }
-        }
       }
+    `, { cursor });
+    const conn = data.orders;
+    for (const e of conn.edges) {
+      const n = e.node;
+      orders.push({
+        id: n.id,
+        createdAt: n.createdAt,
+        total: parseFloat(n.currentTotalPriceSet?.shopMoney?.amount || "0"),
+        lineItems: n.lineItems.edges.map((le: any) => ({
+          title: le.node.title,
+          amount: parseFloat(le.node.originalTotalSet?.shopMoney?.amount || "0"),
+        })),
+      });
     }
-  `, { q: query });
-  if (data.shopifyqlQuery.__typename === "ParseError") {
-    throw new Error(`ShopifyQL parse: ${JSON.stringify(data.shopifyqlQuery.parseErrors)}`);
+    hasNext = conn.pageInfo.hasNextPage;
+    cursor = conn.pageInfo.endCursor;
   }
-  return data.shopifyqlQuery.tableData;
+  return orders;
 }
 
 async function getInventory(token: string, productGid: string) {
-  const data = await shopifyGQL(token, `
+  const data: any = await shopifyGQL(token, `
     query($id: ID!) {
       product(id: $id) {
         title
@@ -76,10 +101,7 @@ async function getInventory(token: string, productGid: string) {
                 inventoryLevels(first: 10) {
                   edges {
                     node {
-                      quantities(names: ["available"]) {
-                        name
-                        quantity
-                      }
+                      quantities(names: ["available"]) { name quantity }
                     }
                   }
                 }
@@ -111,18 +133,14 @@ async function rpcCall(fnName: string, body: Record<string, unknown>) {
 
 // === HELPERS ===
 
-function formatMoneyM(value: number): string {
-  return `$${(value / 1_000_000).toFixed(2)}M`;
-}
-function formatMoneyMshort(value: number): string {
-  return `$${(value / 1_000_000).toFixed(1)}M`;
-}
+function fmtM(v: number): string { return `$${(v / 1_000_000).toFixed(2)}M`; }
+function fmtMshort(v: number): string { return `$${(v / 1_000_000).toFixed(1)}M`; }
 function dayLabel(dateStr: string): string {
   const [y, m, d] = dateStr.split('-').map(Number);
-  const dt = new Date(y, m - 1, d);
-  return `${DOW_ABBR[dt.getDay()]} ${d}`;
+  const dt = new Date(Date.UTC(y, m - 1, d));
+  return `${DOW_ABBR[dt.getUTCDay()]} ${d}`;
 }
-function inventoryClass(n: number): "ok" | "low" | "out" {
+function invClass(n: number): "ok" | "low" | "out" {
   if (n > 5) return "ok";
   if (n >= 1) return "low";
   return "out";
@@ -130,19 +148,19 @@ function inventoryClass(n: number): "ok" | "low" | "out" {
 function shortName(title: string): string {
   return title
     .replace(/^JEAN\s+/i, '')
-    .replace(/\s+(ANCHO|STRAIGHT|RECTO|RELAXED FIT|WIDE LEG FIT)\s+/gi, ' ')
+    .replace(/\b(ANCHO|STRAIGHT|RECTO|RELAXED FIT|WIDE LEG FIT)\b/gi, ' ')
     .replace(/\s+/g, ' ')
     .trim();
 }
 function bogotaTimestamp(): string {
-  const now = new Date();
-  const bogota = new Date(now.getTime() - 5 * 60 * 60 * 1000);
-  const yyyy = bogota.getUTCFullYear();
-  const mm = String(bogota.getUTCMonth() + 1).padStart(2, '0');
-  const dd = String(bogota.getUTCDate()).padStart(2, '0');
-  const hh = String(bogota.getUTCHours()).padStart(2, '0');
-  const min = String(bogota.getUTCMinutes()).padStart(2, '0');
-  return `${yyyy}-${mm}-${dd} ${hh}:${min} -05`;
+  const b = new Date(Date.now() - 5 * 60 * 60 * 1000);
+  return `${b.getUTCFullYear()}-${String(b.getUTCMonth()+1).padStart(2,'0')}-${String(b.getUTCDate()).padStart(2,'0')} ${String(b.getUTCHours()).padStart(2,'0')}:${String(b.getUTCMinutes()).padStart(2,'0')} -05`;
+}
+// Bogota "today" minus N days, as YYYY-MM-DD
+function daysAgoISO(n: number): string {
+  const b = new Date(Date.now() - 5 * 60 * 60 * 1000);
+  b.setUTCDate(b.getUTCDate() - n);
+  return `${b.getUTCFullYear()}-${String(b.getUTCMonth()+1).padStart(2,'0')}-${String(b.getUTCDate()).padStart(2,'0')}`;
 }
 
 // === MAIN ===
@@ -150,10 +168,8 @@ function bogotaTimestamp(): string {
 async function handler(_req: Request): Promise<Response> {
   const startTime = Date.now();
   try {
-    // 1. Get Shopify token
     const shopifyToken = await getShopifyToken();
 
-    // 2. Get active calendars
     const calendars = await rpcCall('rpc_get_active_calendars', {});
     if (!calendars || calendars.length === 0) {
       return new Response(JSON.stringify({ status: 'no active calendars' }), {
@@ -161,61 +177,64 @@ async function handler(_req: Request): Promise<Response> {
       });
     }
 
-    // 3. Pull shared analytics data (sales + sellers, last 7 days)
-    const [salesData, sellersData] = await Promise.all([
-      shopifyQL(shopifyToken, "FROM sales SHOW gross_sales, net_sales, orders TIMESERIES day SINCE -7d UNTIL today"),
-      shopifyQL(shopifyToken, "FROM sales SHOW gross_sales, orders GROUP BY product_title ORDER BY gross_sales DESC LIMIT 8 SINCE -7d UNTIL today"),
-    ]);
+    // Pull orders for last 7 days (shared across calendars)
+    const since = daysAgoISO(7);
+    const orders = await fetchOrders(shopifyToken, since);
 
-    // Process sales rows
-    const salesRows = salesData.rowData || [];
-    let totalGross = 0, totalOrders = 0, maxValue = 0;
-    let bestDay: { date: string; gross: number; orders: number } | null = null;
-    for (const row of salesRows) {
-      const date = row[0] as string;
-      const gross = parseFloat(row[1] as string) || 0;
-      const orders = parseInt(row[3] as string) || 0;
-      totalGross += gross;
-      totalOrders += orders;
-      if (gross > maxValue) {
-        maxValue = gross;
-        bestDay = { date, gross, orders };
+    // Aggregate by day
+    const dayMap: Record<string, { gross: number; orders: number }> = {};
+    const prodMap: Record<string, { gross: number; orderIds: Set<string> }> = {};
+    for (const o of orders) {
+      const day = o.createdAt.slice(0, 10);
+      if (!dayMap[day]) dayMap[day] = { gross: 0, orders: 0 };
+      dayMap[day].gross += o.total;
+      dayMap[day].orders += 1;
+      for (const li of o.lineItems) {
+        if (!prodMap[li.title]) prodMap[li.title] = { gross: 0, orderIds: new Set() };
+        prodMap[li.title].gross += li.amount;
+        prodMap[li.title].orderIds.add(o.id);
       }
     }
 
-    const dailyChart = salesRows.map((row: unknown[]) => {
-      const gross = parseFloat(row[1] as string) || 0;
-      return {
-        label: dayLabel(row[0] as string),
-        value: formatMoneyMshort(gross),
-        height_pct: maxValue > 0 ? Math.round((gross / maxValue) * 100) : 0,
-        peak: gross === maxValue,
-      };
-    });
-
-    const sellersRows = sellersData.rowData || [];
-    const topSellers = sellersRows.slice(0, 6).map((r: unknown[]) => ({
-      name: shortName(r[0] as string),
-      sales: formatMoneyM(parseFloat(r[1] as string) || 0),
-      orders: parseInt(r[2] as string) || 0,
+    // Build 7-day series (oldest -> newest)
+    const series: Array<{ date: string; gross: number; orders: number }> = [];
+    for (let i = 7; i >= 1; i--) {
+      const d = daysAgoISO(i);
+      const e = dayMap[d] || { gross: 0, orders: 0 };
+      series.push({ date: d, gross: e.gross, orders: e.orders });
+    }
+    let totalGross = 0, totalOrders = 0, maxV = 0;
+    let bestDay: { date: string; gross: number; orders: number } | null = null;
+    for (const s of series) {
+      totalGross += s.gross;
+      totalOrders += s.orders;
+      if (s.gross > maxV) { maxV = s.gross; bestDay = s; }
+    }
+    const dailyChart = series.map(s => ({
+      label: dayLabel(s.date),
+      value: fmtMshort(s.gross),
+      height_pct: maxV > 0 ? Math.round((s.gross / maxV) * 100) : 0,
+      peak: s.gross === maxV && maxV > 0,
     }));
 
-    const topSellerRow = sellersRows[0];
-    const topSeller = topSellerRow ? {
-      name: shortName(topSellerRow[0] as string).split(' ').slice(0, 3).join(' '),
-      sales: formatMoneyM(parseFloat(topSellerRow[1] as string) || 0),
-      orders: parseInt(topSellerRow[2] as string) || 0,
-    } : null;
+    // Top sellers
+    const sellersSorted = Object.entries(prodMap)
+      .map(([title, v]) => ({ title, gross: v.gross, orders: v.orderIds.size }))
+      .sort((a, b) => b.gross - a.gross);
+    const topSellers = sellersSorted.slice(0, 6).map(s => ({
+      name: shortName(s.title),
+      sales: fmtM(s.gross),
+      orders: s.orders,
+    }));
+    const top = sellersSorted[0];
 
     const ts = bogotaTimestamp();
     const results: Array<{ id: string; status: string }> = [];
 
-    // 4. For each calendar, build inventory + write
     for (const cal of calendars) {
       try {
         const featured = cal.featured_products || [];
         const inventory: Record<string, Array<{ size: string; available: number; class: string }>> = {};
-
         for (const fp of featured) {
           try {
             const product = await getInventory(shopifyToken, fp.gid);
@@ -223,21 +242,18 @@ async function handler(_req: Request): Promise<Response> {
             const sizeMap: Record<string, number> = {};
             for (const edge of product.variants.edges) {
               const v = edge.node;
-              const size = v.title;
-              let totalAvailable = 0;
-              for (const lvlEdge of v.inventoryItem.inventoryLevels.edges) {
-                const availQty = lvlEdge.node.quantities.find((q: { name: string }) => q.name === 'available');
-                if (availQty) totalAvailable += availQty.quantity || 0;
+              let avail = 0;
+              for (const lvl of v.inventoryItem.inventoryLevels.edges) {
+                const q = lvl.node.quantities.find((x: any) => x.name === 'available');
+                if (q) avail += q.quantity || 0;
               }
-              sizeMap[size] = (sizeMap[size] || 0) + totalAvailable;
+              sizeMap[v.title] = (sizeMap[v.title] || 0) + avail;
             }
-            inventory[fp.gid] = Object.entries(sizeMap).map(([size, avail]) => ({
-              size,
-              available: avail,
-              class: inventoryClass(avail),
+            inventory[fp.gid] = Object.entries(sizeMap).map(([size, a]) => ({
+              size, available: a, class: invClass(a),
             }));
           } catch (err) {
-            console.error(`Inventory ${fp.gid}:`, err);
+            console.error(`Inv ${fp.gid}:`, (err as Error).message);
           }
         }
 
@@ -245,14 +261,14 @@ async function handler(_req: Request): Promise<Response> {
           timestamp: ts,
           data_range: "Últimos 7 días",
           metrics: {
-            gross_sales: formatMoneyM(totalGross),
+            gross_sales: fmtM(totalGross),
             gross_sales_sub: "COP · últimos 7 días",
             orders: totalOrders,
             orders_sub: `avg ${Math.round(totalOrders / 7)}/día`,
             best_day_label: bestDay ? dayLabel(bestDay.date) : "—",
-            best_day_sub: bestDay ? `${formatMoneyM(bestDay.gross)} · ${bestDay.orders} órdenes` : "—",
-            top_seller_name: topSeller ? topSeller.name : "—",
-            top_seller_sub: topSeller ? `${topSeller.sales} · ${topSeller.orders} órdenes` : "—",
+            best_day_sub: bestDay ? `${fmtM(bestDay.gross)} · ${bestDay.orders} órdenes` : "—",
+            top_seller_name: top ? shortName(top.title).split(' ').slice(0, 3).join(' ') : "—",
+            top_seller_sub: top ? `${fmtM(top.gross)} · ${top.orders} órdenes` : "—",
           },
           top_sellers: topSellers,
           daily_chart: dailyChart,
@@ -266,19 +282,16 @@ async function handler(_req: Request): Promise<Response> {
       }
     }
 
-    const duration = ((Date.now() - startTime) / 1000).toFixed(1);
     return new Response(JSON.stringify({
       active_calendars: calendars.length,
+      orders_analyzed: orders.length,
       results,
-      duration_s: duration,
-    }, null, 2), {
-      headers: { 'Content-Type': 'application/json' },
-    });
+      duration_s: ((Date.now() - startTime) / 1000).toFixed(1),
+    }, null, 2), { headers: { 'Content-Type': 'application/json' } });
   } catch (err) {
     console.error('Handler error:', err);
     return new Response(JSON.stringify({ error: (err as Error).message }), {
-      status: 500,
-      headers: { 'Content-Type': 'application/json' },
+      status: 500, headers: { 'Content-Type': 'application/json' },
     });
   }
 }
