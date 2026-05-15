@@ -305,6 +305,46 @@ select.pm-input{cursor:pointer}
 .mine-toggle{display:inline-flex;align-items:center;gap:6px;font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--grey);cursor:pointer;border:1px solid var(--black);padding:6px 10px;background:transparent;transition:all .15s}
 .mine-toggle.active{background:var(--black);color:var(--cream)}
 
+/* VIEW NAV */
+.view-nav{display:flex;gap:2px;margin-bottom:32px;border-bottom:1px solid var(--black)}
+.view-tab{padding:10px 18px;background:transparent;border:none;border-bottom:2px solid transparent;cursor:pointer;font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--grey);transition:all .15s;margin-bottom:-1px}
+.view-tab:hover{color:var(--black)}
+.view-tab.active{color:var(--black);border-bottom-color:var(--rosa-deep);font-weight:500}
+
+/* KANBAN */
+.kanban-board{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:64px}
+.kanban-col{background:var(--cream-dark);border:1px solid var(--black);display:flex;flex-direction:column;min-height:300px}
+.kanban-col-head{padding:12px 14px;font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.15em;text-transform:uppercase;border-bottom:1px solid var(--black);display:flex;justify-content:space-between;align-items:center}
+.kanban-col-head .kc-count{background:var(--black);color:var(--cream);padding:2px 8px;border-radius:10px;font-size:10px}
+.kanban-col[data-col="pendiente"] .kanban-col-head{background:var(--yellow-low);color:#fff}
+.kanban-col[data-col="listo"] .kanban-col-head{background:var(--green-ok);color:#fff}
+.kanban-col[data-col="aprobado"] .kanban-col-head{background:var(--black);color:var(--cream)}
+.kanban-cards{padding:10px;display:flex;flex-direction:column;gap:8px;flex:1}
+.kanban-card{background:#fff;border:1px solid var(--cream-dark);border-left:4px solid var(--rosa-deep);padding:12px;cursor:pointer;transition:box-shadow .15s}
+.kanban-card:hover{box-shadow:0 3px 10px rgba(0,0,0,.12)}
+.kanban-card .kc-day{font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:var(--grey)}
+.kanban-card .kc-title{font-family:'Cormorant Garamond',serif;font-weight:700;font-size:16px;line-height:1.2;margin:4px 0 8px}
+.kanban-card .kc-foot{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.kc-avatar{width:20px;height:20px;border-radius:50%;color:#fff;font-family:'JetBrains Mono',monospace;font-size:8px;font-weight:600;display:flex;align-items:center;justify-content:center}
+.kc-tag{font-family:'JetBrains Mono',monospace;font-size:8px;letter-spacing:.05em;text-transform:uppercase;background:var(--cream-dark);color:var(--black);padding:2px 5px;border-radius:2px}
+.kc-tag.plat{background:var(--black);color:var(--cream)}
+
+/* INVENTORY VIEW */
+.inv-toolbar{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;gap:12px;flex-wrap:wrap}
+.inv-sort{display:flex;gap:2px;border:1px solid var(--black)}
+.inv-sort-btn{padding:8px 12px;background:#fff;border:none;cursor:pointer;font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--grey)}
+.inv-sort-btn.active{background:var(--black);color:var(--cream)}
+.inv-list{display:flex;flex-direction:column;gap:1px;background:var(--black);border:1px solid var(--black);margin-bottom:64px}
+.inv-row{background:#fff;padding:14px 18px;display:flex;align-items:center;gap:16px}
+.inv-row .inv-total{font-family:'Cormorant Garamond',serif;font-weight:900;font-size:28px;font-style:italic;width:60px;text-align:center;flex-shrink:0}
+.inv-row.lowstock .inv-total{color:var(--red-out)}
+.inv-row.midstock .inv-total{color:var(--yellow-low)}
+.inv-row.okstock .inv-total{color:var(--green-ok)}
+.inv-row .inv-name{flex:1;font-family:'Outfit',sans-serif;font-weight:500;font-size:14px}
+.inv-row .inv-sizes{display:flex;gap:4px;flex-wrap:wrap}
+
+@media (max-width:980px){ .kanban-board{grid-template-columns:1fr} }
+
 /* FATAL ERROR SCREEN */
 .fatal{position:fixed;inset:0;background:var(--cream);display:flex;align-items:center;justify-content:center;z-index:200;flex-direction:column;padding:24px;text-align:center}
 .fatal h2{font-family:'Cormorant Garamond',serif;font-style:italic;font-weight:700;font-size:36px;margin-bottom:12px}
@@ -383,8 +423,17 @@ select.pm-input{cursor:pointer}
       <span class="live-dot"></span>
       <span>Shopify data al: <strong id="shopifyTimestamp">— sin data —</strong></span>
     </div>
-    <span style="font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--grey)">Auto-refresh cada 12h via agente programado</span>
+    <span style="font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--grey)">Auto-refresh cada 30 min</span>
   </div>
+
+  <!-- VIEW NAV -->
+  <div class="view-nav">
+    <button class="view-tab active" data-view="calendar">📅 Calendario</button>
+    <button class="view-tab" data-view="kanban">📋 Kanban</button>
+    <button class="view-tab" data-view="inventory">📦 Inventario</button>
+  </div>
+
+  <div id="calendarView">
 
   <!-- METRICS STRIP (JS-rendered) -->
   <section class="metrics-strip" id="metricsStrip">
@@ -475,6 +524,30 @@ select.pm-input{cursor:pointer}
       </div>
     </div>
   </section>
+
+  </div><!-- /calendarView -->
+
+  <!-- KANBAN VIEW -->
+  <div id="kanbanView" style="display:none">
+    <h2 class="section-title"><span>Tablero Kanban</span><span class="meta">Arrastra-libre · click una tarjeta para editar</span></h2>
+    <div class="kanban-board" id="kanbanBoard"></div>
+  </div>
+
+  <!-- INVENTORY VIEW -->
+  <div id="inventoryView" style="display:none">
+    <h2 class="section-title">
+      <span>Filtro de Inventario</span>
+      <span class="meta" id="invMeta">— productos</span>
+    </h2>
+    <div class="inv-toolbar">
+      <input type="text" id="invSearch" placeholder="Buscar producto…" class="pm-input" style="max-width:280px">
+      <div class="inv-sort">
+        <button class="inv-sort-btn active" data-sort="asc">↑ Menos inventario</button>
+        <button class="inv-sort-btn" data-sort="desc">↓ Más inventario</button>
+      </div>
+    </div>
+    <div class="inv-list" id="invList"></div>
+  </div>
 
   <!-- FOOTER -->
   <footer class="footer">
@@ -949,7 +1022,79 @@ function renderPiecesViews(){
   renderWeekGrid();
   renderDayPieceLists();
   renderParrilla();
+  renderKanban();
   updateStats();
+}
+
+// === VIEW SWITCHING ===
+function switchView(name){
+  document.querySelectorAll('.view-tab').forEach(t => t.classList.toggle('active', t.getAttribute('data-view') === name));
+  document.getElementById('calendarView').style.display = name === 'calendar' ? '' : 'none';
+  document.getElementById('kanbanView').style.display = name === 'kanban' ? '' : 'none';
+  document.getElementById('inventoryView').style.display = name === 'inventory' ? '' : 'none';
+  if (name === 'kanban') renderKanban();
+  if (name === 'inventory') renderInventory();
+}
+
+// === KANBAN ===
+function renderKanban(){
+  const board = document.getElementById('kanbanBoard');
+  if (!board) return;
+  const cols = [
+    { key: 'pendiente', label: 'Pendiente', filter: p => p.status !== 'listo' && !p.approved },
+    { key: 'listo',     label: 'Listo',     filter: p => p.status === 'listo' && !p.approved },
+    { key: 'aprobado',  label: 'Aprobado',  filter: p => p.approved }
+  ];
+  board.innerHTML = cols.map(col => {
+    const items = state.pieces.filter(col.filter);
+    return `<div class="kanban-col" data-col="${col.key}">
+      <div class="kanban-col-head"><span>${col.label}</span><span class="kc-count">${items.length}</span></div>
+      <div class="kanban-cards">
+        ${items.map(p => {
+          const m = p.assignee ? teamMember(p.assignee) : null;
+          const cc = (state.comments[p.id]||[]).length;
+          return `<div class="kanban-card" data-piece-id="${p.id}">
+            <div class="kc-day">${escapeHtml(p.day)} · ${escapeHtml(p.type)}</div>
+            <div class="kc-title">${escapeHtml(p.title)}</div>
+            <div class="kc-foot">
+              ${m ? `<span class="kc-avatar" style="background:${m.color}" title="${escapeAttr(m.name)}">${initials(m.name)}</span>` : '<span class="kc-avatar" style="background:var(--cream-dark);color:var(--grey)">?</span>'}
+              ${p.platform ? `<span class="kc-tag plat">${escapeHtml(p.platform)}</span>` : ''}
+              ${p.productGid && catalogProduct(p.productGid) ? `<span class="kc-tag">${escapeHtml((catalogProduct(p.productGid).title||'').slice(0,18))}</span>` : ''}
+              ${cc ? `<span class="kc-tag">💬${cc}</span>` : ''}
+            </div>
+          </div>`;
+        }).join('') || '<div style="padding:16px;text-align:center;color:var(--grey);font-size:11px;font-family:JetBrains Mono,monospace">vacío</div>'}
+      </div>
+    </div>`;
+  }).join('');
+  board.querySelectorAll('.kanban-card').forEach(card => {
+    card.addEventListener('click', () => openUrlsModal(card.getAttribute('data-piece-id')));
+  });
+}
+
+// === INVENTORY FILTER ===
+let invSortDir = 'asc';
+function renderInventory(){
+  const list = document.getElementById('invList');
+  const meta = document.getElementById('invMeta');
+  if (!list) return;
+  const search = (document.getElementById('invSearch')?.value || '').trim().toLowerCase();
+  let items = state.catalog.slice();
+  if (search) items = items.filter(p => p.title.toLowerCase().includes(search));
+  items.sort((a, b) => invSortDir === 'asc' ? a.total - b.total : b.total - a.total);
+  if (meta) meta.textContent = `${items.length} productos`;
+  list.innerHTML = items.map(p => {
+    const cls = p.total <= 5 ? 'lowstock' : p.total <= 20 ? 'midstock' : 'okstock';
+    const chips = (p.sizes||[]).map(s => {
+      const sc = s.available > 5 ? 'ok' : s.available >= 1 ? 'low' : 'out';
+      return `<span class="size-chip ${sc}">${escapeHtml(s.size)}:${s.available}</span>`;
+    }).join('');
+    return `<div class="inv-row ${cls}">
+      <div class="inv-total">${p.total}</div>
+      <div class="inv-name">${escapeHtml(p.title)}</div>
+      <div class="inv-sizes">${chips}</div>
+    </div>`;
+  }).join('') || '<div style="background:#fff;padding:32px;text-align:center;color:var(--grey);font-family:JetBrains Mono,monospace;font-size:11px">Sin productos. Corre el Edge Function para llenar el catálogo.</div>';
 }
 
 function colorToEvtClass(c){ return 'evt-' + (c || 'push'); }
@@ -1529,6 +1674,22 @@ if (mineToggleBtn){
     renderParrilla();
   });
 }
+
+// View tabs
+document.querySelectorAll('.view-tab').forEach(tab => {
+  tab.addEventListener('click', () => switchView(tab.getAttribute('data-view')));
+});
+
+// Inventory search + sort
+const invSearchEl = document.getElementById('invSearch');
+if (invSearchEl) invSearchEl.addEventListener('input', renderInventory);
+document.querySelectorAll('.inv-sort-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    invSortDir = btn.getAttribute('data-sort');
+    document.querySelectorAll('.inv-sort-btn').forEach(b => b.classList.toggle('active', b === btn));
+    renderInventory();
+  });
+});
 
 // === BOOT ===
 boot().catch(err => {
