@@ -261,6 +261,50 @@ html,body{background:var(--cream);color:var(--black);font-family:'Outfit',sans-s
 .footer a{color:var(--rosa-deep);text-decoration:none;border-bottom:1px solid var(--rosa-deep)}
 .footer a:hover{color:var(--black);border-bottom-color:var(--black)}
 
+/* PIECE MODAL */
+.modal-piece{max-width:600px;max-height:90vh;overflow-y:auto}
+.pm-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:6px}
+.pm-label{display:block;font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--grey);margin-bottom:6px}
+.pm-input{width:100%;padding:9px 11px;font-family:'JetBrains Mono',monospace;font-size:12px;border:1px solid var(--black);background:#fff;outline:none}
+.pm-input:focus{border-color:var(--rosa-deep)}
+select.pm-input{cursor:pointer}
+.pm-status-toggle{display:flex;border:1px solid var(--black)}
+.pm-status-toggle button{flex:1;padding:9px 4px;background:#fff;border:none;cursor:pointer;font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--grey)}
+.pm-status-toggle button.active[data-status="pendiente"]{background:var(--yellow-low);color:#fff}
+.pm-status-toggle button.active[data-status="listo"]{background:var(--green-ok);color:#fff}
+.pm-approve-btn{width:100%;padding:9px;background:transparent;border:1px solid var(--black);cursor:pointer;font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.1em;text-transform:uppercase;transition:all .15s}
+.pm-approve-btn:hover:not(:disabled){background:var(--black);color:var(--cream)}
+.pm-approve-btn.approved{background:var(--green-ok);color:#fff;border-color:var(--green-ok)}
+.pm-approve-btn:disabled{opacity:.5;cursor:not-allowed}
+.pm-mini-btn{padding:9px 13px;background:var(--rosa-deep);color:#fff;border:none;font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.1em;text-transform:uppercase;cursor:pointer;white-space:nowrap}
+.pm-mini-btn:hover{background:var(--black)}
+.pm-inventory{margin-top:8px;padding:10px;background:var(--cream);border-left:3px solid var(--rosa-deep);min-height:38px}
+.pm-inv-empty{font-size:11px;color:var(--grey);font-style:italic}
+.pm-inv-title{font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--grey);margin-bottom:6px;text-transform:uppercase;letter-spacing:.08em}
+.pm-comments{max-height:200px;overflow-y:auto;background:var(--cream);padding:10px;display:flex;flex-direction:column;gap:10px}
+.pm-comment-empty{font-size:12px;color:var(--grey);font-style:italic;text-align:center;padding:8px}
+.pm-comment{display:flex;gap:8px;align-items:flex-start}
+.pm-avatar{width:24px;height:24px;border-radius:50%;color:#fff;font-family:'JetBrains Mono',monospace;font-size:9px;font-weight:600;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.pm-comment-body{font-size:13px;line-height:1.45;color:var(--black)}
+.pm-comment-meta{font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--grey);text-transform:uppercase;letter-spacing:.06em;margin-bottom:2px}
+
+/* TILE BADGES (parrilla) */
+.tile-badges{display:flex;align-items:center;gap:5px;padding:4px 10px;flex-wrap:wrap}
+.tile.has-photo .tile-badges{position:relative;z-index:2;background:rgba(255,255,255,.9)}
+.tile-avatar{width:20px;height:20px;border-radius:50%;color:#fff;font-family:'JetBrains Mono',monospace;font-size:8px;font-weight:600;display:flex;align-items:center;justify-content:center}
+.tile-avatar.unassigned{background:var(--cream-dark);color:var(--grey)}
+.tile-statusdot{width:9px;height:9px;border-radius:50%}
+.tile-statusdot.pendiente{background:var(--yellow-low)}
+.tile-statusdot.listo{background:var(--green-ok)}
+.tile-approved{color:var(--green-ok);font-weight:700;font-size:12px}
+.tile-plat{font-family:'JetBrains Mono',monospace;font-size:8px;letter-spacing:.05em;text-transform:uppercase;background:var(--black);color:var(--cream);padding:2px 5px;border-radius:2px}
+.tile-comments{font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--rosa-deep)}
+.tile.is-listo .tile-color{box-shadow:inset 0 0 0 2px var(--green-ok)}
+
+/* MIS TAREAS toggle */
+.mine-toggle{display:inline-flex;align-items:center;gap:6px;font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--grey);cursor:pointer;border:1px solid var(--black);padding:6px 10px;background:transparent;transition:all .15s}
+.mine-toggle.active{background:var(--black);color:var(--cream)}
+
 /* FATAL ERROR SCREEN */
 .fatal{position:fixed;inset:0;background:var(--cream);display:flex;align-items:center;justify-content:center;z-index:200;flex-direction:column;padding:24px;text-align:center}
 .fatal h2{font-family:'Cormorant Garamond',serif;font-style:italic;font-weight:700;font-size:36px;margin-bottom:12px}
@@ -370,7 +414,7 @@ html,body{background:var(--cream);color:var(--black);font-family:'Outfit',sans-s
         <span class="stat-item"><strong id="statReels">—</strong>reels</span>
         <span class="stat-item"><strong id="statStories">—</strong>stories</span>
       </div>
-      <div>Click cualquier campo para editar · × eliminar · + agregar</div>
+      <button class="mine-toggle" id="mineToggle">◴ Mis tareas</button>
     </div>
     <div class="parrilla-grid" id="parrillaGrid"></div>
   </section>
@@ -440,25 +484,63 @@ html,body{background:var(--cream);color:var(--black);font-family:'Outfit',sans-s
 
 </div>
 
-<!-- URLs MODAL (Canva + Referente + Upload) -->
+<!-- PIECE MODAL (workflow + assignment + product + URLs + comments) -->
 <div class="modal-backdrop" id="urlsModal">
-  <div class="modal">
-    <div class="modal-meta">URLs de la pieza</div>
+  <div class="modal modal-piece">
+    <div class="modal-meta">Pieza de contenido</div>
     <h3 data-modal-title>—</h3>
-    <p style="font-size:13px;color:var(--grey);margin-bottom:16px">Pega URLs públicas. La de Canva se usa como imagen de fondo del tile. La de Referente abre en nueva pestaña al click "REF ↗".</p>
 
-    <label style="display:block;font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.15em;text-transform:uppercase;color:var(--grey);margin-bottom:6px">Imagen final</label>
-    <div style="display:flex;gap:6px;margin-bottom:16px">
-      <input type="url" data-modal-input="imageUrl" placeholder="Pega URL o sube foto →" style="flex:1;padding:10px 12px;font-family:'JetBrains Mono',monospace;font-size:12px;border:1px solid var(--black);background:#fff;outline:none">
-      <button data-urls-upload style="padding:10px 14px;background:var(--rosa-deep);color:#fff;border:none;font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.12em;text-transform:uppercase;cursor:pointer;white-space:nowrap">📷 Subir</button>
+    <div class="pm-grid">
+      <div>
+        <label class="pm-label">Responsable</label>
+        <select class="pm-input" data-pm="assignee"></select>
+      </div>
+      <div>
+        <label class="pm-label">Plataforma</label>
+        <select class="pm-input" data-pm="platform">
+          <option value="">—</option>
+          <option value="IG">IG</option>
+          <option value="TikTok">TikTok</option>
+          <option value="Ambos">Ambos</option>
+        </select>
+      </div>
+      <div>
+        <label class="pm-label">Estado</label>
+        <div class="pm-status-toggle" data-pm-status>
+          <button type="button" data-status="pendiente">Pendiente</button>
+          <button type="button" data-status="listo">Listo</button>
+        </div>
+      </div>
+      <div>
+        <label class="pm-label">Aprobación</label>
+        <button type="button" class="pm-approve-btn" data-pm-approve>Aprobar</button>
+      </div>
     </div>
 
-    <label style="display:block;font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.15em;text-transform:uppercase;color:var(--grey);margin-bottom:6px">URL Referente (inspiración)</label>
-    <input type="url" data-modal-input="refUrl" placeholder="https://… (Pinterest, IG, Canva, etc)" style="width:100%;padding:10px 12px;font-family:'JetBrains Mono',monospace;font-size:12px;border:1px solid var(--black);background:#fff;outline:none">
+    <label class="pm-label" style="margin-top:16px">Producto featured (inventario auto)</label>
+    <input list="catalogList" class="pm-input" data-pm="productSearch" placeholder="Busca un producto de la tienda…" autocomplete="off">
+    <datalist id="catalogList"></datalist>
+    <div class="pm-inventory" data-pm-inventory></div>
+
+    <label class="pm-label" style="margin-top:16px">Imagen final (Canva)</label>
+    <div style="display:flex;gap:6px">
+      <input type="url" data-modal-input="imageUrl" placeholder="Pega URL o sube foto →" class="pm-input" style="flex:1">
+      <button data-urls-upload class="pm-mini-btn">📷 Subir</button>
+    </div>
+
+    <label class="pm-label" style="margin-top:12px">URL Referente (inspiración)</label>
+    <input type="url" data-modal-input="refUrl" placeholder="https://… (Pinterest, IG, Canva, etc)" class="pm-input">
+
+    <label class="pm-label" style="margin-top:18px">Comentarios <span data-pm-ccount style="color:var(--rosa-deep)"></span></label>
+    <div class="pm-comments" data-pm-comments></div>
+    <div style="display:flex;gap:6px;margin-top:8px">
+      <input type="text" data-pm-comment-input placeholder="Escribe un comentario…" class="pm-input" style="flex:1">
+      <button class="pm-mini-btn" data-pm-comment-send>Enviar</button>
+    </div>
 
     <div class="modal-actions">
-      <button class="modal-btn" data-urls-cancel>Cancelar</button>
-      <button class="modal-btn primary" data-urls-save>Guardar URLs</button>
+      <button class="modal-btn" data-urls-cancel>Cerrar</button>
+      <button class="modal-btn primary" data-urls-save>Guardar</button>
     </div>
   </div>
 </div>
@@ -486,7 +568,11 @@ const state = {
   calendar: null,    // metadata row from `calendars` table
   days: [],          // array of {key, dow, dnum, dateObj, fullDow}
   pieces: [],
+  team: [],          // team_members rows
+  catalog: [],       // shopify_catalog products [{gid,title,total,sizes}]
+  comments: {},      // pieceId -> [{id,author_email,body,created_at}]
   channels: [],
+  filterMine: false, // "Mis tareas" toggle
   initialized: false
 };
 
@@ -564,7 +650,13 @@ function rowToPiece(r){
     description: r.description || '',
     imageUrl: r.image_url || null,
     refUrl: r.ref_url || null,
-    position: r.position || 0
+    position: r.position || 0,
+    assignee: r.assignee || null,
+    status: r.status || 'pendiente',
+    platform: r.platform || null,
+    approved: !!r.approved,
+    approvedBy: r.approved_by || null,
+    productGid: r.product_gid || null
   };
 }
 function pieceToRow(p){
@@ -579,9 +671,22 @@ function pieceToRow(p){
     image_url: p.imageUrl || null,
     ref_url: p.refUrl || null,
     position: typeof p.position === 'number' ? p.position : 0,
+    assignee: p.assignee || null,
+    status: p.status || 'pendiente',
+    platform: p.platform || null,
+    approved: !!p.approved,
+    approved_by: p.approvedBy || null,
+    product_gid: p.productGid || null,
     updated_at: new Date().toISOString()
   };
 }
+
+// Team helpers
+function teamMember(email){ return state.team.find(m => m.email === email) || null; }
+function myMember(){ return state.user ? teamMember(state.user.email) : null; }
+function canApprove(){ const m = myMember(); return !!(m && m.can_approve); }
+function initials(name){ return (name||'?').trim().split(/\s+/).map(w=>w[0]).slice(0,2).join('').toUpperCase(); }
+function catalogProduct(gid){ return state.catalog.find(p => p.gid === gid) || null; }
 
 // === BOOT ===
 async function boot(){
@@ -677,14 +782,24 @@ async function loadCalendar(){
   // Render skeleton sections that depend on days
   renderDayCards();
 
-  // Load pieces + fields in parallel
-  const [piecesRes, fieldsRes] = await Promise.all([
+  // Load pieces + fields + team + catalog + comments in parallel
+  const [piecesRes, fieldsRes, teamRes, catalogRes, commentsRes] = await Promise.all([
     supabase.from('calendar_pieces').select('*').eq('calendar_id', state.calendarId).order('position', { ascending: true }),
-    supabase.from('calendar_fields').select('*').eq('calendar_id', state.calendarId)
+    supabase.from('calendar_fields').select('*').eq('calendar_id', state.calendarId),
+    supabase.from('team_members').select('*'),
+    supabase.from('shopify_catalog').select('products').eq('id', 1).maybeSingle(),
+    supabase.from('calendar_comments').select('*').eq('calendar_id', state.calendarId).order('created_at', { ascending: true })
   ]);
 
   if (piecesRes.error){ console.error('Load pieces err', piecesRes.error); }
   if (fieldsRes.error){ console.error('Load fields err', fieldsRes.error); }
+
+  state.team = teamRes.data || [];
+  state.catalog = (catalogRes.data && Array.isArray(catalogRes.data.products)) ? catalogRes.data.products : [];
+  state.comments = {};
+  (commentsRes.data || []).forEach(c => {
+    (state.comments[c.piece_id] = state.comments[c.piece_id] || []).push(c);
+  });
 
   state.pieces = (piecesRes.data || []).map(rowToPiece);
   state.initialized = true;
@@ -709,7 +824,15 @@ async function loadCalendar(){
   const calCh = supabase.channel(`calendar:${state.calendarId}:meta`)
     .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'calendars', filter: `id=eq.${state.calendarId}` }, p => handleCalendarChange(p))
     .subscribe();
-  state.channels = [piecesCh, fieldsCh, calCh];
+  const commentsCh = supabase.channel(`calendar:${state.calendarId}:comments`)
+    .on('postgres_changes', { event: '*', schema: 'public', table: 'calendar_comments', filter: `calendar_id=eq.${state.calendarId}` }, p => handleCommentChange(p))
+    .subscribe();
+  const catalogCh = supabase.channel('shopify-catalog')
+    .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'shopify_catalog', filter: 'id=eq.1' }, p => {
+      if (p.new && Array.isArray(p.new.products)) { state.catalog = p.new.products; renderPiecesViews(); }
+    })
+    .subscribe();
+  state.channels = [piecesCh, fieldsCh, calCh, commentsCh, catalogCh];
 
   setSync('connected', 'Sincronizado');
 }
@@ -749,6 +872,26 @@ function handleCalendarChange(payload){
   renderShopifyData(cal.shopify_data || {});
   // Update header status if changed
   document.getElementById('headerWeekStatus').textContent = cal.status === 'active' ? '' : `· ${cal.status}`;
+}
+
+function handleCommentChange(payload){
+  if (payload.eventType === 'INSERT'){
+    const c = payload.new;
+    const arr = state.comments[c.piece_id] = state.comments[c.piece_id] || [];
+    if (!arr.find(x => x.id === c.id)) arr.push(c);
+  } else if (payload.eventType === 'DELETE'){
+    const c = payload.old;
+    if (state.comments[c.piece_id]) {
+      state.comments[c.piece_id] = state.comments[c.piece_id].filter(x => x.id !== c.id);
+    }
+  }
+  // Refresh modal if open on this piece, and piece indicators
+  const modal = document.getElementById('urlsModal');
+  if (modal && modal.classList.contains('open')){
+    const pid = modal.getAttribute('data-piece-id');
+    if (pid) renderComments(pid);
+  }
+  renderPiecesViews();
 }
 
 // === SAVE OPS ===
@@ -964,8 +1107,15 @@ function renderParrilla(){
   const grid = document.getElementById('parrillaGrid');
   if (!grid) return;
 
-  grid.innerHTML = state.pieces.map(t => `
-    <div class="tile ${t.imageUrl ? 'has-photo' : ''}" data-tile-id="${t.id}">
+  const visible = state.filterMine && state.user
+    ? state.pieces.filter(p => p.assignee === state.user.email)
+    : state.pieces;
+
+  grid.innerHTML = visible.map(t => {
+    const m = t.assignee ? teamMember(t.assignee) : null;
+    const ccount = (state.comments[t.id] || []).length;
+    return `
+    <div class="tile ${t.imageUrl ? 'has-photo' : ''} ${t.status==='listo'?'is-listo':''}" data-tile-id="${t.id}">
       ${t.imageUrl ? `<img class="tile-photo" src="${escapeAttr(t.imageUrl)}" alt="" loading="lazy" onerror="this.style.display='none';this.parentElement.classList.remove('has-photo')">` : ''}
       <div class="tile-color ${t.color || 'push'}"></div>
       ${t.refUrl ? `<a class="tile-ref" href="${escapeAttr(t.refUrl)}" target="_blank" rel="noopener" title="Abrir referente">REF ↗</a>` : ''}
@@ -974,15 +1124,22 @@ function renderParrilla(){
         <span class="tile-type" contenteditable="true" data-piece-edit="type">${escapeHtml(t.type)}</span>
       </div>
       <div class="tile-title" contenteditable="true" data-piece-edit="title">${escapeHtml(t.title)}</div>
+      <div class="tile-badges">
+        ${m ? `<span class="tile-avatar" style="background:${m.color}" title="${escapeAttr(m.name)}">${initials(m.name)}</span>` : '<span class="tile-avatar unassigned" title="Sin asignar">?</span>'}
+        <span class="tile-statusdot ${t.status==='listo'?'listo':'pendiente'}" title="${t.status==='listo'?'Listo':'Pendiente'}"></span>
+        ${t.approved ? '<span class="tile-approved" title="Aprobado">✓</span>' : ''}
+        ${t.platform ? `<span class="tile-plat">${escapeHtml(t.platform)}</span>` : ''}
+        ${ccount ? `<span class="tile-comments" title="${ccount} comentarios">💬${ccount}</span>` : ''}
+      </div>
       <div class="tile-bottom">
         ${COLOR_OPTIONS.map(c => `<span class="color-dot ${c} ${c===t.color?'active':''}" data-color="${c}" title="${c}"></span>`).join('')}
       </div>
       <div class="tile-actions">
-        <button class="tile-btn urls" data-action="urls" title="URLs (Canva + Referente)">📎</button>
+        <button class="tile-btn urls" data-action="urls" title="Abrir pieza">⚙</button>
         <button class="tile-btn delete" data-action="delete" title="Eliminar">×</button>
       </div>
-    </div>
-  `).join('') + `
+    </div>`;
+  }).join('') + `
     <button class="tile-add" id="tileAdd"><span class="plus">+</span><span class="add-label">Agregar</span></button>
   `;
 
@@ -1095,30 +1252,147 @@ function renderShopifyData(data){
   }
 }
 
-// === URLs MODAL ===
+// === PIECE MODAL ===
 function openUrlsModal(pieceId){
   const piece = state.pieces.find(p => p.id === pieceId);
   if (!piece) return;
   const modal = document.getElementById('urlsModal');
+  modal.setAttribute('data-piece-id', pieceId);
   modal.querySelector('[data-modal-title]').textContent = piece.title || 'Pieza';
   modal.querySelector('[data-modal-input="imageUrl"]').value = piece.imageUrl || '';
   modal.querySelector('[data-modal-input="refUrl"]').value = piece.refUrl || '';
-  modal.setAttribute('data-piece-id', pieceId);
+
+  // Assignee dropdown
+  const assigneeSel = modal.querySelector('[data-pm="assignee"]');
+  assigneeSel.innerHTML = `<option value="">— Sin asignar —</option>` +
+    state.team.map(m => `<option value="${escapeAttr(m.email)}" ${m.email===piece.assignee?'selected':''}>${escapeHtml(m.name)} · ${escapeHtml(m.focus||m.role)}</option>`).join('');
+
+  // Platform
+  modal.querySelector('[data-pm="platform"]').value = piece.platform || '';
+
+  // Status toggle
+  modal.querySelectorAll('[data-pm-status] button').forEach(b => {
+    b.classList.toggle('active', b.getAttribute('data-status') === (piece.status || 'pendiente'));
+  });
+
+  // Approve button
+  const approveBtn = modal.querySelector('[data-pm-approve]');
+  if (canApprove()){
+    approveBtn.disabled = false;
+    approveBtn.classList.toggle('approved', !!piece.approved);
+    approveBtn.textContent = piece.approved ? `✓ Aprobado por ${escapeHtml((teamMember(piece.approvedBy)||{}).name || 'Lead')}` : 'Aprobar';
+  } else {
+    approveBtn.disabled = true;
+    approveBtn.classList.toggle('approved', !!piece.approved);
+    approveBtn.textContent = piece.approved ? `✓ Aprobado` : 'Solo Lead aprueba';
+  }
+
+  // Product search + datalist
+  const dl = document.getElementById('catalogList');
+  dl.innerHTML = state.catalog.map(p => `<option value="${escapeAttr(p.title)}">`).join('');
+  const prodInput = modal.querySelector('[data-pm="productSearch"]');
+  const cp = piece.productGid ? catalogProduct(piece.productGid) : null;
+  prodInput.value = cp ? cp.title : '';
+  renderModalInventory(piece.productGid);
+
+  // Comments
+  renderComments(pieceId);
+
   modal.classList.add('open');
-  setTimeout(() => modal.querySelector('[data-modal-input="imageUrl"]').focus(), 50);
 }
 function closeUrlsModal(){ document.getElementById('urlsModal').classList.remove('open'); }
+
+function renderModalInventory(gid){
+  const box = document.querySelector('[data-pm-inventory]');
+  if (!box) return;
+  const p = gid ? catalogProduct(gid) : null;
+  if (!p){ box.innerHTML = '<span class="pm-inv-empty">Sin producto seleccionado</span>'; return; }
+  const total = p.total;
+  box.innerHTML = `<div class="pm-inv-title">${escapeHtml(p.title)} · total ${total}</div>` +
+    `<div class="size-chips">` + (p.sizes||[]).map(s => {
+      const cls = s.available > 5 ? 'ok' : s.available >= 1 ? 'low' : 'out';
+      return `<span class="size-chip ${cls}">${escapeHtml(s.size)}:${s.available}</span>`;
+    }).join('') + `</div>`;
+}
+
+function renderComments(pieceId){
+  const box = document.querySelector('[data-pm-comments]');
+  const cnt = document.querySelector('[data-pm-ccount]');
+  if (!box) return;
+  const list = state.comments[pieceId] || [];
+  if (cnt) cnt.textContent = list.length ? `(${list.length})` : '';
+  if (!list.length){ box.innerHTML = '<div class="pm-comment-empty">Sin comentarios aún</div>'; return; }
+  box.innerHTML = list.map(c => {
+    const m = teamMember(c.author_email);
+    const name = m ? m.name : (c.author_email||'').split('@')[0];
+    const color = m ? m.color : '#7a7570';
+    const when = new Date(c.created_at).toLocaleString('es-CO', { day:'2-digit', month:'short', hour:'2-digit', minute:'2-digit' });
+    return `<div class="pm-comment">
+      <span class="pm-avatar" style="background:${color}">${initials(name)}</span>
+      <div class="pm-comment-body"><div class="pm-comment-meta">${escapeHtml(name)} · ${when}</div>${escapeHtml(c.body)}</div>
+    </div>`;
+  }).join('');
+  box.scrollTop = box.scrollHeight;
+}
+
+async function sendComment(){
+  const modal = document.getElementById('urlsModal');
+  const pieceId = modal.getAttribute('data-piece-id');
+  const input = modal.querySelector('[data-pm-comment-input]');
+  const body = (input.value || '').trim();
+  if (!body || !pieceId) return;
+  input.value = '';
+  const { error } = await supabase.from('calendar_comments').insert({
+    calendar_id: state.calendarId,
+    piece_id: pieceId,
+    author_email: state.user.email,
+    body
+  });
+  if (error){ console.error('Comment err', error); setSync('offline','Error al comentar'); input.value = body; }
+}
+
 function saveUrlsModal(){
   const modal = document.getElementById('urlsModal');
   const pieceId = modal.getAttribute('data-piece-id');
-  const imageUrl = modal.querySelector('[data-modal-input="imageUrl"]').value.trim() || null;
-  const refUrl = modal.querySelector('[data-modal-input="refUrl"]').value.trim() || null;
   const piece = state.pieces.find(p => p.id === pieceId);
   if (!piece) return;
-  const updated = { ...piece, imageUrl, refUrl };
+
+  const imageUrl = modal.querySelector('[data-modal-input="imageUrl"]').value.trim() || null;
+  const refUrl = modal.querySelector('[data-modal-input="refUrl"]').value.trim() || null;
+  const assignee = modal.querySelector('[data-pm="assignee"]').value || null;
+  const platform = modal.querySelector('[data-pm="platform"]').value || null;
+  const statusBtn = modal.querySelector('[data-pm-status] button.active');
+  const status = statusBtn ? statusBtn.getAttribute('data-status') : 'pendiente';
+  // Resolve product from search text
+  const prodText = modal.querySelector('[data-pm="productSearch"]').value.trim();
+  let productGid = piece.productGid;
+  if (!prodText){ productGid = null; }
+  else {
+    const match = state.catalog.find(p => p.title.toLowerCase() === prodText.toLowerCase());
+    if (match) productGid = match.gid;
+  }
+
+  const updated = { ...piece, imageUrl, refUrl, assignee, platform, status, productGid };
   state.pieces = state.pieces.map(p => p.id === pieceId ? updated : p);
   saveOnePiece(updated);
   closeUrlsModal();
+  renderPiecesViews();
+}
+
+async function toggleApprove(){
+  if (!canApprove()) return;
+  const modal = document.getElementById('urlsModal');
+  const pieceId = modal.getAttribute('data-piece-id');
+  const piece = state.pieces.find(p => p.id === pieceId);
+  if (!piece) return;
+  const nowApproved = !piece.approved;
+  const updated = { ...piece, approved: nowApproved, approvedBy: nowApproved ? state.user.email : null };
+  state.pieces = state.pieces.map(p => p.id === pieceId ? updated : p);
+  saveOnePiece(updated);
+  // Update button UI immediately
+  const btn = modal.querySelector('[data-pm-approve]');
+  btn.classList.toggle('approved', nowApproved);
+  btn.textContent = nowApproved ? `✓ Aprobado por ${escapeHtml((myMember()||{}).name||'Lead')}` : 'Aprobar';
   renderPiecesViews();
 }
 
@@ -1219,10 +1493,42 @@ if (urlsModalEl){
   urlsModalEl.querySelector('[data-urls-save]').addEventListener('click', saveUrlsModal);
   urlsModalEl.querySelector('[data-urls-upload]').addEventListener('click', uploadPhotoFromModal);
   urlsModalEl.addEventListener('click', e => { if (e.target === urlsModalEl) closeUrlsModal(); });
+
+  // Status toggle
+  urlsModalEl.querySelectorAll('[data-pm-status] button').forEach(b => {
+    b.addEventListener('click', () => {
+      urlsModalEl.querySelectorAll('[data-pm-status] button').forEach(x => x.classList.remove('active'));
+      b.classList.add('active');
+    });
+  });
+  // Approve
+  urlsModalEl.querySelector('[data-pm-approve]').addEventListener('click', toggleApprove);
+  // Comment send
+  urlsModalEl.querySelector('[data-pm-comment-send]').addEventListener('click', sendComment);
+  urlsModalEl.querySelector('[data-pm-comment-input]').addEventListener('keydown', e => {
+    if (e.key === 'Enter'){ e.preventDefault(); sendComment(); }
+  });
+  // Product search live inventory preview
+  urlsModalEl.querySelector('[data-pm="productSearch"]').addEventListener('input', e => {
+    const txt = e.target.value.trim().toLowerCase();
+    const match = state.catalog.find(p => p.title.toLowerCase() === txt);
+    renderModalInventory(match ? match.gid : null);
+  });
 }
 document.addEventListener('keydown', e => {
   if (e.key === 'Escape' && urlsModalEl && urlsModalEl.classList.contains('open')) closeUrlsModal();
 });
+
+// Mis tareas toggle
+const mineToggleBtn = document.getElementById('mineToggle');
+if (mineToggleBtn){
+  mineToggleBtn.addEventListener('click', () => {
+    state.filterMine = !state.filterMine;
+    mineToggleBtn.classList.toggle('active', state.filterMine);
+    mineToggleBtn.textContent = state.filterMine ? '◴ Mis tareas (ON)' : '◴ Mis tareas';
+    renderParrilla();
+  });
+}
 
 // === BOOT ===
 boot().catch(err => {
