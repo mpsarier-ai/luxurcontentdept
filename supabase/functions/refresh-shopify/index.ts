@@ -218,6 +218,13 @@ function bogotaTimestamp(): string {
   const b = new Date(Date.now() - 5 * 60 * 60 * 1000);
   return `${b.getUTCFullYear()}-${String(b.getUTCMonth()+1).padStart(2,'0')}-${String(b.getUTCDate()).padStart(2,'0')} ${String(b.getUTCHours()).padStart(2,'0')}:${String(b.getUTCMinutes()).padStart(2,'0')} -05`;
 }
+// Calendar date (YYYY-MM-DD) of an order timestamp, in Bogota time (UTC-5).
+// Shopify createdAt is ISO8601; Date() parses any offset to epoch, then we shift -5h.
+function bogotaDate(iso: string): string {
+  const t = new Date(iso).getTime() - 5 * 60 * 60 * 1000;
+  const b = new Date(t);
+  return `${b.getUTCFullYear()}-${String(b.getUTCMonth()+1).padStart(2,'0')}-${String(b.getUTCDate()).padStart(2,'0')}`;
+}
 // Bogota "today" minus N days, as YYYY-MM-DD
 function daysAgoISO(n: number): string {
   const b = new Date(Date.now() - 5 * 60 * 60 * 1000);
@@ -263,7 +270,7 @@ async function handler(_req: Request): Promise<Response> {
       const dayMap: Record<string, { gross: number; orders: number }> = {};
       const prodMap: Record<string, { gross: number; orderIds: Set<string> }> = {};
       for (const o of orders) {
-        const day = o.createdAt.slice(0, 10);
+        const day = bogotaDate(o.createdAt);
         if (day < startISO || day > endISO) continue;
         if (!dayMap[day]) dayMap[day] = { gross: 0, orders: 0 };
         dayMap[day].gross += o.total;
