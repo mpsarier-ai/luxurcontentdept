@@ -71,6 +71,12 @@ html,body{background:var(--cream);color:var(--black);font-family:'Outfit',sans-s
 .week-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:1px;background:var(--black);border:1px solid var(--black);margin-bottom:64px}
 .day-cell{background:var(--cream);min-height:200px;display:flex;flex-direction:column}
 .day-head{padding:10px 12px 8px;border-bottom:1px solid var(--cream-dark);display:flex;justify-content:space-between;align-items:baseline}
+.day-head-link{cursor:pointer;transition:background .15s;position:relative}
+.day-head-link:hover{background:var(--rosa)}
+.day-head-link .goto-hint{font-family:'JetBrains Mono',monospace;font-size:8px;letter-spacing:.1em;text-transform:uppercase;color:var(--rosa-deep);opacity:0;transition:opacity .15s;position:absolute;right:10px;bottom:9px}
+.day-head-link:hover .goto-hint{opacity:1}
+.day-flash{animation:dayflash 1.4s ease}
+@keyframes dayflash{0%,100%{box-shadow:0 0 0 0 rgba(212,132,142,0)}25%{box-shadow:0 0 0 4px rgba(212,132,142,.55)}}
 .day-head .dow{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:var(--grey)}
 .day-head .dnum{font-family:'Cormorant Garamond',serif;font-weight:700;font-size:24px}
 .day-events{padding:8px;display:flex;flex-direction:column;gap:6px;flex:1}
@@ -101,14 +107,17 @@ html,body{background:var(--cream);color:var(--black);font-family:'Outfit',sans-s
 .day-card .day-marker .focus:empty::before{content:'+ tema';color:var(--cream-dark)}
 .day-card .content-block .ctype{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:var(--rosa-deep);margin-bottom:6px;outline:none}
 .day-card .content-block .ctype:focus{background:rgba(232,165,173,.12)}
-.day-card .content-block .ctype:empty::before{content:'+ tipo';color:var(--cream-dark)}
+.day-card .content-block .ctype:empty::before{content:attr(data-ph);color:var(--cream-dark)}
 .day-card .content-block h3{font-family:'Cormorant Garamond',serif;font-weight:700;font-size:24px;margin-bottom:14px;line-height:1.15;outline:none}
 .day-card .content-block h3:focus{background:rgba(232,165,173,.12)}
-.day-card .content-block h3:empty::before{content:'+ titulo del dia';color:var(--cream-dark);font-style:italic}
+.day-card .content-block h3:empty::before{content:attr(data-ph);color:var(--cream-dark);font-style:italic}
 .day-card .content-block .copy{font-size:14px;line-height:1.55;margin-bottom:16px;color:#333;outline:none}
 .day-card .content-block .copy:focus{background:rgba(232,165,173,.12)}
-.day-card .content-block .copy:empty::before{content:'+ copy / contexto del dia';color:var(--cream-dark);font-style:italic}
-.piece-list{display:flex;flex-direction:column;gap:14px;margin-top:18px;border-top:1px solid var(--cream-dark);padding-top:18px}
+.day-card .content-block .copy:empty::before{content:attr(data-ph);color:var(--cream-dark);font-style:italic}
+.block-label{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:#fff;background:var(--black);padding:5px 10px;display:inline-block;margin-bottom:12px}
+.block-label.pieces-label{margin-top:22px;background:var(--rosa-deep)}
+.block-label .day-count{opacity:.8;font-weight:400}
+.piece-list{display:flex;flex-direction:column;gap:14px;padding-top:4px}
 .piece{display:grid;grid-template-columns:90px 1fr 24px;gap:14px;align-items:start;position:relative}
 .piece .ptype{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--grey);padding-top:2px;outline:none}
 .piece .ptype:focus{background:rgba(232,165,173,.12);color:var(--rosa-deep)}
@@ -1365,7 +1374,7 @@ function renderWeekGrid(){
     const dayPieces = piecesByDayKey(d.key);
     return `
       <div class="day-cell" data-day-cell="${d.key}">
-        <div class="day-head"><span class="dow">${d.dow}</span><span class="dnum">${d.dnum}</span></div>
+        <div class="day-head day-head-link" data-goto-day="${d.index}" title="Planear este día →"><span class="dow">${d.dow}</span><span class="dnum">${d.dnum}</span><span class="goto-hint">planear ›</span></div>
         <div class="day-events">
           ${dayPieces.map(p => `
             <div class="evt ${colorToEvtClass(p.color)}" data-piece-id="${p.id}">
@@ -1389,9 +1398,21 @@ function renderWeekGrid(){
   grid.querySelectorAll('[data-add-day]').forEach(btn => {
     btn.addEventListener('click', () => addPiece(btn.getAttribute('data-add-day')));
   });
+  grid.querySelectorAll('[data-goto-day]').forEach(h => {
+    h.addEventListener('click', () => scrollToDay(parseInt(h.getAttribute('data-goto-day'))));
+  });
 
   const meta = document.getElementById('weekGridMeta');
-  if (meta) meta.textContent = `7 días · ${state.pieces.length} piezas`;
+  if (meta) meta.textContent = `7 días · ${state.pieces.length} piezas · click un día para planearlo`;
+}
+
+function scrollToDay(idx){
+  const card = document.getElementById('day-' + idx);
+  if (!card) return;
+  card.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  card.classList.remove('day-flash');
+  void card.offsetWidth; // reflow para reiniciar la animacion
+  card.classList.add('day-flash');
 }
 
 function renderDayCards(){
@@ -1400,16 +1421,18 @@ function renderDayCards(){
   if (!container || !state.days.length) return;
 
   container.innerHTML = state.days.map(d => `
-    <article class="day-card" data-day-card="${d.key}">
+    <article class="day-card" id="day-${d.index}" data-day-card="${d.key}">
       <div class="day-marker">
         <div class="dow-large">${d.fullDow}</div>
         <div class="dnum-large">${d.dnum}</div>
         <div class="focus" contenteditable="true" data-field="d${d.index}-focus"></div>
       </div>
       <div class="content-block">
-        <div class="ctype" contenteditable="true" data-field="d${d.index}-ctype"></div>
-        <h3 contenteditable="true" data-field="d${d.index}-title"></h3>
-        <p class="copy" contenteditable="true" data-field="d${d.index}-copy"></p>
+        <div class="block-label">① Concepto del día</div>
+        <div class="ctype" contenteditable="true" data-field="d${d.index}-ctype" data-ph="Tipo (Lanzamiento, Push, Recap…)"></div>
+        <h3 contenteditable="true" data-field="d${d.index}-title" data-ph="Título / idea central del día"></h3>
+        <p class="copy" contenteditable="true" data-field="d${d.index}-copy" data-ph="Contexto: por qué este día, qué buscamos…"></p>
+        <div class="block-label pieces-label">② Piezas del día <span class="day-count" data-day-count="${d.key}">(0)</span></div>
         <div class="piece-list" data-day-pieces="${d.key}"></div>
       </div>
       <aside class="shopify-panel" data-day-shopify="${d.index}">
@@ -1425,6 +1448,8 @@ function renderDayPieceLists(){
   document.querySelectorAll('[data-day-pieces]').forEach(container => {
     const day = container.getAttribute('data-day-pieces');
     const dayPieces = piecesByDayKey(day);
+    const cnt = document.querySelector(`[data-day-count="${day}"]`);
+    if (cnt) cnt.textContent = `(${dayPieces.length})`;
     container.innerHTML = dayPieces.map(p => `
       <div class="piece" data-piece-id="${p.id}">
         <div class="ptype" contenteditable="true" data-piece-edit="type">${escapeHtml(p.type)}</div>
