@@ -323,6 +323,8 @@ select.pm-input{cursor:pointer}
 .kanban-col[data-col="listo"] .kanban-col-head{background:var(--green-ok);color:#fff}
 .kanban-col[data-col="aprobado"] .kanban-col-head{background:var(--black);color:var(--cream)}
 .kanban-cards{padding:10px;display:flex;flex-direction:column;gap:8px;flex:1}
+.kanban-add{margin-top:6px;padding:9px;background:transparent;border:1px dashed var(--rosa-deep);color:var(--rosa-deep);font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.1em;text-transform:uppercase;cursor:pointer;border-radius:2px;transition:background .15s}
+.kanban-add:hover{background:var(--rosa);color:var(--black)}
 .kanban-card{background:#fff;border:1px solid var(--cream-dark);border-left:4px solid var(--rosa-deep);padding:12px;cursor:pointer;transition:box-shadow .15s}
 .kanban-card:hover{box-shadow:0 3px 10px rgba(0,0,0,.12)}
 .kanban-card .kc-day{font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:var(--grey)}
@@ -1071,11 +1073,22 @@ function renderKanban(){
             </div>
           </div>`;
         }).join('') || '<div style="padding:16px;text-align:center;color:var(--grey);font-size:11px;font-family:JetBrains Mono,monospace">vacío</div>'}
+        <button class="kanban-add" data-add-col="${col.key}">+ Pieza</button>
       </div>
     </div>`;
   }).join('');
   board.querySelectorAll('.kanban-card').forEach(card => {
     card.addEventListener('click', () => openUrlsModal(card.getAttribute('data-piece-id')));
+  });
+  board.querySelectorAll('.kanban-add').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const colKey = btn.getAttribute('data-add-col');
+      const opts = colKey === 'aprobado'
+        ? { status: 'listo', approved: true }
+        : { status: colKey === 'listo' ? 'listo' : 'pendiente' };
+      const lastDay = state.days[state.days.length-1];
+      addPiece(lastDay ? lastDay.key : undefined, opts);
+    });
   });
 }
 
@@ -1250,7 +1263,8 @@ function deletePiece(pid){
   renderPiecesViews();
 }
 
-function addPiece(day){
+function addPiece(day, opts){
+  opts = opts || {};
   const newId = 'p' + Date.now().toString(36);
   const piece = {
     id: newId,
@@ -1259,21 +1273,17 @@ function addPiece(day){
     color: 'push',
     title: 'Nueva pieza',
     description: '',
-    position: state.pieces.length
+    position: state.pieces.length,
+    status: opts.status || 'pendiente',
+    approved: !!opts.approved,
+    approvedBy: opts.approved && state.user ? state.user.email : null,
+    assignee: opts.assignee || null
   };
   state.pieces.push(piece);
   saveOnePiece(piece);
   renderPiecesViews();
-  setTimeout(() => {
-    const titleEl = document.querySelector(`.tile[data-tile-id="${newId}"] .tile-title`)
-                 || document.querySelector(`.evt[data-piece-id="${newId}"] .evt-title`)
-                 || document.querySelector(`.piece[data-piece-id="${newId}"] .ptitle`);
-    if (titleEl){
-      titleEl.focus();
-      const range = document.createRange(); range.selectNodeContents(titleEl);
-      const sel = window.getSelection(); sel.removeAllRanges(); sel.addRange(range);
-    }
-  }, 80);
+  // Abrir el modal de settings de una para llenar detalles
+  setTimeout(() => openUrlsModal(newId), 60);
 }
 
 function renderParrilla(){
