@@ -8,27 +8,103 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,700;0,900;1,400&family=Outfit:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
-:root{--cream:#edebe6;--cream-dark:#dedad3;--rosa:#f2d4d7;--rosa-deep:#d4848e;--black:#1a1a1a;--grey:#7a7570}
+:root{
+  --cream:#edebe6;--cream-dark:#dedad3;--rosa:#f2d4d7;--rosa-hot:#e8a5ad;--rosa-deep:#d4848e;
+  --black:#1a1a1a;--grey:#7a7570;--green-ok:#5a7a4f;--yellow-low:#c4a04a;--red-out:#b8504a;
+}
 *{margin:0;padding:0;box-sizing:border-box}
 body{background:var(--cream);color:var(--black);font-family:'Outfit',sans-serif;font-weight:300;min-height:100vh;display:flex;flex-direction:column}
 .wrap{max-width:1100px;margin:0 auto;padding:80px 32px;flex:1;width:100%}
-header{border-bottom:1px solid var(--black);padding-bottom:24px;margin-bottom:64px;display:flex;justify-content:space-between;align-items:flex-end}
+
+header{border-bottom:1px solid var(--black);padding-bottom:24px;margin-bottom:64px;display:flex;justify-content:space-between;align-items:flex-end;flex-wrap:wrap;gap:16px}
 .logo{font-family:'Cormorant Garamond',serif;font-weight:900;font-size:48px;letter-spacing:.18em;line-height:1}
 .tagline{font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:var(--grey);margin-top:8px}
 .year{font-family:'Cormorant Garamond',serif;font-weight:700;font-style:italic;font-size:42px;color:var(--rosa-deep)}
-.section-title{font-family:'Cormorant Garamond',serif;font-weight:700;font-style:italic;font-size:28px;margin-bottom:24px;display:flex;justify-content:space-between;align-items:baseline;border-bottom:1px solid var(--black);padding-bottom:8px}
+
+.session-bar{display:flex;justify-content:space-between;align-items:center;background:var(--cream-dark);padding:12px 20px;margin-bottom:32px;border-radius:2px;font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.1em;text-transform:uppercase;flex-wrap:wrap;gap:12px}
+.session-status{display:flex;align-items:center;gap:10px}
+.sync-dot{width:8px;height:8px;border-radius:50%;background:var(--grey)}
+.sync-dot.connected{background:var(--green-ok)}
+.editor-chip{background:var(--rosa);padding:3px 8px;border-radius:10px;color:var(--black);font-weight:500}
+.signout-btn{background:transparent;border:none;color:var(--grey);font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.12em;text-transform:uppercase;cursor:pointer;text-decoration:underline;text-underline-offset:3px}
+.signout-btn:hover{color:var(--red-out)}
+
+.section-title{font-family:'Cormorant Garamond',serif;font-weight:700;font-style:italic;font-size:32px;margin-bottom:24px;display:flex;justify-content:space-between;align-items:baseline;border-bottom:1px solid var(--black);padding-bottom:8px;gap:16px;flex-wrap:wrap}
 .section-title .meta{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:var(--grey);font-style:normal;font-weight:400}
-.cal-list{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:1px;background:var(--black);border:1px solid var(--black);margin-bottom:64px}
-.cal-card{background:#fff;padding:24px;text-decoration:none;color:var(--black);transition:background .15s,transform .15s;display:flex;flex-direction:column;gap:8px}
+
+.new-week-btn{padding:10px 18px;background:var(--rosa-deep);color:#fff;border:none;font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.15em;text-transform:uppercase;cursor:pointer;transition:background .15s;font-weight:500}
+.new-week-btn:hover{background:var(--black)}
+
+.cal-list{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:1px;background:var(--black);border:1px solid var(--black);margin-bottom:64px;min-height:200px}
+.cal-card{background:#fff;padding:24px;text-decoration:none;color:var(--black);transition:background .15s;display:flex;flex-direction:column;gap:8px;cursor:pointer;position:relative}
 .cal-card:hover{background:var(--rosa)}
+.cal-card.archived{opacity:.55}
 .cal-card .num{font-family:'Cormorant Garamond',serif;font-weight:900;font-size:64px;line-height:.85;font-style:italic;color:var(--rosa-deep)}
 .cal-card .label{font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.15em;text-transform:uppercase;color:var(--grey)}
 .cal-card .range{font-family:'Outfit',sans-serif;font-weight:500;font-size:16px;margin-top:4px}
-.footer{border-top:1px solid var(--black);padding:24px 32px;font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.15em;text-transform:uppercase;color:var(--grey);text-align:center}
+.cal-card .status-chip{position:absolute;top:12px;right:12px;font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:.1em;text-transform:uppercase;padding:3px 8px;border-radius:10px}
+.status-active{background:var(--green-ok);color:#fff}
+.status-draft{background:var(--yellow-low);color:#fff}
+.status-archived{background:var(--cream-dark);color:var(--grey)}
+.cal-card .stats-mini{font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--grey);margin-top:auto;padding-top:12px;border-top:1px dotted var(--cream-dark)}
+
+.empty-state{padding:64px 24px;text-align:center;color:var(--grey);background:#fff;font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.1em;grid-column:1/-1}
+
+.footer{border-top:1px solid var(--black);padding:24px 32px;font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.15em;text-transform:uppercase;color:var(--grey);text-align:center;flex-wrap:wrap;gap:8px}
 .footer a{color:var(--rosa-deep);text-decoration:none}
+
+/* LOGIN */
+.login-overlay{position:fixed;inset:0;background:var(--cream);display:none;align-items:center;justify-content:center;z-index:300;flex-direction:column;padding:24px}
+.login-overlay.show{display:flex}
+.login-card{max-width:440px;width:100%;text-align:center}
+.login-logo{font-family:'Cormorant Garamond',serif;font-weight:900;font-size:48px;letter-spacing:.18em;line-height:1}
+.login-tagline{font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:var(--grey);margin-top:6px;margin-bottom:56px}
+.login-title{font-family:'Cormorant Garamond',serif;font-style:italic;font-weight:700;font-size:34px;margin-bottom:12px}
+.login-help{font-size:13px;color:var(--grey);line-height:1.55;margin-bottom:28px}
+#loginEmail{width:100%;padding:13px 16px;font-family:'JetBrains Mono',monospace;font-size:13px;border:1px solid var(--black);background:#fff;outline:none;margin-bottom:10px;text-align:center}
+#loginEmail:focus{border-color:var(--rosa-deep)}
+#loginBtn{width:100%;padding:14px;background:var(--black);color:var(--cream);border:none;font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.18em;text-transform:uppercase;cursor:pointer}
+#loginBtn:hover:not(:disabled){background:var(--rosa-deep)}
+#loginBtn:disabled{opacity:.5;cursor:not-allowed}
+.login-status{margin-top:20px;font-size:13px;color:var(--rosa-deep);min-height:1.2em;line-height:1.55}
+.login-status.error{color:var(--red-out)}
+.login-status.success{color:var(--green-ok)}
+
+/* MODAL */
+.modal-backdrop{position:fixed;inset:0;background:rgba(26,26,26,.65);backdrop-filter:blur(4px);display:none;align-items:center;justify-content:center;z-index:100;padding:24px}
+.modal-backdrop.open{display:flex}
+.modal{background:var(--cream);max-width:520px;width:100%;border:1px solid var(--black);padding:32px;font-family:'Outfit',sans-serif}
+.modal h3{font-family:'Cormorant Garamond',serif;font-weight:700;font-style:italic;font-size:28px;margin-bottom:8px}
+.modal .modal-meta{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:var(--grey);margin-bottom:20px}
+.modal p{font-size:13px;line-height:1.5;margin-bottom:14px;color:var(--grey)}
+.modal label{display:block;font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.15em;text-transform:uppercase;color:var(--grey);margin-bottom:6px;margin-top:14px}
+.modal input{width:100%;padding:11px 13px;font-family:'JetBrains Mono',monospace;font-size:13px;border:1px solid var(--black);background:#fff;outline:none}
+.modal input:focus{border-color:var(--rosa-deep)}
+.modal-actions{display:flex;gap:10px;justify-content:flex-end;margin-top:24px}
+.modal-btn{padding:10px 16px;font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.12em;text-transform:uppercase;cursor:pointer;border:1px solid var(--black);background:transparent;color:var(--black);transition:all .15s}
+.modal-btn:hover{background:var(--black);color:var(--cream)}
+.modal-btn.primary{background:var(--rosa-deep);color:#fff;border-color:var(--rosa-deep)}
+.modal-btn.primary:hover{background:var(--black);border-color:var(--black)}
+.modal-error{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--red-out);margin-top:14px;min-height:1em}
+.modal-preview{background:#fff;border:1px solid var(--cream-dark);padding:12px;font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--grey);margin-top:14px;line-height:1.5}
+.modal-preview strong{color:var(--black);font-weight:500}
 </style>
 </head>
 <body>
+
+<!-- LOGIN OVERLAY -->
+<div class="login-overlay" id="loginOverlay">
+  <div class="login-card">
+    <div class="login-logo">L U X U R</div>
+    <div class="login-tagline">Content Operations</div>
+    <h2 class="login-title">Acceso del equipo</h2>
+    <p class="login-help">Pega tu email LUXUR. Te llega un magic link al inbox — un click y entras.</p>
+    <input type="email" id="loginEmail" placeholder="tu@email.com" autocomplete="email" inputmode="email">
+    <button id="loginBtn">Enviar magic link</button>
+    <div class="login-status" id="loginStatus"></div>
+  </div>
+</div>
+
 <div class="wrap">
   <header>
     <div>
@@ -38,17 +114,315 @@ header{border-bottom:1px solid var(--black);padding-bottom:24px;margin-bottom:64
     <div class="year">2026</div>
   </header>
 
-  <h2 class="section-title"><span>Calendarios Semanales</span><span class="meta">Mayo · 2026</span></h2>
-  <div class="cal-list">
-    <a class="cal-card" href="calendars/semana21-may19-25.html">
-      <div class="num">21</div>
-      <div class="label">Semana</div>
-      <div class="range">Mar 19 — Lun 25 May</div>
-    </a>
+  <div class="session-bar">
+    <div class="session-status">
+      <span class="sync-dot connected"></span>
+      <span>Sesión:</span>
+      <span class="editor-chip" id="editorList">—</span>
+    </div>
+    <button class="signout-btn" id="signOutBtn">Salir</button>
+  </div>
+
+  <h2 class="section-title">
+    <span>Calendarios Semanales</span>
+    <button class="new-week-btn" id="newWeekBtn">+ Nueva Semana</button>
+  </h2>
+
+  <div class="cal-list" id="calList">
+    <div class="empty-state">Cargando…</div>
   </div>
 </div>
+
 <footer class="footer">
-  LUXUR Content Ops · <a href="https://github.com/mpsarier-ai/luxurcontentdept" target="_blank">Repo en GitHub</a> · Live editing via Firebase
+  LUXUR Content Ops · <a href="https://github.com/mpsarier-ai/luxurcontentdept" target="_blank">Repo en GitHub</a> · Live editing via Supabase + Magic Link
 </footer>
+
+<!-- NEW WEEK MODAL -->
+<div class="modal-backdrop" id="newWeekModal">
+  <div class="modal">
+    <div class="modal-meta">Crear nueva semana</div>
+    <h3>Nueva semana</h3>
+    <p>Define el número de semana y la fecha de inicio (debe ser martes — calendario LUXUR es Mar-Lun). El resto se calcula automático.</p>
+
+    <label>Número de semana</label>
+    <input type="number" id="newWeekNum" min="1" max="53" placeholder="22">
+
+    <label>Fecha de inicio (Martes)</label>
+    <input type="date" id="newWeekStart">
+
+    <div class="modal-preview" id="newWeekPreview" style="display:none">
+      <strong id="previewId">—</strong><br>
+      <span id="previewRange">—</span>
+    </div>
+
+    <div class="modal-error" id="newWeekError"></div>
+
+    <div class="modal-actions">
+      <button class="modal-btn" id="modalCancel">Cancelar</button>
+      <button class="modal-btn primary" id="modalCreate">Crear semana</button>
+    </div>
+  </div>
+</div>
+
+<script type="module">
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+
+const SUPABASE_URL = "https://nrpgtlcdvtesjbxpkxha.supabase.co";
+const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5ycGd0bGNkdnRlc2pieHBreGhhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg3ODkzNTAsImV4cCI6MjA5NDM2NTM1MH0.ntRHkFobaVK6RW9EYRwoww1ATr8N0zHMzXHM__5x8E0";
+
+const MONTH_ABBR = ['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
+const MONTH_SLUG = ['jan','feb','mar','apr','may','jun','jul','aug','sep','oct','nov','dec'];
+const DOW_ABBR = ['Dom','Lun','Mar','Mié','Jue','Vie','Sáb'];
+
+const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+const loginOverlay = document.getElementById('loginOverlay');
+const loginEmail = document.getElementById('loginEmail');
+const loginBtn = document.getElementById('loginBtn');
+const loginStatus = document.getElementById('loginStatus');
+const editorList = document.getElementById('editorList');
+const signOutBtn = document.getElementById('signOutBtn');
+const calList = document.getElementById('calList');
+const newWeekBtn = document.getElementById('newWeekBtn');
+const newWeekModal = document.getElementById('newWeekModal');
+const newWeekNum = document.getElementById('newWeekNum');
+const newWeekStart = document.getElementById('newWeekStart');
+const newWeekError = document.getElementById('newWeekError');
+const newWeekPreview = document.getElementById('newWeekPreview');
+const previewId = document.getElementById('previewId');
+const previewRange = document.getElementById('previewRange');
+const modalCancel = document.getElementById('modalCancel');
+const modalCreate = document.getElementById('modalCreate');
+
+let user = null;
+
+function showLogin(){ loginOverlay.classList.add('show'); setTimeout(() => loginEmail && loginEmail.focus(), 100); }
+function hideLogin(){ loginOverlay.classList.remove('show'); }
+function escapeHtml(s){ return String(s||'').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+
+async function boot(){
+  const { data: { session } } = await supabase.auth.getSession();
+  if (session && session.user){
+    user = session.user;
+    enterApp();
+  } else {
+    showLogin();
+  }
+  supabase.auth.onAuthStateChange((event, session) => {
+    if (event === 'SIGNED_IN' && session && session.user){
+      user = session.user;
+      enterApp();
+    } else if (event === 'SIGNED_OUT'){
+      user = null;
+      showLogin();
+    }
+  });
+}
+
+async function enterApp(){
+  hideLogin();
+  if (editorList) editorList.textContent = user.email;
+  await loadCalendars();
+}
+
+async function loadCalendars(){
+  const { data, error } = await supabase
+    .from('calendars')
+    .select('id, week_number, start_date, end_date, status')
+    .order('start_date', { ascending: false });
+
+  if (error){
+    console.error('Load calendars err', error);
+    if (/policy|permission/i.test(error.message || '')){
+      alert(`Tu email (${user.email}) no está en la allowlist.\n\nPide al admin que te agregue en Supabase.`);
+      await supabase.auth.signOut();
+      return;
+    }
+    calList.innerHTML = `<div class="empty-state">Error: ${escapeHtml(error.message)}</div>`;
+    return;
+  }
+
+  if (!data || !data.length){
+    calList.innerHTML = '<div class="empty-state">Aún no hay calendarios. Click "+ Nueva Semana" para crear el primero.</div>';
+    return;
+  }
+
+  // Get piece counts per calendar (single query)
+  const { data: counts } = await supabase
+    .from('calendar_pieces')
+    .select('calendar_id', { count: 'exact', head: false });
+  const countMap = {};
+  if (counts) counts.forEach(r => { countMap[r.calendar_id] = (countMap[r.calendar_id] || 0) + 1; });
+
+  calList.innerHTML = data.map(c => {
+    const range = formatRange(c.start_date, c.end_date);
+    const statusCls = `status-${c.status}`;
+    const archCls = c.status === 'archived' ? 'archived' : '';
+    const pieces = countMap[c.id] || 0;
+    return `
+      <a class="cal-card ${archCls}" href="calendars/calendar.html?id=${encodeURIComponent(c.id)}">
+        <span class="status-chip ${statusCls}">${c.status}</span>
+        <div class="num">${c.week_number}</div>
+        <div class="label">Semana</div>
+        <div class="range">${escapeHtml(range)}</div>
+        <div class="stats-mini">${pieces} piezas</div>
+      </a>
+    `;
+  }).join('');
+}
+
+function formatRange(startStr, endStr){
+  const [sy, sm, sd] = startStr.split('-').map(Number);
+  const [ey, em, ed] = endStr.split('-').map(Number);
+  const sDow = DOW_ABBR[new Date(sy, sm-1, sd).getDay()];
+  const eDow = DOW_ABBR[new Date(ey, em-1, ed).getDay()];
+  return `${sDow} ${sd} — ${eDow} ${ed} ${MONTH_ABBR[sm-1]} ${sy}`;
+}
+
+// === NEW WEEK MODAL ===
+function openNewWeekModal(){
+  newWeekError.textContent = '';
+  // Auto-suggest: next Tuesday after today, week_number = ISO week + 1
+  const today = new Date();
+  let next = new Date(today);
+  while (next.getDay() !== 2) next.setDate(next.getDate() + 1); // Tuesday=2
+  const yyyy = next.getFullYear();
+  const mm = String(next.getMonth()+1).padStart(2,'0');
+  const dd = String(next.getDate()).padStart(2,'0');
+  newWeekStart.value = `${yyyy}-${mm}-${dd}`;
+  newWeekNum.value = isoWeek(next) + 0;
+  updatePreview();
+  newWeekModal.classList.add('open');
+  setTimeout(() => newWeekNum.focus(), 50);
+}
+function closeNewWeekModal(){ newWeekModal.classList.remove('open'); }
+
+function isoWeek(date){
+  const d = new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()));
+  const dayNum = d.getUTCDay() || 7;
+  d.setUTCDate(d.getUTCDate() + 4 - dayNum);
+  const yearStart = new Date(Date.UTC(d.getUTCFullYear(),0,1));
+  return Math.ceil((((d - yearStart) / 86400000) + 1) / 7);
+}
+
+function updatePreview(){
+  newWeekError.textContent = '';
+  const num = parseInt(newWeekNum.value);
+  const startStr = newWeekStart.value;
+  if (!num || !startStr){ newWeekPreview.style.display = 'none'; return; }
+  const [y, m, d] = startStr.split('-').map(Number);
+  const start = new Date(y, m-1, d);
+  if (start.getDay() !== 2){
+    newWeekError.textContent = `${startStr} no es martes. El calendario LUXUR es Mar-Lun.`;
+    newWeekPreview.style.display = 'none';
+    return;
+  }
+  const end = new Date(start);
+  end.setDate(end.getDate() + 6);
+  const ey = end.getFullYear(), em = String(end.getMonth()+1).padStart(2,'0'), ed = String(end.getDate()).padStart(2,'0');
+  const id = `semana${num}-${MONTH_SLUG[m-1]}${d}-${ed}`;
+  previewId.textContent = id;
+  previewRange.textContent = formatRange(`${y}-${String(m).padStart(2,'0')}-${String(d).padStart(2,'0')}`, `${ey}-${em}-${ed}`);
+  newWeekPreview.style.display = 'block';
+}
+
+newWeekNum.addEventListener('input', updatePreview);
+newWeekStart.addEventListener('change', updatePreview);
+
+async function createNewWeek(){
+  newWeekError.textContent = '';
+  const num = parseInt(newWeekNum.value);
+  const startStr = newWeekStart.value;
+  if (!num || !startStr){ newWeekError.textContent = 'Completa los dos campos'; return; }
+  const [y, m, d] = startStr.split('-').map(Number);
+  const start = new Date(y, m-1, d);
+  if (start.getDay() !== 2){ newWeekError.textContent = 'La fecha de inicio debe ser un martes'; return; }
+  const end = new Date(start);
+  end.setDate(end.getDate() + 6);
+  const ey = end.getFullYear(), em = String(end.getMonth()+1).padStart(2,'0'), ed = String(end.getDate()).padStart(2,'0');
+  const id = `semana${num}-${MONTH_SLUG[m-1]}${d}-${ed}`;
+
+  modalCreate.disabled = true;
+  modalCreate.textContent = 'Creando…';
+
+  // Check if already exists
+  const { data: existing } = await supabase.from('calendars').select('id').eq('id', id).maybeSingle();
+  if (existing){
+    newWeekError.textContent = `Ya existe ${id}. Cambia el número o la fecha.`;
+    modalCreate.disabled = false;
+    modalCreate.textContent = 'Crear semana';
+    return;
+  }
+
+  const { error } = await supabase.from('calendars').insert({
+    id,
+    week_number: num,
+    start_date: `${y}-${String(m).padStart(2,'0')}-${String(d).padStart(2,'0')}`,
+    end_date: `${ey}-${em}-${ed}`,
+    status: 'active',
+    featured_products: []
+  });
+
+  if (error){
+    console.error('Create err', error);
+    newWeekError.textContent = 'Error: ' + error.message;
+    modalCreate.disabled = false;
+    modalCreate.textContent = 'Crear semana';
+    return;
+  }
+
+  // Redirect to the new calendar
+  window.location.href = `calendars/calendar.html?id=${encodeURIComponent(id)}`;
+}
+
+newWeekBtn.addEventListener('click', openNewWeekModal);
+modalCancel.addEventListener('click', closeNewWeekModal);
+modalCreate.addEventListener('click', createNewWeek);
+newWeekModal.addEventListener('click', e => { if (e.target === newWeekModal) closeNewWeekModal(); });
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape' && newWeekModal.classList.contains('open')) closeNewWeekModal();
+});
+
+// === LOGIN ===
+async function sendMagicLink(){
+  const email = (loginEmail.value || '').trim().toLowerCase();
+  if (!email || !email.includes('@')){
+    loginStatus.className = 'login-status error';
+    loginStatus.textContent = 'Email no válido';
+    return;
+  }
+  loginBtn.disabled = true;
+  loginStatus.className = 'login-status';
+  loginStatus.textContent = 'Enviando link…';
+  const { error } = await supabase.auth.signInWithOtp({
+    email,
+    options: { emailRedirectTo: window.location.href.split('#')[0] }
+  });
+  if (error){
+    loginStatus.className = 'login-status error';
+    loginStatus.textContent = 'Error: ' + error.message;
+    loginBtn.disabled = false;
+  } else {
+    loginStatus.className = 'login-status success';
+    loginStatus.innerHTML = `Te enviamos un magic link a <strong>${escapeHtml(email)}</strong>.`;
+  }
+}
+
+if (loginBtn) loginBtn.addEventListener('click', sendMagicLink);
+if (loginEmail) loginEmail.addEventListener('keydown', e => { if (e.key === 'Enter') sendMagicLink(); });
+if (signOutBtn) signOutBtn.addEventListener('click', async () => {
+  if (!confirm('¿Cerrar sesión?')) return;
+  await supabase.auth.signOut();
+  showLogin();
+});
+
+// Realtime: refresh list when new calendar is created
+supabase.channel('calendars-list')
+  .on('postgres_changes', { event: '*', schema: 'public', table: 'calendars' }, () => loadCalendars())
+  .subscribe();
+
+boot();
+</script>
+
 </body>
 </html>

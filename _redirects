@@ -1,0 +1,8 @@
+# Redirects for the LUXUR Calendar app on Netlify
+# Old per-week HTML URLs → new dynamic calendar.html?id=...
+
+/calendars/semana21-may19-25.html  /calendars/calendar.html?id=semana21-may19-25  301
+/calendars/semana21*.html  /calendars/calendar.html?id=semana21-may19-25  301
+
+# SPA-like fallback for any unknown calendar URL
+/calendars/calendar  /calendars/calendar.html  200

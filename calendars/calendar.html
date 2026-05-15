@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>LUXUR — Semana 21 · May 19-25, 2026</title>
+<title>LUXUR — Content Calendar</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;0,900;1,400&family=Outfit:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
@@ -26,6 +26,8 @@ html,body{background:var(--cream);color:var(--black);font-family:'Outfit',sans-s
 [contenteditable="true"]:hover{border-bottom-color:var(--rosa-deep)}
 [contenteditable="true"]:focus{background:rgba(232,165,173,.12);border-bottom-color:var(--rosa-deep)}
 .container{max-width:1400px;margin:0 auto;padding:48px 32px 96px}
+.back-link{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.15em;text-transform:uppercase;color:var(--grey);text-decoration:none;display:inline-flex;align-items:center;gap:6px;transition:color .15s}
+.back-link:hover{color:var(--black)}
 
 /* HEADER */
 .brand-header{display:flex;justify-content:space-between;align-items:flex-end;border-bottom:1px solid var(--black);padding-bottom:24px;margin-bottom:48px}
@@ -34,9 +36,10 @@ html,body{background:var(--cream);color:var(--black);font-family:'Outfit',sans-s
 .week-block{text-align:right}
 .week-block .week-num{font-family:'Cormorant Garamond',serif;font-weight:700;font-size:64px;line-height:.9;font-style:italic}
 .week-block .week-range{font-family:'JetBrains Mono',monospace;font-size:12px;letter-spacing:.16em;text-transform:uppercase;margin-top:4px}
+.week-block .week-status{font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:.18em;text-transform:uppercase;color:var(--rosa-deep);margin-top:6px;font-weight:500}
 
 /* COLLAB BAR */
-.collab-bar{display:flex;justify-content:space-between;align-items:center;background:var(--cream-dark);padding:12px 20px;margin-bottom:32px;border-radius:2px;font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.1em;text-transform:uppercase}
+.collab-bar{display:flex;justify-content:space-between;align-items:center;background:var(--cream-dark);padding:12px 20px;margin-bottom:16px;border-radius:2px;font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.1em;text-transform:uppercase;flex-wrap:wrap;gap:12px}
 .sync-status{display:flex;align-items:center;gap:10px}
 .sync-dot{width:8px;height:8px;border-radius:50%;background:var(--grey);transition:background .3s ease}
 .sync-dot.connected{background:var(--green-ok);box-shadow:0 0 0 0 rgba(90,122,79,.5);animation:pulse 2s infinite}
@@ -45,6 +48,13 @@ html,body{background:var(--cream);color:var(--black);font-family:'Outfit',sans-s
 @keyframes pulse{0%{box-shadow:0 0 0 0 rgba(90,122,79,.4)}70%{box-shadow:0 0 0 8px rgba(90,122,79,0)}100%{box-shadow:0 0 0 0 rgba(90,122,79,0)}}
 .editor-list{display:flex;align-items:center;gap:8px;color:var(--grey)}
 .editor-chip{background:var(--rosa);padding:3px 8px;border-radius:10px;color:var(--black);font-weight:500}
+
+/* SHOPIFY STAMP BAR */
+.stamp-bar{display:flex;justify-content:space-between;align-items:center;margin-bottom:32px;flex-wrap:wrap;gap:12px}
+.shopify-stamp{display:inline-flex;align-items:center;gap:8px;font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--grey);font-weight:400}
+.shopify-stamp .live-dot{width:6px;height:6px;border-radius:50%;background:var(--yellow-low);display:inline-block}
+.shopify-stamp.fresh .live-dot{background:var(--green-ok)}
+.shopify-stamp.stale .live-dot{background:var(--red-out)}
 
 /* METRICS STRIP */
 .metrics-strip{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--black);margin-bottom:48px;border:1px solid var(--black)}
@@ -86,16 +96,22 @@ html,body{background:var(--cream);color:var(--black);font-family:'Outfit',sans-s
 .day-card{background:#fff;border:1px solid var(--black);padding:32px;display:grid;grid-template-columns:160px 1fr 280px;gap:32px}
 .day-card .day-marker .dow-large{font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:var(--grey)}
 .day-card .day-marker .dnum-large{font-family:'Cormorant Garamond',serif;font-weight:900;font-size:88px;line-height:.85;font-style:italic;margin-top:4px}
-.day-card .day-marker .focus{font-family:'Outfit',sans-serif;font-size:11px;text-transform:uppercase;letter-spacing:.12em;margin-top:12px;color:var(--rosa-deep);font-weight:500}
-.day-card .content-block .ctype{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:var(--rosa-deep);margin-bottom:6px}
-.day-card .content-block h3{font-family:'Cormorant Garamond',serif;font-weight:700;font-size:24px;margin-bottom:14px;line-height:1.15}
-.day-card .content-block .copy{font-size:14px;line-height:1.55;margin-bottom:16px;color:#333}
+.day-card .day-marker .focus{font-family:'Outfit',sans-serif;font-size:11px;text-transform:uppercase;letter-spacing:.12em;margin-top:12px;color:var(--rosa-deep);font-weight:500;outline:none}
+.day-card .day-marker .focus:focus{background:rgba(232,165,173,.12)}
+.day-card .day-marker .focus:empty::before{content:'+ tema';color:var(--cream-dark)}
+.day-card .content-block .ctype{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:var(--rosa-deep);margin-bottom:6px;outline:none}
+.day-card .content-block .ctype:focus{background:rgba(232,165,173,.12)}
+.day-card .content-block .ctype:empty::before{content:'+ tipo';color:var(--cream-dark)}
+.day-card .content-block h3{font-family:'Cormorant Garamond',serif;font-weight:700;font-size:24px;margin-bottom:14px;line-height:1.15;outline:none}
+.day-card .content-block h3:focus{background:rgba(232,165,173,.12)}
+.day-card .content-block h3:empty::before{content:'+ titulo del dia';color:var(--cream-dark);font-style:italic}
+.day-card .content-block .copy{font-size:14px;line-height:1.55;margin-bottom:16px;color:#333;outline:none}
+.day-card .content-block .copy:focus{background:rgba(232,165,173,.12)}
+.day-card .content-block .copy:empty::before{content:'+ copy / contexto del dia';color:var(--cream-dark);font-style:italic}
 .piece-list{display:flex;flex-direction:column;gap:14px;margin-top:18px;border-top:1px solid var(--cream-dark);padding-top:18px}
 .piece{display:grid;grid-template-columns:90px 1fr 24px;gap:14px;align-items:start;position:relative}
 .piece .ptype{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--grey);padding-top:2px;outline:none}
 .piece .ptype:focus{background:rgba(232,165,173,.12);color:var(--rosa-deep)}
-.piece .pdetail{font-size:13px;line-height:1.5}
-.piece .pdetail strong{font-weight:600;color:var(--black)}
 .piece .ptitle{font-family:'Outfit',sans-serif;font-weight:600;font-size:14px;margin-bottom:4px;outline:none;color:var(--black)}
 .piece .ptitle:focus{background:rgba(232,165,173,.12)}
 .piece .pdesc{font-size:13px;line-height:1.5;color:#444;outline:none}
@@ -110,16 +126,15 @@ html,body{background:var(--cream);color:var(--black);font-family:'Outfit',sans-s
 .shopify-panel{background:var(--cream);padding:20px;border-left:3px solid var(--rosa-deep)}
 .shopify-panel .panel-title{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:var(--grey);margin-bottom:14px;display:flex;align-items:center;gap:6px}
 .shopify-panel .panel-title::before{content:'●';color:var(--rosa-deep);font-size:14px}
+.shopify-panel .panel-empty{font-size:11px;color:var(--grey);font-style:italic;line-height:1.4}
 .product-row{margin-bottom:14px;padding-bottom:14px;border-bottom:1px dotted var(--cream-dark)}
 .product-row:last-child{border-bottom:none;margin-bottom:0;padding-bottom:0}
 .product-row .pname{font-family:'Outfit',sans-serif;font-weight:500;font-size:12px;line-height:1.3;margin-bottom:6px}
-.product-row .pprice{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--rosa-deep);margin-bottom:6px}
 .size-chips{display:flex;flex-wrap:wrap;gap:4px;margin-top:6px}
 .size-chip{font-family:'JetBrains Mono',monospace;font-size:10px;padding:2px 6px;border-radius:2px;border:1px solid currentColor;letter-spacing:.05em}
 .size-chip.ok{color:var(--green-ok)}
 .size-chip.low{color:var(--yellow-low)}
 .size-chip.out{color:var(--red-out)}
-.action-tag{display:inline-block;font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:.1em;text-transform:uppercase;background:var(--black);color:var(--cream);padding:3px 6px;margin-top:6px;border-radius:2px}
 
 /* TOP SELLERS BLOCK */
 .sellers-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:1px;background:var(--black);border:1px solid var(--black);margin-bottom:48px}
@@ -130,6 +145,7 @@ html,body{background:var(--cream);color:var(--black);font-family:'Outfit',sans-s
 .seller .right{text-align:right}
 .seller .sales{font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:500;color:var(--green-ok)}
 .seller .orders{font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--grey);letter-spacing:.1em}
+.empty-state{padding:48px;text-align:center;font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--grey);letter-spacing:.1em;background:#fff;border:1px solid var(--cream-dark)}
 
 /* DAILY SALES CHART */
 .sales-chart{background:#fff;border:1px solid var(--black);padding:24px;margin-bottom:48px}
@@ -148,8 +164,10 @@ html,body{background:var(--cream);color:var(--black);font-family:'Outfit',sans-s
 .midcheck-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:24px}
 .midcheck-block h4{font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.15em;text-transform:uppercase;color:var(--rosa-hot);margin-bottom:10px}
 .midcheck-block ul{list-style:none}
-.midcheck-block li{font-size:13px;line-height:1.6;padding-left:14px;position:relative}
+.midcheck-block li{font-size:13px;line-height:1.6;padding-left:14px;position:relative;outline:none}
 .midcheck-block li::before{content:'—';position:absolute;left:0;color:var(--rosa-hot)}
+.midcheck-block li:focus{background:rgba(255,255,255,.08)}
+.midcheck-block li:empty::before{content:'— +';color:var(--rosa-hot);opacity:.5}
 
 /* PARRILLA DE CONTENIDO */
 .parrilla-section{margin-bottom:64px}
@@ -225,34 +243,29 @@ html,body{background:var(--cream);color:var(--black);font-family:'Outfit',sans-s
 .signout-btn{background:transparent;border:none;color:var(--grey);font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.12em;text-transform:uppercase;cursor:pointer;padding:0;text-decoration:underline;text-underline-offset:3px}
 .signout-btn:hover{color:var(--red-out)}
 
-/* SHOPIFY REFRESH */
-.shopify-stamp{display:inline-flex;align-items:center;gap:8px;font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--grey);font-weight:400;font-style:normal}
-.shopify-stamp .live-dot{width:6px;height:6px;border-radius:50%;background:var(--yellow-low);display:inline-block}
-.shopify-stamp.fresh .live-dot{background:var(--green-ok)}
-.shopify-stamp.stale .live-dot{background:var(--red-out)}
-.refresh-btn{display:inline-flex;align-items:center;gap:6px;padding:6px 10px;background:var(--black);color:var(--cream);border:none;font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.12em;text-transform:uppercase;cursor:pointer;border-radius:2px;transition:background .15s}
-.refresh-btn:hover{background:var(--rosa-deep)}
-.refresh-btn::before{content:'⟳';font-size:13px}
-
+/* MODAL */
 .modal-backdrop{position:fixed;inset:0;background:rgba(26,26,26,.65);backdrop-filter:blur(4px);display:none;align-items:center;justify-content:center;z-index:100;padding:24px}
 .modal-backdrop.open{display:flex}
 .modal{background:var(--cream);max-width:560px;width:100%;border:1px solid var(--black);padding:32px;font-family:'Outfit',sans-serif}
 .modal h3{font-family:'Cormorant Garamond',serif;font-weight:700;font-style:italic;font-size:28px;margin-bottom:8px}
 .modal .modal-meta{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:var(--grey);margin-bottom:20px}
 .modal p{font-size:14px;line-height:1.55;margin-bottom:14px}
-.modal-prompt{background:#fff;border:1px solid var(--black);padding:14px;font-family:'JetBrains Mono',monospace;font-size:12px;line-height:1.4;margin-bottom:18px;white-space:pre-wrap;word-break:break-word}
 .modal-actions{display:flex;gap:10px;justify-content:flex-end;margin-top:24px}
 .modal-btn{padding:10px 16px;font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.12em;text-transform:uppercase;cursor:pointer;border:1px solid var(--black);background:transparent;color:var(--black);transition:all .15s}
 .modal-btn:hover{background:var(--black);color:var(--cream)}
 .modal-btn.primary{background:var(--rosa-deep);color:#fff;border-color:var(--rosa-deep)}
 .modal-btn.primary:hover{background:var(--black);border-color:var(--black)}
-.copy-feedback{font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--green-ok);letter-spacing:.1em;text-transform:uppercase;margin-right:auto;align-self:center;opacity:0;transition:opacity .2s}
-.copy-feedback.show{opacity:1}
 
 /* FOOTER */
-.footer{display:flex;justify-content:space-between;align-items:center;border-top:1px solid var(--black);padding-top:24px;margin-top:48px;font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.15em;text-transform:uppercase;color:var(--grey)}
+.footer{display:flex;justify-content:space-between;align-items:center;border-top:1px solid var(--black);padding-top:24px;margin-top:48px;font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.15em;text-transform:uppercase;color:var(--grey);flex-wrap:wrap;gap:12px}
 .footer a{color:var(--rosa-deep);text-decoration:none;border-bottom:1px solid var(--rosa-deep)}
 .footer a:hover{color:var(--black);border-bottom-color:var(--black)}
+
+/* FATAL ERROR SCREEN */
+.fatal{position:fixed;inset:0;background:var(--cream);display:flex;align-items:center;justify-content:center;z-index:200;flex-direction:column;padding:24px;text-align:center}
+.fatal h2{font-family:'Cormorant Garamond',serif;font-style:italic;font-weight:700;font-size:36px;margin-bottom:12px}
+.fatal p{font-family:'Outfit',sans-serif;color:var(--grey);font-size:14px;line-height:1.6;max-width:480px;margin-bottom:24px}
+.fatal a{color:var(--rosa-deep);text-decoration:none;border-bottom:1px solid var(--rosa-deep)}
 
 /* RESPONSIVE */
 @media (max-width: 980px){
@@ -283,17 +296,27 @@ html,body{background:var(--cream);color:var(--black);font-family:'Outfit',sans-s
   </div>
 </div>
 
+<!-- FATAL ERROR (shown if calendar can't be loaded) -->
+<div class="fatal" id="fatalScreen" style="display:none">
+  <h2 id="fatalTitle">Calendario no encontrado</h2>
+  <p id="fatalMsg">No pudimos cargar este calendario.</p>
+  <a href="../index.html" class="back-link" style="font-size:13px">← Volver al hub</a>
+</div>
+
 <div class="container">
 
-  <!-- HEADER -->
+  <a href="../index.html" class="back-link" style="margin-bottom:18px;display:inline-block">← Hub de calendarios</a>
+
+  <!-- HEADER (fully dynamic) -->
   <header class="brand-header">
     <div class="brand-block">
       <div class="logo">L U X U R</div>
       <div class="tagline">Content Calendar · United Brand</div>
     </div>
     <div class="week-block">
-      <div class="week-num">Semana 21</div>
-      <div class="week-range">Mar 19 — Lun 25 · Mayo 2026</div>
+      <div class="week-num" id="headerWeekNum">Cargando…</div>
+      <div class="week-range" id="headerWeekRange">—</div>
+      <div class="week-status" id="headerWeekStatus"></div>
     </div>
   </header>
 
@@ -310,43 +333,27 @@ html,body{background:var(--cream);color:var(--black);font-family:'Outfit',sans-s
     </div>
   </div>
 
-  <!-- SHOPIFY DATA STAMP / REFRESH -->
-  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;flex-wrap:wrap;gap:12px">
+  <!-- SHOPIFY DATA STAMP -->
+  <div class="stamp-bar">
     <div class="shopify-stamp" id="shopifyStamp">
       <span class="live-dot"></span>
-      <span>Shopify data al: <strong id="shopifyTimestamp">2026-05-14 16:07 -05</strong></span>
+      <span>Shopify data al: <strong id="shopifyTimestamp">— sin data —</strong></span>
     </div>
-    <button class="refresh-btn" id="refreshShopifyBtn">Refrescar Shopify</button>
+    <span style="font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--grey)">Auto-refresh cada 12h via agente programado</span>
   </div>
 
-  <!-- METRICS STRIP -->
-  <section class="metrics-strip">
-    <div class="metric">
-      <div class="label">Gross Sales · 7d</div>
-      <div class="value">$27.15M</div>
-      <div class="delta">COP · vs prev week</div>
-    </div>
-    <div class="metric">
-      <div class="label">Órdenes · 7d</div>
-      <div class="value">106</div>
-      <div class="delta">avg 13/día</div>
-    </div>
-    <div class="metric">
-      <div class="label">Best Day</div>
-      <div class="value">Mié 13</div>
-      <div class="delta">$5.82M · 15 órdenes</div>
-    </div>
-    <div class="metric">
-      <div class="label">Top Seller</div>
-      <div class="value">Red Riders</div>
-      <div class="delta">$1.47M · 8 órdenes</div>
-    </div>
+  <!-- METRICS STRIP (JS-rendered) -->
+  <section class="metrics-strip" id="metricsStrip">
+    <div class="metric"><div class="label">Gross Sales · 7d</div><div class="value">—</div><div class="delta">esperando data</div></div>
+    <div class="metric"><div class="label">Órdenes · 7d</div><div class="value">—</div><div class="delta">esperando data</div></div>
+    <div class="metric"><div class="label">Best Day</div><div class="value">—</div><div class="delta">esperando data</div></div>
+    <div class="metric"><div class="label">Top Seller</div><div class="value">—</div><div class="delta">esperando data</div></div>
   </section>
 
-  <!-- WEEK GRID (JS-rendered desde state.pieces) -->
+  <!-- WEEK GRID -->
   <h2 class="section-title">
     <span>Vista Semanal</span>
-    <span class="meta" id="weekGridMeta">7 días · cargando…</span>
+    <span class="meta" id="weekGridMeta">7 días · — piezas</span>
   </h2>
   <section class="week-grid" id="weekGrid"></section>
 
@@ -365,355 +372,61 @@ html,body{background:var(--cream);color:var(--black);font-family:'Outfit',sans-s
       </div>
       <div>Click cualquier campo para editar · × eliminar · + agregar</div>
     </div>
-    <div class="parrilla-grid" id="parrillaGrid">
-      <!-- tiles renderizados por JS -->
-    </div>
+    <div class="parrilla-grid" id="parrillaGrid"></div>
   </section>
 
-  <!-- TOP SELLERS -->
+  <!-- TOP SELLERS (JS-rendered) -->
   <h2 class="section-title">
     <span>Top Sellers · Última semana</span>
     <span class="meta">Live · Shopify</span>
   </h2>
-  <section class="sellers-grid">
-    <div class="seller"><div class="left"><span class="rank">01</span><span class="pname">Red Riders Azul Dirty</span></div><div class="right"><div class="sales">$1.47M</div><div class="orders">8 órdenes</div></div></div>
-    <div class="seller"><div class="left"><span class="rank">02</span><span class="pname">Wide Leg Fully Blush Rosado</span></div><div class="right"><div class="sales">$1.27M</div><div class="orders">7 órdenes</div></div></div>
-    <div class="seller"><div class="left"><span class="rank">03</span><span class="pname">Wide Leg Light Wash Azul Claro</span></div><div class="right"><div class="sales">$1.27M</div><div class="orders">7 órdenes</div></div></div>
-    <div class="seller"><div class="left"><span class="rank">04</span><span class="pname">Wide Leg Tone Washed Azul Oscuro</span></div><div class="right"><div class="sales">$1.27M</div><div class="orders">7 órdenes</div></div></div>
-    <div class="seller"><div class="left"><span class="rank">05</span><span class="pname">Deserve Less Azul Claro</span></div><div class="right"><div class="sales">$1.23M</div><div class="orders">7 órdenes</div></div></div>
-    <div class="seller"><div class="left"><span class="rank">06</span><span class="pname">Deserve Less Negro</span></div><div class="right"><div class="sales">$1.23M</div><div class="orders">6 órdenes</div></div></div>
+  <section class="sellers-grid" id="sellersGrid">
+    <div class="empty-state" style="grid-column:1/-1">Esperando data de Shopify…</div>
   </section>
 
-  <!-- DAILY SALES CHART -->
+  <!-- DAILY SALES CHART (JS-rendered) -->
   <h2 class="section-title">
     <span>Ventas Diarias · Últimos 7 días</span>
-    <span class="meta">May 7 — May 14 · COP</span>
+    <span class="meta" id="chartMeta">COP</span>
   </h2>
   <section class="sales-chart">
-    <div class="bars">
-      <div class="bar-col"><div class="bar-value">$2.7M</div><div class="bar-track"><div class="bar" style="height:46%"></div></div><div class="bar-label">Jue 7</div></div>
-      <div class="bar-col"><div class="bar-value">$3.4M</div><div class="bar-track"><div class="bar" style="height:58%"></div></div><div class="bar-label">Vie 8</div></div>
-      <div class="bar-col"><div class="bar-value">$4.8M</div><div class="bar-track"><div class="bar" style="height:83%"></div></div><div class="bar-label">Sáb 9</div></div>
-      <div class="bar-col"><div class="bar-value">$1.6M</div><div class="bar-track"><div class="bar" style="height:28%"></div></div><div class="bar-label">Dom 10</div></div>
-      <div class="bar-col"><div class="bar-value">$3.3M</div><div class="bar-track"><div class="bar" style="height:57%"></div></div><div class="bar-label">Lun 11</div></div>
-      <div class="bar-col"><div class="bar-value">$4.0M</div><div class="bar-track"><div class="bar" style="height:69%"></div></div><div class="bar-label">Mar 12</div></div>
-      <div class="bar-col"><div class="bar-value">$5.8M</div><div class="bar-track"><div class="bar peak" style="height:100%"></div></div><div class="bar-label">Mié 13</div></div>
-      <div class="bar-col"><div class="bar-value">$1.4M</div><div class="bar-track"><div class="bar" style="height:25%"></div></div><div class="bar-label">Jue 14</div></div>
-    </div>
+    <div class="bars" id="chartBars"></div>
   </section>
 
-  <!-- DAY-BY-DAY DETAIL -->
+  <!-- DAY-BY-DAY DETAIL (JS-rendered) -->
   <h2 class="section-title">
     <span>Detalle Día a Día</span>
-    <span class="meta">Click cualquier campo para editar · sync live</span>
+    <span class="meta">Click para editar · sync live</span>
   </h2>
-
-  <div class="day-cards">
-
-    <!-- MARTES 19 -->
-    <article class="day-card">
-      <div class="day-marker">
-        <div class="dow-large">Martes</div>
-        <div class="dnum-large">19</div>
-        <div class="focus">Recap + Push</div>
-      </div>
-      <div class="content-block">
-        <div class="ctype" data-field="d19-ctype" contenteditable="true">Lanzamiento · Recap</div>
-        <h3 data-field="d19-title" contenteditable="true">Recap Lanzamiento — El Trío Mayo</h3>
-        <p class="copy" data-field="d19-copy" contenteditable="true">Arrancamos la semana mostrando el trío que voló: Men Deserve Less Negro, Wide Leg Dirty Azul y Wide Leg Washed Verde. Carrusel con vibes de calle, try-on real, y la prueba social de las primeras compradoras.</p>
-
-        <div class="piece-list" data-day-pieces="Mar 19"></div>
-      </div>
-      <aside class="shopify-panel">
-        <div class="panel-title">Shopify Live</div>
-        <div class="product-row">
-          <div class="pname">Men Deserve Less Negro</div>
-          <div class="pprice">$219,000 COP</div>
-          <div class="size-chips">
-            <span class="size-chip ok">S:8</span>
-            <span class="size-chip ok">M:8</span>
-            <span class="size-chip ok">L:7</span>
-          </div>
-          <span class="action-tag">Push libre</span>
-        </div>
-        <div class="product-row">
-          <div class="pname">Wide Leg Dirty Azul</div>
-          <div class="pprice">$229,000 COP</div>
-          <div class="size-chips">
-            <span class="size-chip low">XS:4</span>
-            <span class="size-chip low">S:4</span>
-            <span class="size-chip low">M:4</span>
-            <span class="size-chip low">L:3</span>
-            <span class="size-chip low">XL:2</span>
-          </div>
-          <span class="action-tag">Tracking demanda</span>
-        </div>
-        <div class="product-row">
-          <div class="pname">Wide Leg Washed Verde</div>
-          <div class="pprice">$229,000 COP</div>
-          <div class="size-chips">
-            <span class="size-chip low">XS:4</span>
-            <span class="size-chip low">S:4</span>
-            <span class="size-chip low">M:4</span>
-            <span class="size-chip low">L:3</span>
-            <span class="size-chip low">XL:2</span>
-          </div>
-          <span class="action-tag">Tracking demanda</span>
-        </div>
-      </aside>
-    </article>
-
-    <!-- MIÉRCOLES 20 -->
-    <article class="day-card">
-      <div class="day-marker">
-        <div class="dow-large">Miércoles</div>
-        <div class="dnum-large">20</div>
-        <div class="focus">Lanzamiento Restock</div>
-      </div>
-      <div class="content-block">
-        <div class="ctype" data-field="d20-ctype" contenteditable="true">Lanzamiento · Restock</div>
-        <h3 data-field="d20-title" contenteditable="true">YA LLEGÓ — Men Deserve Less Azul Claro</h3>
-        <p class="copy" data-field="d20-copy" contenteditable="true">El más esperado: lo pidieron tanto que estuvo en negativo en sistema. Físicamente ya está acá. Comunicación de victoria — premiar a la gente que esperó, mostrar el producto en cámara real, abrir compra inmediata. Pendiente: subir entradas a Shopify para que las tallas dejen de aparecer en negativo.</p>
-
-        <div class="piece-list" data-day-pieces="Mié 20"></div>
-      </div>
-      <aside class="shopify-panel">
-        <div class="panel-title">Shopify Live</div>
-        <div class="product-row">
-          <div class="pname">Men Deserve Less Azul Claro</div>
-          <div class="pprice">$219,000 COP</div>
-          <div class="size-chips">
-            <span class="size-chip out">XS:0</span>
-            <span class="size-chip out">S:-3</span>
-            <span class="size-chip out">M:-4</span>
-            <span class="size-chip out">L:-2</span>
-          </div>
-          <span class="action-tag">⚠ Subir entradas a Shopify</span>
-        </div>
-        <div class="product-row">
-          <div class="pname" style="color:var(--rosa-deep);font-weight:600">Acción operativa</div>
-          <div class="pprice" style="color:var(--black)">Antes del miércoles AM</div>
-          <div class="size-chips" style="margin-top:4px">
-            <span style="font-size:11px;line-height:1.4">Cargar inventario físico recibido en LUXUR Medellín + Pereira para que el sistema deje de mostrar negativo y la gente pueda comprar online.</span>
-          </div>
-        </div>
-      </aside>
-    </article>
-
-    <!-- JUEVES 21 -->
-    <article class="day-card">
-      <div class="day-marker">
-        <div class="dow-large">Jueves</div>
-        <div class="dnum-large">21</div>
-        <div class="focus">Wide Leg Trio</div>
-      </div>
-      <div class="content-block">
-        <div class="ctype" data-field="d21-ctype" contenteditable="true">Push · Editorial</div>
-        <h3 data-field="d21-title" contenteditable="true">Wide Leg Trio — Rosado · Verde · Azul Dirty</h3>
-        <p class="copy" data-field="d21-copy" contenteditable="true">Tres siluetas, una semana. Posicionar el Wide Leg como el fit de la temporada con un editorial de 6 slides. Reel de styling combina los jeans con los Tank Top Double Taches que vienen empujando bien.</p>
-
-        <div class="piece-list" data-day-pieces="Jue 21"></div>
-      </div>
-      <aside class="shopify-panel">
-        <div class="panel-title">Shopify Live</div>
-        <div class="product-row">
-          <div class="pname">Wide Leg Fully Blush Rosado</div>
-          <div class="pprice">$229,000 COP</div>
-          <div class="size-chips">
-            <span class="size-chip out">Total:3</span>
-          </div>
-          <span class="action-tag">Top seller · low stock</span>
-        </div>
-        <div class="product-row">
-          <div class="pname">Wide Leg Washed Verde</div>
-          <div class="pprice">$229,000 COP</div>
-          <div class="size-chips">
-            <span class="size-chip low">XS:4 S:4 M:4 L:3 XL:2</span>
-          </div>
-        </div>
-        <div class="product-row">
-          <div class="pname">Wide Leg Dirty Azul</div>
-          <div class="pprice">$229,000 COP</div>
-          <div class="size-chips">
-            <span class="size-chip low">XS:4 S:4 M:4 L:3 XL:2</span>
-          </div>
-        </div>
-        <div class="product-row">
-          <div class="pname">Tank Top Double Taches Negro/Café/Blanco</div>
-          <div class="pprice">$89,000 COP</div>
-          <div class="size-chips">
-            <span class="size-chip ok">Talla única · 53 disp</span>
-          </div>
-          <span class="action-tag">Cross-sell</span>
-        </div>
-      </aside>
-    </article>
-
-    <!-- VIERNES 22 -->
-    <article class="day-card">
-      <div class="day-marker">
-        <div class="dow-large">Viernes</div>
-        <div class="dnum-large">22</div>
-        <div class="focus">Lanzamiento Stars</div>
-      </div>
-      <div class="content-block">
-        <div class="ctype" data-field="d22-ctype" contenteditable="true">Lanzamiento · Editorial</div>
-        <h3 data-field="d22-title" contenteditable="true">Lanzamiento Black Stars Azul Claro + Pink Stars Teaser</h3>
-        <p class="copy" data-field="d22-copy" contenteditable="true">Black Stars Azul Claro llegó con 56 unidades en Medellín — lanzamiento Friday completo con post editorial, reel y stories. En paralelo aprovechamos el momentum de "stars" para teasear el restock de Pink Stars en stories. Doble play: venta directa + lista de espera.</p>
-
-        <div class="piece-list" data-day-pieces="Vie 22"></div>
-      </div>
-      <aside class="shopify-panel">
-        <div class="panel-title">Shopify Live</div>
-        <div class="product-row">
-          <div class="pname">Jean Black Stars Azul Claro</div>
-          <div class="pprice">$229,000 COP</div>
-          <div class="size-chips">
-            <span class="size-chip low">XS:1</span>
-            <span class="size-chip ok">S:27</span>
-            <span class="size-chip ok">M:19</span>
-            <span class="size-chip ok">L:9</span>
-          </div>
-          <span class="action-tag">🆕 Lanzamiento — push libre</span>
-        </div>
-        <div class="product-row">
-          <div class="pname">Jean Pink Stars Retro Azul</div>
-          <div class="pprice">$229,000 COP</div>
-          <div class="size-chips">
-            <span class="size-chip out">XS:0</span>
-            <span class="size-chip out">S:0</span>
-            <span class="size-chip out">M:0</span>
-            <span class="size-chip out">L:0</span>
-          </div>
-          <span class="action-tag">Lista de espera vía DM</span>
-        </div>
-      </aside>
-    </article>
-
-    <!-- SÁBADO 23 -->
-    <article class="day-card">
-      <div class="day-marker">
-        <div class="dow-large">Sábado</div>
-        <div class="dnum-large">23</div>
-        <div class="focus">Top weekend push</div>
-      </div>
-      <div class="content-block">
-        <div class="ctype" data-field="d23-ctype" contenteditable="true">Push · Urgencia</div>
-        <h3 data-field="d23-title" contenteditable="true">Red Riders — Última Talla S</h3>
-        <p class="copy" data-field="d23-copy" contenteditable="true">El top seller de la semana pasada (8 órdenes, $1.47M) tiene M y L agotados. Solo quedan 2 unidades en S. Push de urgencia real, no fabricada — con BTS de la pieza para reforzar deseo.</p>
-
-        <div class="piece-list" data-day-pieces="Sáb 23"></div>
-      </div>
-      <aside class="shopify-panel">
-        <div class="panel-title">Shopify Live</div>
-        <div class="product-row">
-          <div class="pname">Red Riders Azul Dirty</div>
-          <div class="pprice">$249,000 COP</div>
-          <div class="size-chips">
-            <span class="size-chip low">S:2</span>
-            <span class="size-chip out">M:0</span>
-            <span class="size-chip out">L:0</span>
-          </div>
-          <span class="action-tag">Agotar S antes restock</span>
-        </div>
-      </aside>
-    </article>
-
-    <!-- DOMINGO 24 -->
-    <article class="day-card">
-      <div class="day-marker">
-        <div class="dow-large">Domingo</div>
-        <div class="dnum-large">24</div>
-        <div class="focus">Cross-sell ligero</div>
-      </div>
-      <div class="content-block">
-        <div class="ctype" data-field="d24-ctype" contenteditable="true">Cross-Sell · Stories</div>
-        <h3 data-field="d24-title" contenteditable="true">Outfit Combos — Sunday Vibes</h3>
-        <p class="copy" data-field="d24-copy" contenteditable="true">Día de descanso comunicacional pero no comercial. Stories que muestran combos de jean + top + camiseta como "looks listos" — bajan el costo cognitivo del comprar y empujan ticket promedio.</p>
-
-        <div class="piece-list" data-day-pieces="Dom 24"></div>
-      </div>
-      <aside class="shopify-panel">
-        <div class="panel-title">Shopify Live</div>
-        <div class="product-row">
-          <div class="pname">Pretty Math Baby Tee Rosa</div>
-          <div class="pprice">$79,000 COP</div>
-          <div class="size-chips"><span class="size-chip ok">21 disp</span></div>
-        </div>
-        <div class="product-row">
-          <div class="pname">Iconic Baby Tee Gris</div>
-          <div class="pprice">$79,000 COP</div>
-          <div class="size-chips"><span class="size-chip ok">28 disp</span></div>
-        </div>
-        <div class="product-row">
-          <div class="pname">Tank Top Escotado Doble Taches Negro</div>
-          <div class="pprice">$89,000 COP</div>
-          <div class="size-chips"><span class="size-chip ok">27 disp</span></div>
-        </div>
-      </aside>
-    </article>
-
-    <!-- LUNES 25 -->
-    <article class="day-card">
-      <div class="day-marker">
-        <div class="dow-large">Lunes</div>
-        <div class="dnum-large">25</div>
-        <div class="focus">Recap + Teaser Junio</div>
-      </div>
-      <div class="content-block">
-        <div class="ctype" data-field="d25-ctype" contenteditable="true">Recap · Teaser</div>
-        <h3 data-field="d25-title" contenteditable="true">Recap Semana 21 + Destroyed Drop Preview</h3>
-        <p class="copy" data-field="d25-copy" contenteditable="true">Cierre de semana con carrusel de recap (top sellers, mejores outfits, DMs destacados) y teaser sutil de la Colección Destroyed que llega ~ Jun 20. Empieza la conversación 4 semanas antes para precalentar la audiencia.</p>
-
-        <div class="piece-list" data-day-pieces="Lun 25"></div>
-      </div>
-      <aside class="shopify-panel">
-        <div class="panel-title">Pipeline Junio</div>
-        <div class="product-row">
-          <div class="pname">Colección Destroyed</div>
-          <div class="pprice">~ Jun 20 · 4 colores</div>
-          <div class="size-chips">
-            <span class="size-chip ok">Negro · Azul · Azul Claro · Arena</span>
-          </div>
-          <span class="action-tag">Pre-launch start</span>
-        </div>
-        <div class="product-row">
-          <div class="pname">Jean Bordado Costado</div>
-          <div class="pprice">~ Jun 3</div>
-          <span class="action-tag">Próximo lanzamiento</span>
-        </div>
-      </aside>
-    </article>
-
-  </div>
+  <div class="day-cards" id="dayCards"></div>
 
   <!-- MIDCHECK -->
   <section class="midcheck">
-    <div class="midcheck-meta">Midcheck · Jueves 21 Mayo</div>
+    <div class="midcheck-meta" id="midcheckMeta">Midcheck</div>
     <h3>Revisión a mitad de semana</h3>
     <div class="midcheck-grid">
       <div class="midcheck-block">
         <h4>Tracking</h4>
         <ul>
-          <li data-field="mid-t1" contenteditable="true">Conversión del lanzamiento Deserve Less Azul (mié) — primer día</li>
-          <li data-field="mid-t2" contenteditable="true">DMs / lista de espera generada por Pink Stars teaser</li>
-          <li data-field="mid-t3" contenteditable="true">Engagement vs semana 20 — comparar reels</li>
+          <li data-field="mid-t1" contenteditable="true"></li>
+          <li data-field="mid-t2" contenteditable="true"></li>
+          <li data-field="mid-t3" contenteditable="true"></li>
         </ul>
       </div>
       <div class="midcheck-block">
         <h4>Decisiones</h4>
         <ul>
-          <li data-field="mid-d1" contenteditable="true">⚠ Subir entradas físicas Deserve Less Azul a Shopify ANTES del miércoles AM (sale en negativo)</li>
-          <li data-field="mid-d2" contenteditable="true">¿Subir pauta extra a Red Riders el sábado?</li>
-          <li data-field="mid-d3" contenteditable="true">Black Stars: si S/M se mueven rápido, planear restock antes que se agote la temporada</li>
+          <li data-field="mid-d1" contenteditable="true"></li>
+          <li data-field="mid-d2" contenteditable="true"></li>
+          <li data-field="mid-d3" contenteditable="true"></li>
         </ul>
       </div>
       <div class="midcheck-block">
         <h4>Próximos drops</h4>
         <ul>
-          <li data-field="mid-n1" contenteditable="true">Pink Stars restock — semana 22</li>
-          <li data-field="mid-n2" contenteditable="true">Bordado Costado — primera semana junio</li>
-          <li data-field="mid-n3" contenteditable="true">Destroyed Collection — Jun 20 · 4 colores · campaña 4 semanas</li>
+          <li data-field="mid-n1" contenteditable="true"></li>
+          <li data-field="mid-n2" contenteditable="true"></li>
+          <li data-field="mid-n3" contenteditable="true"></li>
         </ul>
       </div>
     </div>
@@ -721,13 +434,13 @@ html,body{background:var(--cream);color:var(--black);font-family:'Outfit',sans-s
 
   <!-- FOOTER -->
   <footer class="footer">
-    <div>LUXUR Content Ops · Generado <span id="genDate">2026-05-14 16:07 -05</span></div>
-    <div>Cambios sincronizados en tiempo real · Supabase + Magic Link Auth</div>
+    <div>LUXUR Content Ops · <span id="footerCalendar">—</span></div>
+    <div>Sync en vivo · Supabase + Magic Link Auth</div>
   </footer>
 
 </div>
 
-<!-- URLs MODAL (Canva + Referente) -->
+<!-- URLs MODAL (Canva + Referente + Upload) -->
 <div class="modal-backdrop" id="urlsModal">
   <div class="modal">
     <div class="modal-meta">URLs de la pieza</div>
@@ -750,73 +463,31 @@ html,body{background:var(--cream);color:var(--black);font-family:'Outfit',sans-s
   </div>
 </div>
 
-<!-- REFRESH SHOPIFY MODAL -->
-<div class="modal-backdrop" id="refreshModal">
-  <div class="modal">
-    <div class="modal-meta">Refrescar data de Shopify</div>
-    <h3>Pídele a Claude que actualice</h3>
-    <p>Los datos de Shopify (inventario, top sellers, ventas diarias y métricas) están hardcodeados al snapshot que ves arriba. Para actualizarlos, copia este prompt y pégalo en tu sesión de Claude Code:</p>
-    <div class="modal-prompt" id="modalPrompt">Refresca data de Shopify para el calendario Semana 21 (calendars/semana21-may19-25.html). Pull live: ventas últimos 7d, top 12 productos, inventario por talla de Deserve Less Negro / Wide Leg Dirty Azul / Wide Leg Washed Verde / Red Riders / Deserve Less Azul Claro / Black Stars Azul Claro / Pink Stars / Pretty Math Tee / Iconic Tee Gris / Tank Tops Double Taches. Actualiza el HTML, el timestamp, y haz push.</div>
-    <p style="font-size:12px;color:var(--grey)">El HTML se actualiza, Netlify redespliega solo (~30s) y refrescas el navegador.</p>
-    <div class="modal-actions">
-      <span class="copy-feedback" id="copyFeedback">✓ Copiado</span>
-      <button class="modal-btn" id="modalClose">Cerrar</button>
-      <button class="modal-btn primary" id="modalCopy">Copiar prompt</button>
-    </div>
-  </div>
-</div>
-
 <!-- ============================================================ -->
-<!-- SUPABASE REAL-TIME COLLABORATIVE EDITING + MAGIC LINK AUTH   -->
+<!-- SUPABASE DYNAMIC CALENDAR + MAGIC LINK AUTH                  -->
 <!-- ============================================================ -->
 <script type="module">
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
 const SUPABASE_URL = "https://nrpgtlcdvtesjbxpkxha.supabase.co";
 const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5ycGd0bGNkdnRlc2pieHBreGhhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg3ODkzNTAsImV4cCI6MjA5NDM2NTM1MH0.ntRHkFobaVK6RW9EYRwoww1ATr8N0zHMzXHM__5x8E0";
-const CALENDAR_ID = "semana21-may19-25";
 const STORAGE_BUCKET = "calendar-photos";
+const COLOR_OPTIONS = ['launch','preorden','push','recap','cross','admin'];
+const MONTH_ABBR = ['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
+const DOW_ABBR = ['Dom','Lun','Mar','Mié','Jue','Vie','Sáb'];
+const DOW_FULL = ['Domingo','Lunes','Martes','Miércoles','Jueves','Viernes','Sábado'];
 
 const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-
-const COLOR_OPTIONS = ['launch','preorden','push','recap','cross','admin'];
-const DAYS = [
-  { key:'Mar 19', dow:'Mar', dnum:19 },
-  { key:'Mié 20', dow:'Mié', dnum:20 },
-  { key:'Jue 21', dow:'Jue', dnum:21 },
-  { key:'Vie 22', dow:'Vie', dnum:22 },
-  { key:'Sáb 23', dow:'Sáb', dnum:23 },
-  { key:'Dom 24', dow:'Dom', dnum:24 },
-  { key:'Lun 25', dow:'Lun', dnum:25 }
-];
-
-const DEFAULT_PIECES = [
-  { id:'p1',  day:'Mar 19', type:'Post · 5',    color:'recap',    title:'Recap trío lanzamiento', description:'Slide 1: Cover trío con tipografía editorial · Slide 2-4: Cada jean en flat lay + detalle · Slide 5: CTA "tallas en bio"' },
-  { id:'p2',  day:'Mar 19', type:'Reel · 15s',  color:'launch',   title:'Try-on 3 jeans nuevos', description:'Try-on transition: 3 outfits, 1 modelo, cambio rápido. Audio trending del momento. Caption: "Mayo en 3 piezas 🤍"' },
-  { id:'p3',  day:'Mar 19', type:'Stories · 4', color:'push',     title:'Tallas live + link', description:'1: Inventario por talla · 2: Reseña cliente real · 3: Link directo · 4: Sticker "¿cuál te llevas?"' },
-  { id:'p4',  day:'Mié 20', type:'Post · 5',    color:'launch',   title:'YA LLEGÓ Deserve Less Azul', description:'Slide 1: "YA LLEGÓ" tipografía editorial · Slide 2: Producto en outfit completo · Slide 3: Detalle textura + costura · Slide 4: Tallas disponibles · Slide 5: "Para los que esperaron — gracias" CTA' },
-  { id:'p5',  day:'Mié 20', type:'Reel · 20s',  color:'launch',   title:'Unboxing + try-on', description:'Concept: Unboxing real de la caja que llegó del taller + try-on en vivo. Audio: pop alternativo cálido. Caption: "Llegaron. Por fin."' },
-  { id:'p6',  day:'Mié 20', type:'Stories · 6', color:'push',     title:'Para quienes esperaron', description:'1: "Para quienes esperaron 🤍" · 2: Screenshot cliente que pidió por DM · 3-4: Producto en cámara real · 5: Inventario por talla · 6: Link directo + "no esperes esta vez"' },
-  { id:'p7',  day:'Jue 21', type:'Post · 6',    color:'launch',   title:'Wide Leg Trio editorial', description:'Slide 1: Editorial cover B&W · 2-4: Cada wide leg en outfit completo · 5: Detalle textura denim · 6: "Pick your blue, pick your green, pick your pink"' },
-  { id:'p8',  day:'Jue 21', type:'Reel · 30s',  color:'launch',   title:'Styling con Tank Tops', description:'Concept: 3 outfits con misma base (Tank Top Double Taches) cambiando solo el jean. Trans entre cada uno. Audio: pop alternativo.' },
-  { id:'p9',  day:'Jue 21', type:'Stories · 4', color:'cross',    title:'Día / Noche outfits', description:'1: Día con Wide Leg Verde + tank · 2: Tarde con Wide Leg Rosado + cropped · 3: Noche con Wide Leg Dirty + body · 4: "¿cuál vibe?"' },
-  { id:'p10', day:'Vie 22', type:'Post · 6',    color:'launch',   title:'Black Stars editorial', description:'Slide 1: Cover editorial — modelo con jean en pose estática · 2: Detalle estrellas negras sobre denim azul claro · 3-4: Outfit completo día / noche · 5: Inventario por talla · 6: "Black Stars · Vie 22 May" CTA' },
-  { id:'p11', day:'Vie 22', type:'Reel · 25s',  color:'launch',   title:'Estrellas en movimiento', description:'Concept: Cámara cercana a las estrellas en movimiento al caminar — la textura es el héroe. Cierre con outfit completo. Audio: indie/sad girl moment.' },
-  { id:'p12', day:'Vie 22', type:'Stories · 5', color:'preorden', title:'Black live + Pink teaser', description:'1: "BLACK STARS LIVE" cover · 2: Producto en cámara real + tallas · 3: Link directo · 4: Sticker "¿pink o black?" + sneak Pink Stars · 5: "Pink Stars en lista de espera — DM"' },
-  { id:'p13', day:'Sáb 23', type:'Post · 5',    color:'launch',   title:'Red Riders último S', description:'Slide 1: "QUEDAN 2" tipografía dramática · 2: Producto en outfit completo · 3: Detalle del estampado RED RIDERS · 4: Por qué fue top seller · 5: CTA directo' },
-  { id:'p14', day:'Sáb 23', type:'Reel · 20s',  color:'launch',   title:'BTS Red Riders', description:'BTS: Cómo se ve el detalle del bordado en cámara cercana, transición a outfit en movimiento. Caption: "El último S te está esperando"' },
-  { id:'p15', day:'Sáb 23', type:'Stories · 4', color:'push',     title:'Inventario crítico', description:'1: Capture del inventario S:2 M:0 L:0 · 2: Outfit completo · 3: Reseña cliente · 4: Link + "el restock no está confirmado"' },
-  { id:'p16', day:'Dom 24', type:'Stories · 6', color:'cross',    title:'Combos jean + tops', description:'1: Combo Wide Leg Verde + Pretty Math Baby Tee Rosa · 2: Combo Deserve Less Negro + Tank Top Negro · 3: Combo Wide Leg Dirty + Iconic Baby Tee Gris · 4: Combo Red Riders + Tank Café · 5: Sticker "tu combo fav?" · 6: Link a cada uno' },
-  { id:'p17', day:'Lun 25', type:'Post · 4',    color:'recap',    title:'Recap + Destroyed teaser', description:'Slide 1: "Semana 21 en LUXUR" cover · 2: Top 3 más vendidos con números reales · 3: Mejores user content tagged · 4: "Algo está roto. Junio 20." (teaser Destroyed)' },
-  { id:'p18', day:'Lun 25', type:'Stories · 4', color:'admin',    title:'Agradecimiento + sneak', description:'1: Agradecimiento general · 2: Dato de la semana ($27M en 7d) · 3: Sticker "qué quieres ver más?" · 4: Sneak destroyed (silhouette negra)' }
-];
 
 // === STATE ===
 const state = {
   user: null,
+  calendarId: null,
+  calendar: null,    // metadata row from `calendars` table
+  days: [],          // array of {key, dow, dnum, dateObj, fullDow}
   pieces: [],
-  initialized: false,
-  channels: []
+  channels: [],
+  initialized: false
 };
 
 const syncDot = document.getElementById('syncDot');
@@ -827,10 +498,60 @@ const loginEmail = document.getElementById('loginEmail');
 const loginBtn = document.getElementById('loginBtn');
 const loginStatus = document.getElementById('loginStatus');
 const signOutBtn = document.getElementById('signOutBtn');
+const fatalScreen = document.getElementById('fatalScreen');
 
 function setSync(s, label){ if(syncDot){syncDot.className = 'sync-dot ' + s;} if(syncLabel){syncLabel.textContent = label;} }
 function flashSaving(){ setSync('editing','Guardando…'); }
 function flashSaved(){ setSync('connected', `Guardado · ${new Date().toLocaleTimeString('es-CO',{hour:'2-digit',minute:'2-digit'})}`); }
+
+function escapeHtml(s){
+  return String(s||'').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+function escapeAttr(s){ return String(s||'').replace(/"/g,'&quot;'); }
+
+function showFatal(title, msg){
+  document.getElementById('fatalTitle').textContent = title;
+  document.getElementById('fatalMsg').textContent = msg;
+  fatalScreen.style.display = 'flex';
+  document.querySelector('.container').style.display = 'none';
+}
+
+function showLogin(){
+  loginOverlay.classList.add('show');
+  setTimeout(() => loginEmail && loginEmail.focus(), 100);
+}
+function hideLogin(){ loginOverlay.classList.remove('show'); }
+
+// === DAYS COMPUTATION ===
+function computeDays(startDateStr){
+  // startDateStr in 'YYYY-MM-DD'
+  const [y, m, d] = startDateStr.split('-').map(Number);
+  const start = new Date(y, m - 1, d);  // local time, no TZ shift
+  const days = [];
+  for (let i = 0; i < 7; i++){
+    const dt = new Date(start);
+    dt.setDate(start.getDate() + i);
+    const dow = DOW_ABBR[dt.getDay()];
+    const fullDow = DOW_FULL[dt.getDay()];
+    const dnum = dt.getDate();
+    days.push({
+      index: i,
+      key: `${dow} ${dnum}`,
+      dow, fullDow, dnum,
+      dateObj: dt
+    });
+  }
+  return days;
+}
+
+function formatDateRange(startStr, endStr){
+  const [sy, sm, sd] = startStr.split('-').map(Number);
+  const [ey, em, ed] = endStr.split('-').map(Number);
+  const startDow = DOW_ABBR[new Date(sy, sm-1, sd).getDay()];
+  const endDow = DOW_ABBR[new Date(ey, em-1, ed).getDay()];
+  const monthName = MONTH_ABBR[sm-1];
+  return `${startDow} ${sd} — ${endDow} ${ed} · ${monthName} ${sy}`;
+}
 
 // === DB <-> JS row converters ===
 function rowToPiece(r){
@@ -849,7 +570,7 @@ function rowToPiece(r){
 function pieceToRow(p){
   return {
     id: p.id,
-    calendar_id: CALENDAR_ID,
+    calendar_id: state.calendarId,
     day: p.day,
     type: p.type,
     color: p.color,
@@ -866,7 +587,6 @@ function pieceToRow(p){
 async function boot(){
   setSync('','Conectando…');
 
-  // Si la URL trae token de magic link, Supabase lo procesa solo
   const { data: { session } } = await supabase.auth.getSession();
   if (session && session.user){
     state.user = session.user;
@@ -875,14 +595,12 @@ async function boot(){
     showLogin();
   }
 
-  // Auth state changes (magic link redirect, sign out)
   supabase.auth.onAuthStateChange(async (event, session) => {
     if (event === 'SIGNED_IN' && session && session.user){
       state.user = session.user;
       await enterApp();
     } else if (event === 'SIGNED_OUT'){
       state.user = null;
-      // Cleanup channels
       state.channels.forEach(ch => supabase.removeChannel(ch));
       state.channels = [];
       state.initialized = false;
@@ -891,62 +609,89 @@ async function boot(){
   });
 }
 
-function showLogin(){
-  loginOverlay.classList.add('show');
-  setTimeout(() => loginEmail && loginEmail.focus(), 100);
-}
-function hideLogin(){
-  loginOverlay.classList.remove('show');
-}
-
 async function enterApp(){
   hideLogin();
   if (editorList) editorList.innerHTML = `<span class="editor-chip">${escapeHtml(state.user.email)}</span>`;
-  await loadAndSubscribe();
-}
 
-async function loadAndSubscribe(){
-  setSync('','Cargando piezas…');
-
-  // Load pieces
-  const { data: pieces, error } = await supabase
-    .from('calendar_pieces')
-    .select('*')
-    .eq('calendar_id', CALENDAR_ID)
-    .order('position', { ascending: true });
-
-  if (error){
-    console.error('Load pieces err', error);
-    if (error.code === '42501' || /policy|permission/i.test(error.message)){
-      alert(`Tu email (${state.user.email}) no está en la allowlist del calendario.\n\nPide al admin que te agregue en Supabase → SQL Editor:\n\ninsert into allowed_emails (email) values ('${state.user.email}');`);
-      await supabase.auth.signOut();
+  // Determine calendar_id from URL or fall back to most recent active
+  const urlId = new URLSearchParams(window.location.search).get('id');
+  if (urlId){
+    state.calendarId = urlId;
+  } else {
+    setSync('','Detectando calendario activo…');
+    const { data: latest } = await supabase
+      .from('calendars')
+      .select('id')
+      .eq('status', 'active')
+      .order('start_date', { ascending: false })
+      .limit(1);
+    if (!latest || !latest.length){
+      showFatal('Sin calendarios activos', 'Crea uno desde el hub.');
       return;
     }
-    setSync('offline', 'Error al cargar: ' + error.message);
+    state.calendarId = latest[0].id;
+    // Update URL without reload
+    const newUrl = new URL(window.location.href);
+    newUrl.searchParams.set('id', state.calendarId);
+    history.replaceState({}, '', newUrl);
+  }
+
+  await loadCalendar();
+}
+
+async function loadCalendar(){
+  setSync('','Cargando calendario…');
+
+  const { data: cal, error: calErr } = await supabase
+    .from('calendars')
+    .select('*')
+    .eq('id', state.calendarId)
+    .single();
+
+  if (calErr || !cal){
+    if (calErr && calErr.code === 'PGRST116'){
+      showFatal('Calendario no encontrado', `El id "${state.calendarId}" no existe.`);
+    } else if (calErr && /policy|permission/i.test(calErr.message || '')){
+      alert(`Tu email (${state.user.email}) no está en la allowlist.\n\nPide al admin que te agregue.`);
+      await supabase.auth.signOut();
+    } else {
+      showFatal('Error', (calErr && calErr.message) || 'No pudimos cargar este calendario.');
+    }
     return;
   }
 
-  if (!pieces || pieces.length === 0){
-    // Seed con DEFAULT_PIECES
-    const seedRows = DEFAULT_PIECES.map((p, i) => ({ ...pieceToRow(p), position: i }));
-    const { error: seedErr } = await supabase.from('calendar_pieces').insert(seedRows);
-    if (seedErr) console.error('Seed err', seedErr);
-    state.pieces = JSON.parse(JSON.stringify(DEFAULT_PIECES));
-  } else {
-    state.pieces = pieces.map(rowToPiece);
-  }
+  state.calendar = cal;
+  state.days = computeDays(cal.start_date);
+
+  // Update page title + header
+  document.title = `LUXUR — Semana ${cal.week_number} · ${formatDateRange(cal.start_date, cal.end_date)}`;
+  document.getElementById('headerWeekNum').textContent = `Semana ${cal.week_number}`;
+  document.getElementById('headerWeekRange').textContent = formatDateRange(cal.start_date, cal.end_date);
+  document.getElementById('headerWeekStatus').textContent = cal.status === 'active' ? '' : `· ${cal.status}`;
+  document.getElementById('footerCalendar').textContent = `Semana ${cal.week_number} · ${state.calendarId}`;
+  document.getElementById('midcheckMeta').textContent = `Midcheck · ${state.days[2].fullDow} ${state.days[2].dnum}`;
+
+  // Render shopify data (initial)
+  renderShopifyData(cal.shopify_data || {});
+
+  // Render skeleton sections that depend on days
+  renderDayCards();
+
+  // Load pieces + fields in parallel
+  const [piecesRes, fieldsRes] = await Promise.all([
+    supabase.from('calendar_pieces').select('*').eq('calendar_id', state.calendarId).order('position', { ascending: true }),
+    supabase.from('calendar_fields').select('*').eq('calendar_id', state.calendarId)
+  ]);
+
+  if (piecesRes.error){ console.error('Load pieces err', piecesRes.error); }
+  if (fieldsRes.error){ console.error('Load fields err', fieldsRes.error); }
+
+  state.pieces = (piecesRes.data || []).map(rowToPiece);
   state.initialized = true;
+  renderPiecesViews();
 
-  // Load fields
-  const { data: fields } = await supabase
-    .from('calendar_fields')
-    .select('*')
-    .eq('calendar_id', CALENDAR_ID);
-
-  renderAll();
-
-  if (fields){
-    fields.forEach(f => {
+  if (fieldsRes.data){
+    fieldsRes.data.forEach(f => {
       const el = document.querySelector(`[data-field="${f.field_id}"]`);
       if (el && document.activeElement !== el) el.innerHTML = f.value || '';
     });
@@ -955,13 +700,16 @@ async function loadAndSubscribe(){
   bindFieldEditors();
 
   // Realtime subscriptions
-  const piecesCh = supabase.channel(`calendar:${CALENDAR_ID}:pieces`)
-    .on('postgres_changes', { event: '*', schema: 'public', table: 'calendar_pieces', filter: `calendar_id=eq.${CALENDAR_ID}` }, payload => handlePieceChange(payload))
+  const piecesCh = supabase.channel(`calendar:${state.calendarId}:pieces`)
+    .on('postgres_changes', { event: '*', schema: 'public', table: 'calendar_pieces', filter: `calendar_id=eq.${state.calendarId}` }, p => handlePieceChange(p))
     .subscribe();
-  const fieldsCh = supabase.channel(`calendar:${CALENDAR_ID}:fields`)
-    .on('postgres_changes', { event: '*', schema: 'public', table: 'calendar_fields', filter: `calendar_id=eq.${CALENDAR_ID}` }, payload => handleFieldChange(payload))
+  const fieldsCh = supabase.channel(`calendar:${state.calendarId}:fields`)
+    .on('postgres_changes', { event: '*', schema: 'public', table: 'calendar_fields', filter: `calendar_id=eq.${state.calendarId}` }, p => handleFieldChange(p))
     .subscribe();
-  state.channels = [piecesCh, fieldsCh];
+  const calCh = supabase.channel(`calendar:${state.calendarId}:meta`)
+    .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'calendars', filter: `id=eq.${state.calendarId}` }, p => handleCalendarChange(p))
+    .subscribe();
+  state.channels = [piecesCh, fieldsCh, calCh];
 
   setSync('connected', 'Sincronizado');
 }
@@ -971,15 +719,15 @@ function handlePieceChange(payload){
     const p = rowToPiece(payload.new);
     if (!state.pieces.find(x => x.id === p.id)){
       state.pieces.push(p);
-      renderAll();
+      renderPiecesViews();
     }
   } else if (payload.eventType === 'UPDATE'){
     const p = rowToPiece(payload.new);
     state.pieces = state.pieces.map(x => x.id === p.id ? p : x);
-    renderAll();
+    renderPiecesViews();
   } else if (payload.eventType === 'DELETE'){
     state.pieces = state.pieces.filter(x => x.id !== payload.old.id);
-    renderAll();
+    renderPiecesViews();
   }
   setSync('connected', `Sincronizado · ${new Date().toLocaleTimeString('es-CO',{hour:'2-digit',minute:'2-digit'})}`);
 }
@@ -992,6 +740,15 @@ function handleFieldChange(payload){
   if (document.activeElement === el) return;
   if (payload.eventType === 'DELETE'){ el.innerHTML = ''; }
   else { if (el.innerHTML !== (payload.new.value || '')) el.innerHTML = payload.new.value || ''; }
+}
+
+function handleCalendarChange(payload){
+  const cal = payload.new;
+  if (!cal) return;
+  state.calendar = cal;
+  renderShopifyData(cal.shopify_data || {});
+  // Update header status if changed
+  document.getElementById('headerWeekStatus').textContent = cal.status === 'active' ? '' : `· ${cal.status}`;
 }
 
 // === SAVE OPS ===
@@ -1010,7 +767,7 @@ async function deletePieceFromDb(pieceId){
 async function saveField(fieldId, value){
   flashSaving();
   const { error } = await supabase.from('calendar_fields').upsert({
-    calendar_id: CALENDAR_ID,
+    calendar_id: state.calendarId,
     field_id: fieldId,
     value: value,
     updated_at: new Date().toISOString()
@@ -1035,23 +792,15 @@ function bindFieldEditors(){
   });
 }
 
-// === RENDERING (UNIFIED) ===
-function escapeHtml(s){
-  return String(s||'').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-}
-function escapeAttr(s){ return String(s||'').replace(/"/g,'&quot;'); }
-
-function colorToEvtClass(c){ return 'evt-' + (c || 'push'); }
-
-function piecesByDay(day){
-  return state.pieces.filter(p => p.day === day);
+// === RENDERING ===
+function piecesByDayKey(dayKey){
+  return state.pieces.filter(p => p.day === dayKey);
 }
 
-function renderAll(){
-  // si el usuario está editando, defiere
+function renderPiecesViews(){
   const active = document.activeElement;
   if (active && active.closest && (active.closest('.tile') || active.closest('.evt') || active.closest('.piece'))){
-    active.addEventListener('blur', () => renderAll(), { once:true });
+    active.addEventListener('blur', () => renderPiecesViews(), { once:true });
     return;
   }
   renderWeekGrid();
@@ -1060,11 +809,13 @@ function renderAll(){
   updateStats();
 }
 
+function colorToEvtClass(c){ return 'evt-' + (c || 'push'); }
+
 function renderWeekGrid(){
   const grid = document.getElementById('weekGrid');
-  if (!grid) return;
-  grid.innerHTML = DAYS.map(d => {
-    const dayPieces = piecesByDay(d.key);
+  if (!grid || !state.days.length) return;
+  grid.innerHTML = state.days.map(d => {
+    const dayPieces = piecesByDayKey(d.key);
     return `
       <div class="day-cell" data-day-cell="${d.key}">
         <div class="day-head"><span class="dow">${d.dow}</span><span class="dnum">${d.dnum}</span></div>
@@ -1082,7 +833,6 @@ function renderWeekGrid(){
     `;
   }).join('');
 
-  // bind events
   grid.querySelectorAll('.evt').forEach(evt => {
     const pid = evt.getAttribute('data-piece-id');
     bindPieceTextEdit(evt, pid);
@@ -1097,10 +847,41 @@ function renderWeekGrid(){
   if (meta) meta.textContent = `7 días · ${state.pieces.length} piezas`;
 }
 
+function renderDayCards(){
+  // Renders the SHELL for each day. Shopify panels and fields populate after.
+  const container = document.getElementById('dayCards');
+  if (!container || !state.days.length) return;
+  const featured = (state.calendar && state.calendar.featured_products) || [];
+
+  container.innerHTML = state.days.map(d => `
+    <article class="day-card" data-day-card="${d.key}">
+      <div class="day-marker">
+        <div class="dow-large">${d.fullDow}</div>
+        <div class="dnum-large">${d.dnum}</div>
+        <div class="focus" contenteditable="true" data-field="d${d.index}-focus"></div>
+      </div>
+      <div class="content-block">
+        <div class="ctype" contenteditable="true" data-field="d${d.index}-ctype"></div>
+        <h3 contenteditable="true" data-field="d${d.index}-title"></h3>
+        <p class="copy" contenteditable="true" data-field="d${d.index}-copy"></p>
+        <div class="piece-list" data-day-pieces="${d.key}"></div>
+      </div>
+      <aside class="shopify-panel" data-day-shopify="${d.index}">
+        <div class="panel-title">Shopify Live</div>
+        ${featured.length ? renderShopifyPanelEmpty() : '<div class="panel-empty">Configura productos featured en el hub para ver inventario por talla.</div>'}
+      </aside>
+    </article>
+  `).join('');
+}
+
+function renderShopifyPanelEmpty(){
+  return '<div class="panel-empty">Esperando data de Shopify (auto-refresh cada 12h).</div>';
+}
+
 function renderDayPieceLists(){
   document.querySelectorAll('[data-day-pieces]').forEach(container => {
     const day = container.getAttribute('data-day-pieces');
-    const dayPieces = piecesByDay(day);
+    const dayPieces = piecesByDayKey(day);
     container.innerHTML = dayPieces.map(p => `
       <div class="piece" data-piece-id="${p.id}">
         <div class="ptype" contenteditable="true" data-piece-edit="type">${escapeHtml(p.type)}</div>
@@ -1150,14 +931,14 @@ function deletePiece(pid){
   if (!confirm(`¿Eliminar "${p.title}"?`)) return;
   state.pieces = state.pieces.filter(x => x.id !== pid);
   deletePieceFromDb(pid);
-  renderAll();
+  renderPiecesViews();
 }
 
 function addPiece(day){
   const newId = 'p' + Date.now().toString(36);
   const piece = {
     id: newId,
-    day: day || 'Lun 25',
+    day: day || (state.days[0] && state.days[0].key) || 'Mar',
     type: 'Post',
     color: 'push',
     title: 'Nueva pieza',
@@ -1166,7 +947,7 @@ function addPiece(day){
   };
   state.pieces.push(piece);
   saveOnePiece(piece);
-  renderAll();
+  renderPiecesViews();
   setTimeout(() => {
     const titleEl = document.querySelector(`.tile[data-tile-id="${newId}"] .tile-title`)
                  || document.querySelector(`.evt[data-piece-id="${newId}"] .evt-title`)
@@ -1179,7 +960,142 @@ function addPiece(day){
   }, 80);
 }
 
-// === URLs MODAL (Canva + Referente + Upload) ===
+function renderParrilla(){
+  const grid = document.getElementById('parrillaGrid');
+  if (!grid) return;
+
+  grid.innerHTML = state.pieces.map(t => `
+    <div class="tile ${t.imageUrl ? 'has-photo' : ''}" data-tile-id="${t.id}">
+      ${t.imageUrl ? `<img class="tile-photo" src="${escapeAttr(t.imageUrl)}" alt="" loading="lazy" onerror="this.style.display='none';this.parentElement.classList.remove('has-photo')">` : ''}
+      <div class="tile-color ${t.color || 'push'}"></div>
+      ${t.refUrl ? `<a class="tile-ref" href="${escapeAttr(t.refUrl)}" target="_blank" rel="noopener" title="Abrir referente">REF ↗</a>` : ''}
+      <div class="tile-meta">
+        <span class="tile-day" contenteditable="true" data-piece-edit="day">${escapeHtml(t.day)}</span>
+        <span class="tile-type" contenteditable="true" data-piece-edit="type">${escapeHtml(t.type)}</span>
+      </div>
+      <div class="tile-title" contenteditable="true" data-piece-edit="title">${escapeHtml(t.title)}</div>
+      <div class="tile-bottom">
+        ${COLOR_OPTIONS.map(c => `<span class="color-dot ${c} ${c===t.color?'active':''}" data-color="${c}" title="${c}"></span>`).join('')}
+      </div>
+      <div class="tile-actions">
+        <button class="tile-btn urls" data-action="urls" title="URLs (Canva + Referente)">📎</button>
+        <button class="tile-btn delete" data-action="delete" title="Eliminar">×</button>
+      </div>
+    </div>
+  `).join('') + `
+    <button class="tile-add" id="tileAdd"><span class="plus">+</span><span class="add-label">Agregar</span></button>
+  `;
+
+  grid.querySelectorAll('.tile').forEach(tileEl => {
+    const id = tileEl.getAttribute('data-tile-id');
+    tileEl.querySelector('[data-action="delete"]').addEventListener('click', e => { e.stopPropagation(); deletePiece(id); });
+    const urlsBtn = tileEl.querySelector('[data-action="urls"]');
+    if (urlsBtn) urlsBtn.addEventListener('click', e => { e.stopPropagation(); openUrlsModal(id); });
+    tileEl.querySelectorAll('.color-dot').forEach(dot => {
+      dot.addEventListener('click', e => {
+        e.stopPropagation();
+        const newColor = dot.getAttribute('data-color');
+        const piece = state.pieces.find(x => x.id === id);
+        if (!piece) return;
+        const updated = { ...piece, color: newColor };
+        state.pieces = state.pieces.map(x => x.id === id ? updated : x);
+        saveOnePiece(updated);
+        renderPiecesViews();
+      });
+    });
+    bindPieceTextEdit(tileEl, id);
+  });
+
+  const addBtn = document.getElementById('tileAdd');
+  if (addBtn) addBtn.addEventListener('click', () => addPiece(state.days[state.days.length-1].key));
+}
+
+function updateStats(){
+  const total = state.pieces.length;
+  const posts = state.pieces.filter(t => /post/i.test(t.type)).length;
+  const reels = state.pieces.filter(t => /reel/i.test(t.type)).length;
+  const stories = state.pieces.filter(t => /stor/i.test(t.type)).length;
+  const set = (id, n) => { const e = document.getElementById(id); if (e) e.textContent = n; };
+  set('statTotal', total); set('statPosts', posts); set('statReels', reels); set('statStories', stories);
+}
+
+// === SHOPIFY DATA RENDER (from calendars.shopify_data jsonb) ===
+function renderShopifyData(data){
+  // data = { timestamp, metrics, top_sellers, daily_chart, inventory }
+  const stamp = document.getElementById('shopifyStamp');
+  const tsEl = document.getElementById('shopifyTimestamp');
+
+  if (!data || !data.timestamp){
+    if (tsEl) tsEl.textContent = '— sin data —';
+    if (stamp){ stamp.classList.remove('fresh','stale'); }
+    return;
+  }
+
+  if (tsEl) tsEl.textContent = data.timestamp;
+  if (stamp){
+    stamp.classList.remove('fresh','stale');
+    const m = (data.timestamp || '').match(/(\d{4})-(\d{2})-(\d{2})\s+(\d{2}):(\d{2})/);
+    if (m){
+      const dt = new Date(`${m[1]}-${m[2]}-${m[3]}T${m[4]}:${m[5]}:00-05:00`);
+      const hoursAgo = (Date.now() - dt.getTime()) / 3600000;
+      if (hoursAgo < 14) stamp.classList.add('fresh');
+      else if (hoursAgo > 48) stamp.classList.add('stale');
+    }
+  }
+
+  // Metrics
+  if (data.metrics){
+    const ms = document.getElementById('metricsStrip');
+    const m = data.metrics;
+    ms.innerHTML = `
+      <div class="metric"><div class="label">Gross Sales · 7d</div><div class="value">${escapeHtml(m.gross_sales || '—')}</div><div class="delta">${escapeHtml(m.gross_sales_sub || 'COP · last 7 días')}</div></div>
+      <div class="metric"><div class="label">Órdenes · 7d</div><div class="value">${escapeHtml(String(m.orders || '—'))}</div><div class="delta">${escapeHtml(m.orders_sub || '')}</div></div>
+      <div class="metric"><div class="label">Best Day</div><div class="value">${escapeHtml(m.best_day_label || '—')}</div><div class="delta">${escapeHtml(m.best_day_sub || '')}</div></div>
+      <div class="metric"><div class="label">Top Seller</div><div class="value">${escapeHtml(m.top_seller_name || '—')}</div><div class="delta">${escapeHtml(m.top_seller_sub || '')}</div></div>
+    `;
+  }
+
+  // Top sellers
+  if (Array.isArray(data.top_sellers) && data.top_sellers.length){
+    const sg = document.getElementById('sellersGrid');
+    sg.innerHTML = data.top_sellers.slice(0,6).map((s, i) => `
+      <div class="seller">
+        <div class="left"><span class="rank">${String(i+1).padStart(2,'0')}</span><span class="pname">${escapeHtml(s.name)}</span></div>
+        <div class="right"><div class="sales">${escapeHtml(s.sales)}</div><div class="orders">${escapeHtml(String(s.orders))} órdenes</div></div>
+      </div>
+    `).join('');
+  }
+
+  // Daily chart
+  if (Array.isArray(data.daily_chart) && data.daily_chart.length){
+    const cb = document.getElementById('chartBars');
+    cb.innerHTML = data.daily_chart.map(d => `
+      <div class="bar-col">
+        <div class="bar-value">${escapeHtml(d.value)}</div>
+        <div class="bar-track"><div class="bar ${d.peak ? 'peak' : ''}" style="height:${d.height_pct}%"></div></div>
+        <div class="bar-label">${escapeHtml(d.label)}</div>
+      </div>
+    `).join('');
+  }
+
+  // Inventory in shopify panels
+  if (data.inventory && state.calendar && Array.isArray(state.calendar.featured_products)){
+    document.querySelectorAll('[data-day-shopify]').forEach(panel => {
+      panel.innerHTML = `<div class="panel-title">Shopify Live</div>` +
+        state.calendar.featured_products.map(prod => {
+          const inv = data.inventory[prod.gid];
+          if (!inv) return '';
+          const chips = inv.map(s => `<span class="size-chip ${s.class}">${escapeHtml(s.size)}:${s.available}</span>`).join('');
+          return `<div class="product-row">
+            <div class="pname">${escapeHtml(prod.name)}</div>
+            <div class="size-chips">${chips}</div>
+          </div>`;
+        }).filter(Boolean).join('') || '<div class="panel-empty">Sin data de inventario.</div>';
+    });
+  }
+}
+
+// === URLs MODAL ===
 function openUrlsModal(pieceId){
   const piece = state.pieces.find(p => p.id === pieceId);
   if (!piece) return;
@@ -1191,9 +1107,7 @@ function openUrlsModal(pieceId){
   modal.classList.add('open');
   setTimeout(() => modal.querySelector('[data-modal-input="imageUrl"]').focus(), 50);
 }
-function closeUrlsModal(){
-  document.getElementById('urlsModal').classList.remove('open');
-}
+function closeUrlsModal(){ document.getElementById('urlsModal').classList.remove('open'); }
 function saveUrlsModal(){
   const modal = document.getElementById('urlsModal');
   const pieceId = modal.getAttribute('data-piece-id');
@@ -1205,7 +1119,7 @@ function saveUrlsModal(){
   state.pieces = state.pieces.map(p => p.id === pieceId ? updated : p);
   saveOnePiece(updated);
   closeUrlsModal();
-  renderAll();
+  renderPiecesViews();
 }
 
 // === STORAGE UPLOAD ===
@@ -1249,7 +1163,7 @@ async function uploadPhotoFromModal(){
     uploadBtn.textContent = 'Subiendo…';
     try {
       const blob = await compressImage(file);
-      const path = `${CALENDAR_ID}/${pieceId}-${Date.now()}.jpg`;
+      const path = `${state.calendarId}/${pieceId}-${Date.now()}.jpg`;
       const { error: upErr } = await supabase.storage.from(STORAGE_BUCKET).upload(path, blob, { contentType: 'image/jpeg', upsert: false });
       if (upErr) throw upErr;
       const { data: { publicUrl } } = supabase.storage.from(STORAGE_BUCKET).getPublicUrl(path);
@@ -1264,74 +1178,6 @@ async function uploadPhotoFromModal(){
     }
   };
   input.click();
-}
-
-function renderParrilla(){
-  const grid = document.getElementById('parrillaGrid');
-  if (!grid) return;
-
-  grid.innerHTML = state.pieces.map(t => `
-    <div class="tile ${t.imageUrl ? 'has-photo' : ''}" data-tile-id="${t.id}">
-      ${t.imageUrl ? `<img class="tile-photo" src="${escapeAttr(t.imageUrl)}" alt="" loading="lazy" onerror="this.style.display='none';this.parentElement.classList.remove('has-photo')">` : ''}
-      <div class="tile-color ${t.color || 'push'}"></div>
-      ${t.refUrl ? `<a class="tile-ref" href="${escapeAttr(t.refUrl)}" target="_blank" rel="noopener" title="Abrir referente">REF ↗</a>` : ''}
-      <div class="tile-meta">
-        <span class="tile-day" contenteditable="true" data-piece-edit="day">${escapeHtml(t.day)}</span>
-        <span class="tile-type" contenteditable="true" data-piece-edit="type">${escapeHtml(t.type)}</span>
-      </div>
-      <div class="tile-title" contenteditable="true" data-piece-edit="title">${escapeHtml(t.title)}</div>
-      <div class="tile-bottom">
-        ${COLOR_OPTIONS.map(c => `<span class="color-dot ${c} ${c===t.color?'active':''}" data-color="${c}" title="${c}"></span>`).join('')}
-      </div>
-      <div class="tile-actions">
-        <button class="tile-btn urls" data-action="urls" title="URLs (Canva + Referente)">📎</button>
-        <button class="tile-btn delete" data-action="delete" title="Eliminar">×</button>
-      </div>
-    </div>
-  `).join('') + `
-    <button class="tile-add" id="tileAdd"><span class="plus">+</span><span class="add-label">Agregar</span></button>
-  `;
-
-  grid.querySelectorAll('.tile').forEach(tileEl => {
-    const id = tileEl.getAttribute('data-tile-id');
-
-    tileEl.querySelector('[data-action="delete"]').addEventListener('click', e => {
-      e.stopPropagation();
-      deletePiece(id);
-    });
-
-    const urlsBtn = tileEl.querySelector('[data-action="urls"]');
-    if (urlsBtn){
-      urlsBtn.addEventListener('click', e => { e.stopPropagation(); openUrlsModal(id); });
-    }
-
-    tileEl.querySelectorAll('.color-dot').forEach(dot => {
-      dot.addEventListener('click', e => {
-        e.stopPropagation();
-        const newColor = dot.getAttribute('data-color');
-        const piece = state.pieces.find(x => x.id === id);
-        if (!piece) return;
-        const updated = { ...piece, color: newColor };
-        state.pieces = state.pieces.map(x => x.id === id ? updated : x);
-        saveOnePiece(updated);
-        renderAll();
-      });
-    });
-
-    bindPieceTextEdit(tileEl, id);
-  });
-
-  const addBtn = document.getElementById('tileAdd');
-  if (addBtn) addBtn.addEventListener('click', () => addPiece('Lun 25'));
-}
-
-function updateStats(){
-  const total = state.pieces.length;
-  const posts = state.pieces.filter(t => /post/i.test(t.type)).length;
-  const reels = state.pieces.filter(t => /reel/i.test(t.type)).length;
-  const stories = state.pieces.filter(t => /stor/i.test(t.type)).length;
-  const set = (id, n) => { const e = document.getElementById(id); if (e) e.textContent = n; };
-  set('statTotal', total); set('statPosts', posts); set('statReels', reels); set('statStories', stories);
 }
 
 // === LOGIN HANDLERS ===
@@ -1355,7 +1201,7 @@ async function sendMagicLink(){
     loginBtn.disabled = false;
   } else {
     loginStatus.className = 'login-status success';
-    loginStatus.innerHTML = `Te enviamos un magic link a <strong>${escapeHtml(email)}</strong>.<br>Revisa tu inbox (puede tomar 1 min) y haz click para entrar.`;
+    loginStatus.innerHTML = `Te enviamos un magic link a <strong>${escapeHtml(email)}</strong>.<br>Revisa tu inbox y haz click para entrar.`;
   }
 }
 
@@ -1366,18 +1212,6 @@ if (signOutBtn) signOutBtn.addEventListener('click', async () => {
   await supabase.auth.signOut();
 });
 
-// === REFRESH MODAL ===
-const refreshBtn = document.getElementById('refreshShopifyBtn');
-const refreshModal = document.getElementById('refreshModal');
-const modalClose = document.getElementById('modalClose');
-const modalCopy = document.getElementById('modalCopy');
-const modalPrompt = document.getElementById('modalPrompt');
-const copyFeedback = document.getElementById('copyFeedback');
-
-if (refreshBtn) refreshBtn.addEventListener('click', () => refreshModal.classList.add('open'));
-if (modalClose) modalClose.addEventListener('click', () => refreshModal.classList.remove('open'));
-if (refreshModal) refreshModal.addEventListener('click', e => { if (e.target === refreshModal) refreshModal.classList.remove('open'); });
-
 // URLs modal handlers
 const urlsModalEl = document.getElementById('urlsModal');
 if (urlsModalEl){
@@ -1387,36 +1221,8 @@ if (urlsModalEl){
   urlsModalEl.addEventListener('click', e => { if (e.target === urlsModalEl) closeUrlsModal(); });
 }
 document.addEventListener('keydown', e => {
-  if (e.key === 'Escape'){
-    if (urlsModalEl && urlsModalEl.classList.contains('open')) closeUrlsModal();
-    if (refreshModal && refreshModal.classList.contains('open')) refreshModal.classList.remove('open');
-  }
+  if (e.key === 'Escape' && urlsModalEl && urlsModalEl.classList.contains('open')) closeUrlsModal();
 });
-if (modalCopy) modalCopy.addEventListener('click', async () => {
-  try {
-    await navigator.clipboard.writeText(modalPrompt.textContent.trim());
-    copyFeedback.classList.add('show');
-    setTimeout(() => copyFeedback.classList.remove('show'), 2000);
-  } catch(e){
-    // Fallback selección manual
-    const range = document.createRange(); range.selectNodeContents(modalPrompt);
-    const sel = window.getSelection(); sel.removeAllRanges(); sel.addRange(range);
-  }
-});
-
-// Marca data como stale si tiene >24h
-(function flagStaleness(){
-  const stamp = document.getElementById('shopifyStamp');
-  const tsEl = document.getElementById('shopifyTimestamp');
-  if (!stamp || !tsEl) return;
-  const text = tsEl.textContent.trim();
-  const m = text.match(/(\d{4})-(\d{2})-(\d{2})\s+(\d{2}):(\d{2})/);
-  if (!m) return;
-  const dataDate = new Date(`${m[1]}-${m[2]}-${m[3]}T${m[4]}:${m[5]}:00-05:00`);
-  const hoursAgo = (Date.now() - dataDate.getTime()) / 3600000;
-  if (hoursAgo < 6) stamp.classList.add('fresh');
-  else if (hoursAgo > 48) stamp.classList.add('stale');
-})();
 
 // === BOOT ===
 boot().catch(err => {
