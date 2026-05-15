@@ -354,13 +354,26 @@ async function createNewWeek(){
     return;
   }
 
+  // Heredar shopify_data + featured_products de la ultima semana activa (si existe)
+  const { data: latest } = await supabase
+    .from('calendars')
+    .select('shopify_data, featured_products')
+    .eq('status', 'active')
+    .order('start_date', { ascending: false })
+    .limit(1)
+    .maybeSingle();
+
+  const inheritedShopifyData = (latest && latest.shopify_data) || {};
+  const inheritedFeatured = (latest && Array.isArray(latest.featured_products)) ? latest.featured_products : [];
+
   const { error } = await supabase.from('calendars').insert({
     id,
     week_number: num,
     start_date: `${y}-${String(m).padStart(2,'0')}-${String(d).padStart(2,'0')}`,
     end_date: `${ey}-${em}-${ed}`,
     status: 'active',
-    featured_products: []
+    featured_products: inheritedFeatured,
+    shopify_data: inheritedShopifyData
   });
 
   if (error){
