@@ -204,6 +204,27 @@ html,body{background:var(--cream);color:var(--black);font-family:'Outfit',sans-s
 .tile-add .plus{font-family:'Cormorant Garamond',serif;font-size:48px;line-height:1;font-weight:300}
 .tile-add .add-label{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.15em;text-transform:uppercase;margin-top:4px}
 
+/* LOGIN OVERLAY */
+.login-overlay{position:fixed;inset:0;background:var(--cream);display:none;align-items:center;justify-content:center;z-index:300;flex-direction:column;padding:24px}
+.login-overlay.show{display:flex}
+.login-card{max-width:440px;width:100%;text-align:center}
+.login-logo{font-family:'Cormorant Garamond',serif;font-weight:900;font-size:48px;letter-spacing:.18em;line-height:1}
+.login-tagline{font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:var(--grey);margin-top:6px;margin-bottom:56px}
+.login-title{font-family:'Cormorant Garamond',serif;font-style:italic;font-weight:700;font-size:34px;margin-bottom:12px;line-height:1.1}
+.login-help{font-size:13px;color:var(--grey);line-height:1.55;margin-bottom:28px}
+#loginEmail{width:100%;padding:13px 16px;font-family:'JetBrains Mono',monospace;font-size:13px;border:1px solid var(--black);background:#fff;outline:none;margin-bottom:10px;text-align:center;letter-spacing:.05em}
+#loginEmail:focus{border-color:var(--rosa-deep)}
+#loginBtn{width:100%;padding:14px;background:var(--black);color:var(--cream);border:none;font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.18em;text-transform:uppercase;cursor:pointer;transition:background .15s}
+#loginBtn:hover:not(:disabled){background:var(--rosa-deep)}
+#loginBtn:disabled{opacity:.5;cursor:not-allowed}
+.login-status{margin-top:20px;font-size:13px;color:var(--rosa-deep);min-height:1.2em;line-height:1.55}
+.login-status.error{color:var(--red-out)}
+.login-status.success{color:var(--green-ok)}
+
+/* SIGN OUT */
+.signout-btn{background:transparent;border:none;color:var(--grey);font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.12em;text-transform:uppercase;cursor:pointer;padding:0;text-decoration:underline;text-underline-offset:3px}
+.signout-btn:hover{color:var(--red-out)}
+
 /* SHOPIFY REFRESH */
 .shopify-stamp{display:inline-flex;align-items:center;gap:8px;font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--grey);font-weight:400;font-style:normal}
 .shopify-stamp .live-dot{width:6px;height:6px;border-radius:50%;background:var(--yellow-low);display:inline-block}
@@ -248,6 +269,20 @@ html,body{background:var(--cream);color:var(--black);font-family:'Outfit',sans-s
 </style>
 </head>
 <body>
+
+<!-- LOGIN OVERLAY -->
+<div class="login-overlay" id="loginOverlay">
+  <div class="login-card">
+    <div class="login-logo">L U X U R</div>
+    <div class="login-tagline">Content Operations</div>
+    <h2 class="login-title">Acceso del equipo</h2>
+    <p class="login-help">Pega tu email LUXUR. Te llega un magic link al inbox — un click y entras. Cero contraseñas.</p>
+    <input type="email" id="loginEmail" placeholder="tu@email.com" autocomplete="email" inputmode="email">
+    <button id="loginBtn">Enviar magic link</button>
+    <div class="login-status" id="loginStatus"></div>
+  </div>
+</div>
+
 <div class="container">
 
   <!-- HEADER -->
@@ -269,8 +304,9 @@ html,body{background:var(--cream);color:var(--black);font-family:'Outfit',sans-s
       <span id="syncLabel">Conectando…</span>
     </div>
     <div class="editor-list">
-      <span>Editores activos:</span>
+      <span>Sesión:</span>
       <span id="editorList"><span class="editor-chip">—</span></span>
+      <button class="signout-btn" id="signOutBtn" style="margin-left:12px">Salir</button>
     </div>
   </div>
 
@@ -686,7 +722,7 @@ html,body{background:var(--cream);color:var(--black);font-family:'Outfit',sans-s
   <!-- FOOTER -->
   <footer class="footer">
     <div>LUXUR Content Ops · Generado <span id="genDate">2026-05-14 16:07 -05</span></div>
-    <div>Cambios sincronizados en tiempo real · <a href="https://github.com/mpsarier-ai/luxurcontentdept/edit/main/calendars/semana21-may19-25.html" target="_blank" id="githubLink">Editar en GitHub</a></div>
+    <div>Cambios sincronizados en tiempo real · Supabase + Magic Link Auth</div>
   </footer>
 
 </div>
@@ -698,11 +734,14 @@ html,body{background:var(--cream);color:var(--black);font-family:'Outfit',sans-s
     <h3 data-modal-title>—</h3>
     <p style="font-size:13px;color:var(--grey);margin-bottom:16px">Pega URLs públicas. La de Canva se usa como imagen de fondo del tile. La de Referente abre en nueva pestaña al click "REF ↗".</p>
 
-    <label style="display:block;font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.15em;text-transform:uppercase;color:var(--grey);margin-bottom:6px">URL Canva (imagen final)</label>
-    <input type="url" data-modal-input="imageUrl" placeholder="https://… (link directo a la imagen)" style="width:100%;padding:10px 12px;font-family:'JetBrains Mono',monospace;font-size:12px;border:1px solid var(--black);background:#fff;outline:none;margin-bottom:16px">
+    <label style="display:block;font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.15em;text-transform:uppercase;color:var(--grey);margin-bottom:6px">Imagen final</label>
+    <div style="display:flex;gap:6px;margin-bottom:16px">
+      <input type="url" data-modal-input="imageUrl" placeholder="Pega URL o sube foto →" style="flex:1;padding:10px 12px;font-family:'JetBrains Mono',monospace;font-size:12px;border:1px solid var(--black);background:#fff;outline:none">
+      <button data-urls-upload style="padding:10px 14px;background:var(--rosa-deep);color:#fff;border:none;font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.12em;text-transform:uppercase;cursor:pointer;white-space:nowrap">📷 Subir</button>
+    </div>
 
     <label style="display:block;font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.15em;text-transform:uppercase;color:var(--grey);margin-bottom:6px">URL Referente (inspiración)</label>
-    <input type="url" data-modal-input="refUrl" placeholder="https://… (Pinterest, IG, link de Canva, etc)" style="width:100%;padding:10px 12px;font-family:'JetBrains Mono',monospace;font-size:12px;border:1px solid var(--black);background:#fff;outline:none">
+    <input type="url" data-modal-input="refUrl" placeholder="https://… (Pinterest, IG, Canva, etc)" style="width:100%;padding:10px 12px;font-family:'JetBrains Mono',monospace;font-size:12px;border:1px solid var(--black);background:#fff;outline:none">
 
     <div class="modal-actions">
       <button class="modal-btn" data-urls-cancel>Cancelar</button>
@@ -728,24 +767,18 @@ html,body{background:var(--cream);color:var(--black);font-family:'Outfit',sans-s
 </div>
 
 <!-- ============================================================ -->
-<!-- FIREBASE REAL-TIME COLLABORATIVE EDITING                     -->
+<!-- SUPABASE REAL-TIME COLLABORATIVE EDITING + MAGIC LINK AUTH   -->
 <!-- ============================================================ -->
 <script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-import { getFirestore, doc, onSnapshot, setDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
-import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
-const firebaseConfig = {
-  apiKey: "AIzaSyDffXb-q5KloYzoPwMA3rU9eEXg8ht9yUE",
-  authDomain: "luxur-content-ops.firebaseapp.com",
-  projectId: "luxur-content-ops",
-  storageBucket: "luxur-content-ops.firebasestorage.app",
-  messagingSenderId: "93575662760",
-  appId: "1:93575662760:web:c79a73d3a1748e9436069d"
-};
+const SUPABASE_URL = "https://nrpgtlcdvtesjbxpkxha.supabase.co";
+const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5ycGd0bGNkdnRlc2pieHBreGhhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg3ODkzNTAsImV4cCI6MjA5NDM2NTM1MH0.ntRHkFobaVK6RW9EYRwoww1ATr8N0zHMzXHM__5x8E0";
+const CALENDAR_ID = "semana21-may19-25";
+const STORAGE_BUCKET = "calendar-photos";
 
-const DOC_ID = "semana21-may19-25";
-const COLLECTION = "calendars";
+const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
 const COLOR_OPTIONS = ['launch','preorden','push','recap','cross','admin'];
 const DAYS = [
   { key:'Mar 19', dow:'Mar', dnum:19 },
@@ -780,139 +813,225 @@ const DEFAULT_PIECES = [
 
 // === STATE ===
 const state = {
-  docRef: null,
   user: null,
-  lastWrite: 0,
   pieces: [],
-  initialized: false
+  initialized: false,
+  channels: []
 };
 
 const syncDot = document.getElementById('syncDot');
 const syncLabel = document.getElementById('syncLabel');
 const editorList = document.getElementById('editorList');
+const loginOverlay = document.getElementById('loginOverlay');
+const loginEmail = document.getElementById('loginEmail');
+const loginBtn = document.getElementById('loginBtn');
+const loginStatus = document.getElementById('loginStatus');
+const signOutBtn = document.getElementById('signOutBtn');
 
-function setSync(s, label){ syncDot.className = 'sync-dot ' + s; syncLabel.textContent = label; }
+function setSync(s, label){ if(syncDot){syncDot.className = 'sync-dot ' + s;} if(syncLabel){syncLabel.textContent = label;} }
 function flashSaving(){ setSync('editing','Guardando…'); }
 function flashSaved(){ setSync('connected', `Guardado · ${new Date().toLocaleTimeString('es-CO',{hour:'2-digit',minute:'2-digit'})}`); }
 
-// === FIREBASE BOOT ===
-if (firebaseConfig.apiKey.startsWith("REEMPLAZAR")){
-  setSync('offline','Firebase no configurado · modo local');
-  initLocalOnly();
-} else {
-  try {
-    const app = initializeApp(firebaseConfig);
-    const db = getFirestore(app);
-    const auth = getAuth(app);
-    setSync('','Conectando…');
-
-    signInAnonymously(auth).catch(err => {
-      console.error('Auth error', err);
-      setSync('offline','Error auth · modo local');
-      initLocalOnly();
-    });
-
-    onAuthStateChanged(auth, async (user) => {
-      if (!user) return;
-      state.user = user;
-      state.docRef = doc(db, COLLECTION, DOC_ID);
-
-      onSnapshot(state.docRef, (snap) => {
-        if (!snap.exists()){
-          setSync('connected','Sincronizado · primera edición');
-          state.pieces = JSON.parse(JSON.stringify(DEFAULT_PIECES));
-          state.initialized = true;
-          renderAll();
-          savePiecesRemote();
-          return;
-        }
-        const data = snap.data();
-        if (Date.now() - state.lastWrite < 800) return;
-
-        applyRemoteFields(data.fields || {});
-
-        // Prefer new `pieces` field, fallback to legacy `parrilla`
-        const remotePieces = Array.isArray(data.pieces) ? data.pieces
-                           : Array.isArray(data.parrilla) ? data.parrilla
-                           : null;
-        if (remotePieces){
-          state.pieces = remotePieces;
-          state.initialized = true;
-          renderAll();
-        } else if (!state.initialized){
-          state.pieces = JSON.parse(JSON.stringify(DEFAULT_PIECES));
-          state.initialized = true;
-          renderAll();
-          savePiecesRemote();
-        }
-
-        setSync('connected', `Sincronizado · ${formatTime(data.updatedAt)}`);
-        renderEditors(data.activeEditors || {});
-      }, (err) => {
-        console.error('Snapshot error', err);
-        setSync('offline','Sin conexión · modo local');
-        // Bug fix: si Firebase falla, igual renderiza desde localStorage o defaults para que la pagina funcione
-        if (!state.initialized){
-          const stored = localStorage.getItem('luxur-' + DOC_ID + '-pieces');
-          state.pieces = stored ? JSON.parse(stored) : JSON.parse(JSON.stringify(DEFAULT_PIECES));
-          state.initialized = true;
-          renderAll();
-        }
-      });
-
-      bindFieldEditors();
-    });
-  } catch(err){
-    console.error('Firebase init error', err);
-    setSync('offline','Error config · modo local');
-    initLocalOnly();
-  }
+// === DB <-> JS row converters ===
+function rowToPiece(r){
+  return {
+    id: r.id,
+    day: r.day,
+    type: r.type || 'Post',
+    color: r.color || 'push',
+    title: r.title || '',
+    description: r.description || '',
+    imageUrl: r.image_url || null,
+    refUrl: r.ref_url || null,
+    position: r.position || 0
+  };
+}
+function pieceToRow(p){
+  return {
+    id: p.id,
+    calendar_id: CALENDAR_ID,
+    day: p.day,
+    type: p.type,
+    color: p.color,
+    title: p.title || '',
+    description: p.description || '',
+    image_url: p.imageUrl || null,
+    ref_url: p.refUrl || null,
+    position: typeof p.position === 'number' ? p.position : 0,
+    updated_at: new Date().toISOString()
+  };
 }
 
-// === FIELD EDITORS (existing contenteditable) ===
+// === BOOT ===
+async function boot(){
+  setSync('','Conectando…');
+
+  // Si la URL trae token de magic link, Supabase lo procesa solo
+  const { data: { session } } = await supabase.auth.getSession();
+  if (session && session.user){
+    state.user = session.user;
+    await enterApp();
+  } else {
+    showLogin();
+  }
+
+  // Auth state changes (magic link redirect, sign out)
+  supabase.auth.onAuthStateChange(async (event, session) => {
+    if (event === 'SIGNED_IN' && session && session.user){
+      state.user = session.user;
+      await enterApp();
+    } else if (event === 'SIGNED_OUT'){
+      state.user = null;
+      // Cleanup channels
+      state.channels.forEach(ch => supabase.removeChannel(ch));
+      state.channels = [];
+      state.initialized = false;
+      showLogin();
+    }
+  });
+}
+
+function showLogin(){
+  loginOverlay.classList.add('show');
+  setTimeout(() => loginEmail && loginEmail.focus(), 100);
+}
+function hideLogin(){
+  loginOverlay.classList.remove('show');
+}
+
+async function enterApp(){
+  hideLogin();
+  if (editorList) editorList.innerHTML = `<span class="editor-chip">${escapeHtml(state.user.email)}</span>`;
+  await loadAndSubscribe();
+}
+
+async function loadAndSubscribe(){
+  setSync('','Cargando piezas…');
+
+  // Load pieces
+  const { data: pieces, error } = await supabase
+    .from('calendar_pieces')
+    .select('*')
+    .eq('calendar_id', CALENDAR_ID)
+    .order('position', { ascending: true });
+
+  if (error){
+    console.error('Load pieces err', error);
+    if (error.code === '42501' || /policy|permission/i.test(error.message)){
+      alert(`Tu email (${state.user.email}) no está en la allowlist del calendario.\n\nPide al admin que te agregue en Supabase → SQL Editor:\n\ninsert into allowed_emails (email) values ('${state.user.email}');`);
+      await supabase.auth.signOut();
+      return;
+    }
+    setSync('offline', 'Error al cargar: ' + error.message);
+    return;
+  }
+
+  if (!pieces || pieces.length === 0){
+    // Seed con DEFAULT_PIECES
+    const seedRows = DEFAULT_PIECES.map((p, i) => ({ ...pieceToRow(p), position: i }));
+    const { error: seedErr } = await supabase.from('calendar_pieces').insert(seedRows);
+    if (seedErr) console.error('Seed err', seedErr);
+    state.pieces = JSON.parse(JSON.stringify(DEFAULT_PIECES));
+  } else {
+    state.pieces = pieces.map(rowToPiece);
+  }
+  state.initialized = true;
+
+  // Load fields
+  const { data: fields } = await supabase
+    .from('calendar_fields')
+    .select('*')
+    .eq('calendar_id', CALENDAR_ID);
+
+  renderAll();
+
+  if (fields){
+    fields.forEach(f => {
+      const el = document.querySelector(`[data-field="${f.field_id}"]`);
+      if (el && document.activeElement !== el) el.innerHTML = f.value || '';
+    });
+  }
+
+  bindFieldEditors();
+
+  // Realtime subscriptions
+  const piecesCh = supabase.channel(`calendar:${CALENDAR_ID}:pieces`)
+    .on('postgres_changes', { event: '*', schema: 'public', table: 'calendar_pieces', filter: `calendar_id=eq.${CALENDAR_ID}` }, payload => handlePieceChange(payload))
+    .subscribe();
+  const fieldsCh = supabase.channel(`calendar:${CALENDAR_ID}:fields`)
+    .on('postgres_changes', { event: '*', schema: 'public', table: 'calendar_fields', filter: `calendar_id=eq.${CALENDAR_ID}` }, payload => handleFieldChange(payload))
+    .subscribe();
+  state.channels = [piecesCh, fieldsCh];
+
+  setSync('connected', 'Sincronizado');
+}
+
+function handlePieceChange(payload){
+  if (payload.eventType === 'INSERT'){
+    const p = rowToPiece(payload.new);
+    if (!state.pieces.find(x => x.id === p.id)){
+      state.pieces.push(p);
+      renderAll();
+    }
+  } else if (payload.eventType === 'UPDATE'){
+    const p = rowToPiece(payload.new);
+    state.pieces = state.pieces.map(x => x.id === p.id ? p : x);
+    renderAll();
+  } else if (payload.eventType === 'DELETE'){
+    state.pieces = state.pieces.filter(x => x.id !== payload.old.id);
+    renderAll();
+  }
+  setSync('connected', `Sincronizado · ${new Date().toLocaleTimeString('es-CO',{hour:'2-digit',minute:'2-digit'})}`);
+}
+
+function handleFieldChange(payload){
+  const f = payload.new || payload.old;
+  if (!f) return;
+  const el = document.querySelector(`[data-field="${f.field_id}"]`);
+  if (!el) return;
+  if (document.activeElement === el) return;
+  if (payload.eventType === 'DELETE'){ el.innerHTML = ''; }
+  else { if (el.innerHTML !== (payload.new.value || '')) el.innerHTML = payload.new.value || ''; }
+}
+
+// === SAVE OPS ===
+async function saveOnePiece(piece){
+  flashSaving();
+  const { error } = await supabase.from('calendar_pieces').upsert(pieceToRow(piece), { onConflict: 'id' });
+  if (error){ console.error('Save piece err', error); setSync('offline', 'Error al guardar: ' + error.message); }
+  else flashSaved();
+}
+async function deletePieceFromDb(pieceId){
+  flashSaving();
+  const { error } = await supabase.from('calendar_pieces').delete().eq('id', pieceId);
+  if (error){ console.error('Delete piece err', error); setSync('offline', 'Error al eliminar'); }
+  else flashSaved();
+}
+async function saveField(fieldId, value){
+  flashSaving();
+  const { error } = await supabase.from('calendar_fields').upsert({
+    calendar_id: CALENDAR_ID,
+    field_id: fieldId,
+    value: value,
+    updated_at: new Date().toISOString()
+  }, { onConflict: 'calendar_id,field_id' });
+  if (error){ console.error('Save field err', error); setSync('offline', 'Error al guardar'); }
+  else flashSaved();
+}
+
+// === FIELD EDITORS ===
 function bindFieldEditors(){
   document.querySelectorAll('[data-field]').forEach(el => {
-    if (el.getAttribute('contenteditable') !== 'true' && !el.classList.contains('evt')) return;
-    if (el.classList.contains('evt')) el.setAttribute('contenteditable','true');
-
+    if (el.getAttribute('contenteditable') !== 'true') return;
+    if (el.dataset.bound) return;
+    el.dataset.bound = '1';
+    const field = el.getAttribute('data-field');
     let debounce;
     el.addEventListener('input', () => {
       clearTimeout(debounce);
       flashSaving();
-      debounce = setTimeout(async () => {
-        const field = el.getAttribute('data-field');
-        try {
-          state.lastWrite = Date.now();
-          await setDoc(state.docRef, {
-            fields: { [field]: el.innerHTML },
-            updatedAt: serverTimestamp(),
-            lastEditor: state.user.uid.slice(0,6)
-          }, { merge: true });
-          flashSaved();
-        } catch(err){
-          console.error('Write error', err);
-          setSync('offline','Error al guardar');
-        }
-      }, 500);
+      debounce = setTimeout(() => saveField(field, el.innerHTML), 500);
     });
-
-    el.addEventListener('focus', async () => {
-      if (!state.docRef) return;
-      try {
-        await setDoc(state.docRef, {
-          activeEditors: { [state.user.uid.slice(0,6)]: { last: serverTimestamp() } }
-        }, { merge: true });
-      } catch(e){}
-    });
-  });
-}
-
-function applyRemoteFields(fields){
-  Object.entries(fields).forEach(([id, html]) => {
-    const el = document.querySelector(`[data-field="${id}"]`);
-    if (!el) return;
-    if (document.activeElement === el) return;
-    if (el.innerHTML !== html) el.innerHTML = html;
   });
 }
 
@@ -1015,8 +1134,11 @@ function bindPieceTextEdit(rootEl, pid){
       dbnce = setTimeout(() => {
         const k = field.getAttribute('data-piece-edit');
         const v = field.textContent.trim();
-        state.pieces = state.pieces.map(x => x.id === pid ? { ...x, [k]: v } : x);
-        savePiecesRemote();
+        const piece = state.pieces.find(x => x.id === pid);
+        if (!piece) return;
+        const updated = { ...piece, [k]: v };
+        state.pieces = state.pieces.map(x => x.id === pid ? updated : x);
+        saveOnePiece(updated);
       }, 500);
     });
   });
@@ -1027,21 +1149,23 @@ function deletePiece(pid){
   if (!p) return;
   if (!confirm(`¿Eliminar "${p.title}"?`)) return;
   state.pieces = state.pieces.filter(x => x.id !== pid);
-  savePiecesRemote();
+  deletePieceFromDb(pid);
   renderAll();
 }
 
 function addPiece(day){
   const newId = 'p' + Date.now().toString(36);
-  state.pieces.push({
+  const piece = {
     id: newId,
     day: day || 'Lun 25',
     type: 'Post',
     color: 'push',
     title: 'Nueva pieza',
-    description: ''
-  });
-  savePiecesRemote();
+    description: '',
+    position: state.pieces.length
+  };
+  state.pieces.push(piece);
+  saveOnePiece(piece);
   renderAll();
   setTimeout(() => {
     const titleEl = document.querySelector(`.tile[data-tile-id="${newId}"] .tile-title`)
@@ -1055,7 +1179,7 @@ function addPiece(day){
   }, 80);
 }
 
-// === URLs MODAL (Canva + Referente) ===
+// === URLs MODAL (Canva + Referente + Upload) ===
 function openUrlsModal(pieceId){
   const piece = state.pieces.find(p => p.id === pieceId);
   if (!piece) return;
@@ -1075,10 +1199,71 @@ function saveUrlsModal(){
   const pieceId = modal.getAttribute('data-piece-id');
   const imageUrl = modal.querySelector('[data-modal-input="imageUrl"]').value.trim() || null;
   const refUrl = modal.querySelector('[data-modal-input="refUrl"]').value.trim() || null;
-  state.pieces = state.pieces.map(p => p.id === pieceId ? { ...p, imageUrl, refUrl } : p);
-  savePiecesRemote();
+  const piece = state.pieces.find(p => p.id === pieceId);
+  if (!piece) return;
+  const updated = { ...piece, imageUrl, refUrl };
+  state.pieces = state.pieces.map(p => p.id === pieceId ? updated : p);
+  saveOnePiece(updated);
   closeUrlsModal();
   renderAll();
+}
+
+// === STORAGE UPLOAD ===
+async function compressImage(file, maxDim = 1200, quality = 0.82){
+  return new Promise((resolve, reject) => {
+    const img = new Image();
+    const reader = new FileReader();
+    reader.onload = e => { img.src = e.target.result; };
+    reader.onerror = reject;
+    img.onload = () => {
+      let { width, height } = img;
+      if (width > maxDim || height > maxDim){
+        const r = Math.min(maxDim/width, maxDim/height);
+        width = Math.round(width*r); height = Math.round(height*r);
+      }
+      const canvas = document.createElement('canvas');
+      canvas.width = width; canvas.height = height;
+      const ctx = canvas.getContext('2d');
+      ctx.drawImage(img, 0, 0, width, height);
+      canvas.toBlob(blob => blob ? resolve(blob) : reject(new Error('canvas blob fail')), 'image/jpeg', quality);
+    };
+    img.onerror = reject;
+    reader.readAsDataURL(file);
+  });
+}
+
+async function uploadPhotoFromModal(){
+  const modal = document.getElementById('urlsModal');
+  const pieceId = modal.getAttribute('data-piece-id');
+  if (!pieceId) return;
+  const input = document.createElement('input');
+  input.type = 'file';
+  input.accept = 'image/*';
+  input.onchange = async () => {
+    const file = input.files && input.files[0];
+    if (!file) return;
+    if (!file.type.startsWith('image/')){ alert('Selecciona una imagen'); return; }
+    const uploadBtn = modal.querySelector('[data-urls-upload]');
+    const originalText = uploadBtn.textContent;
+    uploadBtn.disabled = true;
+    uploadBtn.textContent = 'Subiendo…';
+    try {
+      const blob = await compressImage(file);
+      const path = `${CALENDAR_ID}/${pieceId}-${Date.now()}.jpg`;
+      const { error: upErr } = await supabase.storage.from(STORAGE_BUCKET).upload(path, blob, { contentType: 'image/jpeg', upsert: false });
+      if (upErr) throw upErr;
+      const { data: { publicUrl } } = supabase.storage.from(STORAGE_BUCKET).getPublicUrl(path);
+      modal.querySelector('[data-modal-input="imageUrl"]').value = publicUrl;
+      uploadBtn.textContent = '✓ Subido';
+      setTimeout(() => { uploadBtn.textContent = originalText; uploadBtn.disabled = false; }, 1500);
+    } catch(err){
+      console.error('Upload err', err);
+      alert('Error al subir: ' + (err.message || err));
+      uploadBtn.textContent = originalText;
+      uploadBtn.disabled = false;
+    }
+  };
+  input.click();
 }
 
 function renderParrilla(){
@@ -1124,8 +1309,11 @@ function renderParrilla(){
       dot.addEventListener('click', e => {
         e.stopPropagation();
         const newColor = dot.getAttribute('data-color');
-        state.pieces = state.pieces.map(x => x.id === id ? {...x, color:newColor} : x);
-        savePiecesRemote();
+        const piece = state.pieces.find(x => x.id === id);
+        if (!piece) return;
+        const updated = { ...piece, color: newColor };
+        state.pieces = state.pieces.map(x => x.id === id ? updated : x);
+        saveOnePiece(updated);
         renderAll();
       });
     });
@@ -1146,54 +1334,37 @@ function updateStats(){
   set('statTotal', total); set('statPosts', posts); set('statReels', reels); set('statStories', stories);
 }
 
-async function savePiecesRemote(){
-  updateStats();
-  if (!state.docRef){
-    localStorage.setItem('luxur-' + DOC_ID + '-pieces', JSON.stringify(state.pieces));
+// === LOGIN HANDLERS ===
+async function sendMagicLink(){
+  const email = (loginEmail.value || '').trim().toLowerCase();
+  if (!email || !email.includes('@')){
+    loginStatus.className = 'login-status error';
+    loginStatus.textContent = 'Email no válido';
     return;
   }
-  try {
-    state.lastWrite = Date.now();
-    await setDoc(state.docRef, {
-      pieces: state.pieces,
-      updatedAt: serverTimestamp(),
-      lastEditor: state.user.uid.slice(0,6)
-    }, { merge: true });
-    flashSaved();
-  } catch(err){
-    console.error('Pieces save err', err);
-    setSync('offline','Error al guardar piezas');
+  loginBtn.disabled = true;
+  loginStatus.className = 'login-status';
+  loginStatus.textContent = 'Enviando link…';
+  const { error } = await supabase.auth.signInWithOtp({
+    email,
+    options: { emailRedirectTo: window.location.href.split('#')[0] }
+  });
+  if (error){
+    loginStatus.className = 'login-status error';
+    loginStatus.textContent = 'Error: ' + error.message;
+    loginBtn.disabled = false;
+  } else {
+    loginStatus.className = 'login-status success';
+    loginStatus.innerHTML = `Te enviamos un magic link a <strong>${escapeHtml(email)}</strong>.<br>Revisa tu inbox (puede tomar 1 min) y haz click para entrar.`;
   }
 }
 
-function renderEditors(editors){
-  const ids = Object.keys(editors).slice(0,5);
-  if (!ids.length){ editorList.innerHTML = '<span class="editor-chip">solo tú</span>'; return; }
-  editorList.innerHTML = ids.map(id => `<span class="editor-chip">${id}</span>`).join('');
-}
-
-function formatTime(ts){
-  if (!ts || !ts.toDate) return 'ahora';
-  return ts.toDate().toLocaleTimeString('es-CO',{hour:'2-digit',minute:'2-digit'});
-}
-
-// === LOCAL FALLBACK ===
-function initLocalOnly(){
-  // Fields (day theme/copy)
-  document.querySelectorAll('[data-field]').forEach(el => {
-    const field = el.getAttribute('data-field');
-    const stored = localStorage.getItem('luxur-' + DOC_ID + '-' + field);
-    if (stored && document.activeElement !== el) el.innerHTML = stored;
-    el.addEventListener('input', () => {
-      localStorage.setItem('luxur-' + DOC_ID + '-' + field, el.innerHTML);
-    });
-  });
-  // Pieces
-  const stored = localStorage.getItem('luxur-' + DOC_ID + '-pieces');
-  state.pieces = stored ? JSON.parse(stored) : JSON.parse(JSON.stringify(DEFAULT_PIECES));
-  state.initialized = true;
-  renderAll();
-}
+if (loginBtn) loginBtn.addEventListener('click', sendMagicLink);
+if (loginEmail) loginEmail.addEventListener('keydown', e => { if (e.key === 'Enter') sendMagicLink(); });
+if (signOutBtn) signOutBtn.addEventListener('click', async () => {
+  if (!confirm('¿Cerrar sesión?')) return;
+  await supabase.auth.signOut();
+});
 
 // === REFRESH MODAL ===
 const refreshBtn = document.getElementById('refreshShopifyBtn');
@@ -1212,6 +1383,7 @@ const urlsModalEl = document.getElementById('urlsModal');
 if (urlsModalEl){
   urlsModalEl.querySelector('[data-urls-cancel]').addEventListener('click', closeUrlsModal);
   urlsModalEl.querySelector('[data-urls-save]').addEventListener('click', saveUrlsModal);
+  urlsModalEl.querySelector('[data-urls-upload]').addEventListener('click', uploadPhotoFromModal);
   urlsModalEl.addEventListener('click', e => { if (e.target === urlsModalEl) closeUrlsModal(); });
 }
 document.addEventListener('keydown', e => {
@@ -1245,6 +1417,12 @@ if (modalCopy) modalCopy.addEventListener('click', async () => {
   if (hoursAgo < 6) stamp.classList.add('fresh');
   else if (hoursAgo > 48) stamp.classList.add('stale');
 })();
+
+// === BOOT ===
+boot().catch(err => {
+  console.error('Boot error', err);
+  setSync('offline','Error al iniciar: ' + err.message);
+});
 </script>
 
 </body>
