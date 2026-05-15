@@ -351,6 +351,28 @@ select.pm-input{cursor:pointer}
 .inv-sales.zero{color:var(--red-out);font-weight:500}
 .inv-row.quedada{background:#fff5f4;border-left:4px solid var(--red-out)}
 
+/* DASHBOARD SEMANAL */
+.dash{display:grid;grid-template-columns:1.1fr 2fr;gap:1px;background:var(--black);border:1px solid var(--black);margin-bottom:32px}
+.dash-block{background:#fff;padding:20px}
+.dash-block h4{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:var(--grey);margin-bottom:14px}
+.dash-progress{height:10px;background:var(--cream-dark);border-radius:5px;overflow:hidden;margin-bottom:8px}
+.dash-progress-bar{height:100%;background:var(--green-ok);transition:width .3s}
+.dash-pct{font-family:'Cormorant Garamond',serif;font-weight:900;font-size:38px;font-style:italic;line-height:1}
+.dash-stats{display:flex;gap:16px;margin-top:12px;flex-wrap:wrap}
+.dash-stat{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--grey)}
+.dash-stat strong{font-size:18px;color:var(--black);display:block;font-family:'Cormorant Garamond',serif;font-weight:700}
+.dash-people{display:flex;flex-direction:column;gap:10px}
+.dash-person{display:flex;align-items:center;gap:10px}
+.dash-person .dp-av{width:26px;height:26px;border-radius:50%;color:#fff;font-family:'JetBrains Mono',monospace;font-size:9px;font-weight:600;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.dash-person .dp-name{font-family:'Outfit',sans-serif;font-weight:500;font-size:13px;width:80px;flex-shrink:0}
+.dash-person .dp-bar-wrap{flex:1;height:8px;background:var(--cream-dark);border-radius:4px;overflow:hidden}
+.dash-person .dp-bar{height:100%;background:var(--rosa-deep)}
+.dash-person .dp-num{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--grey);width:64px;text-align:right}
+.tile-stockwarn{font-family:'JetBrains Mono',monospace;font-size:8px;letter-spacing:.05em;text-transform:uppercase;background:var(--red-out);color:#fff;padding:2px 5px;border-radius:2px}
+.kanban-card.dragging{opacity:.4}
+.kanban-col.dragover .kanban-cards{background:var(--rosa);outline:2px dashed var(--rosa-deep);outline-offset:-4px}
+@media (max-width:980px){ .dash{grid-template-columns:1fr} }
+
 /* DAY PRODUCTS PANEL */
 .product-row{position:relative}
 .dp-del{position:absolute;top:0;right:0;width:18px;height:18px;border-radius:50%;border:none;background:transparent;color:var(--grey);font-size:13px;cursor:pointer;line-height:1;padding:0}
@@ -454,6 +476,9 @@ select.pm-input{cursor:pointer}
   </div>
 
   <div id="calendarView">
+
+  <!-- DASHBOARD SEMANAL (JS-rendered) -->
+  <section class="dash" id="weekDash"></section>
 
   <!-- METRICS STRIP (JS-rendered) -->
   <section class="metrics-strip" id="metricsStrip">
@@ -1060,7 +1085,64 @@ function renderPiecesViews(){
   renderParrilla();
   renderKanban();
   renderDayProducts();
+  renderDashboard();
   updateStats();
+}
+
+// Stock state of a piece's product (from catalog). Returns null|'out'|'low'
+function pieceStockState(p){
+  if (!p.productGid) return null;
+  const cp = catalogProduct(p.productGid);
+  if (!cp) return null;
+  if ((cp.total || 0) <= 0) return 'out';
+  if ((cp.sizes || []).some(s => s.available <= 0)) return 'low';
+  return null;
+}
+
+function renderDashboard(){
+  const el = document.getElementById('weekDash');
+  if (!el) return;
+  const total = state.pieces.length;
+  const done = state.pieces.filter(p => p.status === 'listo' || p.approved).length;
+  const approved = state.pieces.filter(p => p.approved).length;
+  const pend = state.pieces.filter(p => p.status !== 'listo' && !p.approved).length;
+  const pct = total ? Math.round((done / total) * 100) : 0;
+
+  // Carga por persona
+  const people = state.team.map(m => {
+    const mine = state.pieces.filter(p => p.assignee === m.email);
+    const md = mine.filter(p => p.status === 'listo' || p.approved).length;
+    return { m, count: mine.length, done: md };
+  });
+  const maxCount = Math.max(1, ...people.map(p => p.count));
+  const unassigned = state.pieces.filter(p => !p.assignee).length;
+
+  el.innerHTML = `
+    <div class="dash-block">
+      <h4>Progreso de la semana</h4>
+      <div class="dash-pct">${pct}%</div>
+      <div class="dash-progress"><div class="dash-progress-bar" style="width:${pct}%"></div></div>
+      <div class="dash-stats">
+        <div class="dash-stat"><strong>${total}</strong>piezas</div>
+        <div class="dash-stat"><strong>${pend}</strong>pendientes</div>
+        <div class="dash-stat"><strong>${done}</strong>listas</div>
+        <div class="dash-stat"><strong>${approved}</strong>aprobadas</div>
+        ${unassigned ? `<div class="dash-stat"><strong style="color:var(--red-out)">${unassigned}</strong>sin asignar</div>` : ''}
+      </div>
+    </div>
+    <div class="dash-block">
+      <h4>Carga por persona</h4>
+      <div class="dash-people">
+        ${people.map(({m, count, done}) => `
+          <div class="dash-person">
+            <span class="dp-av" style="background:${m.color}">${initials(m.name)}</span>
+            <span class="dp-name">${escapeHtml(m.name)}</span>
+            <span class="dp-bar-wrap"><span class="dp-bar" style="width:${Math.round((count/maxCount)*100)}%"></span></span>
+            <span class="dp-num">${done}/${count} listas</span>
+          </div>
+        `).join('')}
+      </div>
+    </div>`;
 }
 
 // === VIEW SWITCHING ===
@@ -1090,7 +1172,7 @@ function renderKanban(){
         ${items.map(p => {
           const m = p.assignee ? teamMember(p.assignee) : null;
           const cc = (state.comments[p.id]||[]).length;
-          return `<div class="kanban-card" data-piece-id="${p.id}">
+          return `<div class="kanban-card" draggable="true" data-piece-id="${p.id}">
             <div class="kc-day">${escapeHtml(p.day)} · ${escapeHtml(p.type)}</div>
             <div class="kc-title">${escapeHtml(p.title)}</div>
             <div class="kc-foot">
@@ -1106,7 +1188,39 @@ function renderKanban(){
     </div>`;
   }).join('');
   board.querySelectorAll('.kanban-card').forEach(card => {
-    card.addEventListener('click', () => openUrlsModal(card.getAttribute('data-piece-id')));
+    card.addEventListener('click', e => {
+      if (card.classList.contains('dragging')) return;
+      openUrlsModal(card.getAttribute('data-piece-id'));
+    });
+    card.addEventListener('dragstart', e => {
+      card.classList.add('dragging');
+      e.dataTransfer.setData('text/plain', card.getAttribute('data-piece-id'));
+      e.dataTransfer.effectAllowed = 'move';
+    });
+    card.addEventListener('dragend', () => card.classList.remove('dragging'));
+  });
+  board.querySelectorAll('.kanban-col').forEach(col => {
+    col.addEventListener('dragover', e => { e.preventDefault(); col.classList.add('dragover'); });
+    col.addEventListener('dragleave', () => col.classList.remove('dragover'));
+    col.addEventListener('drop', e => {
+      e.preventDefault();
+      col.classList.remove('dragover');
+      const pid = e.dataTransfer.getData('text/plain');
+      const piece = state.pieces.find(x => x.id === pid);
+      if (!piece) return;
+      const target = col.getAttribute('data-col');
+      let updated;
+      if (target === 'pendiente') updated = { ...piece, status: 'pendiente', approved: false, approvedBy: null };
+      else if (target === 'listo') updated = { ...piece, status: 'listo', approved: false, approvedBy: null };
+      else if (target === 'aprobado'){
+        if (!canApprove()){ alert('Solo el Lead puede aprobar.'); return; }
+        updated = { ...piece, status: 'listo', approved: true, approvedBy: state.user.email };
+      }
+      if (!updated) return;
+      state.pieces = state.pieces.map(x => x.id === pid ? updated : x);
+      saveOnePiece(updated);
+      renderPiecesViews();
+    });
   });
   board.querySelectorAll('.kanban-add').forEach(btn => {
     btn.addEventListener('click', () => {
@@ -1321,6 +1435,7 @@ function renderParrilla(){
   grid.innerHTML = visible.map(t => {
     const m = t.assignee ? teamMember(t.assignee) : null;
     const ccount = (state.comments[t.id] || []).length;
+    const stock = pieceStockState(t);
     return `
     <div class="tile ${t.imageUrl ? 'has-photo' : ''} ${t.status==='listo'?'is-listo':''}" data-tile-id="${t.id}">
       ${t.imageUrl ? `<img class="tile-photo" src="${escapeAttr(t.imageUrl)}" alt="" loading="lazy" onerror="this.style.display='none';this.parentElement.classList.remove('has-photo')">` : ''}
@@ -1337,6 +1452,7 @@ function renderParrilla(){
         ${t.approved ? '<span class="tile-approved" title="Aprobado">✓</span>' : ''}
         ${t.platform ? `<span class="tile-plat">${escapeHtml(t.platform)}</span>` : ''}
         ${ccount ? `<span class="tile-comments" title="${ccount} comentarios">💬${ccount}</span>` : ''}
+        ${stock === 'out' ? '<span class="tile-stockwarn" title="Producto agotado">⚠ AGOTADO</span>' : stock === 'low' ? '<span class="tile-stockwarn" style="background:var(--yellow-low)" title="Talla(s) sin stock">⚠ TALLA</span>' : ''}
       </div>
       <div class="tile-bottom">
         ${COLOR_OPTIONS.map(c => `<span class="color-dot ${c} ${c===t.color?'active':''}" data-color="${c}" title="${c}"></span>`).join('')}
