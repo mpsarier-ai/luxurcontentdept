@@ -233,6 +233,25 @@ html,body{background:var(--cream);color:var(--black);font-family:'Outfit',sans-s
 .tile-add:hover{background:var(--rosa);color:var(--black)}
 .tile-add .plus{font-family:'Cormorant Garamond',serif;font-size:48px;line-height:1;font-weight:300}
 .tile-add .add-label{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.15em;text-transform:uppercase;margin-top:4px}
+/* === VISTA PREVIA FEED (estilo Instagram) === */
+.parrilla-grid.feed-preview{gap:2px;padding:2px;background:#dbdbdb;border:1px solid #dbdbdb}
+.parrilla-grid.feed-preview .tile{background:var(--cream-dark)}
+.parrilla-grid.feed-preview .tile-meta,
+.parrilla-grid.feed-preview .tile-title,
+.parrilla-grid.feed-preview .tile-badges,
+.parrilla-grid.feed-preview .tile-bottom,
+.parrilla-grid.feed-preview .tile-color,
+.parrilla-grid.feed-preview .tile-ref{display:none !important}
+.parrilla-grid.feed-preview .tile-photo{position:absolute;inset:0}
+.parrilla-grid.feed-preview .tile:hover{transform:none;box-shadow:none}
+.parrilla-grid.feed-preview .tile-actions{opacity:0;top:6px;right:6px}
+.parrilla-grid.feed-preview .tile:hover .tile-actions{opacity:1}
+.parrilla-grid.feed-preview .tile-add{aspect-ratio:1;border:1px dashed #b9b9b9;color:#8e8e8e}
+.tile-order{position:absolute;top:6px;left:6px;z-index:5;background:rgba(0,0,0,.6);color:#fff;font-family:'JetBrains Mono',monospace;font-size:10px;font-weight:600;min-width:20px;height:20px;border-radius:10px;display:flex;align-items:center;justify-content:center;padding:0 5px}
+.tile-noimg{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;text-align:center;padding:14px;font-family:'Cormorant Garamond',serif;font-weight:700;font-size:14px;line-height:1.2;color:var(--black);background:var(--cream);z-index:1}
+.parrilla-grid.feed-preview .tile[draggable="true"]{cursor:grab}
+.parrilla-grid.feed-preview .tile.dragging{opacity:.4;cursor:grabbing}
+.parrilla-grid.feed-preview .tile.dragover{outline:3px solid var(--rosa-hot);outline-offset:-3px}
 
 /* LOGIN OVERLAY */
 .login-overlay{position:fixed;inset:0;background:var(--cream);display:none;align-items:center;justify-content:center;z-index:300;flex-direction:column;padding:24px}
@@ -530,7 +549,10 @@ select.pm-input{cursor:pointer}
         <span class="stat-item"><strong id="statReels">—</strong>reels</span>
         <span class="stat-item"><strong id="statStories">—</strong>stories</span>
       </div>
-      <button class="mine-toggle" id="mineToggle">◴ Mis tareas</button>
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
+        <button class="mine-toggle" id="mineToggle">◴ Mis tareas</button>
+        <button class="mine-toggle" id="previewToggle">▦ Vista previa feed</button>
+      </div>
     </div>
     <div class="parrilla-grid" id="parrillaGrid"></div>
   </section>
@@ -1568,20 +1590,27 @@ function addPiece(day, opts){
   setTimeout(() => openUrlsModal(newId), 60);
 }
 
+let feedPreview = false;
 function renderParrilla(){
   const grid = document.getElementById('parrillaGrid');
   if (!grid) return;
+
+  grid.classList.toggle('feed-preview', feedPreview);
+  // reordenar solo en preview y viendo todo (no con "Mis tareas")
+  const canReorder = feedPreview && !state.filterMine;
 
   const visible = state.filterMine && state.user
     ? state.pieces.filter(p => p.assignee === state.user.email)
     : state.pieces;
 
-  grid.innerHTML = visible.map(t => {
+  grid.innerHTML = visible.map((t, i) => {
     const m = t.assignee ? teamMember(t.assignee) : null;
     const ccount = (state.comments[t.id] || []).length;
     const stock = pieceStockState(t);
     return `
-    <div class="tile ${t.imageUrl ? 'has-photo' : ''} ${t.status==='listo'?'is-listo':''}" data-tile-id="${t.id}">
+    <div class="tile ${t.imageUrl ? 'has-photo' : ''} ${t.status==='listo'?'is-listo':''}" data-tile-id="${t.id}" ${canReorder ? 'draggable="true"' : ''}>
+      ${feedPreview ? `<span class="tile-order">${i+1}</span>` : ''}
+      ${!t.imageUrl && feedPreview ? `<div class="tile-noimg">${escapeHtml(t.title)}</div>` : ''}
       ${t.imageUrl ? `<img class="tile-photo" src="${escapeAttr(t.imageUrl)}" alt="" loading="lazy" onerror="this.style.display='none';this.parentElement.classList.remove('has-photo')">` : ''}
       <div class="tile-color ${t.color || 'push'}"></div>
       ${t.refUrl ? `<a class="tile-ref" href="${escapeAttr(t.refUrl)}" target="_blank" rel="noopener" title="Abrir referente">REF ↗</a>` : ''}
@@ -1628,10 +1657,54 @@ function renderParrilla(){
       });
     });
     bindPieceTextEdit(tileEl, id);
+
+    if (canReorder){
+      tileEl.addEventListener('dragstart', e => {
+        dragSrcId = id;
+        tileEl.classList.add('dragging');
+        e.dataTransfer.effectAllowed = 'move';
+        try { e.dataTransfer.setData('text/plain', id); } catch(_){}
+      });
+      tileEl.addEventListener('dragend', () => {
+        tileEl.classList.remove('dragging');
+        grid.querySelectorAll('.tile.dragover').forEach(t => t.classList.remove('dragover'));
+      });
+      tileEl.addEventListener('dragover', e => {
+        e.preventDefault();
+        e.dataTransfer.dropEffect = 'move';
+        if (id !== dragSrcId) tileEl.classList.add('dragover');
+      });
+      tileEl.addEventListener('dragleave', () => tileEl.classList.remove('dragover'));
+      tileEl.addEventListener('drop', e => {
+        e.preventDefault();
+        tileEl.classList.remove('dragover');
+        if (!dragSrcId || dragSrcId === id) return;
+        reorderPieces(dragSrcId, id);
+        dragSrcId = null;
+      });
+    }
   });
 
   const addBtn = document.getElementById('tileAdd');
   if (addBtn) addBtn.addEventListener('click', () => addPiece(state.days[state.days.length-1].key));
+}
+
+let dragSrcId = null;
+function reorderPieces(srcId, targetId){
+  const arr = state.pieces.slice();
+  const from = arr.findIndex(p => p.id === srcId);
+  const to = arr.findIndex(p => p.id === targetId);
+  if (from === -1 || to === -1) return;
+  const [moved] = arr.splice(from, 1);
+  arr.splice(to, 0, moved);
+  // reasignar position 0..n y persistir solo lo que cambió
+  const changed = [];
+  arr.forEach((p, idx) => {
+    if (p.position !== idx){ p.position = idx; changed.push(p); }
+  });
+  state.pieces = arr;
+  renderPiecesViews();
+  changed.forEach(p => saveOnePiece(p));
 }
 
 function updateStats(){
@@ -2077,6 +2150,17 @@ if (mineToggleBtn){
     state.filterMine = !state.filterMine;
     mineToggleBtn.classList.toggle('active', state.filterMine);
     mineToggleBtn.textContent = state.filterMine ? '◴ Mis tareas (ON)' : '◴ Mis tareas';
+    renderParrilla();
+  });
+}
+
+// Vista previa feed (estilo Instagram) toggle
+const previewToggleBtn = document.getElementById('previewToggle');
+if (previewToggleBtn){
+  previewToggleBtn.addEventListener('click', () => {
+    feedPreview = !feedPreview;
+    previewToggleBtn.classList.toggle('active', feedPreview);
+    previewToggleBtn.textContent = feedPreview ? '▦ Vista previa feed (ON)' : '▦ Vista previa feed';
     renderParrilla();
   });
 }
