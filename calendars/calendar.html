@@ -252,6 +252,13 @@ html,body{background:var(--cream);color:var(--black);font-family:'Outfit',sans-s
 .parrilla-grid.feed-preview .tile[draggable="true"]{cursor:grab}
 .parrilla-grid.feed-preview .tile.dragging{opacity:.4;cursor:grabbing}
 .parrilla-grid.feed-preview .tile.dragover{outline:3px solid var(--rosa-hot);outline-offset:-3px}
+.feed-divider{grid-column:1/-1;display:flex;align-items:center;justify-content:center;padding:14px 0;margin:6px 0}
+.feed-divider span{font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:.18em;text-transform:uppercase;color:var(--rosa-deep);background:var(--cream);padding:6px 14px;border:1px solid var(--rosa-deep);border-radius:14px;white-space:nowrap}
+.real-tile{aspect-ratio:1;position:relative;overflow:hidden;display:block;background:var(--cream-dark);cursor:pointer;text-decoration:none}
+.real-tile .tile-photo{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.real-tile:hover{filter:brightness(.92)}
+.real-badge{position:absolute;top:6px;right:6px;z-index:2;color:#fff;font-size:13px;text-shadow:0 1px 3px rgba(0,0,0,.7)}
+.real-tag{position:absolute;bottom:6px;left:6px;z-index:2;background:rgba(0,0,0,.6);color:#fff;font-family:'JetBrains Mono',monospace;font-size:8px;letter-spacing:.12em;font-weight:600;padding:2px 6px;border-radius:8px}
 
 /* LOGIN OVERLAY */
 .login-overlay{position:fixed;inset:0;background:var(--cream);display:none;align-items:center;justify-content:center;z-index:300;flex-direction:column;padding:24px}
@@ -963,13 +970,14 @@ async function loadCalendar(){
   renderDayCards();
 
   // Load pieces + fields + team + catalog + comments in parallel
-  const [piecesRes, fieldsRes, teamRes, catalogRes, commentsRes, pipelineRes] = await Promise.all([
+  const [piecesRes, fieldsRes, teamRes, catalogRes, commentsRes, pipelineRes, igRes] = await Promise.all([
     supabase.from('calendar_pieces').select('*').eq('calendar_id', state.calendarId).order('position', { ascending: true }),
     supabase.from('calendar_fields').select('*').eq('calendar_id', state.calendarId),
     supabase.from('team_members').select('*'),
     supabase.from('shopify_catalog').select('products').eq('id', 1).maybeSingle(),
     supabase.from('calendar_comments').select('*').eq('calendar_id', state.calendarId).order('created_at', { ascending: true }),
-    supabase.from('product_pipeline').select('*')
+    supabase.from('product_pipeline').select('*'),
+    supabase.from('instagram_feed').select('data').eq('id', 1).maybeSingle()
   ]);
 
   if (piecesRes.error){ console.error('Load pieces err', piecesRes.error); }
@@ -978,6 +986,7 @@ async function loadCalendar(){
   state.team = teamRes.data || [];
   state.catalog = (catalogRes.data && Array.isArray(catalogRes.data.products)) ? catalogRes.data.products : [];
   state.pipeline = pipelineRes.data || [];
+  state.igFeed = (igRes && igRes.data && igRes.data.data) ? igRes.data.data : null;
   state.comments = {};
   (commentsRes.data || []).forEach(c => {
     (state.comments[c.piece_id] = state.comments[c.piece_id] || []).push(c);
@@ -1603,7 +1612,7 @@ function renderParrilla(){
     ? state.pieces.filter(p => p.assignee === state.user.email)
     : state.pieces;
 
-  grid.innerHTML = visible.map((t, i) => {
+  const draftsHtml = visible.map((t, i) => {
     const m = t.assignee ? teamMember(t.assignee) : null;
     const ccount = (state.comments[t.id] || []).length;
     const stock = pieceStockState(t);
@@ -1635,11 +1644,35 @@ function renderParrilla(){
         <button class="tile-btn delete" data-action="delete" title="Eliminar">×</button>
       </div>
     </div>`;
-  }).join('') + `
-    <button class="tile-add" id="tileAdd"><span class="plus">+</span><span class="add-label">Agregar</span></button>
-  `;
+  }).join('');
 
-  grid.querySelectorAll('.tile').forEach(tileEl => {
+  const addHtml = `<button class="tile-add" id="tileAdd"><span class="plus">+</span><span class="add-label">Agregar</span></button>`;
+
+  // Feed REAL de Instagram (debajo de los drafts, solo en vista previa)
+  let realHtml = '';
+  if (feedPreview && state.igFeed && Array.isArray(state.igFeed.media) && state.igFeed.media.length){
+    const acct = state.igFeed.account && state.igFeed.account.username ? '@' + escapeHtml(state.igFeed.account.username) : 'Instagram';
+    let when = '';
+    if (state.igFeed.fetched_at){
+      try { when = ' · ' + new Date(state.igFeed.fetched_at).toLocaleString('es-CO', { day:'numeric', month:'short', hour:'2-digit', minute:'2-digit' }); } catch(_){}
+    }
+    realHtml = `<div class="feed-divider"><span>↑ DRAFTS PLANEADOS &nbsp;·&nbsp; PUBLICADO ${acct}${when} ↓</span></div>` +
+      state.igFeed.media.map(mm => {
+        const isVid = mm.media_type === 'VIDEO';
+        const img = isVid ? (mm.thumbnail_url || mm.media_url) : mm.media_url;
+        const cap = (mm.caption || '').replace(/\s+/g,' ').slice(0,140);
+        const badge = isVid ? '▶' : (mm.media_type === 'CAROUSEL_ALBUM' ? '▣' : '');
+        return `<a class="tile real-tile" href="${escapeAttr(mm.permalink || '#')}" target="_blank" rel="noopener" title="${escapeAttr(cap)}">
+          <img class="tile-photo" src="${escapeAttr(img)}" alt="" loading="lazy" onerror="this.style.display='none'">
+          ${badge ? `<span class="real-badge">${badge}</span>` : ''}
+          <span class="real-tag">REAL</span>
+        </a>`;
+      }).join('');
+  }
+
+  grid.innerHTML = draftsHtml + addHtml + realHtml;
+
+  grid.querySelectorAll('.tile[data-tile-id]').forEach(tileEl => {
     const id = tileEl.getAttribute('data-tile-id');
     tileEl.querySelector('[data-action="delete"]').addEventListener('click', e => { e.stopPropagation(); deletePiece(id); });
     const urlsBtn = tileEl.querySelector('[data-action="urls"]');
