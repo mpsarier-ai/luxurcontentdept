@@ -775,6 +775,22 @@ body{padding-top:env(safe-area-inset-top);padding-bottom:env(safe-area-inset-bot
 <script type="module">
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
+// === Capacitor: navegar al URL completo cuando iOS abre la app via Universal Link ===
+// Sin esto, el magic link de Supabase se pierde (la app abre pero no procesa el token)
+if (window.Capacitor?.isNativePlatform?.()) {
+  const handleUrl = (url) => {
+    if (!url) return;
+    const target = url.replace(/^https?:\/\/[^/]+/, '');
+    if (target && (target.includes('access_token') || target.includes('refresh_token') || target.includes('?code=') || target.includes('type=magiclink') || target.includes('type=recovery'))) {
+      window.location.replace(target);
+    }
+  };
+  // Listener para cuando la app ya está abierta y llega un Universal Link
+  window.Capacitor.Plugins?.App?.addListener?.('appUrlOpen', (e) => handleUrl(e.url));
+  // Si la app se abrió con un URL (cold start), checkear getLaunchUrl
+  window.Capacitor.Plugins?.App?.getLaunchUrl?.().then?.((res) => handleUrl(res?.url)).catch?.(() => {});
+}
+
 const SUPABASE_URL = "https://nrpgtlcdvtesjbxpkxha.supabase.co";
 const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5ycGd0bGNkdnRlc2pieHBreGhhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg3ODkzNTAsImV4cCI6MjA5NDM2NTM1MH0.ntRHkFobaVK6RW9EYRwoww1ATr8N0zHMzXHM__5x8E0";
 const STORAGE_BUCKET = "calendar-photos";
