@@ -791,31 +791,41 @@ if (window.Capacitor?.isNativePlatform?.()) {
   };
   dbg('boot · platform=' + window.Capacitor.getPlatform?.());
   dbg('hash=' + (window.location.hash || '(none)') + ' search=' + (window.location.search || '(none)'));
-  const handleUrl = (url, src) => {
-    dbg('handleUrl[' + src + '] url=' + (url || 'null'));
-    if (!url) return;
-    try { if (sessionStorage.getItem('ll_handled') === url) return dbg('  ya handled, skip'); sessionStorage.setItem('ll_handled', url); } catch(_) {}
-    let u; try { u = new URL(url); } catch(e) { return dbg('  URL parse err'); }
-    if (!u.hash && !u.search) return dbg('  no auth params, skip');
-    const target = u.pathname + u.search + u.hash;
-    const samePath = window.location.pathname + window.location.search === u.pathname + u.search;
-    dbg('  target=' + target + ' samePath=' + samePath);
-    if (samePath) {
-      window.location.hash = u.hash.slice(1);
-      dbg('  reload..');
-      setTimeout(() => window.location.reload(), 100);
-    } else {
-      dbg('  href..');
-      window.location.href = target;
+  (async () => {
+    let App = window.Capacitor.Plugins?.App;
+    if (!App) {
+      dbg('App plugin no inyectado, importando de CDN...');
+      try {
+        const mod = await import('https://esm.sh/@capacitor/app@6.0.2');
+        App = mod.App;
+        window.Capacitor.Plugins = window.Capacitor.Plugins || {};
+        window.Capacitor.Plugins.App = App;
+        dbg('App importado OK');
+      } catch (e) {
+        return dbg('import err: ' + (e?.message || e));
+      }
     }
-  };
-  if (window.Capacitor.Plugins?.App?.addListener) {
-    window.Capacitor.Plugins.App.addListener('appUrlOpen', (e) => handleUrl(e.url, 'evt'));
-    dbg('listener OK');
-  } else { dbg('App plugin MISSING'); }
-  if (window.Capacitor.Plugins?.App?.getLaunchUrl) {
-    window.Capacitor.Plugins.App.getLaunchUrl().then((res) => handleUrl(res?.url, 'launch')).catch((e) => dbg('getLaunchUrl err ' + e));
-  } else { dbg('getLaunchUrl MISSING'); }
+    const handleUrl = (url, src) => {
+      dbg('handleUrl[' + src + '] url=' + (url || 'null'));
+      if (!url) return;
+      try { if (sessionStorage.getItem('ll_handled') === url) return dbg('  ya handled, skip'); sessionStorage.setItem('ll_handled', url); } catch(_) {}
+      let u; try { u = new URL(url); } catch(e) { return dbg('  URL parse err'); }
+      if (!u.hash && !u.search) return dbg('  no auth params, skip');
+      const target = u.pathname + u.search + u.hash;
+      const samePath = window.location.pathname + window.location.search === u.pathname + u.search;
+      dbg('  target=' + target + ' samePath=' + samePath);
+      if (samePath) {
+        window.location.hash = u.hash.slice(1);
+        dbg('  reload..');
+        setTimeout(() => window.location.reload(), 100);
+      } else {
+        dbg('  href..');
+        window.location.href = target;
+      }
+    };
+    try { await App.addListener('appUrlOpen', (e) => handleUrl(e.url, 'evt')); dbg('listener OK'); } catch (e) { dbg('addListener err: ' + e); }
+    try { const res = await App.getLaunchUrl(); handleUrl(res?.url, 'launch'); } catch (e) { dbg('getLaunchUrl err: ' + e); }
+  })();
 }
 
 const SUPABASE_URL = "https://nrpgtlcdvtesjbxpkxha.supabase.co";
