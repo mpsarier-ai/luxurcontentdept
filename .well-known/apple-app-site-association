@@ -1,0 +1,15 @@
+{
+  "applinks": {
+    "details": [
+      {
+        "appIDs": ["L87D2G2PS2.com.psalazar.luxurops"],
+        "components": [
+          {
+            "/": "/*",
+            "comment": "Route all paths to LUXUR Ops app when installed"
+          }
+        ]
+      }
+    ]
+  }
+}

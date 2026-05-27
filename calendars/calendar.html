@@ -2,7 +2,12 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="LUXUR Ops">
+<meta name="format-detection" content="telephone=no">
+<meta name="theme-color" content="#edebe6">
 <title>LUXUR — Content Calendar</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -450,6 +455,40 @@ select.pm-input{cursor:pointer}
   .bar-track{height:120px}
   .parrilla-grid{grid-template-columns:repeat(3,1fr)}
   .tile-title{font-size:12px}
+}
+
+/* === MOBILE / iOS APP SHELL === */
+html,body{-webkit-text-size-adjust:100%;-webkit-tap-highlight-color:rgba(0,0,0,0);overscroll-behavior-y:none}
+body{padding-top:env(safe-area-inset-top);padding-bottom:env(safe-area-inset-bottom);padding-left:env(safe-area-inset-left);padding-right:env(safe-area-inset-right)}
+@media (max-width:768px){
+  button,a.btn,.btn,.nav-btn,.view-tab,.mine-toggle,.add-piece-btn,.tile-add,.day-add-piece{min-height:44px;font-size:14px;padding:12px 18px;touch-action:manipulation}
+  input,textarea,select{font-size:16px;min-height:44px;padding:10px 14px}
+  body{font-size:15px;line-height:1.55}
+  h1{font-size:24px}
+  h2{font-size:20px}
+  h3{font-size:17px}
+  /* Modal full screen mobile */
+  .modal{width:100%!important;max-width:100%!important;border-radius:0!important;min-height:100vh;padding:20px 16px}
+  .modal-backdrop{align-items:flex-start;padding:0}
+  /* Vistas con grids apilan en mobile */
+  .calendar-grid,.week-grid,.day-cards-list,.kanban-board,.day-pieces-list{grid-template-columns:1fr!important;gap:14px}
+  /* Parrilla queda 2 cols en mobile (más legible que 3) */
+  .parrilla-grid{grid-template-columns:repeat(2,1fr)!important;gap:6px}
+  .parrilla-grid.feed-preview{grid-template-columns:repeat(3,1fr)!important;gap:2px}
+  .tile-title{font-size:11px;padding:6px 8px}
+  /* Padding general */
+  .wrap,.container,main{padding:14px 16px!important}
+  header{padding:16px!important}
+  /* Tablas scrolleables */
+  table{display:block;overflow-x:auto;-webkit-overflow-scrolling:touch}
+  /* Pieces / cards más respirables */
+  .piece-card,.day-card,.kanban-item{padding:14px!important}
+  /* Toolbar de view tabs scrollea horizontal sin romper */
+  .view-tabs,.toolbar{overflow-x:auto;-webkit-overflow-scrolling:touch;flex-wrap:nowrap;white-space:nowrap}
+  .view-tab{flex:0 0 auto}
+  /* Stats compactos */
+  .stats{flex-wrap:wrap;gap:8px}
+  .stat{flex:1 1 calc(50% - 4px);min-width:0;padding:10px}
 }
 </style>
 </head>

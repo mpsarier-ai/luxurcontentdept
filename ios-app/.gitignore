@@ -1,0 +1,20 @@
+# Capacitor / Node
+node_modules/
+package-lock.json
+
+# iOS / Xcode / CocoaPods
+ios/App/Pods/
+ios/App/Podfile.lock
+ios/App/build/
+ios/App/App.xcworkspace/xcuserdata/
+ios/App/App.xcodeproj/xcuserdata/
+ios/App/App.xcodeproj/project.xcworkspace/xcuserdata/
+ios/DerivedData/
+*.xcuserstate
+*.xcuserdatad/
+
+# Capacitor build outputs
+ios/App/public/
+
+# macOS
+.DS_Store

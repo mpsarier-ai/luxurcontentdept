@@ -1,0 +1,7 @@
+# Apple Universal Links — AASA file must be served as application/json
+/.well-known/apple-app-site-association
+  Content-Type: application/json
+
+# iOS PWA / app shell tags
+/*
+  X-Content-Type-Options: nosniff

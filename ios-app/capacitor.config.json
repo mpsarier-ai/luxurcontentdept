@@ -1,0 +1,17 @@
+{
+  "appId": "com.psalazar.luxurops",
+  "appName": "LUXUR Ops",
+  "webDir": "dist",
+  "server": {
+    "url": "https://ops.luxurjeans.com",
+    "cleartext": false,
+    "androidScheme": "https",
+    "iosScheme": "https"
+  },
+  "ios": {
+    "contentInset": "always",
+    "backgroundColor": "#edebe6",
+    "scrollEnabled": true,
+    "limitsNavigationsToAppBoundDomains": false
+  }
+}
