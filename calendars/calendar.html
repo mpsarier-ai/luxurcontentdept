@@ -777,17 +777,16 @@ import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
 // === Capacitor: procesar Universal Link cuando iOS abre la app con un magic link ===
 if (window.Capacitor?.isNativePlatform?.()) {
-  let handled = false;
   const handleUrl = (url) => {
-    if (!url || handled) return;
+    if (!url) return;
     const hasAuth = url.includes('access_token=') || url.includes('refresh_token=') || url.includes('?code=') || url.includes('&code=') || url.includes('token_hash=') || url.includes('type=magiclink') || url.includes('type=recovery');
     if (!hasAuth) return;
-    handled = true;
+    // Evitar bucle: getLaunchUrl devuelve la misma URL aunque ya reloadeamos. Marcar en sessionStorage.
+    try { if (sessionStorage.getItem('ll_handled') === url) return; sessionStorage.setItem('ll_handled', url); } catch(_) {}
     const target = url.replace(/^https?:\/\/[^/]+/, '');
     const [targetPath, targetHash = ''] = target.split('#');
     const samePath = window.location.pathname + window.location.search === targetPath;
     if (samePath) {
-      // Solo cambió el hash (Supabase magic link fragment). Hash change != reload, así que forzamos.
       window.location.hash = targetHash;
       window.location.reload();
     } else {
