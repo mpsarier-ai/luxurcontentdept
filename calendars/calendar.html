@@ -775,19 +775,26 @@ body{padding-top:env(safe-area-inset-top);padding-bottom:env(safe-area-inset-bot
 <script type="module">
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
-// === Capacitor: navegar al URL completo cuando iOS abre la app via Universal Link ===
-// Sin esto, el magic link de Supabase se pierde (la app abre pero no procesa el token)
+// === Capacitor: procesar Universal Link cuando iOS abre la app con un magic link ===
 if (window.Capacitor?.isNativePlatform?.()) {
+  let handled = false;
   const handleUrl = (url) => {
-    if (!url) return;
+    if (!url || handled) return;
+    const hasAuth = url.includes('access_token=') || url.includes('refresh_token=') || url.includes('?code=') || url.includes('&code=') || url.includes('token_hash=') || url.includes('type=magiclink') || url.includes('type=recovery');
+    if (!hasAuth) return;
+    handled = true;
     const target = url.replace(/^https?:\/\/[^/]+/, '');
-    if (target && (target.includes('access_token') || target.includes('refresh_token') || target.includes('?code=') || target.includes('type=magiclink') || target.includes('type=recovery'))) {
-      window.location.replace(target);
+    const [targetPath, targetHash = ''] = target.split('#');
+    const samePath = window.location.pathname + window.location.search === targetPath;
+    if (samePath) {
+      // Solo cambió el hash (Supabase magic link fragment). Hash change != reload, así que forzamos.
+      window.location.hash = targetHash;
+      window.location.reload();
+    } else {
+      window.location.href = target;
     }
   };
-  // Listener para cuando la app ya está abierta y llega un Universal Link
   window.Capacitor.Plugins?.App?.addListener?.('appUrlOpen', (e) => handleUrl(e.url));
-  // Si la app se abrió con un URL (cold start), checkear getLaunchUrl
   window.Capacitor.Plugins?.App?.getLaunchUrl?.().then?.((res) => handleUrl(res?.url)).catch?.(() => {});
 }
 
