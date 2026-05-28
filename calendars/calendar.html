@@ -530,7 +530,67 @@ body{padding-top:env(safe-area-inset-top);padding-bottom:env(safe-area-inset-bot
   }
 }
 
-/* === IG-STYLE MOBILE SHELL · bottom tabs, cards, slide-up modals === */
+/* View transitions slide */
+@keyframes llSlideIn{from{opacity:0;transform:translateX(20px)}to{opacity:1;transform:none}}
+@keyframes llSlideInRev{from{opacity:0;transform:translateX(-20px)}to{opacity:1;transform:none}}
+
+/* === MAX IMPACT MOBILE — premium app feel === */
+@media (max-width:768px){
+  /* HEADER hero con gradient rosa + tipografía display dramática */
+  header{padding:18px 16px 22px!important;background:linear-gradient(180deg,rgba(242,212,215,.6) 0%,rgba(237,235,230,.92) 100%)!important;border-bottom:none!important}
+  header h1{font-family:'Cormorant Garamond',serif!important;font-weight:700!important;font-size:32px!important;letter-spacing:-.02em;animation:llFadeUp .6s cubic-bezier(.16,1,.3,1)}
+  .week-title{font-family:'Cormorant Garamond',serif;font-size:26px;font-weight:700;letter-spacing:-.02em}
+
+  /* PAGE INTRO animation: contenido entra con fade+slide stagger */
+  main>*,.calendar-grid>*,.day-cards-list>*,.week-grid>*{animation:llFadeUp .5s cubic-bezier(.16,1,.3,1) both}
+  main>*:nth-child(2){animation-delay:.05s} main>*:nth-child(3){animation-delay:.1s} main>*:nth-child(4){animation-delay:.15s}
+  @keyframes llFadeUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
+
+  /* CARDS con más presencia: shadow grande + hover lift */
+  .piece-card,.day-card,.week-card,.kanban-item,.event,.pipeline-card{border-radius:18px!important;padding:18px!important;box-shadow:0 4px 16px rgba(0,0,0,.06),0 1px 3px rgba(0,0,0,.04)!important;border:1px solid rgba(0,0,0,.03)!important;transition:transform .25s cubic-bezier(.16,1,.3,1),box-shadow .25s!important}
+  .piece-card:active,.day-card:active,.week-card:active,.kanban-item:active{transform:scale(.97)!important}
+
+  /* SPRING tap feedback con scale + bounce */
+  button:active,.view-tab:active,.btn:active{transform:scale(.94)!important;transition:transform .12s cubic-bezier(.16,1,.3,1)!important}
+
+  /* AVATAR rings rosa gradient (status: online) */
+  .tile-avatar,.avatar,.team-avatar{box-shadow:0 0 0 2px var(--cream),0 0 0 4px var(--rosa-hot)!important;border-radius:50%}
+
+  /* BOTTOM TAB BAR: icons scale al activo + tab grande */
+  .view-nav{padding:8px 0!important;padding-bottom:calc(8px + env(safe-area-inset-bottom))!important;background:rgba(255,255,255,.85)!important;backdrop-filter:saturate(200%) blur(28px)!important;-webkit-backdrop-filter:saturate(200%) blur(28px)!important;box-shadow:0 -1px 0 rgba(0,0,0,.06)}
+  .view-nav .view-tab{font-size:11px!important;font-weight:500!important;gap:4px!important;transition:transform .2s cubic-bezier(.16,1,.3,1)!important}
+  .view-nav .view-tab.active{color:var(--rosa-deep)!important;font-weight:700!important;transform:scale(1.05)}
+  .view-nav .view-tab.active::before{content:'';position:absolute;top:0;left:50%;transform:translateX(-50%);width:24px;height:3px;background:var(--rosa-deep);border-radius:0 0 4px 4px;animation:llTabBar .25s cubic-bezier(.16,1,.3,1)}
+  .view-nav .view-tab{position:relative}
+  @keyframes llTabBar{from{width:0;opacity:0}to{width:24px;opacity:1}}
+
+  /* MODAL con spring bounce entrance */
+  .modal-backdrop{align-items:flex-end!important;padding:0!important;background:rgba(0,0,0,.5)!important;backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px)}
+  .modal{border-radius:24px 24px 0 0!important;max-height:92dvh;min-height:auto!important;animation:llSpring .42s cubic-bezier(.34,1.56,.64,1) both;padding-top:22px!important}
+  .modal::before{content:'';display:block;width:42px;height:5px;background:rgba(0,0,0,.18);border-radius:999px;margin:-12px auto 18px;flex-shrink:0}
+  @keyframes llSpring{from{transform:translateY(110%);opacity:.5}to{transform:translateY(0);opacity:1}}
+
+  /* STATUS dots con pulse */
+  .live-dot,.status-dot.online,.tile-statusdot.listo{animation:llPulse 2s ease-in-out infinite}
+  @keyframes llPulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.65;transform:scale(1.15)}}
+
+  /* FLOATING ACTION BUTTON estilo IG/Material */
+  .day-add-piece,.add-piece-btn{position:fixed!important;bottom:calc(90px + env(safe-area-inset-bottom))!important;right:16px!important;width:56px!important;height:56px!important;min-height:56px!important;padding:0!important;border-radius:50%!important;background:var(--rosa-deep)!important;color:#fff!important;font-size:22px!important;font-weight:300!important;box-shadow:0 6px 20px rgba(212,132,142,.45),0 2px 6px rgba(0,0,0,.1)!important;z-index:45;display:flex;align-items:center;justify-content:center;border:none!important;animation:llFAB .5s cubic-bezier(.34,1.56,.64,1) both;animation-delay:.3s}
+  @keyframes llFAB{from{transform:scale(0) rotate(-90deg);opacity:0}to{transform:scale(1) rotate(0);opacity:1}}
+
+  /* PARRILLA tiles con más prominence */
+  .tile.has-photo .tile-photo{transition:transform .3s cubic-bezier(.16,1,.3,1)}
+  .tile:active{transform:scale(.96)}
+
+  /* INPUT focus con accent rosa */
+  input:focus,textarea:focus,select:focus{outline:none!important;border-color:var(--rosa-deep)!important;box-shadow:0 0 0 3px rgba(212,132,142,.18)!important}
+
+  /* Numeric counters / stats: tipo display más grande */
+  .stat-value,.stat strong,.metric-value{font-size:24px!important;font-weight:700!important;font-family:'Cormorant Garamond',serif!important}
+  .stat-label,.stat span:not(strong),.metric-label{font-size:10px!important;letter-spacing:.1em!important;text-transform:uppercase!important;color:var(--grey)!important}
+}
+
+/* === IG-STYLE MOBILE SHELL (legacy block, mantengo lo que ya funciona) === */
 @media (max-width:768px){
   /* Body padding bottom for fixed bottom nav */
   body{padding-bottom:calc(70px + env(safe-area-inset-bottom))!important}
@@ -1450,13 +1510,28 @@ function renderDashboard(){
 }
 
 // === VIEW SWITCHING ===
+let _currentView = 'calendar';
+const _viewOrder = ['calendar','kanban','inventory'];
 function switchView(name){
   document.querySelectorAll('.view-tab').forEach(t => t.classList.toggle('active', t.getAttribute('data-view') === name));
+  const fromIdx = _viewOrder.indexOf(_currentView);
+  const toIdx = _viewOrder.indexOf(name);
+  const dir = toIdx > fromIdx ? 1 : -1;
+  const targetView = document.getElementById(name === 'calendar' ? 'calendarView' : name === 'kanban' ? 'kanbanView' : 'inventoryView');
+  // Apply slide-in animation (CSS keyframe)
   document.getElementById('calendarView').style.display = name === 'calendar' ? '' : 'none';
   document.getElementById('kanbanView').style.display = name === 'kanban' ? '' : 'none';
   document.getElementById('inventoryView').style.display = name === 'inventory' ? '' : 'none';
+  if (targetView && _currentView !== name) {
+    targetView.style.animation = 'none';
+    void targetView.offsetWidth; // reflow
+    targetView.style.animation = `llSlide${dir > 0 ? 'In' : 'InRev'} .35s cubic-bezier(.16,1,.3,1)`;
+  }
   if (name === 'kanban') renderKanban();
   if (name === 'inventory') renderInventory();
+  _currentView = name;
+  // Haptic-feel: tiny scroll-to-top so view feels fresh
+  window.scrollTo({top:0, behavior:'smooth'});
 }
 
 // === KANBAN ===

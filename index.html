@@ -177,7 +177,49 @@ body{padding-top:env(safe-area-inset-top);padding-bottom:env(safe-area-inset-bot
   .desktop-only{display:none!important}
 }
 
-/* === IG-STYLE MOBILE SHELL · header sticky, cards, slide-up modals === */
+/* === MAX IMPACT MOBILE — premium app feel === */
+@media (max-width:768px){
+  /* HEADER hero gradient + display serif */
+  header,.hub-header{padding:22px 16px 26px!important;background:linear-gradient(180deg,rgba(242,212,215,.65) 0%,rgba(237,235,230,.92) 100%)!important;border-bottom:none!important}
+  header h1,.hub-header h1{font-family:'Cormorant Garamond',serif!important;font-weight:700!important;font-size:36px!important;letter-spacing:-.02em;animation:llFadeUp .6s cubic-bezier(.16,1,.3,1)}
+
+  /* PAGE INTRO fade+slide */
+  main>*,.cards-grid>*,.weeks-grid>*,.pipeline-grid>*{animation:llFadeUp .5s cubic-bezier(.16,1,.3,1) both}
+  main>*:nth-child(2){animation-delay:.05s} main>*:nth-child(3){animation-delay:.1s} main>*:nth-child(4){animation-delay:.15s}
+  @keyframes llFadeUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
+
+  /* CARDS bigger shadow + tap feedback */
+  .week-card,.product-card,.pipeline-card,.calendar-card{border-radius:18px!important;padding:18px!important;box-shadow:0 4px 16px rgba(0,0,0,.06),0 1px 3px rgba(0,0,0,.04)!important;border:1px solid rgba(0,0,0,.03)!important;transition:transform .25s cubic-bezier(.16,1,.3,1)!important}
+  .week-card:active,.product-card:active,.pipeline-card:active{transform:scale(.97)!important}
+
+  /* SPRING tap feedback */
+  button:active,.btn:active{transform:scale(.94)!important;transition:transform .12s cubic-bezier(.16,1,.3,1)!important}
+
+  /* MODAL spring entrance */
+  .modal-backdrop{background:rgba(0,0,0,.5)!important;backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px)}
+  .modal,.modal-content{border-radius:24px 24px 0 0!important;animation:llSpring .42s cubic-bezier(.34,1.56,.64,1) both;padding-top:22px!important}
+  @keyframes llSpring{from{transform:translateY(110%);opacity:.5}to{transform:translateY(0);opacity:1}}
+
+  /* WHATSAPP button = FAB rosa-deep con animación entrada */
+  .whatsapp-btn{position:fixed!important;bottom:calc(20px + env(safe-area-inset-bottom))!important;right:16px!important;left:auto!important;width:auto!important;border-radius:999px!important;background:var(--rosa-deep)!important;color:#fff!important;box-shadow:0 6px 20px rgba(212,132,142,.45),0 2px 6px rgba(0,0,0,.1)!important;padding:14px 22px!important;animation:llFAB .5s cubic-bezier(.34,1.56,.64,1) both;animation-delay:.3s;z-index:45}
+  @keyframes llFAB{from{transform:scale(0) rotate(-45deg);opacity:0}to{transform:scale(1) rotate(0);opacity:1}}
+
+  /* AVATAR ring rosa */
+  .avatar,.team-avatar,.user-avatar{box-shadow:0 0 0 2px var(--cream),0 0 0 4px var(--rosa-hot)!important;border-radius:50%}
+
+  /* STATUS dots pulse */
+  .live-dot,.status-dot.online{animation:llPulse 2s ease-in-out infinite}
+  @keyframes llPulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.65;transform:scale(1.15)}}
+
+  /* Input focus rosa accent */
+  input:focus,textarea:focus,select:focus{outline:none!important;border-color:var(--rosa-deep)!important;box-shadow:0 0 0 3px rgba(212,132,142,.18)!important}
+
+  /* Stat numbers display serif */
+  .stat-value,.stat strong,.metric-value{font-size:26px!important;font-weight:700!important;font-family:'Cormorant Garamond',serif!important}
+  .stat-label,.metric-label{font-size:10px!important;letter-spacing:.1em!important;text-transform:uppercase!important;color:var(--grey)!important}
+}
+
+/* === IG-STYLE MOBILE SHELL (base, mantengo) === */
 @media (max-width:768px){
   /* Header compact + sticky con blur */
   header,.hub-header{padding:10px 16px!important;position:sticky;top:0;z-index:40;background:rgba(237,235,230,.92);backdrop-filter:saturate(180%) blur(18px);-webkit-backdrop-filter:saturate(180%) blur(18px);border-bottom:1px solid rgba(0,0,0,.05)}
