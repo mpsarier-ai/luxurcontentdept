@@ -84,21 +84,29 @@ header{border-bottom:1px solid var(--black);padding-bottom:24px;margin-bottom:64
 .ps-card.ok .ps-num{color:var(--green-ok)}
 
 /* TIMELINE */
-.timeline{display:flex;flex-direction:column;gap:1px;background:var(--black);border:1px solid var(--black);margin-bottom:40px;min-height:80px}
-.tl-row{background:#fff;padding:16px 20px;display:flex;align-items:center;gap:18px}
-.tl-date{font-family:'Cormorant Garamond',serif;font-weight:700;font-style:italic;font-size:20px;width:90px;flex-shrink:0;line-height:1.1}
-.tl-date small{display:block;font-family:'JetBrains Mono',monospace;font-size:9px;font-style:normal;color:var(--grey);letter-spacing:.1em;text-transform:uppercase;font-weight:400}
-.tl-type{font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:.1em;text-transform:uppercase;padding:3px 8px;border-radius:2px;flex-shrink:0}
-.tl-type.launch{background:#1a1a1a;color:var(--cream)}
-.tl-type.restock{background:var(--rosa);color:#1a1a1a}
-.tl-name{flex:1;font-family:'Outfit',sans-serif;font-weight:500;font-size:14px}
-.tl-name small{display:block;color:var(--grey);font-size:12px;font-weight:400;margin-top:2px}
-.tl-status{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.08em;text-transform:uppercase;cursor:pointer;padding:5px 10px;border:1px solid var(--black);background:transparent}
+.timeline{display:flex;flex-direction:column;gap:10px;margin-bottom:40px;min-height:80px}
+.tl-row{background:#fff;padding:16px 18px;border-radius:14px;border:1px solid rgba(0,0,0,.06);box-shadow:0 1px 3px rgba(0,0,0,.04);display:grid;grid-template-columns:auto 1fr auto;gap:14px;align-items:center;transition:transform .2s,box-shadow .2s}
+.tl-row:hover{transform:translateY(-1px);box-shadow:0 4px 12px rgba(0,0,0,.06)}
+.tl-date{font-family:'Cormorant Garamond',serif;font-weight:700;font-style:italic;font-size:22px;min-width:64px;flex-shrink:0;line-height:1.05;color:var(--black)}
+.tl-date small{display:block;font-family:'JetBrains Mono',monospace;font-size:9px;font-style:normal;color:var(--grey);letter-spacing:.1em;text-transform:uppercase;font-weight:400;margin-top:2px}
+.tl-body{min-width:0;display:flex;flex-direction:column;gap:4px}
+.tl-name{font-family:'Outfit',sans-serif;font-weight:500;font-size:15px;color:var(--black);line-height:1.3;cursor:pointer;display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.tl-name small{color:var(--grey);font-size:11px;font-weight:400;display:inline-block}
+.tl-name .tl-edit-mark{color:var(--rosa-deep);font-size:10px;opacity:.55}
+.tl-type{font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:.1em;text-transform:uppercase;padding:3px 8px;border-radius:999px;flex-shrink:0;display:inline-block;width:max-content;font-weight:500}
+.tl-type.launch{background:var(--black);color:var(--cream)}
+.tl-type.restock{background:var(--rosa);color:var(--black)}
+.tl-actions{display:flex;align-items:center;gap:8px;flex-shrink:0}
+.tl-status{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.08em;text-transform:uppercase;cursor:pointer;padding:6px 12px;border:1px solid var(--black);background:transparent;border-radius:999px;font-weight:500}
 .tl-status.pendiente{color:var(--yellow-low);border-color:var(--yellow-low)}
 .tl-status.llego{background:var(--green-ok);color:#fff;border-color:var(--green-ok)}
-.tl-del{width:24px;height:24px;border-radius:50%;border:1px solid var(--cream-dark);background:transparent;color:var(--grey);cursor:pointer;font-size:14px}
+.tl-del{width:30px;height:30px;border-radius:50%;border:1px solid var(--cream-dark);background:transparent;color:var(--grey);cursor:pointer;font-size:15px;line-height:1}
 .tl-del:hover{background:var(--red-out);color:#fff;border-color:var(--red-out)}
+.tl-overdue{border-color:var(--red-out)}
 .tl-overdue .tl-date{color:var(--red-out)}
+.tl-meta{color:var(--grey);font-size:11px;display:flex;gap:8px;flex-wrap:wrap;margin-top:2px}
+.tl-meta .tl-photo{color:var(--rosa-deep);font-weight:600}
+.tl-meta .tl-photo.overdue{color:var(--red-out)}
 @media (max-width:980px){.ps-cards{grid-template-columns:repeat(2,1fr)}.ps-grid{grid-template-columns:1fr}.tl-row{flex-wrap:wrap;gap:10px}}
 
 .footer{border-top:1px solid var(--black);padding:24px 32px;font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.15em;text-transform:uppercase;color:var(--grey);text-align:center;flex-wrap:wrap;gap:8px}
@@ -462,6 +470,25 @@ let catalog = [];
 async function enterApp(){
   hideLogin();
   if (editorList) editorList.textContent = user.email;
+  // Auto-redirect al calendario actual si existe y el usuario no agregó ?stay=1
+  const urlParams = new URLSearchParams(location.search);
+  if (!urlParams.has('stay')){
+    try {
+      const todayISO = new Date().toISOString().slice(0,10);
+      const { data: currentCal } = await supabase
+        .from('calendars')
+        .select('id')
+        .lte('start_date', todayISO)
+        .gte('end_date', todayISO)
+        .order('start_date', { ascending: false })
+        .limit(1)
+        .maybeSingle();
+      if (currentCal && currentCal.id){
+        location.href = `calendars/calendar.html?id=${encodeURIComponent(currentCal.id)}`;
+        return;
+      }
+    } catch (err) { console.warn('Auto-redirect skipped', err); }
+  }
   await Promise.all([loadCalendars(), loadProductStatus(), loadPipeline()]);
 }
 
@@ -549,27 +576,35 @@ function renderPipeline(){
     const fmtDM = iso => { const p = iso.split('-'); return `${parseInt(p[2])} ${MONTH_ABBR[parseInt(p[1])-1]}`; };
     let dateBox;
     if (e.tentative_date && e.tentative_date_end){
-      dateBox = `<div class="tl-date" style="font-size:15px">${fmtDM(e.tentative_date)}<small>a ${fmtDM(e.tentative_date_end)}</small></div>`;
+      dateBox = `<div class="tl-date" style="font-size:16px">${fmtDM(e.tentative_date)}<small>a ${fmtDM(e.tentative_date_end)}</small></div>`;
     } else if (e.tentative_date){
       const d = e.tentative_date.split('-');
-      dateBox = `<div class="tl-date">${parseInt(d[2])} <small>${MONTH_ABBR[parseInt(d[1])-1]}</small></div>`;
+      dateBox = `<div class="tl-date">${parseInt(d[2])}<small>${MONTH_ABBR[parseInt(d[1])-1]}</small></div>`;
     } else {
       dateBox = `<div class="tl-date">—</div>`;
     }
     const effEnd = e.tentative_date_end || e.tentative_date;
     const overdue = effEnd && effEnd < todayStr && e.status === 'pendiente';
-    let photoLine = '';
+    const metaBits = [];
     if (e.entry_type === 'launch' && e.photo_date){
       const pd = e.photo_date.split('-');
       const photoOverdue = e.photo_date < todayStr && e.status === 'pendiente';
-      photoLine = `<small style="color:${photoOverdue?'var(--red-out)':'var(--rosa-deep)'};font-weight:600">📸 Hacer fotos ${photoOverdue?'(¡atrasado!)':''}: ${parseInt(pd[2])} ${MONTH_ABBR[parseInt(pd[1])-1]}</small>`;
+      metaBits.push(`<span class="tl-photo ${photoOverdue?'overdue':''}">📸 fotos ${parseInt(pd[2])} ${MONTH_ABBR[parseInt(pd[1])-1]}${photoOverdue?' (atrasado)':''}</span>`);
     }
+    if (e.notes) metaBits.push(`<span>${escapeHtml(e.notes)}</span>`);
+    if (overdue) metaBits.push(`<span style="color:var(--red-out)">⚠ atrasado</span>`);
+    const metaHtml = metaBits.length ? `<div class="tl-meta">${metaBits.join('')}</div>` : '';
     return `<div class="tl-row ${overdue?'tl-overdue':''}" data-id="${e.id}">
       ${dateBox}
-      <span class="tl-type ${e.entry_type}">${e.entry_type === 'launch' ? 'Lanzamiento' : 'Restock'}</span>
-      <div class="tl-name" data-edit="${e.id}" style="cursor:pointer" title="Click para editar">${escapeHtml(e.product_name)} <span style="color:var(--rosa-deep);font-size:11px">✎</span>${photoLine}${e.notes ? `<small>${escapeHtml(e.notes)}</small>` : ''}${overdue ? '<small style="color:var(--red-out)">⚠ fecha pasada, aún pendiente</small>' : ''}</div>
-      <button class="tl-status ${e.status}" data-toggle="${e.id}">${e.status === 'llego' ? '✓ Llegó' : 'Pendiente'}</button>
-      <button class="tl-del" data-del="${e.id}" title="Eliminar">×</button>
+      <div class="tl-body">
+        <span class="tl-type ${e.entry_type}">${e.entry_type === 'launch' ? 'Lanzamiento' : 'Restock'}</span>
+        <div class="tl-name" data-edit="${e.id}" title="Click para editar"><span>${escapeHtml(e.product_name)}</span><span class="tl-edit-mark">✎</span></div>
+        ${metaHtml}
+      </div>
+      <div class="tl-actions">
+        <button class="tl-status ${e.status}" data-toggle="${e.id}">${e.status === 'llego' ? '✓ Llegó' : 'Pendiente'}</button>
+        <button class="tl-del" data-del="${e.id}" title="Eliminar">×</button>
+      </div>
     </div>`;
   }).join('');
   el.querySelectorAll('[data-toggle]').forEach(b => b.addEventListener('click', () => togglePipelineStatus(b.getAttribute('data-toggle'))));

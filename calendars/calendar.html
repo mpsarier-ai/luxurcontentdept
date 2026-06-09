@@ -183,87 +183,36 @@ html,body{background:var(--cream);color:var(--black);font-family:'Outfit',sans-s
 .midcheck-block li:focus{background:rgba(255,255,255,.08)}
 .midcheck-block li:empty::before{content:'— +';color:var(--rosa-hot);opacity:.5}
 
-/* PARRILLA DE CONTENIDO */
-.parrilla-section{margin-bottom:64px}
-.parrilla-toolbar{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--grey);flex-wrap:wrap;gap:12px}
-.parrilla-stats{display:flex;gap:18px}
+/* IMAGE PREVIEW dentro del modal de pieza */
+.pm-image-preview{margin-bottom:10px}
+.pm-image-preview img{display:block;width:100%;max-height:280px;object-fit:cover;border-radius:10px;background:var(--cream-dark);border:1px solid var(--cream-dark)}
+.pm-image-preview:empty{display:none}
+
+/* VISTA HOY */
+.today-head{display:flex;justify-content:space-between;align-items:flex-end;gap:14px;margin-bottom:24px;flex-wrap:wrap}
+.today-title{font-family:'Cormorant Garamond',serif;font-size:36px;line-height:1;font-weight:700;letter-spacing:-.02em;margin:0}
+.today-jump{background:transparent;border:none;font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--rosa-deep);cursor:pointer;padding:8px 0}
+.today-jump:hover{color:var(--black)}
+.today-list{display:flex;flex-direction:column;gap:14px}
+.today-empty{padding:48px 24px;text-align:center;color:var(--grey);font-style:italic}
+.today-card{background:#fff;border:1px solid rgba(0,0,0,.05);border-radius:18px;padding:18px;display:flex;gap:14px;align-items:flex-start;box-shadow:0 4px 16px rgba(0,0,0,.05),0 1px 3px rgba(0,0,0,.04);transition:transform .25s cubic-bezier(.16,1,.3,1)}
+.today-card:active{transform:scale(.97)}
+.today-card.is-listo{opacity:.55;background:linear-gradient(90deg,#fff,var(--cream-dark) 200%)}
+.today-card-thumb{width:64px;height:64px;border-radius:12px;background:var(--cream-dark);flex-shrink:0;display:flex;align-items:center;justify-content:center;font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--grey);overflow:hidden;background-size:cover;background-position:center}
+.today-card-body{flex:1;min-width:0}
+.today-card-type{font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:.12em;text-transform:uppercase;color:var(--rosa-deep);margin-bottom:4px}
+.today-card-title{font-family:'Cormorant Garamond',serif;font-weight:700;font-size:18px;line-height:1.2;color:var(--black);margin-bottom:6px}
+.today-card-meta{display:flex;gap:8px;align-items:center;font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--grey)}
+.today-card-actions{display:flex;flex-direction:column;gap:6px;align-items:flex-end}
+.today-card-btn{background:var(--rosa-deep);color:#fff;border:none;padding:8px 14px;border-radius:999px;font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.1em;text-transform:uppercase;cursor:pointer;font-weight:600;min-height:34px}
+.today-card-btn:hover{background:var(--black)}
+.today-card.is-listo .today-card-btn{background:var(--grey)}
+.today-card-edit{background:transparent;border:1px solid var(--cream-dark);color:var(--black);padding:6px 10px;border-radius:999px;font-family:'JetBrains Mono',monospace;font-size:9px;cursor:pointer}
+
+/* SUMMARY BAR · stats + mine toggle */
+.summary-bar{display:flex;justify-content:space-between;align-items:center;gap:14px;flex-wrap:wrap;margin-bottom:28px;font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--grey)}
+.parrilla-stats{display:flex;gap:18px;flex-wrap:wrap}
 .parrilla-stats .stat-item strong{color:var(--black);font-weight:500;margin-right:4px;font-size:13px}
-.parrilla-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;background:var(--cream-dark);padding:6px;border:1px solid var(--black)}
-.tile{aspect-ratio:1;background:#fff;position:relative;display:flex;flex-direction:column;overflow:hidden;transition:transform .15s,box-shadow .15s}
-.tile:hover{z-index:2;transform:scale(1.02);box-shadow:0 4px 16px rgba(0,0,0,.15)}
-.tile-photo{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:0;background:var(--cream-dark)}
-.tile.has-photo{color:#fff}
-.tile.has-photo .tile-meta{position:relative;z-index:2;background:linear-gradient(180deg,rgba(0,0,0,.6) 0%,transparent 100%);padding-bottom:14px}
-.tile.has-photo .tile-day{color:#fff !important;text-shadow:0 1px 2px rgba(0,0,0,.6)}
-.tile.has-photo .tile-type{color:var(--rosa);text-shadow:0 1px 2px rgba(0,0,0,.6)}
-.tile.has-photo .tile-title{position:absolute;bottom:36px;left:0;right:0;padding:24px 12px 12px;background:linear-gradient(0deg,rgba(0,0,0,.75) 30%,transparent 100%);color:#fff;z-index:2;text-shadow:0 1px 3px rgba(0,0,0,.6);align-items:flex-end}
-.tile.has-photo .tile-bottom{position:relative;z-index:2;background:rgba(255,255,255,.94);backdrop-filter:blur(4px);margin-top:auto}
-.tile-color{height:6px;width:100%;flex-shrink:0;position:relative;z-index:2}
-.tile-color.launch{background:var(--black)}
-.tile-color.preorden{background:var(--rosa)}
-.tile-color.push{background:var(--cream-dark)}
-.tile-color.recap{background:linear-gradient(90deg,var(--rosa) 0%,var(--cream-dark) 100%)}
-.tile-color.cross{background:var(--rosa-hot)}
-.tile-color.admin{background:var(--grey)}
-.tile-meta{display:flex;justify-content:space-between;padding:8px 10px 4px;gap:6px;font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:.1em;text-transform:uppercase}
-.tile-day{color:var(--black);font-weight:500;outline:none}
-.tile-type{color:var(--rosa-deep);outline:none}
-.tile-day:focus,.tile-type:focus{background:rgba(232,165,173,.15)}
-.tile-title{padding:0 10px;font-family:'Cormorant Garamond',serif;font-weight:700;font-size:15px;line-height:1.18;flex:1;display:flex;align-items:center;outline:none;color:var(--black)}
-.tile-title:focus{background:rgba(232,165,173,.12)}
-.tile-actions{position:absolute;top:8px;right:8px;display:flex;gap:6px;opacity:.55;transition:opacity .15s;z-index:4}
-.tile:hover .tile-actions{opacity:1}
-.tile.has-photo .tile-actions{opacity:1}
-.tile-btn{height:30px;min-width:30px;padding:0 10px;border-radius:15px;border:none;background:rgba(255,255,255,.97);color:var(--black);font-size:13px;line-height:1;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:5px;font-family:'JetBrains Mono',monospace;font-weight:600;letter-spacing:.06em;text-transform:uppercase;box-shadow:0 2px 8px rgba(0,0,0,.25)}
-.tile-btn.urls{background:var(--black);color:var(--cream);font-size:10px}
-.tile-btn.urls::after{content:'EDITAR'}
-.tile-btn:hover{background:var(--rosa-deep);color:#fff}
-.tile-btn.delete:hover{background:var(--red-out);color:#fff}
-.tile-btn.urls:hover{background:var(--rosa-deep);color:#fff}
-.tile-ref{position:absolute;top:12px;left:8px;z-index:3;background:rgba(255,255,255,.92);color:var(--black);font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:.12em;font-weight:600;text-transform:uppercase;padding:3px 7px;border-radius:2px;text-decoration:none;box-shadow:0 1px 3px rgba(0,0,0,.18);transition:all .15s}
-.tile-ref:hover{background:var(--rosa-deep);color:#fff}
-.tile.has-photo .tile-ref{background:rgba(255,255,255,.95)}
-.tile-bottom{display:flex;gap:5px;padding:6px 10px 8px;flex-wrap:wrap;align-items:center}
-.color-dot{width:13px;height:13px;border-radius:50%;cursor:pointer;border:2px solid transparent;transition:border-color .15s,transform .1s}
-.color-dot:hover{transform:scale(1.2)}
-.color-dot.active{border-color:var(--black)}
-.color-dot.launch{background:var(--black)}
-.color-dot.preorden{background:var(--rosa)}
-.color-dot.push{background:var(--cream-dark);border-color:var(--grey)}
-.color-dot.push.active{border-color:var(--black)}
-.color-dot.recap{background:linear-gradient(135deg,var(--rosa),var(--cream-dark))}
-.color-dot.cross{background:var(--rosa-hot)}
-.color-dot.admin{background:var(--grey)}
-.tile-add{aspect-ratio:1;border:2px dashed var(--rosa-deep);background:transparent;display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;color:var(--rosa-deep);transition:background .15s}
-.tile-add:hover{background:var(--rosa);color:var(--black)}
-.tile-add .plus{font-family:'Cormorant Garamond',serif;font-size:48px;line-height:1;font-weight:300}
-.tile-add .add-label{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.15em;text-transform:uppercase;margin-top:4px}
-/* === VISTA PREVIA FEED (estilo Instagram) === */
-.parrilla-grid.feed-preview{gap:2px;padding:2px;background:#dbdbdb;border:1px solid #dbdbdb}
-.parrilla-grid.feed-preview .tile{background:var(--cream-dark)}
-.parrilla-grid.feed-preview .tile-meta,
-.parrilla-grid.feed-preview .tile-title,
-.parrilla-grid.feed-preview .tile-badges,
-.parrilla-grid.feed-preview .tile-bottom,
-.parrilla-grid.feed-preview .tile-color,
-.parrilla-grid.feed-preview .tile-ref{display:none !important}
-.parrilla-grid.feed-preview .tile-photo{position:absolute;inset:0}
-.parrilla-grid.feed-preview .tile:hover{transform:none;box-shadow:none}
-.parrilla-grid.feed-preview .tile-actions{opacity:0;top:6px;right:6px}
-.parrilla-grid.feed-preview .tile:hover .tile-actions{opacity:1}
-.parrilla-grid.feed-preview .tile-add{aspect-ratio:1;border:1px dashed #b9b9b9;color:#8e8e8e}
-.tile-order{position:absolute;top:6px;left:6px;z-index:5;background:rgba(0,0,0,.6);color:#fff;font-family:'JetBrains Mono',monospace;font-size:10px;font-weight:600;min-width:20px;height:20px;border-radius:10px;display:flex;align-items:center;justify-content:center;padding:0 5px}
-.tile-noimg{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;text-align:center;padding:14px;font-family:'Cormorant Garamond',serif;font-weight:700;font-size:14px;line-height:1.2;color:var(--black);background:var(--cream);z-index:1}
-.parrilla-grid.feed-preview .tile[draggable="true"]{cursor:grab}
-.parrilla-grid.feed-preview .tile.dragging{opacity:.4;cursor:grabbing}
-.parrilla-grid.feed-preview .tile.dragover{outline:3px solid var(--rosa-hot);outline-offset:-3px}
-.feed-divider{grid-column:1/-1;display:flex;align-items:center;justify-content:center;padding:14px 0;margin:6px 0}
-.feed-divider span{font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:.18em;text-transform:uppercase;color:var(--rosa-deep);background:var(--cream);padding:6px 14px;border:1px solid var(--rosa-deep);border-radius:14px;white-space:nowrap}
-.real-tile{aspect-ratio:1;position:relative;overflow:hidden;display:block;background:var(--cream-dark);cursor:pointer;text-decoration:none}
-.real-tile .tile-photo{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
-.real-tile:hover{filter:brightness(.92)}
-.real-badge{position:absolute;top:6px;right:6px;z-index:2;color:#fff;font-size:13px;text-shadow:0 1px 3px rgba(0,0,0,.7)}
-.real-tag{position:absolute;bottom:6px;left:6px;z-index:2;background:rgba(0,0,0,.6);color:#fff;font-family:'JetBrains Mono',monospace;font-size:8px;letter-spacing:.12em;font-weight:600;padding:2px 6px;border-radius:8px}
 
 /* LOGIN OVERLAY */
 .login-overlay{position:fixed;inset:0;background:var(--cream);display:none;align-items:center;justify-content:center;z-index:300;flex-direction:column;padding:24px}
@@ -327,13 +276,6 @@ select.pm-input{cursor:pointer}
 .pm-inventory{margin-top:8px;padding:10px;background:var(--cream);border-left:3px solid var(--rosa-deep);min-height:38px}
 .pm-inv-empty{font-size:11px;color:var(--grey);font-style:italic}
 .pm-inv-title{font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--grey);margin-bottom:6px;text-transform:uppercase;letter-spacing:.08em}
-.pm-comments{max-height:200px;overflow-y:auto;background:var(--cream);padding:10px;display:flex;flex-direction:column;gap:10px}
-.pm-comment-empty{font-size:12px;color:var(--grey);font-style:italic;text-align:center;padding:8px}
-.pm-comment{display:flex;gap:8px;align-items:flex-start}
-.pm-avatar{width:24px;height:24px;border-radius:50%;color:#fff;font-family:'JetBrains Mono',monospace;font-size:9px;font-weight:600;display:flex;align-items:center;justify-content:center;flex-shrink:0}
-.pm-comment-body{font-size:13px;line-height:1.45;color:var(--black)}
-.pm-comment-meta{font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--grey);text-transform:uppercase;letter-spacing:.06em;margin-bottom:2px}
-
 /* TILE BADGES (parrilla) */
 .tile-badges{display:flex;align-items:center;gap:5px;padding:4px 10px;flex-wrap:wrap}
 .tile.has-photo .tile-badges{position:relative;z-index:2;background:rgba(255,255,255,.9)}
@@ -646,12 +588,12 @@ body{padding-top:env(safe-area-inset-top);padding-bottom:env(safe-area-inset-bot
 <div class="fatal" id="fatalScreen" style="display:none">
   <h2 id="fatalTitle">Calendario no encontrado</h2>
   <p id="fatalMsg">No pudimos cargar este calendario.</p>
-  <a href="../index.html" class="back-link" style="font-size:13px">← Volver al hub</a>
+  <a href="../index.html?stay=1" class="back-link" style="font-size:13px">← Volver al hub</a>
 </div>
 
 <div class="container">
 
-  <a href="../index.html" class="back-link" style="margin-bottom:18px;display:inline-block">← Hub de calendarios</a>
+  <a href="../index.html?stay=1" class="back-link" style="margin-bottom:18px;display:inline-block">← Hub de calendarios</a>
 
   <!-- HEADER (fully dynamic) -->
   <header class="brand-header">
@@ -689,12 +631,22 @@ body{padding-top:env(safe-area-inset-top);padding-bottom:env(safe-area-inset-bot
 
   <!-- VIEW NAV -->
   <div class="view-nav">
-    <button class="view-tab active" data-view="calendar">📅 Calendario</button>
+    <button class="view-tab active" data-view="today">⭐ Hoy</button>
+    <button class="view-tab" data-view="calendar">📅 Semana</button>
     <button class="view-tab" data-view="kanban">📋 Kanban</button>
     <button class="view-tab" data-view="inventory">📦 Inventario</button>
   </div>
 
-  <div id="calendarView">
+  <!-- VISTA HOY · piezas filtradas por fecha de hoy -->
+  <div id="todayView">
+    <div class="today-head">
+      <h2 class="today-title" id="todayTitle">Hoy</h2>
+      <button class="today-jump" data-jump-week>Ver semana completa →</button>
+    </div>
+    <div id="todayList" class="today-list"></div>
+  </div>
+
+  <div id="calendarView" style="display:none">
 
   <!-- ALERTA DE SEMANA (lanzamientos / llegadas / fotos) -->
   <div id="weekAlerts"></div>
@@ -717,25 +669,15 @@ body{padding-top:env(safe-area-inset-top);padding-bottom:env(safe-area-inset-bot
   </h2>
   <section class="week-grid" id="weekGrid"></section>
 
-  <!-- PARRILLA DE CONTENIDO -->
-  <section class="parrilla-section">
-    <h2 class="section-title">
-      <span>Parrilla de Contenido</span>
-      <span class="meta">Vista feed · agregar / eliminar / editar</span>
-    </h2>
-    <div class="parrilla-toolbar">
-      <div class="parrilla-stats">
-        <span class="stat-item"><strong id="statTotal">—</strong>piezas</span>
-        <span class="stat-item"><strong id="statPosts">—</strong>posts</span>
-        <span class="stat-item"><strong id="statReels">—</strong>reels</span>
-        <span class="stat-item"><strong id="statStories">—</strong>stories</span>
-      </div>
-      <div style="display:flex;gap:8px;flex-wrap:wrap">
-        <button class="mine-toggle" id="mineToggle">◴ Mis tareas</button>
-        <button class="mine-toggle" id="previewToggle">▦ Vista previa feed</button>
-      </div>
+  <!-- RESUMEN SEMANA · stats + mine toggle -->
+  <section class="summary-bar">
+    <div class="parrilla-stats">
+      <span class="stat-item"><strong id="statTotal">—</strong>piezas</span>
+      <span class="stat-item"><strong id="statPosts">—</strong>posts</span>
+      <span class="stat-item"><strong id="statReels">—</strong>reels</span>
+      <span class="stat-item"><strong id="statStories">—</strong>stories</span>
     </div>
-    <div class="parrilla-grid" id="parrillaGrid"></div>
+    <button class="mine-toggle" id="mineToggle">◴ Mis tareas</button>
   </section>
 
   <!-- TOP SELLERS (JS-rendered) -->
@@ -882,6 +824,7 @@ body{padding-top:env(safe-area-inset-top);padding-bottom:env(safe-area-inset-bot
     <div class="pm-inventory" data-pm-inventory></div>
 
     <label class="pm-label" style="margin-top:16px">Imagen final (Canva)</label>
+    <div class="pm-image-preview" data-pm-image-preview></div>
     <div style="display:flex;gap:6px">
       <input type="url" data-modal-input="imageUrl" placeholder="Pega URL o sube foto →" class="pm-input" style="flex:1">
       <button data-urls-upload class="pm-mini-btn">📷 Subir</button>
@@ -889,13 +832,6 @@ body{padding-top:env(safe-area-inset-top);padding-bottom:env(safe-area-inset-bot
 
     <label class="pm-label" style="margin-top:12px">URL Referente (inspiración)</label>
     <input type="url" data-modal-input="refUrl" placeholder="https://… (Pinterest, IG, Canva, etc)" class="pm-input">
-
-    <label class="pm-label" style="margin-top:18px">Comentarios <span data-pm-ccount style="color:var(--rosa-deep)"></span></label>
-    <div class="pm-comments" data-pm-comments></div>
-    <div style="display:flex;gap:6px;margin-top:8px">
-      <input type="text" data-pm-comment-input placeholder="Escribe un comentario…" class="pm-input" style="flex:1">
-      <button class="pm-mini-btn" data-pm-comment-send>Enviar</button>
-    </div>
 
     <div class="modal-actions">
       <button class="modal-btn" data-urls-cancel>Cerrar</button>
@@ -960,7 +896,6 @@ const state = {
   pieces: [],
   team: [],          // team_members rows
   catalog: [],       // shopify_catalog products [{gid,title,total,sizes}]
-  comments: {},      // pieceId -> [{id,author_email,body,created_at}]
   pipeline: [],      // product_pipeline rows (lanzamientos/restock)
   dayProducts: {},   // dayIndex -> [gid,...] manual products to promote that day
   channels: [],
@@ -1174,13 +1109,12 @@ async function loadCalendar(){
   // Render skeleton sections that depend on days
   renderDayCards();
 
-  // Load pieces + fields + team + catalog + comments in parallel
-  const [piecesRes, fieldsRes, teamRes, catalogRes, commentsRes, pipelineRes, igRes] = await Promise.all([
+  // Load pieces + fields + team + catalog + pipeline + ig feed in parallel
+  const [piecesRes, fieldsRes, teamRes, catalogRes, pipelineRes, igRes] = await Promise.all([
     supabase.from('calendar_pieces').select('*').eq('calendar_id', state.calendarId).order('position', { ascending: true }),
     supabase.from('calendar_fields').select('*').eq('calendar_id', state.calendarId),
     supabase.from('team_members').select('*'),
     supabase.from('shopify_catalog').select('products').eq('id', 1).maybeSingle(),
-    supabase.from('calendar_comments').select('*').eq('calendar_id', state.calendarId).order('created_at', { ascending: true }),
     supabase.from('product_pipeline').select('*'),
     supabase.from('instagram_feed').select('data').eq('id', 1).maybeSingle()
   ]);
@@ -1192,10 +1126,6 @@ async function loadCalendar(){
   state.catalog = (catalogRes.data && Array.isArray(catalogRes.data.products)) ? catalogRes.data.products : [];
   state.pipeline = pipelineRes.data || [];
   state.igFeed = (igRes && igRes.data && igRes.data.data) ? igRes.data.data : null;
-  state.comments = {};
-  (commentsRes.data || []).forEach(c => {
-    (state.comments[c.piece_id] = state.comments[c.piece_id] || []).push(c);
-  });
 
   state.pieces = (piecesRes.data || []).map(rowToPiece);
   state.initialized = true;
@@ -1227,9 +1157,6 @@ async function loadCalendar(){
   const calCh = supabase.channel(`calendar:${state.calendarId}:meta`)
     .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'calendars', filter: `id=eq.${state.calendarId}` }, p => handleCalendarChange(p))
     .subscribe();
-  const commentsCh = supabase.channel(`calendar:${state.calendarId}:comments`)
-    .on('postgres_changes', { event: '*', schema: 'public', table: 'calendar_comments', filter: `calendar_id=eq.${state.calendarId}` }, p => handleCommentChange(p))
-    .subscribe();
   const catalogCh = supabase.channel('shopify-catalog')
     .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'shopify_catalog', filter: 'id=eq.1' }, p => {
       if (p.new && Array.isArray(p.new.products)) { state.catalog = p.new.products; renderPiecesViews(); }
@@ -1242,7 +1169,7 @@ async function loadCalendar(){
       renderWeekAlerts();
     })
     .subscribe();
-  state.channels = [piecesCh, fieldsCh, calCh, commentsCh, catalogCh, pipelineCh];
+  state.channels = [piecesCh, fieldsCh, calCh, catalogCh, pipelineCh];
 
   renderWeekAlerts();
   setSync('connected', 'Sincronizado');
@@ -1371,26 +1298,6 @@ function handleCalendarChange(payload){
   document.getElementById('headerWeekStatus').textContent = cal.status === 'active' ? '' : `· ${cal.status}`;
 }
 
-function handleCommentChange(payload){
-  if (payload.eventType === 'INSERT'){
-    const c = payload.new;
-    const arr = state.comments[c.piece_id] = state.comments[c.piece_id] || [];
-    if (!arr.find(x => x.id === c.id)) arr.push(c);
-  } else if (payload.eventType === 'DELETE'){
-    const c = payload.old;
-    if (state.comments[c.piece_id]) {
-      state.comments[c.piece_id] = state.comments[c.piece_id].filter(x => x.id !== c.id);
-    }
-  }
-  // Refresh modal if open on this piece, and piece indicators
-  const modal = document.getElementById('urlsModal');
-  if (modal && modal.classList.contains('open')){
-    const pid = modal.getAttribute('data-piece-id');
-    if (pid) renderComments(pid);
-  }
-  renderPiecesViews();
-}
-
 // === SAVE OPS ===
 async function saveOnePiece(piece){
   flashSaving();
@@ -1445,11 +1352,11 @@ function renderPiecesViews(){
   }
   renderWeekGrid();
   renderDayPieceLists();
-  renderParrilla();
   renderKanban();
   renderDayProducts();
   renderDashboard();
   updateStats();
+  renderToday();
 }
 
 // Stock state of a piece's product (from catalog). Returns null|'out'|'low'
@@ -1510,27 +1417,28 @@ function renderDashboard(){
 }
 
 // === VIEW SWITCHING ===
-let _currentView = 'calendar';
-const _viewOrder = ['calendar','kanban','inventory'];
+let _currentView = 'today';
+const _viewOrder = ['today','calendar','kanban','inventory'];
 function switchView(name){
   document.querySelectorAll('.view-tab').forEach(t => t.classList.toggle('active', t.getAttribute('data-view') === name));
   const fromIdx = _viewOrder.indexOf(_currentView);
   const toIdx = _viewOrder.indexOf(name);
   const dir = toIdx > fromIdx ? 1 : -1;
-  const targetView = document.getElementById(name === 'calendar' ? 'calendarView' : name === 'kanban' ? 'kanbanView' : 'inventoryView');
-  // Apply slide-in animation (CSS keyframe)
-  document.getElementById('calendarView').style.display = name === 'calendar' ? '' : 'none';
-  document.getElementById('kanbanView').style.display = name === 'kanban' ? '' : 'none';
-  document.getElementById('inventoryView').style.display = name === 'inventory' ? '' : 'none';
+  const idMap = { today:'todayView', calendar:'calendarView', kanban:'kanbanView', inventory:'inventoryView' };
+  Object.keys(idMap).forEach(k => {
+    const el = document.getElementById(idMap[k]);
+    if (el) el.style.display = (k === name) ? '' : 'none';
+  });
+  const targetView = document.getElementById(idMap[name]);
   if (targetView && _currentView !== name) {
     targetView.style.animation = 'none';
-    void targetView.offsetWidth; // reflow
+    void targetView.offsetWidth;
     targetView.style.animation = `llSlide${dir > 0 ? 'In' : 'InRev'} .35s cubic-bezier(.16,1,.3,1)`;
   }
+  if (name === 'today') renderToday();
   if (name === 'kanban') renderKanban();
   if (name === 'inventory') renderInventory();
   _currentView = name;
-  // Haptic-feel: tiny scroll-to-top so view feels fresh
   window.scrollTo({top:0, behavior:'smooth'});
 }
 
@@ -1550,7 +1458,6 @@ function renderKanban(){
       <div class="kanban-cards">
         ${items.map(p => {
           const m = p.assignee ? teamMember(p.assignee) : null;
-          const cc = (state.comments[p.id]||[]).length;
           return `<div class="kanban-card" draggable="true" data-piece-id="${p.id}">
             <div class="kc-day">${escapeHtml(p.day)} · ${escapeHtml(p.type)}</div>
             <div class="kc-title">${escapeHtml(p.title)}</div>
@@ -1558,7 +1465,6 @@ function renderKanban(){
               ${m ? `<span class="kc-avatar" style="background:${m.color}" title="${escapeAttr(m.name)}">${initials(m.name)}</span>` : '<span class="kc-avatar" style="background:var(--cream-dark);color:var(--grey)">?</span>'}
               ${p.platform ? `<span class="kc-tag plat">${escapeHtml(p.platform)}</span>` : ''}
               ${p.productGid && catalogProduct(p.productGid) ? `<span class="kc-tag">${escapeHtml((catalogProduct(p.productGid).title||'').slice(0,18))}</span>` : ''}
-              ${cc ? `<span class="kc-tag">💬${cc}</span>` : ''}
             </div>
           </div>`;
         }).join('') || '<div style="padding:16px;text-align:center;color:var(--grey);font-size:11px;font-family:JetBrains Mono,monospace">vacío</div>'}
@@ -1722,11 +1628,7 @@ function renderDayCards(){
         <div class="focus" contenteditable="true" data-field="d${d.index}-focus"></div>
       </div>
       <div class="content-block">
-        <div class="block-label">① Concepto del día</div>
-        <div class="ctype" contenteditable="true" data-field="d${d.index}-ctype" data-ph="Tipo (Lanzamiento, Push, Recap…)"></div>
-        <h3 contenteditable="true" data-field="d${d.index}-title" data-ph="Título / idea central del día"></h3>
-        <p class="copy" contenteditable="true" data-field="d${d.index}-copy" data-ph="Contexto: por qué este día, qué buscamos…"></p>
-        <div class="block-label pieces-label">② Piezas del día <span class="day-count" data-day-count="${d.key}">(0)</span></div>
+        <div class="block-label pieces-label">Piezas del día <span class="day-count" data-day-count="${d.key}">(0)</span></div>
         <div class="piece-list" data-day-pieces="${d.key}"></div>
       </div>
       <aside class="shopify-panel" data-day-shopify="${d.index}">
@@ -1819,145 +1721,68 @@ function addPiece(day, opts){
   setTimeout(() => openUrlsModal(newId), 60);
 }
 
-let feedPreview = false;
-function renderParrilla(){
-  const grid = document.getElementById('parrillaGrid');
-  if (!grid) return;
-
-  grid.classList.toggle('feed-preview', feedPreview);
-  // reordenar solo en preview y viendo todo (no con "Mis tareas")
-  const canReorder = feedPreview && !state.filterMine;
-
-  const visible = state.filterMine && state.user
-    ? state.pieces.filter(p => p.assignee === state.user.email)
-    : state.pieces;
-
-  const draftsHtml = visible.map((t, i) => {
-    const m = t.assignee ? teamMember(t.assignee) : null;
-    const ccount = (state.comments[t.id] || []).length;
-    const stock = pieceStockState(t);
-    return `
-    <div class="tile ${t.imageUrl ? 'has-photo' : ''} ${t.status==='listo'?'is-listo':''}" data-tile-id="${t.id}" ${canReorder ? 'draggable="true"' : ''}>
-      ${feedPreview ? `<span class="tile-order">${i+1}</span>` : ''}
-      ${!t.imageUrl && feedPreview ? `<div class="tile-noimg">${escapeHtml(t.title)}</div>` : ''}
-      ${t.imageUrl ? `<img class="tile-photo" src="${escapeAttr(t.imageUrl)}" alt="" loading="lazy" onerror="this.style.display='none';this.parentElement.classList.remove('has-photo')">` : ''}
-      <div class="tile-color ${t.color || 'push'}"></div>
-      ${t.refUrl ? `<a class="tile-ref" href="${escapeAttr(t.refUrl)}" target="_blank" rel="noopener" title="Abrir referente">REF ↗</a>` : ''}
-      <div class="tile-meta">
-        <span class="tile-day" contenteditable="true" data-piece-edit="day">${escapeHtml(t.day)}</span>
-        <span class="tile-type" contenteditable="true" data-piece-edit="type">${escapeHtml(t.type)}</span>
+// === RENDER HOY ===
+function renderToday(){
+  const list = document.getElementById('todayList');
+  const titleEl = document.getElementById('todayTitle');
+  if (!list || !state.days.length) return;
+  // Detectar el día actual del calendario
+  const now = new Date();
+  const today = state.days.find(d => {
+    const dt = d.dateObj;
+    return dt.getFullYear() === now.getFullYear() && dt.getMonth() === now.getMonth() && dt.getDate() === now.getDate();
+  });
+  if (!today){
+    // El calendario abierto no es de esta semana — mostrar el primer día
+    titleEl.textContent = state.days[0].fullDow + ' ' + state.days[0].dnum;
+    list.innerHTML = `<div class="today-empty">Este calendario no incluye el día de hoy.<br>Tocá "Ver semana completa" para planear.</div>`;
+    return;
+  }
+  titleEl.textContent = today.fullDow + ' ' + today.dnum;
+  let pieces = state.pieces.filter(p => p.day === today.key);
+  if (state.filterMine && state.user){
+    pieces = pieces.filter(p => p.assignee === state.user.email);
+  }
+  if (!pieces.length){
+    list.innerHTML = `<div class="today-empty">${state.filterMine ? 'No tenés piezas asignadas para hoy ✨' : 'Sin piezas planeadas para hoy.'}</div>`;
+    return;
+  }
+  list.innerHTML = pieces.map(p => {
+    const m = p.assignee ? teamMember(p.assignee) : null;
+    const thumbStyle = p.imageUrl ? `background-image:url('${escapeAttr(p.imageUrl)}')` : '';
+    const thumbInner = p.imageUrl ? '' : escapeHtml((p.type || '').split(' ')[0] || '·');
+    const isListo = p.status === 'listo' || p.approved;
+    return `<div class="today-card ${isListo ? 'is-listo' : ''}" data-piece-id="${p.id}">
+      <div class="today-card-thumb" style="${thumbStyle}">${thumbInner}</div>
+      <div class="today-card-body">
+        <div class="today-card-type">${escapeHtml(p.type || 'Pieza')} ${p.platform ? '· '+escapeHtml(p.platform) : ''}</div>
+        <div class="today-card-title">${escapeHtml(p.title || 'Sin título')}</div>
+        <div class="today-card-meta">
+          ${m ? `<span class="tile-avatar" style="background:${m.color};width:18px;height:18px;font-size:8px">${initials(m.name)}</span> ${escapeHtml(m.name)}` : 'Sin asignar'}
+          ${p.approved ? ' · ✓ aprobado' : ''}
+        </div>
       </div>
-      <div class="tile-title" contenteditable="true" data-piece-edit="title">${escapeHtml(t.title)}</div>
-      <div class="tile-badges">
-        ${m ? `<span class="tile-avatar" style="background:${m.color}" title="${escapeAttr(m.name)}">${initials(m.name)}</span>` : '<span class="tile-avatar unassigned" title="Sin asignar">?</span>'}
-        <span class="tile-statusdot ${t.status==='listo'?'listo':'pendiente'}" title="${t.status==='listo'?'Listo':'Pendiente'}"></span>
-        ${t.approved ? '<span class="tile-approved" title="Aprobado">✓</span>' : ''}
-        ${t.platform ? `<span class="tile-plat">${escapeHtml(t.platform)}</span>` : ''}
-        ${ccount ? `<span class="tile-comments" title="${ccount} comentarios">💬${ccount}</span>` : ''}
-        ${stock === 'out' ? '<span class="tile-stockwarn" title="Producto agotado">⚠ AGOTADO</span>' : stock === 'low' ? '<span class="tile-stockwarn" style="background:var(--yellow-low)" title="Talla(s) sin stock">⚠ TALLA</span>' : ''}
-      </div>
-      <div class="tile-bottom">
-        ${COLOR_OPTIONS.map(c => `<span class="color-dot ${c} ${c===t.color?'active':''}" data-color="${c}" title="${c}"></span>`).join('')}
-      </div>
-      <div class="tile-actions">
-        <button class="tile-btn urls" data-action="urls" title="Abrir pieza">⚙</button>
-        <button class="tile-btn delete" data-action="delete" title="Eliminar">×</button>
+      <div class="today-card-actions">
+        <button class="today-card-btn" data-today-toggle>${isListo ? '✓ Listo' : 'Marcar listo'}</button>
+        <button class="today-card-edit" data-today-edit>Editar</button>
       </div>
     </div>`;
   }).join('');
-
-  const addHtml = `<button class="tile-add" id="tileAdd"><span class="plus">+</span><span class="add-label">Agregar</span></button>`;
-
-  // Feed REAL de Instagram (debajo de los drafts, solo en vista previa)
-  let realHtml = '';
-  if (feedPreview && state.igFeed && Array.isArray(state.igFeed.media) && state.igFeed.media.length){
-    const acct = state.igFeed.account && state.igFeed.account.username ? '@' + escapeHtml(state.igFeed.account.username) : 'Instagram';
-    let when = '';
-    if (state.igFeed.fetched_at){
-      try { when = ' · ' + new Date(state.igFeed.fetched_at).toLocaleString('es-CO', { day:'numeric', month:'short', hour:'2-digit', minute:'2-digit' }); } catch(_){}
-    }
-    realHtml = `<div class="feed-divider"><span>↑ DRAFTS PLANEADOS &nbsp;·&nbsp; PUBLICADO ${acct}${when} ↓</span></div>` +
-      state.igFeed.media.map(mm => {
-        const isVid = mm.media_type === 'VIDEO';
-        const img = isVid ? (mm.thumbnail_url || mm.media_url) : mm.media_url;
-        const cap = (mm.caption || '').replace(/\s+/g,' ').slice(0,140);
-        const badge = isVid ? '▶' : (mm.media_type === 'CAROUSEL_ALBUM' ? '▣' : '');
-        return `<a class="tile real-tile" href="${escapeAttr(mm.permalink || '#')}" target="_blank" rel="noopener" title="${escapeAttr(cap)}">
-          <img class="tile-photo" src="${escapeAttr(img)}" alt="" loading="lazy" onerror="this.style.display='none'">
-          ${badge ? `<span class="real-badge">${badge}</span>` : ''}
-          <span class="real-tag">REAL</span>
-        </a>`;
-      }).join('');
-  }
-
-  grid.innerHTML = draftsHtml + addHtml + realHtml;
-
-  grid.querySelectorAll('.tile[data-tile-id]').forEach(tileEl => {
-    const id = tileEl.getAttribute('data-tile-id');
-    tileEl.querySelector('[data-action="delete"]').addEventListener('click', e => { e.stopPropagation(); deletePiece(id); });
-    const urlsBtn = tileEl.querySelector('[data-action="urls"]');
-    if (urlsBtn) urlsBtn.addEventListener('click', e => { e.stopPropagation(); openUrlsModal(id); });
-    tileEl.querySelectorAll('.color-dot').forEach(dot => {
-      dot.addEventListener('click', e => {
-        e.stopPropagation();
-        const newColor = dot.getAttribute('data-color');
-        const piece = state.pieces.find(x => x.id === id);
-        if (!piece) return;
-        const updated = { ...piece, color: newColor };
-        state.pieces = state.pieces.map(x => x.id === id ? updated : x);
-        saveOnePiece(updated);
-        renderPiecesViews();
-      });
+  // Bind actions
+  list.querySelectorAll('.today-card').forEach(card => {
+    const id = card.getAttribute('data-piece-id');
+    card.querySelector('[data-today-edit]').addEventListener('click', e => { e.stopPropagation(); openUrlsModal(id); });
+    card.querySelector('[data-today-toggle]').addEventListener('click', e => {
+      e.stopPropagation();
+      const piece = state.pieces.find(x => x.id === id);
+      if (!piece) return;
+      const updated = { ...piece, status: piece.status === 'listo' ? 'pendiente' : 'listo' };
+      state.pieces = state.pieces.map(x => x.id === id ? updated : x);
+      saveOnePiece(updated);
+      renderPiecesViews();
+      renderToday();
     });
-    bindPieceTextEdit(tileEl, id);
-
-    if (canReorder){
-      tileEl.addEventListener('dragstart', e => {
-        dragSrcId = id;
-        tileEl.classList.add('dragging');
-        e.dataTransfer.effectAllowed = 'move';
-        try { e.dataTransfer.setData('text/plain', id); } catch(_){}
-      });
-      tileEl.addEventListener('dragend', () => {
-        tileEl.classList.remove('dragging');
-        grid.querySelectorAll('.tile.dragover').forEach(t => t.classList.remove('dragover'));
-      });
-      tileEl.addEventListener('dragover', e => {
-        e.preventDefault();
-        e.dataTransfer.dropEffect = 'move';
-        if (id !== dragSrcId) tileEl.classList.add('dragover');
-      });
-      tileEl.addEventListener('dragleave', () => tileEl.classList.remove('dragover'));
-      tileEl.addEventListener('drop', e => {
-        e.preventDefault();
-        tileEl.classList.remove('dragover');
-        if (!dragSrcId || dragSrcId === id) return;
-        reorderPieces(dragSrcId, id);
-        dragSrcId = null;
-      });
-    }
   });
-
-  const addBtn = document.getElementById('tileAdd');
-  if (addBtn) addBtn.addEventListener('click', () => addPiece(state.days[state.days.length-1].key));
-}
-
-let dragSrcId = null;
-function reorderPieces(srcId, targetId){
-  const arr = state.pieces.slice();
-  const from = arr.findIndex(p => p.id === srcId);
-  const to = arr.findIndex(p => p.id === targetId);
-  if (from === -1 || to === -1) return;
-  const [moved] = arr.splice(from, 1);
-  arr.splice(to, 0, moved);
-  // reasignar position 0..n y persistir solo lo que cambió
-  const changed = [];
-  arr.forEach((p, idx) => {
-    if (p.position !== idx){ p.position = idx; changed.push(p); }
-  });
-  state.pieces = arr;
-  renderPiecesViews();
-  changed.forEach(p => saveOnePiece(p));
 }
 
 function updateStats(){
@@ -2120,8 +1945,18 @@ function openUrlsModal(pieceId){
   const modal = document.getElementById('urlsModal');
   modal.setAttribute('data-piece-id', pieceId);
   modal.querySelector('[data-modal-title]').textContent = piece.title || 'Pieza';
-  modal.querySelector('[data-modal-input="imageUrl"]').value = piece.imageUrl || '';
+  const imgInput = modal.querySelector('[data-modal-input="imageUrl"]');
+  imgInput.value = piece.imageUrl || '';
   modal.querySelector('[data-modal-input="refUrl"]').value = piece.refUrl || '';
+  // Render image preview
+  const renderImagePreview = (url) => {
+    const box = modal.querySelector('[data-pm-image-preview]');
+    if (!box) return;
+    if (!url){ box.innerHTML = ''; return; }
+    box.innerHTML = `<img src="${escapeAttr(url)}" alt="" onerror="this.parentElement.innerHTML='<div style=&quot;padding:14px;color:var(--grey);font-size:12px;font-style:italic&quot;>No se pudo cargar la imagen</div>'">`;
+  };
+  renderImagePreview(piece.imageUrl);
+  imgInput.addEventListener('input', () => renderImagePreview(imgInput.value.trim()), { once: false });
 
   // Assignee dropdown
   const assigneeSel = modal.querySelector('[data-pm="assignee"]');
@@ -2166,9 +2001,6 @@ function openUrlsModal(pieceId){
   prodInput.value = cp ? cp.title : '';
   renderModalInventory(piece.productGid);
 
-  // Comments
-  renderComments(pieceId);
-
   modal.classList.add('open');
 }
 function closeUrlsModal(){ document.getElementById('urlsModal').classList.remove('open'); }
@@ -2184,42 +2016,6 @@ function renderModalInventory(gid){
       const cls = s.available > 5 ? 'ok' : s.available >= 1 ? 'low' : 'out';
       return `<span class="size-chip ${cls}">${escapeHtml(s.size)}:${s.available}</span>`;
     }).join('') + `</div>`;
-}
-
-function renderComments(pieceId){
-  const box = document.querySelector('[data-pm-comments]');
-  const cnt = document.querySelector('[data-pm-ccount]');
-  if (!box) return;
-  const list = state.comments[pieceId] || [];
-  if (cnt) cnt.textContent = list.length ? `(${list.length})` : '';
-  if (!list.length){ box.innerHTML = '<div class="pm-comment-empty">Sin comentarios aún</div>'; return; }
-  box.innerHTML = list.map(c => {
-    const m = teamMember(c.author_email);
-    const name = m ? m.name : (c.author_email||'').split('@')[0];
-    const color = m ? m.color : '#7a7570';
-    const when = new Date(c.created_at).toLocaleString('es-CO', { day:'2-digit', month:'short', hour:'2-digit', minute:'2-digit' });
-    return `<div class="pm-comment">
-      <span class="pm-avatar" style="background:${color}">${initials(name)}</span>
-      <div class="pm-comment-body"><div class="pm-comment-meta">${escapeHtml(name)} · ${when}</div>${escapeHtml(c.body)}</div>
-    </div>`;
-  }).join('');
-  box.scrollTop = box.scrollHeight;
-}
-
-async function sendComment(){
-  const modal = document.getElementById('urlsModal');
-  const pieceId = modal.getAttribute('data-piece-id');
-  const input = modal.querySelector('[data-pm-comment-input]');
-  const body = (input.value || '').trim();
-  if (!body || !pieceId) return;
-  input.value = '';
-  const { error } = await supabase.from('calendar_comments').insert({
-    calendar_id: state.calendarId,
-    piece_id: pieceId,
-    author_email: state.user.email,
-    body
-  });
-  if (error){ console.error('Comment err', error); setSync('offline','Error al comentar'); input.value = body; }
 }
 
 function saveUrlsModal(){
@@ -2380,11 +2176,6 @@ if (urlsModalEl){
   });
   // Approve
   urlsModalEl.querySelector('[data-pm-approve]').addEventListener('click', toggleApprove);
-  // Comment send
-  urlsModalEl.querySelector('[data-pm-comment-send]').addEventListener('click', sendComment);
-  urlsModalEl.querySelector('[data-pm-comment-input]').addEventListener('keydown', e => {
-    if (e.key === 'Enter'){ e.preventDefault(); sendComment(); }
-  });
   // Product search live inventory preview
   urlsModalEl.querySelector('[data-pm="productSearch"]').addEventListener('input', e => {
     const txt = e.target.value.trim().toLowerCase();
@@ -2396,25 +2187,21 @@ document.addEventListener('keydown', e => {
   if (e.key === 'Escape' && urlsModalEl && urlsModalEl.classList.contains('open')) closeUrlsModal();
 });
 
-// Mis tareas toggle
+// "Ver semana completa" en la vista HOY
+const jumpWeekBtn = document.querySelector('[data-jump-week]');
+if (jumpWeekBtn){
+  jumpWeekBtn.addEventListener('click', () => switchView('calendar'));
+}
+
+// Mis tareas toggle — filtra las vistas (today + week + kanban + day cards) por user
 const mineToggleBtn = document.getElementById('mineToggle');
 if (mineToggleBtn){
   mineToggleBtn.addEventListener('click', () => {
     state.filterMine = !state.filterMine;
     mineToggleBtn.classList.toggle('active', state.filterMine);
     mineToggleBtn.textContent = state.filterMine ? '◴ Mis tareas (ON)' : '◴ Mis tareas';
-    renderParrilla();
-  });
-}
-
-// Vista previa feed (estilo Instagram) toggle
-const previewToggleBtn = document.getElementById('previewToggle');
-if (previewToggleBtn){
-  previewToggleBtn.addEventListener('click', () => {
-    feedPreview = !feedPreview;
-    previewToggleBtn.classList.toggle('active', feedPreview);
-    previewToggleBtn.textContent = feedPreview ? '▦ Vista previa feed (ON)' : '▦ Vista previa feed';
-    renderParrilla();
+    renderPiecesViews();
+    renderToday();
   });
 }
 
