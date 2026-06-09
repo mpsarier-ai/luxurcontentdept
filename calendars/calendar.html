@@ -73,9 +73,10 @@ html,body{background:var(--cream);color:var(--black);font-family:'Outfit',sans-s
 .section-title .meta{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:var(--grey);font-style:normal;font-weight:400}
 
 /* WEEK GRID */
-.week-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:1px;background:var(--black);border:1px solid var(--black);margin-bottom:64px}
-.day-cell{background:var(--cream);min-height:200px;display:flex;flex-direction:column}
-.day-head{padding:10px 12px 8px;border-bottom:1px solid var(--cream-dark);display:flex;justify-content:space-between;align-items:baseline}
+.week-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:10px;margin-bottom:64px}
+.day-cell{background:#fff;border:1px solid rgba(0,0,0,.04);border-radius:14px;min-height:200px;display:flex;flex-direction:column;box-shadow:0 1px 3px rgba(0,0,0,.04);overflow:hidden;transition:box-shadow .25s cubic-bezier(.16,1,.3,1)}
+.day-cell:hover{box-shadow:0 4px 12px rgba(0,0,0,.06)}
+.day-head{padding:12px 14px 10px;border-bottom:1px solid rgba(0,0,0,.04);display:flex;justify-content:space-between;align-items:baseline}
 .day-head-link{cursor:pointer;transition:background .15s;position:relative}
 .day-head-link:hover{background:var(--rosa)}
 .day-head-link .goto-hint{font-family:'JetBrains Mono',monospace;font-size:8px;letter-spacing:.1em;text-transform:uppercase;color:var(--rosa-deep);opacity:0;transition:opacity .15s;position:absolute;right:10px;bottom:9px}
@@ -85,7 +86,7 @@ html,body{background:var(--cream);color:var(--black);font-family:'Outfit',sans-s
 .day-head .dow{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:var(--grey)}
 .day-head .dnum{font-family:'Cormorant Garamond',serif;font-weight:700;font-size:24px}
 .day-events{padding:8px;display:flex;flex-direction:column;gap:6px;flex:1}
-.evt{font-family:'Outfit',sans-serif;font-size:11px;padding:6px 8px;border-radius:2px;line-height:1.3;position:relative;cursor:text}
+.evt{font-family:'Outfit',sans-serif;font-size:11px;padding:8px 10px;border-radius:10px;line-height:1.3;position:relative;cursor:text;box-shadow:0 1px 2px rgba(0,0,0,.04)}
 .evt-launch{background:var(--black);color:var(--cream)}
 .evt-preorden{background:var(--rosa);color:var(--black)}
 .evt-push{background:var(--cream-dark);color:var(--black)}
@@ -104,9 +105,10 @@ html,body{background:var(--cream);color:var(--black);font-family:'Outfit',sans-s
 
 /* DAY DETAIL CARDS */
 .day-cards{display:flex;flex-direction:column;gap:24px;margin-bottom:64px}
-.day-card{background:#fff;border:1px solid var(--black);padding:32px;display:grid;grid-template-columns:160px 1fr 280px;gap:32px}
+.day-card{background:#fff;border:1px solid rgba(0,0,0,.04);border-radius:18px;padding:22px;display:grid;grid-template-columns:140px 1fr 260px;gap:24px;box-shadow:0 1px 3px rgba(0,0,0,.04),0 4px 16px rgba(0,0,0,.05);transition:box-shadow .25s cubic-bezier(.16,1,.3,1)}
+.day-card:hover{box-shadow:0 4px 12px rgba(0,0,0,.08),0 8px 24px rgba(0,0,0,.06)}
 .day-card .day-marker .dow-large{font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:var(--grey)}
-.day-card .day-marker .dnum-large{font-family:'Cormorant Garamond',serif;font-weight:900;font-size:88px;line-height:.85;font-style:italic;margin-top:4px}
+.day-card .day-marker .dnum-large{font-family:'Cormorant Garamond',serif;font-weight:700;font-size:64px;line-height:.95;font-style:italic;margin-top:4px;color:var(--black);letter-spacing:-.02em}
 .day-card .day-marker .focus{font-family:'Outfit',sans-serif;font-size:11px;text-transform:uppercase;letter-spacing:.12em;margin-top:12px;color:var(--rosa-deep);font-weight:500;outline:none}
 .day-card .day-marker .focus:focus{background:rgba(232,165,173,.12)}
 .day-card .day-marker .focus:empty::before{content:'+ tema';color:var(--cream-dark)}
@@ -119,9 +121,9 @@ html,body{background:var(--cream);color:var(--black);font-family:'Outfit',sans-s
 .day-card .content-block .copy{font-size:14px;line-height:1.55;margin-bottom:16px;color:#333;outline:none}
 .day-card .content-block .copy:focus{background:rgba(232,165,173,.12)}
 .day-card .content-block .copy:empty::before{content:attr(data-ph);color:var(--cream-dark);font-style:italic}
-.block-label{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:#fff;background:var(--black);padding:5px 10px;display:inline-block;margin-bottom:12px}
-.block-label.pieces-label{margin-top:22px;background:var(--rosa-deep)}
-.block-label .day-count{opacity:.8;font-weight:400}
+.block-label{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:var(--grey);background:transparent;padding:0;display:inline-flex;align-items:center;gap:6px;margin-bottom:12px;font-weight:500}
+.block-label.pieces-label{margin-top:0;color:var(--rosa-deep)}
+.block-label .day-count{opacity:.8;font-weight:400;color:var(--grey)}
 .piece-list{display:flex;flex-direction:column;gap:14px;padding-top:4px}
 .piece{display:grid;grid-template-columns:90px 1fr 24px;gap:14px;align-items:start;position:relative}
 .piece .ptype{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--grey);padding-top:2px;outline:none}
@@ -137,7 +139,8 @@ html,body{background:var(--cream);color:var(--black);font-family:'Outfit',sans-s
 .add-piece-btn:hover{background:var(--rosa);color:var(--black)}
 
 /* SHOPIFY SIDE PANEL */
-.shopify-panel{background:var(--cream);padding:20px;border-left:3px solid var(--rosa-deep)}
+.shopify-panel{background:var(--cream);border-radius:14px;padding:18px;border:1px solid rgba(212,132,142,.18);position:relative}
+.shopify-panel::before{content:'';position:absolute;left:0;top:14px;bottom:14px;width:3px;background:var(--rosa-deep);border-radius:0 2px 2px 0}
 .shopify-panel .panel-title{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:var(--grey);margin-bottom:14px;display:flex;align-items:center;gap:6px}
 .shopify-panel .panel-title::before{content:'●';color:var(--rosa-deep);font-size:14px}
 .shopify-panel .panel-empty{font-size:11px;color:var(--grey);font-style:italic;line-height:1.4}
@@ -182,6 +185,11 @@ html,body{background:var(--cream);color:var(--black);font-family:'Outfit',sans-s
 .midcheck-block li::before{content:'—';position:absolute;left:0;color:var(--rosa-hot)}
 .midcheck-block li:focus{background:rgba(255,255,255,.08)}
 .midcheck-block li:empty::before{content:'— +';color:var(--rosa-hot);opacity:.5}
+
+/* FAB central · botón "+" en el nav-bar */
+.fab-add{width:48px;height:48px;border-radius:50%;background:var(--rosa-deep);color:#fff;border:none;font-size:24px;font-weight:300;line-height:1;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 12px rgba(212,132,142,.4),0 1px 3px rgba(0,0,0,.08);flex-shrink:0;transition:transform .2s cubic-bezier(.34,1.56,.64,1),background .2s;-webkit-tap-highlight-color:transparent}
+.fab-add:hover{background:var(--black);transform:scale(1.05)}
+.fab-add:active{transform:scale(.92)}
 
 /* IMAGE PREVIEW dentro del modal de pieza */
 .pm-image-preview{margin-bottom:10px}
@@ -301,17 +309,19 @@ select.pm-input{cursor:pointer}
 
 /* KANBAN */
 .kanban-board{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:64px}
-.kanban-col{background:var(--cream-dark);border:1px solid var(--black);display:flex;flex-direction:column;min-height:300px}
-.kanban-col-head{padding:12px 14px;font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.15em;text-transform:uppercase;border-bottom:1px solid var(--black);display:flex;justify-content:space-between;align-items:center}
-.kanban-col-head .kc-count{background:var(--black);color:var(--cream);padding:2px 8px;border-radius:10px;font-size:10px}
-.kanban-col[data-col="pendiente"] .kanban-col-head{background:var(--yellow-low);color:#fff}
-.kanban-col[data-col="listo"] .kanban-col-head{background:var(--green-ok);color:#fff}
-.kanban-col[data-col="aprobado"] .kanban-col-head{background:var(--black);color:var(--cream)}
+.kanban-col{background:#fff;border:1px solid rgba(0,0,0,.04);border-radius:18px;display:flex;flex-direction:column;min-height:300px;box-shadow:0 1px 3px rgba(0,0,0,.04),0 4px 16px rgba(0,0,0,.05);overflow:hidden}
+.kanban-col-head{padding:14px 18px;font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.15em;text-transform:uppercase;border-bottom:1px solid rgba(0,0,0,.05);display:flex;justify-content:space-between;align-items:center;font-weight:500}
+.kanban-col-head .kc-count{background:rgba(0,0,0,.06);color:var(--black);padding:3px 10px;border-radius:999px;font-size:10px;font-weight:500}
+.kanban-col[data-col="pendiente"] .kanban-col-head{color:var(--yellow-low)}
+.kanban-col[data-col="listo"] .kanban-col-head{color:var(--green-ok)}
+.kanban-col[data-col="aprobado"] .kanban-col-head{color:var(--rosa-deep)}
 .kanban-cards{padding:10px;display:flex;flex-direction:column;gap:8px;flex:1}
 .kanban-add{margin-top:6px;padding:9px;background:transparent;border:1px dashed var(--rosa-deep);color:var(--rosa-deep);font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.1em;text-transform:uppercase;cursor:pointer;border-radius:2px;transition:background .15s}
 .kanban-add:hover{background:var(--rosa);color:var(--black)}
-.kanban-card{background:#fff;border:1px solid var(--cream-dark);border-left:4px solid var(--rosa-deep);padding:12px;cursor:pointer;transition:box-shadow .15s}
-.kanban-card:hover{box-shadow:0 3px 10px rgba(0,0,0,.12)}
+.kanban-card{background:#fff;border:1px solid rgba(0,0,0,.05);border-radius:12px;padding:14px;cursor:pointer;box-shadow:0 1px 3px rgba(0,0,0,.04);transition:transform .2s cubic-bezier(.16,1,.3,1),box-shadow .2s;position:relative}
+.kanban-card::before{content:'';position:absolute;left:0;top:14px;bottom:14px;width:3px;background:var(--rosa-deep);border-radius:0 2px 2px 0}
+.kanban-card:hover{transform:translateY(-1px);box-shadow:0 4px 12px rgba(0,0,0,.08)}
+.kanban-card:active{transform:scale(.98)}
 .kanban-card .kc-day{font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:var(--grey)}
 .kanban-card .kc-title{font-family:'Cormorant Garamond',serif;font-weight:700;font-size:16px;line-height:1.2;margin:4px 0 8px}
 .kanban-card .kc-foot{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
@@ -324,9 +334,10 @@ select.pm-input{cursor:pointer}
 .inv-sort{display:flex;gap:2px;border:1px solid var(--black)}
 .inv-sort-btn{padding:8px 12px;background:#fff;border:none;cursor:pointer;font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--grey)}
 .inv-sort-btn.active{background:var(--black);color:var(--cream)}
-.inv-list{display:flex;flex-direction:column;gap:1px;background:var(--black);border:1px solid var(--black);margin-bottom:64px}
-.inv-row{background:#fff;padding:14px 18px;display:flex;align-items:center;gap:16px}
-.inv-row .inv-total{font-family:'Cormorant Garamond',serif;font-weight:900;font-size:28px;font-style:italic;width:60px;text-align:center;flex-shrink:0}
+.inv-list{display:flex;flex-direction:column;gap:10px;margin-bottom:64px}
+.inv-row{background:#fff;border:1px solid rgba(0,0,0,.04);border-radius:14px;padding:14px 18px;display:flex;align-items:center;gap:16px;box-shadow:0 1px 3px rgba(0,0,0,.04);transition:transform .2s cubic-bezier(.16,1,.3,1)}
+.inv-row:hover{transform:translateY(-1px);box-shadow:0 4px 12px rgba(0,0,0,.06)}
+.inv-row .inv-total{font-family:'Cormorant Garamond',serif;font-weight:700;font-size:28px;font-style:italic;width:54px;text-align:center;flex-shrink:0;line-height:1}
 .inv-row.lowstock .inv-total{color:var(--red-out)}
 .inv-row.midstock .inv-total{color:var(--yellow-low)}
 .inv-row.okstock .inv-total{color:var(--green-ok)}
@@ -334,23 +345,25 @@ select.pm-input{cursor:pointer}
 .inv-row .inv-sizes{display:flex;gap:4px;flex-wrap:wrap}
 .inv-sales{display:block;font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--grey);margin-top:3px;letter-spacing:.04em}
 .inv-sales.zero{color:var(--red-out);font-weight:500}
-.inv-row.quedada{background:#fff5f4;border-left:4px solid var(--red-out)}
+.inv-row.quedada{background:#fff5f4;border-color:rgba(184,80,74,.25);position:relative}
+.inv-row.quedada::before{content:'';position:absolute;left:0;top:14px;bottom:14px;width:3px;background:var(--red-out);border-radius:0 2px 2px 0}
 
 /* WEEK ALERTS */
-.wk-alerts{display:flex;flex-direction:column;gap:8px;margin-bottom:24px}
-.wk-alert{padding:14px 18px;font-family:'Outfit',sans-serif;font-size:14px;line-height:1.4;border-left:4px solid var(--black)}
+.wk-alerts{display:flex;flex-direction:column;gap:10px;margin-bottom:24px}
+.wk-alert{padding:14px 18px;font-family:'Outfit',sans-serif;font-size:14px;line-height:1.4;border-radius:14px;position:relative;padding-left:24px;box-shadow:0 1px 3px rgba(0,0,0,.04)}
+.wk-alert::before{content:'';position:absolute;left:12px;top:14px;bottom:14px;width:3px;background:var(--rosa-deep);border-radius:0 2px 2px 0}
 .wk-alert b{font-weight:600}
-.wk-alert.launch{background:#1a1a1a;color:var(--cream);border-left-color:var(--rosa-deep)}
-.wk-alert.restock{background:var(--rosa);color:#1a1a1a;border-left-color:var(--rosa-deep)}
-.wk-alert.photo{background:var(--cream-dark);color:#1a1a1a;border-left-color:var(--rosa-deep)}
+.wk-alert.launch{background:var(--black);color:var(--cream)}
+.wk-alert.restock{background:var(--rosa);color:var(--black)}
+.wk-alert.photo{background:var(--cream-dark);color:var(--black)}
 
 /* DASHBOARD SEMANAL */
-.dash{display:grid;grid-template-columns:1.1fr 2fr;gap:1px;background:var(--black);border:1px solid var(--black);margin-bottom:32px}
-.dash-block{background:#fff;padding:20px}
-.dash-block h4{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:var(--grey);margin-bottom:14px}
-.dash-progress{height:10px;background:var(--cream-dark);border-radius:5px;overflow:hidden;margin-bottom:8px}
-.dash-progress-bar{height:100%;background:var(--green-ok);transition:width .3s}
-.dash-pct{font-family:'Cormorant Garamond',serif;font-weight:900;font-size:38px;font-style:italic;line-height:1}
+.dash{display:grid;grid-template-columns:1.1fr 2fr;gap:14px;margin-bottom:32px}
+.dash-block{background:#fff;border:1px solid rgba(0,0,0,.04);border-radius:18px;padding:22px;box-shadow:0 1px 3px rgba(0,0,0,.04),0 4px 16px rgba(0,0,0,.05)}
+.dash-block h4{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:var(--grey);margin-bottom:14px;font-weight:500}
+.dash-progress{height:8px;background:var(--cream);border-radius:999px;overflow:hidden;margin-bottom:8px}
+.dash-progress-bar{height:100%;background:var(--green-ok);transition:width .3s;border-radius:999px}
+.dash-pct{font-family:'Cormorant Garamond',serif;font-weight:700;font-size:38px;font-style:italic;line-height:1;color:var(--black);letter-spacing:-.02em}
 .dash-stats{display:flex;gap:16px;margin-top:12px;flex-wrap:wrap}
 .dash-stat{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--grey)}
 .dash-stat strong{font-size:18px;color:var(--black);display:block;font-family:'Cormorant Garamond',serif;font-weight:700}
@@ -498,8 +511,9 @@ body{padding-top:env(safe-area-inset-top);padding-bottom:env(safe-area-inset-bot
   /* AVATAR rings rosa gradient (status: online) */
   .tile-avatar,.avatar,.team-avatar{box-shadow:0 0 0 2px var(--cream),0 0 0 4px var(--rosa-hot)!important;border-radius:50%}
 
-  /* BOTTOM TAB BAR: icons scale al activo + tab grande */
-  .view-nav{padding:8px 0!important;padding-bottom:calc(8px + env(safe-area-inset-bottom))!important;background:rgba(255,255,255,.85)!important;backdrop-filter:saturate(200%) blur(28px)!important;-webkit-backdrop-filter:saturate(200%) blur(28px)!important;box-shadow:0 -1px 0 rgba(0,0,0,.06)}
+  /* BOTTOM TAB BAR: icons scale al activo + FAB raised en el centro */
+  .view-nav{padding:8px 0!important;padding-bottom:calc(8px + env(safe-area-inset-bottom))!important;background:rgba(255,255,255,.85)!important;backdrop-filter:saturate(200%) blur(28px)!important;-webkit-backdrop-filter:saturate(200%) blur(28px)!important;box-shadow:0 -1px 0 rgba(0,0,0,.06);align-items:center!important}
+  .view-nav .fab-add{width:56px;height:56px;font-size:28px;margin:-22px 8px 0;border:4px solid var(--cream);box-shadow:0 6px 18px rgba(212,132,142,.5),0 2px 6px rgba(0,0,0,.12);flex:0 0 auto!important}
   .view-nav .view-tab{font-size:11px!important;font-weight:500!important;gap:4px!important;transition:transform .2s cubic-bezier(.16,1,.3,1)!important}
   .view-nav .view-tab.active{color:var(--rosa-deep)!important;font-weight:700!important;transform:scale(1.05)}
   .view-nav .view-tab.active::before{content:'';position:absolute;top:0;left:50%;transform:translateX(-50%);width:24px;height:3px;background:var(--rosa-deep);border-radius:0 0 4px 4px;animation:llTabBar .25s cubic-bezier(.16,1,.3,1)}
@@ -516,8 +530,8 @@ body{padding-top:env(safe-area-inset-top);padding-bottom:env(safe-area-inset-bot
   .live-dot,.status-dot.online,.tile-statusdot.listo{animation:llPulse 2s ease-in-out infinite}
   @keyframes llPulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.65;transform:scale(1.15)}}
 
-  /* FLOATING ACTION BUTTON estilo IG/Material */
-  .day-add-piece,.add-piece-btn{position:fixed!important;bottom:calc(90px + env(safe-area-inset-bottom))!important;right:16px!important;width:56px!important;height:56px!important;min-height:56px!important;padding:0!important;border-radius:50%!important;background:var(--rosa-deep)!important;color:#fff!important;font-size:22px!important;font-weight:300!important;box-shadow:0 6px 20px rgba(212,132,142,.45),0 2px 6px rgba(0,0,0,.1)!important;z-index:45;display:flex;align-items:center;justify-content:center;border:none!important;animation:llFAB .5s cubic-bezier(.34,1.56,.64,1) both;animation-delay:.3s}
+  /* Add-piece buttons inline (no FAB per-day — usamos el FAB central del nav-bar) */
+  .day-add-piece,.add-piece-btn{position:relative!important;width:100%!important;height:auto!important;border-radius:12px!important;background:transparent!important;border:1px dashed var(--rosa-deep)!important;color:var(--rosa-deep)!important;padding:12px!important;font-size:11px!important;letter-spacing:.12em;text-transform:uppercase;font-weight:500}
   @keyframes llFAB{from{transform:scale(0) rotate(-90deg);opacity:0}to{transform:scale(1) rotate(0);opacity:1}}
 
   /* PARRILLA tiles con más prominence */
@@ -633,6 +647,7 @@ body{padding-top:env(safe-area-inset-top);padding-bottom:env(safe-area-inset-bot
   <div class="view-nav">
     <button class="view-tab active" data-view="today">⭐ Hoy</button>
     <button class="view-tab" data-view="calendar">📅 Semana</button>
+    <button class="fab-add" id="fabAdd" aria-label="Agregar pieza" title="Agregar pieza">+</button>
     <button class="view-tab" data-view="kanban">📋 Kanban</button>
     <button class="view-tab" data-view="inventory">📦 Inventario</button>
   </div>
@@ -2191,6 +2206,21 @@ document.addEventListener('keydown', e => {
 const jumpWeekBtn = document.querySelector('[data-jump-week]');
 if (jumpWeekBtn){
   jumpWeekBtn.addEventListener('click', () => switchView('calendar'));
+}
+
+// FAB central "+" agrega una pieza al día actual (si está en esta semana) o al primer día
+const fabAddBtn = document.getElementById('fabAdd');
+if (fabAddBtn){
+  fabAddBtn.addEventListener('click', () => {
+    if (!state.days.length) return;
+    const now = new Date();
+    const todayDay = state.days.find(d => {
+      const dt = d.dateObj;
+      return dt.getFullYear() === now.getFullYear() && dt.getMonth() === now.getMonth() && dt.getDate() === now.getDate();
+    });
+    const targetKey = todayDay ? todayDay.key : state.days[0].key;
+    addPiece(targetKey);
+  });
 }
 
 // Mis tareas toggle — filtra las vistas (today + week + kanban + day cards) por user
