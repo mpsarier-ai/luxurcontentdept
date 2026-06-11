@@ -191,10 +191,21 @@ html,body{background:var(--cream);color:var(--black);font-family:'Outfit',sans-s
 .fab-add:hover{background:var(--black);transform:scale(1.05)}
 .fab-add:active{transform:scale(.92)}
 
-/* IMAGE PREVIEW dentro del modal de pieza */
-.pm-image-preview{margin-bottom:10px}
-.pm-image-preview img{display:block;width:100%;max-height:280px;object-fit:cover;border-radius:10px;background:var(--cream-dark);border:1px solid var(--cream-dark)}
+/* IMAGE PREVIEW dentro del modal de pieza · soporta carruseles laterales */
+.pm-image-preview{margin-bottom:10px;position:relative}
 .pm-image-preview:empty{display:none}
+.pm-image-scroll{display:block;width:100%;overflow-x:auto;overflow-y:hidden;-webkit-overflow-scrolling:touch;background:var(--cream-dark);border:1px solid var(--cream-dark);border-radius:10px;scrollbar-width:thin}
+.pm-image-scroll::-webkit-scrollbar{height:6px}
+.pm-image-scroll::-webkit-scrollbar-thumb{background:var(--rosa-deep);border-radius:999px}
+.pm-image-scroll img{display:block;height:360px;width:auto;max-width:none;cursor:zoom-in}
+.pm-image-hint{position:absolute;top:10px;right:10px;background:rgba(0,0,0,.55);color:#fff;font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:.1em;text-transform:uppercase;padding:5px 9px;border-radius:999px;pointer-events:none;backdrop-filter:blur(6px)}
+/* Modal fullscreen viewer del carrusel */
+.img-fs{position:fixed;inset:0;background:rgba(0,0,0,.92);z-index:9999;display:none;align-items:center;justify-content:center;padding:20px;overflow:hidden;flex-direction:column;gap:14px}
+.img-fs.open{display:flex}
+.img-fs-scroll{flex:1;width:100%;overflow-x:auto;overflow-y:auto;display:flex;align-items:center;-webkit-overflow-scrolling:touch}
+.img-fs-scroll img{height:auto;max-height:100%;width:auto;display:block;margin:0 auto}
+.img-fs-close{position:absolute;top:max(20px,env(safe-area-inset-top));right:20px;width:44px;height:44px;border-radius:50%;background:rgba(255,255,255,.18);color:#fff;border:none;font-size:22px;cursor:pointer;backdrop-filter:blur(10px);display:flex;align-items:center;justify-content:center;line-height:1}
+.img-fs-hint{color:rgba(255,255,255,.7);font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.1em;text-transform:uppercase}
 
 /* VISTA HOY */
 .today-head{display:flex;justify-content:space-between;align-items:flex-end;gap:14px;margin-bottom:16px;flex-wrap:wrap}
@@ -2050,12 +2061,23 @@ function openUrlsModal(pieceId){
   const imgInput = modal.querySelector('[data-modal-input="imageUrl"]');
   imgInput.value = piece.imageUrl || '';
   modal.querySelector('[data-modal-input="refUrl"]').value = piece.refUrl || '';
-  // Render image preview
+  // Render image preview (con scroll horizontal para carruseles laterales)
   const renderImagePreview = (url) => {
     const box = modal.querySelector('[data-pm-image-preview]');
     if (!box) return;
     if (!url){ box.innerHTML = ''; return; }
-    box.innerHTML = `<img src="${escapeAttr(url)}" alt="" onerror="this.parentElement.innerHTML='<div style=&quot;padding:14px;color:var(--grey);font-size:12px;font-style:italic&quot;>No se pudo cargar la imagen</div>'">`;
+    box.innerHTML = `<div class="pm-image-scroll" data-pm-scroll><img src="${escapeAttr(url)}" alt="" onload="this.dataset.loaded='1'" onerror="this.parentElement.parentElement.innerHTML='<div style=&quot;padding:14px;color:var(--grey);font-size:12px;font-style:italic&quot;>No se pudo cargar la imagen</div>'"></div><span class="pm-image-hint" data-pm-hint>↔ swipe · toca para agrandar</span>`;
+    const img = box.querySelector('img');
+    if (img){
+      img.addEventListener('click', () => openImageFullscreen(url));
+      img.addEventListener('load', () => {
+        // Si el aspect ratio es ~normal (no carrusel lateral), ocultar el hint
+        if (img.naturalWidth && img.naturalHeight && img.naturalWidth / img.naturalHeight < 1.6){
+          const hint = box.querySelector('[data-pm-hint]');
+          if (hint) hint.textContent = 'toca para agrandar';
+        }
+      });
+    }
   };
   renderImagePreview(piece.imageUrl);
   imgInput.addEventListener('input', () => renderImagePreview(imgInput.value.trim()), { once: false });
@@ -2345,6 +2367,34 @@ boot().catch(err => {
   console.error('Boot error', err);
   setSync('offline','Error al iniciar: ' + err.message);
 });
+
+
+// === FULLSCREEN VIEWER pa carruseles ===
+function openImageFullscreen(url){
+  let fs = document.getElementById('imgFs');
+  if (!fs){
+    fs = document.createElement('div');
+    fs.id = 'imgFs';
+    fs.className = 'img-fs';
+    fs.innerHTML = `
+      <button class="img-fs-close" aria-label="Cerrar">×</button>
+      <div class="img-fs-scroll"><img alt=""></div>
+      <div class="img-fs-hint">↔ desliza para ver el carrusel completo</div>
+    `;
+    document.body.appendChild(fs);
+    fs.querySelector('.img-fs-close').addEventListener('click', closeImageFullscreen);
+    fs.addEventListener('click', e => { if (e.target === fs) closeImageFullscreen(); });
+  }
+  fs.querySelector('img').src = url;
+  fs.classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+function closeImageFullscreen(){
+  const fs = document.getElementById('imgFs');
+  if (fs){ fs.classList.remove('open'); }
+  document.body.style.overflow = '';
+}
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeImageFullscreen(); });
 </script>
 
 </body>
