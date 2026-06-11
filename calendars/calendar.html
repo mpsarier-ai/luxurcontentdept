@@ -197,7 +197,7 @@ html,body{background:var(--cream);color:var(--black);font-family:'Outfit',sans-s
 .pm-image-scroll{display:block;width:100%;overflow-x:auto;overflow-y:hidden;-webkit-overflow-scrolling:touch;background:var(--cream-dark);border:1px solid var(--cream-dark);border-radius:10px;scrollbar-width:thin;scroll-snap-type:x mandatory}
 .pm-image-scroll::-webkit-scrollbar{height:6px}
 .pm-image-scroll::-webkit-scrollbar-thumb{background:var(--rosa-deep);border-radius:999px}
-.pm-image-scroll img{display:block;height:min(520px,70vh);width:auto;max-width:none;cursor:zoom-in;image-rendering:auto;image-rendering:-webkit-optimize-contrast;image-rendering:high-quality;-webkit-user-drag:none}
+.pm-image-scroll img{display:block;max-height:min(560px,72vh);height:auto;width:auto;max-width:none;cursor:zoom-in;-webkit-user-drag:none}
 .pm-image-hint{position:absolute;top:10px;right:10px;background:rgba(0,0,0,.55);color:#fff;font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:.1em;text-transform:uppercase;padding:5px 9px;border-radius:999px;pointer-events:none;backdrop-filter:blur(6px);z-index:3}
 .pm-video-frame{position:relative;width:100%;aspect-ratio:9/16;max-height:520px;border-radius:10px;overflow:hidden;background:#000;border:1px solid var(--cream-dark)}
 .pm-video-frame.landscape{aspect-ratio:16/9}
@@ -206,8 +206,9 @@ html,body{background:var(--cream);color:var(--black);font-family:'Outfit',sans-s
 /* Modal fullscreen viewer del carrusel */
 .img-fs{position:fixed;inset:0;background:rgba(0,0,0,.96);z-index:9999;display:none;align-items:center;justify-content:center;overflow:hidden;flex-direction:column;gap:8px}
 .img-fs.open{display:flex}
-.img-fs-scroll{flex:1;width:100%;height:100%;overflow-x:auto;overflow-y:auto;display:flex;align-items:center;-webkit-overflow-scrolling:touch;padding:env(safe-area-inset-top) 0 env(safe-area-inset-bottom)}
-.img-fs-scroll img{height:100vh;max-height:100vh;width:auto;display:block;margin:0 auto;image-rendering:auto;image-rendering:-webkit-optimize-contrast;image-rendering:high-quality;-webkit-user-drag:none}
+.img-fs-scroll{flex:1;width:100%;height:100%;overflow-x:auto;overflow-y:hidden;display:block;-webkit-overflow-scrolling:touch}
+.img-fs-scroll-inner{display:flex;align-items:center;justify-content:flex-start;min-width:100%;min-height:100%;padding:env(safe-area-inset-top) 0 env(safe-area-inset-bottom)}
+.img-fs-scroll img{display:block;max-height:calc(100vh - env(safe-area-inset-top) - env(safe-area-inset-bottom));height:auto;width:auto;max-width:none;-webkit-user-drag:none;flex-shrink:0}
 .img-fs-close{position:absolute;top:max(20px,env(safe-area-inset-top));right:20px;width:44px;height:44px;border-radius:50%;background:rgba(255,255,255,.18);color:#fff;border:none;font-size:22px;cursor:pointer;backdrop-filter:blur(10px);display:flex;align-items:center;justify-content:center;line-height:1;z-index:2}
 .img-fs-hint{position:absolute;bottom:max(20px,env(safe-area-inset-bottom));left:50%;transform:translateX(-50%);color:rgba(255,255,255,.7);font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.1em;text-transform:uppercase;background:rgba(0,0,0,.5);padding:6px 12px;border-radius:999px;backdrop-filter:blur(6px)}
 
@@ -2410,7 +2411,7 @@ function openImageFullscreen(url){
     fs.className = 'img-fs';
     fs.innerHTML = `
       <button class="img-fs-close" aria-label="Cerrar">×</button>
-      <div class="img-fs-scroll"><img alt=""></div>
+      <div class="img-fs-scroll"><div class="img-fs-scroll-inner"><img alt=""></div></div>
       <div class="img-fs-hint">↔ desliza para ver el carrusel completo</div>
     `;
     document.body.appendChild(fs);
