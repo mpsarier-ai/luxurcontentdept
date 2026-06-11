@@ -197,8 +197,14 @@ html,body{background:var(--cream);color:var(--black);font-family:'Outfit',sans-s
 .pm-image-preview:empty{display:none}
 
 /* VISTA HOY */
-.today-head{display:flex;justify-content:space-between;align-items:flex-end;gap:14px;margin-bottom:24px;flex-wrap:wrap}
-.today-title{font-family:'Cormorant Garamond',serif;font-size:36px;line-height:1;font-weight:700;letter-spacing:-.02em;margin:0}
+.today-head{display:flex;justify-content:space-between;align-items:flex-end;gap:14px;margin-bottom:16px;flex-wrap:wrap}
+.today-title{font-family:'Cormorant Garamond',serif;font-size:36px;line-height:1;font-weight:700;letter-spacing:-.02em;margin:0;display:flex;align-items:baseline;gap:10px}
+.today-title .today-dnum{font-size:48px;color:var(--rosa-deep)}
+.today-title .today-chip{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.18em;background:var(--rosa-deep);color:#fff;padding:3px 9px;border-radius:999px;font-weight:500;align-self:center}
+.today-day-nav{display:flex;justify-content:center;gap:8px;margin-bottom:24px;padding:8px 0;touch-action:pan-y}
+.today-dot{width:8px;height:8px;border-radius:50%;background:rgba(0,0,0,.12);cursor:pointer;transition:all .2s cubic-bezier(.16,1,.3,1)}
+.today-dot:hover{background:rgba(0,0,0,.25);transform:scale(1.2)}
+.today-dot.active{background:var(--rosa-deep);width:24px;border-radius:999px}
 .today-jump{background:transparent;border:none;font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--rosa-deep);cursor:pointer;padding:8px 0}
 .today-jump:hover{color:var(--black)}
 .today-list{display:flex;flex-direction:column;gap:14px}
@@ -212,10 +218,15 @@ html,body{background:var(--cream);color:var(--black);font-family:'Outfit',sans-s
 .today-card-title{font-family:'Cormorant Garamond',serif;font-weight:700;font-size:18px;line-height:1.2;color:var(--black);margin-bottom:6px}
 .today-card-meta{display:flex;gap:8px;align-items:center;font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--grey)}
 .today-card-actions{display:flex;flex-direction:column;gap:6px;align-items:flex-end}
-.today-card-btn{background:var(--rosa-deep);color:#fff;border:none;padding:8px 14px;border-radius:999px;font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.1em;text-transform:uppercase;cursor:pointer;font-weight:600;min-height:34px}
+.today-card-btn{background:var(--rosa-deep);color:#fff;border:none;padding:8px 14px;border-radius:999px;font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.1em;text-transform:uppercase;cursor:pointer;font-weight:600;min-height:34px;white-space:nowrap}
 .today-card-btn:hover{background:var(--black)}
-.today-card.is-listo .today-card-btn{background:var(--grey)}
-.today-card-edit{background:transparent;border:1px solid var(--cream-dark);color:var(--black);padding:6px 10px;border-radius:999px;font-family:'JetBrains Mono',monospace;font-size:9px;cursor:pointer}
+.today-card-btn.is-listo{background:var(--grey)}
+.today-card-btn.approve{background:transparent;color:var(--black);border:1px solid var(--black)}
+.today-card-btn.approve:hover{background:var(--black);color:#fff}
+.today-card-btn.approve.is-approved{background:var(--green-ok);color:#fff;border-color:var(--green-ok)}
+.today-card.is-approved{border-color:rgba(90,122,79,.25);background:linear-gradient(to right,#fff 60%,rgba(90,122,79,.04))}
+.today-card-edit{background:transparent;border:1px solid var(--cream-dark);color:var(--black);padding:6px 10px;border-radius:999px;font-family:'JetBrains Mono',monospace;font-size:9px;cursor:pointer;min-height:30px;white-space:nowrap}
+.today-card-edit:hover{background:var(--cream)}
 
 /* SUMMARY BAR · stats + mine toggle */
 .summary-bar{display:flex;justify-content:space-between;align-items:center;gap:14px;flex-wrap:wrap;margin-bottom:28px;font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--grey)}
@@ -652,12 +663,13 @@ body{padding-top:env(safe-area-inset-top);padding-bottom:env(safe-area-inset-bot
     <button class="view-tab" data-view="inventory">📦 Inventario</button>
   </div>
 
-  <!-- VISTA HOY · piezas filtradas por fecha de hoy -->
+  <!-- VISTA HOY · piezas filtradas por día (swipe horizontal pa cambiar) -->
   <div id="todayView">
     <div class="today-head">
       <h2 class="today-title" id="todayTitle">Hoy</h2>
       <button class="today-jump" data-jump-week>Ver semana completa →</button>
     </div>
+    <div class="today-day-nav" id="todayDayNav" title="Swipe para navegar días"></div>
     <div id="todayList" class="today-list"></div>
   </div>
 
@@ -1138,6 +1150,9 @@ async function loadCalendar(){
   if (fieldsRes.error){ console.error('Load fields err', fieldsRes.error); }
 
   state.team = teamRes.data || [];
+  // Detectar rol del user actual — necesario para mostrar botón "Aprobar"
+  const myMember = state.user ? state.team.find(t => (t.email || '').toLowerCase() === state.user.email.toLowerCase()) : null;
+  state.userRole = myMember ? (myMember.role || null) : null;
   state.catalog = (catalogRes.data && Array.isArray(catalogRes.data.products)) ? catalogRes.data.products : [];
   state.pipeline = pipelineRes.data || [];
   state.igFeed = (igRes && igRes.data && igRes.data.data) ? igRes.data.data : null;
@@ -1609,6 +1624,12 @@ function renderWeekGrid(){
     bindPieceTextEdit(evt, pid);
     const delBtn = evt.querySelector('[data-piece-action="delete"]');
     if (delBtn) delBtn.addEventListener('click', e => { e.stopPropagation(); deletePiece(pid); });
+    // Click en cualquier parte del evento (que NO sea el título editable ni la X) abre el modal completo
+    evt.addEventListener('click', e => {
+      if (e.target.closest('[contenteditable], [data-piece-action]')) return;
+      openUrlsModal(pid);
+    });
+    evt.style.cursor = 'pointer';
   });
   grid.querySelectorAll('[data-add-day]').forEach(btn => {
     btn.addEventListener('click', () => addPiece(btn.getAttribute('data-add-day')));
@@ -1679,6 +1700,12 @@ function renderDayPieceLists(){
       bindPieceTextEdit(pEl, pid);
       const del = pEl.querySelector('[data-piece-action="delete"]');
       if (del) del.addEventListener('click', e => { e.stopPropagation(); deletePiece(pid); });
+      // Click en zona no-editable abre el modal
+      pEl.addEventListener('click', e => {
+        if (e.target.closest('[contenteditable], [data-piece-action]')) return;
+        openUrlsModal(pid);
+      });
+      pEl.style.cursor = 'pointer';
     });
     const addBtn = container.querySelector('[data-add-day]');
     if (addBtn) addBtn.addEventListener('click', () => addPiece(addBtn.getAttribute('data-add-day')));
@@ -1737,48 +1764,66 @@ function addPiece(day, opts){
 }
 
 // === RENDER HOY ===
-function renderToday(){
-  const list = document.getElementById('todayList');
-  const titleEl = document.getElementById('todayTitle');
-  if (!list || !state.days.length) return;
-  // Detectar el día actual del calendario
+// state.todayCursor = índice del día actualmente mostrado en la vista Hoy
+function getInitialDayIndex(){
   const now = new Date();
-  const today = state.days.find(d => {
+  const todayIdx = state.days.findIndex(d => {
     const dt = d.dateObj;
     return dt.getFullYear() === now.getFullYear() && dt.getMonth() === now.getMonth() && dt.getDate() === now.getDate();
   });
-  if (!today){
-    // El calendario abierto no es de esta semana — mostrar el primer día
-    titleEl.textContent = state.days[0].fullDow + ' ' + state.days[0].dnum;
-    list.innerHTML = `<div class="today-empty">Este calendario no incluye el día de hoy.<br>Tocá "Ver semana completa" para planear.</div>`;
-    return;
+  return todayIdx >= 0 ? todayIdx : 0;
+}
+function renderToday(){
+  const list = document.getElementById('todayList');
+  const titleEl = document.getElementById('todayTitle');
+  const wrap = document.getElementById('todayView');
+  if (!list || !state.days.length || !wrap) return;
+  if (typeof state.todayCursor !== 'number' || state.todayCursor < 0 || state.todayCursor >= state.days.length){
+    state.todayCursor = getInitialDayIndex();
   }
-  titleEl.textContent = today.fullDow + ' ' + today.dnum;
-  let pieces = state.pieces.filter(p => p.day === today.key);
+  const day = state.days[state.todayCursor];
+  // Detectar si el día mostrado es el de hoy de verdad
+  const now = new Date();
+  const isReallyToday = day.dateObj.getFullYear() === now.getFullYear()
+    && day.dateObj.getMonth() === now.getMonth()
+    && day.dateObj.getDate() === now.getDate();
+  titleEl.innerHTML = `${escapeHtml(day.fullDow)} <span class="today-dnum">${day.dnum}</span> ${isReallyToday ? '<span class="today-chip">HOY</span>' : ''}`;
+  // Render flechas prev/next + indicador
+  const navEl = document.getElementById('todayDayNav');
+  if (navEl){
+    navEl.innerHTML = state.days.map((d, i) => `<span class="today-dot ${i===state.todayCursor?'active':''}" data-day-idx="${i}" title="${escapeAttr(d.fullDow + ' ' + d.dnum)}"></span>`).join('');
+    navEl.querySelectorAll('[data-day-idx]').forEach(dot => {
+      dot.addEventListener('click', () => { state.todayCursor = parseInt(dot.getAttribute('data-day-idx')); renderToday(); });
+    });
+  }
+  let pieces = state.pieces.filter(p => p.day === day.key);
   if (state.filterMine && state.user){
     pieces = pieces.filter(p => p.assignee === state.user.email);
   }
   if (!pieces.length){
-    list.innerHTML = `<div class="today-empty">${state.filterMine ? 'No tenés piezas asignadas para hoy ✨' : 'Sin piezas planeadas para hoy.'}</div>`;
+    list.innerHTML = `<div class="today-empty">${state.filterMine ? 'No tenés piezas asignadas en este día ✨' : 'Sin piezas planeadas para este día.'}</div>`;
     return;
   }
+  const canApprove = state.userRole === 'lead' || state.userRole === 'admin';
   list.innerHTML = pieces.map(p => {
     const m = p.assignee ? teamMember(p.assignee) : null;
     const thumbStyle = p.imageUrl ? `background-image:url('${escapeAttr(p.imageUrl)}')` : '';
     const thumbInner = p.imageUrl ? '' : escapeHtml((p.type || '').split(' ')[0] || '·');
     const isListo = p.status === 'listo' || p.approved;
-    return `<div class="today-card ${isListo ? 'is-listo' : ''}" data-piece-id="${p.id}">
+    const isApproved = !!p.approved;
+    return `<div class="today-card ${isListo ? 'is-listo' : ''} ${isApproved ? 'is-approved' : ''}" data-piece-id="${p.id}">
       <div class="today-card-thumb" style="${thumbStyle}">${thumbInner}</div>
       <div class="today-card-body">
         <div class="today-card-type">${escapeHtml(p.type || 'Pieza')} ${p.platform ? '· '+escapeHtml(p.platform) : ''}</div>
         <div class="today-card-title">${escapeHtml(p.title || 'Sin título')}</div>
         <div class="today-card-meta">
           ${m ? `<span class="tile-avatar" style="background:${m.color};width:18px;height:18px;font-size:8px">${initials(m.name)}</span> ${escapeHtml(m.name)}` : 'Sin asignar'}
-          ${p.approved ? ' · ✓ aprobado' : ''}
+          ${isApproved ? ' · ✓ aprobado' : ''}
         </div>
       </div>
       <div class="today-card-actions">
-        <button class="today-card-btn" data-today-toggle>${isListo ? '✓ Listo' : 'Marcar listo'}</button>
+        <button class="today-card-btn ${isListo?'is-listo':''}" data-today-toggle>${isListo ? '✓ Listo' : 'Marcar listo'}</button>
+        ${canApprove ? `<button class="today-card-btn approve ${isApproved?'is-approved':''}" data-today-approve>${isApproved ? '✓ Aprobado' : 'Aprobar'}</button>` : ''}
         <button class="today-card-edit" data-today-edit>Editar</button>
       </div>
     </div>`;
@@ -1795,9 +1840,51 @@ function renderToday(){
       state.pieces = state.pieces.map(x => x.id === id ? updated : x);
       saveOnePiece(updated);
       renderPiecesViews();
-      renderToday();
     });
+    const approveBtn = card.querySelector('[data-today-approve]');
+    if (approveBtn){
+      approveBtn.addEventListener('click', e => {
+        e.stopPropagation();
+        const piece = state.pieces.find(x => x.id === id);
+        if (!piece) return;
+        const updated = { ...piece, approved: !piece.approved, approvedBy: !piece.approved ? state.user.email : null };
+        state.pieces = state.pieces.map(x => x.id === id ? updated : x);
+        saveOnePiece(updated);
+        renderPiecesViews();
+      });
+    }
   });
+}
+
+// Swipe horizontal en HOY → navegar días prev/next
+function bindTodaySwipe(){
+  const wrap = document.getElementById('todayView');
+  if (!wrap || wrap.__llSwipe) return;
+  wrap.__llSwipe = true;
+  let sx = 0, sy = 0, tracking = false;
+  wrap.addEventListener('touchstart', e => {
+    if (e.touches.length !== 1) return;
+    sx = e.touches[0].clientX; sy = e.touches[0].clientY; tracking = true;
+  }, { passive: true });
+  wrap.addEventListener('touchend', e => {
+    if (!tracking) return;
+    tracking = false;
+    const dx = e.changedTouches[0].clientX - sx;
+    const dy = e.changedTouches[0].clientY - sy;
+    if (Math.abs(dx) < 60 || Math.abs(dx) < Math.abs(dy) * 1.4) return;
+    if (!state.days.length) return;
+    const next = state.todayCursor + (dx < 0 ? 1 : -1);
+    if (next < 0 || next >= state.days.length) return;
+    state.todayCursor = next;
+    // Animación suave de slide
+    const list = document.getElementById('todayList');
+    if (list){
+      list.style.animation = 'none';
+      void list.offsetWidth;
+      list.style.animation = `llSlide${dx < 0 ? 'In' : 'InRev'} .3s cubic-bezier(.16,1,.3,1)`;
+    }
+    renderToday();
+  }, { passive: true });
 }
 
 function updateStats(){
@@ -2207,6 +2294,8 @@ const jumpWeekBtn = document.querySelector('[data-jump-week]');
 if (jumpWeekBtn){
   jumpWeekBtn.addEventListener('click', () => switchView('calendar'));
 }
+// Swipe horizontal en HOY para navegar días
+bindTodaySwipe();
 
 // FAB central "+" agrega una pieza al día actual (si está en esta semana) o al primer día
 const fabAddBtn = document.getElementById('fabAdd');
