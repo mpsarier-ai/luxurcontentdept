@@ -71,6 +71,8 @@ header{border-bottom:1px solid var(--black);padding-bottom:24px;margin-bottom:64
 .fa-kpi.urgente .fa-kpi-num{color:var(--rosa-deep)}
 .fa-kpi.medio .fa-kpi-num{color:#c48a4f}
 .fa-kpi.ligero .fa-kpi-num{color:#8a9a6c}
+.fa-kpi.lost .fa-kpi-num{color:#a85555}
+.fa-kpi.push .fa-kpi-num{color:#7891b0}
 
 /* Top rolling 30d · barras horizontales */
 .fa-top{background:#fff;border-radius:18px;padding:18px 20px 22px;box-shadow:0 1px 2px rgba(0,0,0,.04),0 6px 18px rgba(0,0,0,.05);margin-bottom:20px}
@@ -95,18 +97,27 @@ header{border-bottom:1px solid var(--black);padding-bottom:24px;margin-bottom:64
 .fa-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:14px}
 .fa-card{background:#fff;border-radius:18px;padding:18px 18px 16px;box-shadow:0 1px 2px rgba(0,0,0,.04),0 4px 14px rgba(0,0,0,.05);position:relative;overflow:hidden;border-top:3px solid var(--cream-dark);transition:transform .2s ease,box-shadow .2s ease}
 .fa-card:hover{transform:translateY(-2px);box-shadow:0 2px 4px rgba(0,0,0,.05),0 10px 24px rgba(0,0,0,.07)}
-.fa-card.urgente{border-top-color:var(--rosa-deep)}
-.fa-card.medio{border-top-color:#c48a4f}
-.fa-card.ligero{border-top-color:#8a9a6c}
+.fa-card.r1{border-top-color:var(--rosa-deep)}
+.fa-card.r2{border-top-color:#c48a4f}
+.fa-card.r3{border-top-color:#8a9a6c}
 .fa-card.sano{border-top-color:#7ba87b}
 .fa-card.sobre{border-top-color:#7891b0}
 .fa-card.liquidar{border-top-color:#a85555}
-.fa-cat{display:inline-block;font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:.12em;text-transform:uppercase;padding:4px 10px;border-radius:999px;margin-bottom:10px;background:var(--rosa);color:var(--black);font-weight:500}
-.fa-card.medio .fa-cat{background:#f3dec0;color:#6e4a1c}
-.fa-card.ligero .fa-cat{background:#e3eccb;color:#52613a}
+.fa-card.sold{border-top-color:#1a1a1a}
+.fa-card.broken{border-top-color:#8a3030}
+.fa-card.push{border-top-color:#b08a55}
+.fa-card-head{display:flex;align-items:center;gap:8px;margin-bottom:10px;flex-wrap:wrap}
+.fa-cat{display:inline-block;font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:.12em;text-transform:uppercase;padding:4px 10px;border-radius:999px;background:var(--rosa);color:var(--black);font-weight:500}
+.fa-card.r1 .fa-cat{background:var(--rosa);color:var(--black)}
+.fa-card.r2 .fa-cat{background:#f3dec0;color:#6e4a1c}
+.fa-card.r3 .fa-cat{background:#e3eccb;color:#52613a}
 .fa-card.sano .fa-cat{background:#d4e8d4;color:#3a5a3a}
 .fa-card.sobre .fa-cat{background:#dde6f0;color:#3a5172}
 .fa-card.liquidar .fa-cat{background:#efc6c6;color:#7a3030}
+.fa-card.sold .fa-cat{background:#1a1a1a;color:#fff}
+.fa-card.broken .fa-cat{background:#8a3030;color:#fff}
+.fa-card.push .fa-cat{background:#f0e0c0;color:#5a4520}
+.fa-new-badge{font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:.1em;background:var(--cream-dark);color:var(--black);padding:3px 8px;border-radius:999px;font-weight:500}
 .fa-title{font-family:'Outfit',sans-serif;font-weight:600;font-size:14.5px;line-height:1.3;color:var(--black);margin-bottom:14px;display:flex;align-items:center;gap:7px}
 .fa-trend{font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:700;line-height:1;letter-spacing:-.02em;flex-shrink:0}
 .fa-trend.up{color:#5b9a5b}
@@ -124,8 +135,35 @@ header{border-bottom:1px solid var(--black);padding-bottom:24px;margin-bottom:64
 .fa-st-bar{height:5px;background:rgba(0,0,0,.05);border-radius:999px;overflow:hidden;margin-bottom:12px}
 .fa-st-bar span{display:block;height:100%;background:linear-gradient(90deg,var(--rosa),var(--rosa-deep));border-radius:999px}
 
-.fa-reason{font-family:'Outfit',sans-serif;font-size:12px;color:#555;line-height:1.4;letter-spacing:.005em}
+.fa-reason{font-family:'Outfit',sans-serif;font-size:12px;color:#555;line-height:1.4;letter-spacing:.005em;margin-top:8px}
 .fa-reason b{color:var(--black);font-weight:600}
+
+/* Venta perdida badge en card */
+.fa-lost{background:rgba(168,85,85,.08);border:1px solid rgba(168,85,85,.2);border-radius:10px;padding:6px 10px;font-family:'Outfit',sans-serif;font-size:11.5px;color:#7a3030;margin-bottom:10px;letter-spacing:.01em}
+.fa-lost b{font-family:'JetBrains Mono',monospace;color:#a85555;font-weight:600}
+
+/* Análisis por talla dentro de la card */
+.fa-sizes{display:flex;flex-direction:column;gap:3px;padding-top:8px;margin-top:4px;border-top:1px dashed rgba(0,0,0,.06)}
+.fa-size-row{display:grid;grid-template-columns:24px 28px 1fr 32px;gap:8px;align-items:center;font-family:'JetBrains Mono',monospace;font-size:10px;padding:3px 0}
+.fa-size-name{color:var(--black);font-weight:500;letter-spacing:.05em}
+.fa-size-stock{color:var(--grey);text-align:right;font-size:10px}
+.fa-size-bar{height:4px;background:rgba(0,0,0,.05);border-radius:999px;overflow:hidden}
+.fa-size-bar span{display:block;height:100%;background:var(--rosa-deep);border-radius:999px}
+.fa-size-pct{color:var(--grey);text-align:right;font-size:9.5px;letter-spacing:.02em}
+.fa-size-row.broken .fa-size-name{color:var(--rosa-deep);font-weight:700}
+.fa-size-row.broken .fa-size-stock{color:#a85555;font-weight:600}
+.fa-size-row.broken .fa-size-bar span{background:#a85555}
+.fa-size-row.zero .fa-size-stock{color:#999}
+
+/* Mix de tallas (bar chart vertical) */
+.fa-mix{background:#fff;border-radius:18px;padding:18px 20px 20px;box-shadow:0 1px 2px rgba(0,0,0,.04),0 6px 18px rgba(0,0,0,.05);margin-bottom:20px}
+.fa-mix-bars{display:flex;justify-content:space-around;align-items:flex-end;gap:8px;height:140px;padding:14px 0 0;margin-top:8px;border-bottom:1px solid rgba(0,0,0,.05)}
+.fa-mix-bar{display:flex;flex-direction:column;align-items:center;gap:6px;flex:1;min-width:0}
+.fa-mix-pct{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--rosa-deep);font-weight:500}
+.fa-mix-track{width:100%;max-width:36px;display:flex;justify-content:center}
+.fa-mix-fill{width:100%;background:linear-gradient(180deg,var(--rosa) 0%,var(--rosa-deep) 100%);border-radius:6px 6px 0 0;min-height:4px;transition:height .3s ease}
+.fa-mix-label{font-family:'Outfit',sans-serif;font-size:11.5px;color:var(--black);font-weight:500}
+.fa-mix-note{font-family:'Outfit',sans-serif;font-size:11px;color:var(--grey);text-align:center;margin-top:14px;line-height:1.5;font-style:italic}
 
 .fa-empty{background:#fff;border-radius:18px;padding:36px;text-align:center;color:var(--grey);font-family:'Outfit',sans-serif;font-style:italic;font-size:13px;grid-column:1/-1}
 
@@ -687,77 +725,176 @@ async function loadProductStatus(){
 
 function fmtK(n){ return n >= 1000000 ? `$${(n/1000000).toFixed(1)}M` : `$${Math.round(n/1000)}K`; }
 
-// === FASHIONALYTICS: categorización con lead time 4 semanas + trend ===
-// Cada producto tiene units30d, unitsPrev30d, units7d, unitsPrev7d (del refresh-shopify).
-// Si falta data 30d (refresh viejo), aproximamos units30d ≈ units7d × 4.3 con flag.
+// === FASHIONALYTICS · spec Paulina (ventana 30d, lead time 4 semanas) ===
+// Métricas por producto y por variante (talla), con cálculo de venta perdida.
+// Fuentes:
+//   - units30d: ShopifyQL net_items_sold nativo si disponible, fallback a órdenes
+//   - units90d: ShopifyQL nativo si disponible, sino null (no se infiere)
+//   - daysSincePublished: del fetchCatalog
+//   - sizes[*].units30d: ShopifyQL per-variant nativo si disponible
+// Sell-through: aproximación (ShopifyQL no expone starting_inventory_units públicamente)
+//   ST ≈ units30d / max(1, units30d + stock_pos)  — capeado a 100%
+//   broken_inv si stock_actual + units30d <= 0 (oversold roto)
+
+const FA_SIZE_ORDER = ['XS','S','M','L','XL','XXL','XXXL'];
+const FA_SIZE_GENERIC = /^(default title|talla [úu]nica|[úu]nica|única|única talla)$/i;
+
+function sizeIsGeneric(s){ return FA_SIZE_GENERIC.test((s || '').trim()); }
+function sizeOrderIndex(s){
+  const idx = FA_SIZE_ORDER.indexOf((s || '').toUpperCase().trim());
+  return idx === -1 ? 99 : idx;
+}
+
 function faAnalyze(p){
-  const stock = Math.max(0, p.total || 0);
-  const stockReal = p.total || 0; // puede ser negativo (oversold)
-  let u30 = p.units30d ?? null;
-  let u7 = p.units7d ?? null;
-  let uPrev30 = p.unitsPrev30d ?? null;
-  let uPrev7 = p.unitsPrev7d ?? null;
-  let approx = false;
-  // Fallback si el refresh viejo no guardó units fields:
-  // usamos orders como proxy (1 orden ≈ 1 jean para LUXUR), y extrapolamos 30d desde 7d
-  if (u7 === null || u7 === undefined) { u7 = p.orders7d || 0; approx = true; }
-  if (uPrev7 === null || uPrev7 === undefined) { uPrev7 = p.ordersPrev7d || 0; approx = true; }
-  if (u30 === null || u30 === undefined) { u30 = Math.round(u7 * 4.3); approx = true; }
-  if (uPrev30 === null || uPrev30 === undefined) { uPrev30 = Math.round(uPrev7 * 4.3); approx = true; }
+  const stockReal = p.total || 0;       // puede ser negativo
+  const stockPos = Math.max(0, stockReal);
+  const age = p.daysSincePublished ?? 999;
+  const isNew = age < 14;
 
-  // Velocity = units/mes (rolling 30d)
-  const velocity = u30;
-  // Cobertura en meses
-  let cob = velocity > 0 ? stock / velocity : (stock > 0 ? 99 : 0);
-
-  // Sell-through: units sold / (sold + stock disponible) sobre ventana 30d
-  const denom = u30 + Math.max(0, stock);
-  let st = denom > 0 ? (u30 / denom) * 100 : 0;
-  if (stockReal < 0 && u30 > 0) st = (u30 / (u30 + stockReal)) * 100; // oversold > 100%
-  st = Math.max(0, Math.min(150, Math.round(st)));
-
-  // Trend 30d (rolling vs prev 30d)
-  let trend30 = 0;
-  if (uPrev30 > 0) trend30 = ((u30 - uPrev30) / uPrev30) * 100;
-  else if (u30 > 0) trend30 = 100;
-
-  // Trend 7d (rolling 7d vs prev 7d) — señal más reciente
-  let trend7 = 0;
-  if (uPrev7 > 0) trend7 = ((u7 - uPrev7) / uPrev7) * 100;
-  else if (u7 > 0) trend7 = 100;
-
-  // Categorización (lead time = 4 semanas ≈ 1 mes)
-  let cat = 'sano';
-  let reason = '';
-  if (stockReal <= 0 && u30 > 0){
-    cat = 'urgente';
-    reason = trend7 > 30 ? 'agotado y acelerando' : 'oversold, vendía';
-  } else if (cob < 1){
-    cat = 'urgente';
-    reason = trend7 > 30 ? 'rolling fuerte, casi agotado' : (cob < 0.3 ? 'top agotado, verificar variante' : 'cobertura < lead time');
-  } else if (cob < 1.5){
-    cat = 'medio';
-    reason = trend30 > 20 ? 'subiendo, planear restock' : 'planear restock este mes';
-  } else if (cob < 2.5){
-    cat = 'ligero';
-    reason = 'reordenar curva próxima';
-  } else if (cob > 6 && u30 === 0 && stock > 3){
-    cat = 'liquidar';
-    reason = '0 ventas 30d con stock alto';
-  } else if (cob > 4){
-    cat = 'sobre';
-    reason = trend30 < -30 ? 'cayendo + stock alto' : 'rotación lenta';
-  } else {
-    cat = 'sano';
-    reason = trend30 > 30 ? 'rolling subiendo' : 'rotación OK';
+  // Rolling 30d — preferir nativo
+  const u30Native = p.units30d_native ?? null;
+  const u30Manual = p.units30d_manual ?? p.units30d ?? p.units7d ?? p.orders7d ?? 0;
+  let u30 = u30Native ?? u30Manual;
+  // Si refresh viejo (sin fields nuevos), aproximar desde orders
+  let approx = (u30Native === null || u30Native === undefined);
+  if (!u30 && (p.orders7d || 0) > 0) {
+    u30 = Math.round((p.orders7d || 0) * 4.3);
+    approx = true;
   }
 
-  return { cat, reason, st, cob, trend30, trend7, velocity, u30, u7, stock, stockReal, approx };
+  // 90d — solo si nativo disponible (sino null, no inventamos)
+  const u90 = p.units90d_native ?? p.units90d ?? null;
+
+  // Sell-through (% mensual aproximado)
+  // Inventario roto: stock_actual + sold <= 0 (oversold quedó negativo después de las ventas)
+  const startApprox = stockReal + u30;            // aproximación de starting_inventory
+  const brokenInv = startApprox <= 0 && stockReal < 0;
+  let st = null;
+  if (!brokenInv) {
+    const denom = Math.max(1, u30 + stockPos);
+    st = Math.min(100, Math.round((u30 / denom) * 100));
+  }
+  // En productos nuevos (<14d), ST no es confiable
+  const stConfiable = !isNew && !brokenInv && (u30 + stockPos) > 0;
+
+  // Cobertura en meses
+  const cob = u30 > 0 ? stockPos / u30 : (stockPos > 0 ? 99 : 0);
+
+  // === Análisis por talla ===
+  const allSizes = Array.isArray(p.sizes) ? p.sizes : [];
+  const hasSizeCurve = allSizes.some(s => !sizeIsGeneric(s.size));
+  const sizes = hasSizeCurve ? allSizes.filter(s => !sizeIsGeneric(s.size)) : [];
+
+  // Sum sold por variante (para detectar quiebres + venta perdida)
+  let totalLostUnits = 0;
+  let totalLostMoney = 0;
+  const variants = sizes.map(s => {
+    const sold = s.units30d ?? 0;
+    const ending = s.available ?? 0;
+    const price = s.price ?? null;
+    // ST aprox por talla: sold / (sold + max(0, ending))
+    const denomV = Math.max(1, sold + Math.max(0, ending));
+    const stV = Math.min(100, Math.round((sold / denomV) * 100));
+    // Quiebre: ST >= 85% O ending <= 0
+    const broken = (sold + Math.max(0, ending)) > 0 && (stV >= 85 || ending <= 0);
+
+    // Venta perdida (spec sección 5)
+    // windowDays: si es nuevo, días desde lanzamiento; si no, 30
+    const windowDays = isNew ? Math.max(1, Math.min(age, 30)) : 30;
+    let lostUnits = 0;
+    if (sold > 0 && ending <= 0) {
+      // starting_inv aprox = sold (si ahora está en 0, todo se vendió)
+      // ó sold + ending si ending > 0 (no aplica aquí, ending<=0)
+      const startingApprox = sold;
+      // días con stock ≈ (starting / sold) * windowDays, capeado a windowDays
+      const daysWithStock = Math.min(windowDays, Math.max(1, (startingApprox / sold) * windowDays));
+      const daysOut = Math.max(0, windowDays - daysWithStock);
+      const vDaily = sold / daysWithStock;
+      lostUnits = vDaily * daysOut;
+      // Cap de cordura: no más de 2x lo vendido
+      lostUnits = Math.min(lostUnits, sold * 2);
+      lostUnits = Math.max(0, Math.round(lostUnits));
+    }
+    const lostMoney = price ? lostUnits * price : 0;
+    totalLostUnits += lostUnits;
+    totalLostMoney += lostMoney;
+    return { size: s.size, sold, ending, price, stV, broken, lostUnits, lostMoney };
+  }).sort((a, b) => sizeOrderIndex(a.size) - sizeOrderIndex(b.size));
+
+  const brokenSizes = variants.filter(v => v.broken);
+  const hasSizeBreak = brokenSizes.length > 0;
+
+  // === Cascada de clasificación (spec sección 3) ===
+  // 0. Producto nuevo (<14d) NUNCA va a liquidar/dead
+  // 1. liquidar: rolling30 <= 1 AND u90 < 5 AND age >= 14
+  // 2. sold: stock <= 0
+  // 3. sobre: cob > 6m O (ST<15% con stock alto) Y maduro. Si nuevo + sobrestock → push
+  // 4. r1: ST >= 80%
+  // 5. r2: ST 60-79%
+  // 6. r3: ST 40-59% con quiebre de talla
+  // 7. push: nuevo con rolling bajo, O maduro sobrestock que vale empujar
+  // 8. sano: resto
+  let cat = 'sano';
+  let reason = '';
+
+  if (brokenInv) {
+    cat = 'broken';
+    reason = 'inventario roto · oversold doble contado, corregir';
+  } else if (!isNew && u30 <= 1 && (u90 ?? 999) < 5) {
+    cat = 'liquidar';
+    reason = `${age}d viejo · 0-1 venta 30d · <5 en 90d`;
+  } else if (stockReal <= 0) {
+    cat = 'sold';
+    reason = u30 > 0 ? `agotado · vendía ${u30}u/mes` : 'agotado';
+  } else if (cob > 6 || (st !== null && st < 15 && stockPos > 8)) {
+    if (isNew) {
+      cat = 'push';
+      reason = `nuevo (${age}d) con arranque lento · pauta + contenido`;
+    } else {
+      cat = 'sobre';
+      reason = cob > 99 ? 'sin ventas · stock alto' : `cobertura ${cob.toFixed(1)}m · ST ${st ?? '—'}%`;
+    }
+  } else if (isNew && u30 <= 3) {
+    cat = 'push';
+    reason = `nuevo (${age}d) · pauta para arrancar`;
+  } else if (stConfiable && st >= 80) {
+    cat = 'r1';
+    reason = hasSizeBreak
+      ? `ST ${st}% · quiebres en ${brokenSizes.map(v=>v.size).join('/')}`
+      : `ST ${st}% · agotándose rápido`;
+  } else if (stConfiable && st >= 60) {
+    cat = 'r2';
+    reason = `ST ${st}% · planear restock`;
+  } else if (stConfiable && st >= 40 && hasSizeBreak) {
+    cat = 'r3';
+    reason = `ST ${st}% · quiebre en ${brokenSizes.map(v=>v.size).join('/')}`;
+  } else {
+    cat = 'sano';
+    if (isNew) reason = `nuevo (${age}d) · rolling ${u30}u`;
+    else if (st !== null) reason = `ST ${st}% · cob ${cob.toFixed(1)}m`;
+    else reason = `rolling ${u30}u · cob ${cob.toFixed(1)}m`;
+  }
+
+  // Trend (señal complementaria, no clasifica)
+  const uPrev30 = p.unitsPrev30d ?? 0;
+  const uPrev7 = p.unitsPrev7d ?? p.ordersPrev7d ?? 0;
+  const u7 = p.units7d ?? p.orders7d ?? 0;
+  let trend30 = 0;
+  if (uPrev30 > 0) trend30 = ((u30/4.3 - uPrev30) / uPrev30) * 100; // normaliza a ventana 7d para comparar
+  let trend7 = 0;
+  if (uPrev7 > 0) trend7 = ((u7 - uPrev7) / uPrev7) * 100;
+
+  return {
+    cat, reason, st, cob, u30, u90, age, isNew,
+    stock: stockPos, stockReal, brokenInv,
+    variants, hasSizeBreak, brokenSizes,
+    lostUnits: totalLostUnits, lostMoney: totalLostMoney,
+    trend30, trend7, approx, hasSizeCurve,
+  };
 }
 
 function faTrendArrow(trend30, trend7){
-  // Usamos trend7 (más reciente) como señal principal, pero solo si trend30 también va en esa dirección
-  const t = Math.abs(trend7) >= 15 ? trend7 : trend30;
+  const t = Math.abs(trend7) >= 20 ? trend7 : trend30;
   if (t > 50) return '<span class="fa-trend up" title="acelerando fuerte">↑↑</span>';
   if (t > 15) return '<span class="fa-trend up" title="acelerando">↑</span>';
   if (t < -50) return '<span class="fa-trend down" title="cayendo fuerte">↓↓</span>';
@@ -766,15 +903,18 @@ function faTrendArrow(trend30, trend7){
 }
 
 const FA_CAT_LABEL = {
-  urgente: 'Restock urgente',
-  medio: 'Restock medio',
-  ligero: 'Restock ligero',
+  broken: 'Inv. roto',
+  sold: 'Agotado',
+  r1: 'Restock urgente',
+  r2: 'Restock medio',
+  r3: 'Restock ligero',
+  push: 'Marketing push',
   sano: 'Sanos',
   sobre: 'Sobrestock',
   liquidar: 'Liquidar',
 };
-const FA_CAT_ORDER = ['urgente','medio','ligero','sano','sobre','liquidar'];
-let faActiveFilter = 'urgente';
+const FA_CAT_ORDER = ['r1','r2','r3','sold','broken','push','sano','sobre','liquidar'];
+let faActiveFilter = 'r1';
 
 function shortNameFa(t){
   return (t || '')
@@ -783,24 +923,35 @@ function shortNameFa(t){
     .trim();
 }
 
+function fmtMoneyShort(n){
+  if (!n) return '$0';
+  if (n >= 1_000_000) return `$${(n/1_000_000).toFixed(1)}M`;
+  if (n >= 1000) return `$${Math.round(n/1000)}K`;
+  return `$${Math.round(n)}`;
+}
+
 function renderProductStatus(){
   const el = document.getElementById('prodStatus');
   const meta = document.getElementById('prodStatusMeta');
   if (!el) return;
   if (!catalog.length){ el.innerHTML = '<div class="fa-empty">Sin catálogo aún. Corre el refresh de Shopify.</div>'; return; }
 
-  // Solo JEANS activos (excluye tank tops + accesorios) y con stock o ventas
+  // Solo JEANS activos
   const isJean = t => /^JEAN[\s·\-]/i.test((t || '').trim());
-  const products = catalog.filter(p => isJean(p.title) && ((p.total ?? 0) !== 0 || (p.units30d ?? p.units7d ?? 0) > 0));
+  const products = catalog.filter(p => isJean(p.title) && ((p.total ?? 0) !== 0 || (p.units30d_native ?? p.units30d ?? p.units7d ?? p.orders7d ?? 0) > 0));
   const analyzed = products.map(p => ({ p, a: faAnalyze(p) }));
   const anyApprox = analyzed.some(x => x.a.approx);
+  const hasNative = analyzed.some(x => x.p.units30d_native !== null && x.p.units30d_native !== undefined);
 
   // Conteos por categoría
-  const counts = { urgente:0, medio:0, ligero:0, sano:0, sobre:0, liquidar:0 };
-  analyzed.forEach(x => counts[x.a.cat]++);
+  const counts = {};
+  FA_CAT_ORDER.forEach(k => counts[k] = 0);
+  analyzed.forEach(x => { counts[x.a.cat] = (counts[x.a.cat] || 0) + 1; });
 
   // KPI totals
   const sold30 = analyzed.reduce((s,x) => s + (x.a.u30 || 0), 0);
+  const lostUnitsTotal = analyzed.reduce((s,x) => s + (x.a.lostUnits || 0), 0);
+  const lostMoneyTotal = analyzed.reduce((s,x) => s + (x.a.lostMoney || 0), 0);
 
   // Top rolling 30d (10 productos)
   const topRolling = analyzed
@@ -809,20 +960,38 @@ function renderProductStatus(){
     .slice(0, 10);
   const maxTop = Math.max(1, ...topRolling.map(x => x.a.u30));
 
-  if (meta) meta.textContent = `${analyzed.length} jeans · live Shopify`;
+  // Mix de tallas dinámico (sum por talla / sum total) — sobre las ventas reales
+  const sizeMix = {};
+  let sizeMixTotal = 0;
+  analyzed.forEach(({a}) => {
+    a.variants.forEach(v => {
+      sizeMix[v.size] = (sizeMix[v.size] || 0) + v.sold;
+      sizeMixTotal += v.sold;
+    });
+  });
+  const sizeMixPct = {};
+  Object.keys(sizeMix).forEach(s => {
+    sizeMixPct[s] = sizeMixTotal > 0 ? Math.round((sizeMix[s] / sizeMixTotal) * 100) : 0;
+  });
 
-  // Filtros
+  if (meta) meta.textContent = `${analyzed.length} jeans · ${hasNative ? 'native Shopify' : 'aprox órdenes'}`;
+
+  // Filtros (solo categorías con productos)
   const filterChips = [
     { key: 'all', label: 'Todos', count: analyzed.length },
     ...FA_CAT_ORDER.map(k => ({ key: k, label: FA_CAT_LABEL[k], count: counts[k] }))
   ].filter(c => c.key === 'all' || c.count > 0);
 
-  // Cards filtradas
+  // Si el filtro activo quedó vacío, vuelvo a 'all'
+  if (faActiveFilter !== 'all' && (counts[faActiveFilter] || 0) === 0) faActiveFilter = 'all';
+
+  // Cards filtradas + orden interno
   const filtered = analyzed.filter(x => faActiveFilter === 'all' || x.a.cat === faActiveFilter);
-  // Ordenar dentro del filtro: por urgencia interna (menos cobertura primero) y luego por rolling
   filtered.sort((a,b) => {
-    if (a.a.cat === 'urgente' || b.a.cat === 'urgente') return a.a.cob - b.a.cob;
-    return b.a.u30 - a.a.u30;
+    // por venta perdida primero, luego por urgencia (menor cobertura)
+    if (b.a.lostUnits !== a.a.lostUnits) return b.a.lostUnits - a.a.lostUnits;
+    if (a.a.cat !== b.a.cat) return FA_CAT_ORDER.indexOf(a.a.cat) - FA_CAT_ORDER.indexOf(b.a.cat);
+    return a.a.cob - b.a.cob;
   });
 
   el.innerHTML = `
@@ -832,25 +1001,25 @@ function renderProductStatus(){
         <div class="fa-kpi-num">${sold30}</div>
         <div class="fa-kpi-sub">unidades · jeans activos</div>
       </div>
+      <div class="fa-kpi lost">
+        <div class="fa-kpi-label">Venta perdida 30d</div>
+        <div class="fa-kpi-num">${lostUnitsTotal}</div>
+        <div class="fa-kpi-sub">${fmtMoneyShort(lostMoneyTotal)} · quiebres de talla</div>
+      </div>
       <div class="fa-kpi urgente">
         <div class="fa-kpi-label">Restock urgente</div>
-        <div class="fa-kpi-num">${counts.urgente}</div>
-        <div class="fa-kpi-sub">se agota ≤ 4 semanas (lead time)</div>
+        <div class="fa-kpi-num">${counts.r1}</div>
+        <div class="fa-kpi-sub">ST ≥ 80% · agotándose</div>
       </div>
-      <div class="fa-kpi medio">
-        <div class="fa-kpi-label">Restock medio</div>
-        <div class="fa-kpi-num">${counts.medio}</div>
-        <div class="fa-kpi-sub">cobertura 1 – 1.5m</div>
-      </div>
-      <div class="fa-kpi ligero">
-        <div class="fa-kpi-label">Restock ligero</div>
-        <div class="fa-kpi-num">${counts.ligero}</div>
-        <div class="fa-kpi-sub">reordenar curva/tallas</div>
+      <div class="fa-kpi push">
+        <div class="fa-kpi-label">Marketing push</div>
+        <div class="fa-kpi-num">${counts.push}</div>
+        <div class="fa-kpi-sub">pauta + contenido</div>
       </div>
     </div>
 
     ${topRolling.length ? `<div class="fa-top">
-      <div class="fa-top-head"><span>Top Rolling 30d</span><span class="fa-top-sub">unidades vendidas · 30 días</span></div>
+      <div class="fa-top-head"><span>Top Rolling 30d</span><span class="fa-top-sub">unidades · 30 días</span></div>
       ${topRolling.map(x => `
         <div class="fa-bar-row">
           <div class="fa-bar-name">${escapeHtml(shortNameFa(x.p.title))}</div>
@@ -858,6 +1027,20 @@ function renderProductStatus(){
           <div class="fa-bar-val">${x.a.u30}</div>
         </div>
       `).join('')}
+    </div>` : ''}
+
+    ${sizeMixTotal > 0 ? `<div class="fa-mix">
+      <div class="fa-top-head"><span>Mix de tallas · 30d</span><span class="fa-top-sub">% de ventas totales</span></div>
+      <div class="fa-mix-bars">
+        ${Object.keys(sizeMixPct).sort((a,b) => sizeOrderIndex(a) - sizeOrderIndex(b)).map(s => `
+          <div class="fa-mix-bar">
+            <div class="fa-mix-pct">${sizeMixPct[s]}%</div>
+            <div class="fa-mix-track"><div class="fa-mix-fill" style="height:${Math.max(4, sizeMixPct[s]*1.5)}px"></div></div>
+            <div class="fa-mix-label">${escapeHtml(s)}</div>
+          </div>
+        `).join('')}
+      </div>
+      <div class="fa-mix-note">Para un restock de N unidades, esta es tu curva real (no pareja).</div>
     </div>` : ''}
 
     <div class="fa-filters-head">Detalle por producto</div>
@@ -868,23 +1051,46 @@ function renderProductStatus(){
     <div class="fa-grid">
       ${filtered.length === 0 ? `<div class="fa-empty">No hay productos en "${FA_CAT_LABEL[faActiveFilter] || 'esta categoría'}"</div>` : filtered.map(({p,a}) => {
         const stockClass = a.stockReal < 0 ? 'neg' : (a.stockReal === 0 ? 'zero' : '');
-        const cobShow = a.cob >= 99 ? '∞' : (a.cob < 0.1 ? '0' : a.cob.toFixed(1) + 'm');
+        const cobShow = a.cob >= 99 ? '—' : (a.cob < 0.1 ? '<0.1m' : a.cob.toFixed(1) + 'm');
+        const stShow = a.st === null ? '—' : `${a.st}%`;
+        const newBadge = a.isNew ? `<span class="fa-new-badge" title="lanzado hace ${a.age} días">NUEVO ${a.age}d</span>` : '';
+        const sizesHtml = a.variants.length ? `
+          <div class="fa-sizes">
+            ${a.variants.map(v => `
+              <div class="fa-size-row ${v.broken ? 'broken' : (v.ending === 0 ? 'zero' : '')}" title="vendido 30d / stock actual">
+                <span class="fa-size-name">${escapeHtml(v.size)}</span>
+                <span class="fa-size-stock">${v.ending}</span>
+                <span class="fa-size-bar"><span style="width:${Math.min(100, v.stV)}%"></span></span>
+                <span class="fa-size-pct">${v.stV}%</span>
+              </div>
+            `).join('')}
+          </div>` : '';
+        const lostHtml = a.lostUnits > 0 ? `
+          <div class="fa-lost"><b>−${a.lostUnits}u</b> venta perdida${a.lostMoney ? ' · ' + fmtMoneyShort(a.lostMoney) : ''}</div>` : '';
         return `<div class="fa-card ${a.cat}">
-          <div class="fa-cat">${FA_CAT_LABEL[a.cat]}</div>
+          <div class="fa-card-head">
+            <span class="fa-cat">${FA_CAT_LABEL[a.cat]}</span>
+            ${newBadge}
+          </div>
           <div class="fa-title">${escapeHtml(shortNameFa(p.title))} ${faTrendArrow(a.trend30, a.trend7)}</div>
           <div class="fa-metrics">
             <div class="fa-metric"><div class="fa-metric-label">Roll 30d</div><div class="fa-metric-val">${a.u30}</div></div>
             <div class="fa-metric"><div class="fa-metric-label">Stock</div><div class="fa-metric-val ${stockClass}">${a.stockReal}</div></div>
             <div class="fa-metric"><div class="fa-metric-label">Cob.</div><div class="fa-metric-val">${cobShow}</div></div>
           </div>
-          <div class="fa-st-row"><span>sell-through</span><span class="fa-st-pct">${a.st}%</span></div>
-          <div class="fa-st-bar"><span style="width:${Math.min(100, a.st)}%"></span></div>
-          <div class="fa-reason"><b>${FA_CAT_LABEL[a.cat].split(' ')[0]}</b> · ${escapeHtml(a.reason)}</div>
+          <div class="fa-st-row"><span>sell-through 30d</span><span class="fa-st-pct">${stShow}</span></div>
+          <div class="fa-st-bar"><span style="width:${Math.min(100, a.st || 0)}%"></span></div>
+          ${lostHtml}
+          ${sizesHtml}
+          <div class="fa-reason">${escapeHtml(a.reason)}</div>
         </div>`;
       }).join('')}
     </div>
 
-    ${anyApprox ? `<div style="font-family:'JetBrains Mono',monospace;font-size:9.5px;color:var(--grey);letter-spacing:.04em;margin-top:18px;text-align:center;line-height:1.5">* Aproximado usando órdenes (1 orden ≈ 1 jean) y 7d × 4.3.<br>Redeploya refresh-shopify para data real de 30d en unidades.</div>` : ''}
+    ${!hasNative ? `<div style="font-family:'JetBrains Mono',monospace;font-size:9.5px;color:var(--grey);letter-spacing:.04em;margin-top:18px;text-align:center;line-height:1.6">
+      * Aproximado: usando órdenes como proxy de unidades.<br>
+      Redeploya refresh-shopify para usar ShopifyQL nativo (requiere Shopify Plus).
+    </div>` : ''}
   `;
 }
 

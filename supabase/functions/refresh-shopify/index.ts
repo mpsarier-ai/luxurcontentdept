@@ -122,7 +122,8 @@ async function fetchCatalog(token: string) {
     title: string;
     total: number;
     createdAt: string;
-    sizes: Array<{ size: string; available: number }>;
+    publishedAt: string | null;
+    sizes: Array<{ size: string; available: number; price?: number }>;
   }> = [];
   let cursor: string | null = null;
   let hasNext = true;
@@ -138,10 +139,12 @@ async function fetchCatalog(token: string) {
               id
               title
               createdAt
+              publishedAt
               variants(first: 20) {
                 edges {
                   node {
                     title
+                    price
                     inventoryItem {
                       inventoryLevels(first: 10) {
                         edges { node { quantities(names: ["available"]) { name quantity } } }
@@ -158,7 +161,7 @@ async function fetchCatalog(token: string) {
     const conn = data.products;
     for (const e of conn.edges) {
       const n = e.node;
-      const sizeMap: Record<string, number> = {};
+      const sizeMap: Record<string, { available: number; price?: number }> = {};
       for (const ve of n.variants.edges) {
         const v = ve.node;
         let avail = 0;
@@ -166,16 +169,58 @@ async function fetchCatalog(token: string) {
           const q = lvl.node.quantities.find((x: any) => x.name === 'available');
           if (q) avail += q.quantity || 0;
         }
-        sizeMap[v.title] = (sizeMap[v.title] || 0) + avail;
+        const price = v.price ? parseFloat(v.price) : undefined;
+        if (!sizeMap[v.title]) sizeMap[v.title] = { available: 0, price };
+        sizeMap[v.title].available += avail;
+        if (price && !sizeMap[v.title].price) sizeMap[v.title].price = price;
       }
-      const sizes = Object.entries(sizeMap).map(([size, available]) => ({ size, available }));
+      const sizes = Object.entries(sizeMap).map(([size, v]) => ({ size, available: v.available, price: v.price }));
       const total = sizes.reduce((s, x) => s + x.available, 0);
-      products.push({ gid: n.id, title: n.title, total, createdAt: n.createdAt, sizes });
+      products.push({
+        gid: n.id, title: n.title, total,
+        createdAt: n.createdAt, publishedAt: n.publishedAt || n.createdAt,
+        sizes,
+      });
     }
     hasNext = conn.pageInfo.hasNextPage;
     cursor = conn.pageInfo.endCursor;
   }
   return products;
+}
+
+// === ShopifyQL · Plus only — sales nativos por producto y variante ===
+// Devuelve { rows: any[], err: string|null }. Si la tienda no es Plus, err viene poblado.
+// Soporta dos formas de respuesta del schema (tableData.rowData 2D-array vs rows objects)
+async function runShopifyQL(token: string, q: string): Promise<{ rows: any[]; err: string | null }> {
+  try {
+    const data: any = await shopifyGQL(token, `
+      query RunQL($q: String!) {
+        shopifyqlQuery(query: $q) {
+          parseErrors { message code }
+          tableData { columns { name dataType } rowData }
+        }
+      }
+    `, { q });
+    const res = data?.shopifyqlQuery;
+    if (!res) return { rows: [], err: "no_response" };
+    if (res.parseErrors && res.parseErrors.length) {
+      return { rows: [], err: res.parseErrors.map((p: any) => p.message || p.code).join('; ') };
+    }
+    const cols: { name: string }[] = res.tableData?.columns || [];
+    const rowData: any[] = res.tableData?.rowData || [];
+    const rows = rowData.map((row: any) => {
+      // rowData puede venir como array (posicional) u objeto (keyed)
+      if (Array.isArray(row)) {
+        const obj: Record<string, any> = {};
+        cols.forEach((c, i) => { obj[c.name] = row[i]; });
+        return obj;
+      }
+      return row;
+    });
+    return { rows, err: null };
+  } catch (err) {
+    return { rows: [], err: (err as Error).message };
+  }
 }
 
 // === SUPABASE ===
@@ -313,8 +358,10 @@ async function handler(_req: Request): Promise<Response> {
       return { startISO, endISO, prodMap, series, totalGross, totalOrders, bestDay, dailyChart, topSellers, top: sellersSorted[0] };
     }
 
-    // Catalog enriched con ventanas 7d, prev-7d, 30d, prev-30d (units + gross)
+    // Catalog enriched: ventanas 7d, prev-7d, 30d, prev-30d (units + gross) +
+    // ShopifyQL nativo de 30d y 90d, por producto y por variante (si la tienda es Plus)
     let catalogCount = 0;
+    let shopifyqlStatus: { ok: boolean; err: string | null } = { ok: false, err: null };
     try {
       const rolling = buildWindow(rollingStart, 7);
       const prev = buildWindow(prevWeekStart, 7);
@@ -322,26 +369,93 @@ async function handler(_req: Request): Promise<Response> {
       const prev30 = buildWindow(prev30Start, 30);
       const catalog = await fetchCatalog(shopifyToken);
       catalogCount = catalog.length;
+
+      // === ShopifyQL nativo (solo Plus) ===
+      // Si falla (no Plus), el dashboard usa el agregado de órdenes como fallback.
+      const [sales30Res, sales90Res, variantSales30Res] = await Promise.all([
+        runShopifyQL(shopifyToken,
+          `FROM sales SHOW net_items_sold GROUP BY product_title SINCE -30d UNTIL today LIMIT 200`),
+        runShopifyQL(shopifyToken,
+          `FROM sales SHOW net_items_sold GROUP BY product_title SINCE -90d UNTIL today LIMIT 200`),
+        runShopifyQL(shopifyToken,
+          `FROM sales SHOW net_items_sold GROUP BY product_title, product_variant_title SINCE -30d UNTIL today LIMIT 1000`),
+      ]);
+      // Si AL MENOS una query funcionó, marcamos como OK; si todas fallaron, error
+      const allFailed = !!sales30Res.err && !!sales90Res.err && !!variantSales30Res.err;
+      shopifyqlStatus = allFailed
+        ? { ok: false, err: sales30Res.err || sales90Res.err || variantSales30Res.err || 'unknown' }
+        : { ok: true, err: null };
+      if (!shopifyqlStatus.ok) {
+        console.warn('ShopifyQL no disponible (probable no-Plus):', shopifyqlStatus.err);
+      }
+
+      // Mapas product_title -> units
+      const native30Map: Record<string, number> = {};
+      for (const r of sales30Res.rows) {
+        const t = r.product_title; if (!t) continue;
+        native30Map[t] = parseInt(String(r.net_items_sold ?? "0"), 10) || 0;
+      }
+      const native90Map: Record<string, number> = {};
+      for (const r of sales90Res.rows) {
+        const t = r.product_title; if (!t) continue;
+        native90Map[t] = parseInt(String(r.net_items_sold ?? "0"), 10) || 0;
+      }
+      // Mapa product_title -> variant_title -> units
+      const variantNative30Map: Record<string, Record<string, number>> = {};
+      for (const r of variantSales30Res.rows) {
+        const t = r.product_title; const v = r.product_variant_title;
+        if (!t || v == null) continue;
+        if (!variantNative30Map[t]) variantNative30Map[t] = {};
+        variantNative30Map[t][v] = parseInt(String(r.net_items_sold ?? "0"), 10) || 0;
+      }
+
+      // Día de referencia para "antigüedad" en Bogotá
+      const todayMs = Date.parse(daysAgoISO(0) + 'T00:00:00-05:00');
+
       for (const p of catalog as any[]) {
         const sold = rolling.prodMap[p.title];
         const soldPrev = prev.prodMap[p.title];
         const sold30 = rolling30.prodMap[p.title];
         const soldPrev30 = prev30.prodMap[p.title];
-        // 7d window
+
+        // === Ventana 7d (manual, desde órdenes) ===
         p.sales7d = sold ? Math.round(sold.gross) : 0;
         p.units7d = sold ? sold.units : 0;
         p.orders7d = sold ? sold.orderIds.size : 0;
         p.salesPrev7d = soldPrev ? Math.round(soldPrev.gross) : 0;
         p.unitsPrev7d = soldPrev ? soldPrev.units : 0;
         p.ordersPrev7d = soldPrev ? soldPrev.orderIds.size : 0;
-        // 30d window (rolling)
+
+        // === Ventana 30d ===
+        // Preferimos ShopifyQL nativo si disponible; fallback a agregación manual.
+        const manual30 = sold30 ? sold30.units : 0;
+        p.units30d_manual = manual30;
+        p.units30d_native = native30Map[p.title] ?? null;
+        p.units30d = (p.units30d_native ?? manual30); // canónico
+        p.units90d_native = native90Map[p.title] ?? null;
+        p.units90d = (p.units90d_native ?? null); // 90d solo si ShopifyQL disponible
+
+        // gross + prev (de órdenes, ya disponible)
         p.sales30d = sold30 ? Math.round(sold30.gross) : 0;
-        p.units30d = sold30 ? sold30.units : 0;
         p.orders30d = sold30 ? sold30.orderIds.size : 0;
         p.salesPrev30d = soldPrev30 ? Math.round(soldPrev30.gross) : 0;
         p.unitsPrev30d = soldPrev30 ? soldPrev30.units : 0;
         p.ordersPrev30d = soldPrev30 ? soldPrev30.orderIds.size : 0;
+
+        // === Antigüedad (días desde publishedAt) ===
+        const pubMs = p.publishedAt ? Date.parse(p.publishedAt) : Date.parse(p.createdAt);
+        p.daysSincePublished = isNaN(pubMs) ? 999 : Math.max(0, Math.floor((todayMs - pubMs) / 86400000));
+
+        // === Per-variant 30d sales (nativo si disponible) ===
+        const varMap = variantNative30Map[p.title] || {};
+        if (Array.isArray(p.sizes)) {
+          for (const sz of p.sizes) {
+            sz.units30d = varMap[sz.size] ?? 0;
+          }
+        }
       }
+
+      // Status del refresh — el dashboard infiere la fuente revisando units30d_native !== null
       await rpcCall('rpc_update_catalog', { data: catalog });
     } catch (err) {
       console.error('Catalog refresh failed:', (err as Error).message);
