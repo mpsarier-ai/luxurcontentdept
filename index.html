@@ -885,12 +885,44 @@ function faAnalyze(p){
   if (uPrev7 > 0) trend7 = ((u7 - uPrev7) / uPrev7) * 100;
 
   return {
-    cat, reason, st, cob, u30, u90, age, isNew,
+    cat, reason, st, cob, u30, u7, u90, age, isNew,
     stock: stockPos, stockReal, brokenInv,
     variants, hasSizeBreak, brokenSizes,
     lostUnits: totalLostUnits, lostMoney: totalLostMoney,
-    trend30, trend7, approx, hasSizeCurve,
+    trend30, trend7, approx, hasSizeCurve, stConfiable,
   };
+}
+
+// Guards de "Restock urgente": evita el falso positivo cuando ST es alto pero
+// la demanda absoluta es baja, O cuando el producto recién empezó a vender (demoró en salir).
+// Se ejecuta DESPUÉS de calcular stats globales del catálogo.
+function faRefineUrgency(a, medianU30){
+  if (a.cat !== 'r1') return;
+  // Piso de velocity absoluta: 40% de la mediana del catálogo, con mínimo de 5u/mes
+  const MIN_URGENT = Math.max(5, Math.round(medianU30 * 0.4));
+  // Acceleration ratio: velocidad de los últimos 7d vs promedio mensual (u30/4.3)
+  const weeklyAvg = a.u30 / 4.3;
+  const accelRatio = weeklyAvg > 0.2 ? (a.u7 || 0) / weeklyAvg : 0;
+
+  // Guard 1: demanda absoluta muy baja
+  if (a.u30 < MIN_URGENT){
+    a.cat = 'sano';
+    a.reason = `ST ${a.st}% pero solo ${a.u30}u/mes · demanda estructuralmente baja, no urgente`;
+    return;
+  }
+  // Guard 2: se está enfriando (vendía pero ya no)
+  if (accelRatio < 0.4 && (a.u7 || 0) <= 1){
+    a.cat = 'sano';
+    a.reason = `ST ${a.st}% pero demanda apagándose (${a.u7 || 0}u últimos 7d) · no urgente`;
+    return;
+  }
+  // Guard 3: recién arrancó (la mayoría de ventas son recientes — demoró en salir)
+  if (accelRatio > 2.5 && a.age > 21){
+    a.cat = 'r2';
+    a.reason = `ST ${a.st}% pero acelerando recién (${a.age}d en tienda) · incluir en curva próxima, no urgencia`;
+    return;
+  }
+  // Pasa los guards → urgente genuino; mantenemos cat y razón originales
 }
 
 function faTrendArrow(trend30, trend7){
@@ -943,7 +975,16 @@ function renderProductStatus(){
   const anyApprox = analyzed.some(x => x.a.approx);
   const hasNative = analyzed.some(x => x.p.units30d_native !== null && x.p.units30d_native !== undefined);
 
-  // Conteos por categoría
+  // Stats globales para calibrar el piso de "Restock urgente"
+  // Mediana del u30 entre productos que venden — usado como referencia de "velocidad normal"
+  const u30Values = analyzed.map(x => x.a.u30).filter(v => v > 0).sort((a,b) => a-b);
+  const medianU30 = u30Values.length ? u30Values[Math.floor(u30Values.length / 2)] : 5;
+
+  // Aplicar guards anti-falso-urgente: ST alto ≠ urgencia si demanda absoluta es baja
+  // o si el producto recién empezó a vender (demoró en salir, no escasez crónica)
+  analyzed.forEach(x => faRefineUrgency(x.a, medianU30));
+
+  // Conteos por categoría (después del refine)
   const counts = {};
   FA_CAT_ORDER.forEach(k => counts[k] = 0);
   analyzed.forEach(x => { counts[x.a.cat] = (counts[x.a.cat] || 0) + 1; });
