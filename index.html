@@ -694,16 +694,16 @@ function faAnalyze(p){
   const stock = Math.max(0, p.total || 0);
   const stockReal = p.total || 0; // puede ser negativo (oversold)
   let u30 = p.units30d ?? null;
-  let u7 = p.units7d ?? 0;
+  let u7 = p.units7d ?? null;
   let uPrev30 = p.unitsPrev30d ?? null;
-  let uPrev7 = p.unitsPrev7d ?? 0;
+  let uPrev7 = p.unitsPrev7d ?? null;
   let approx = false;
-  if (u30 === null || u30 === undefined){
-    // refresh viejo (sin 30d) — aproximamos desde 7d × 4.3
-    u30 = Math.round((u7 || 0) * 4.3);
-    uPrev30 = Math.round((uPrev7 || 0) * 4.3);
-    approx = true;
-  }
+  // Fallback si el refresh viejo no guardó units fields:
+  // usamos orders como proxy (1 orden ≈ 1 jean para LUXUR), y extrapolamos 30d desde 7d
+  if (u7 === null || u7 === undefined) { u7 = p.orders7d || 0; approx = true; }
+  if (uPrev7 === null || uPrev7 === undefined) { uPrev7 = p.ordersPrev7d || 0; approx = true; }
+  if (u30 === null || u30 === undefined) { u30 = Math.round(u7 * 4.3); approx = true; }
+  if (uPrev30 === null || uPrev30 === undefined) { uPrev30 = Math.round(uPrev7 * 4.3); approx = true; }
 
   // Velocity = units/mes (rolling 30d)
   const velocity = u30;
@@ -884,7 +884,7 @@ function renderProductStatus(){
       }).join('')}
     </div>
 
-    ${anyApprox ? `<div style="font-family:'JetBrains Mono',monospace;font-size:9.5px;color:var(--grey);letter-spacing:.04em;margin-top:18px;text-align:center">* rolling 30d aproximado de 7d × 4.3 — redeploya refresh-shopify para data real de 30d</div>` : ''}
+    ${anyApprox ? `<div style="font-family:'JetBrains Mono',monospace;font-size:9.5px;color:var(--grey);letter-spacing:.04em;margin-top:18px;text-align:center;line-height:1.5">* Aproximado usando órdenes (1 orden ≈ 1 jean) y 7d × 4.3.<br>Redeploya refresh-shopify para data real de 30d en unidades.</div>` : ''}
   `;
 }
 
