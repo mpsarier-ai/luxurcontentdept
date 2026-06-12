@@ -275,6 +275,10 @@ html,body{background:var(--cream);color:var(--black);font-family:'Outfit',sans-s
 .modal-backdrop.open{display:flex}
 .modal{background:var(--cream);max-width:560px;width:100%;border:1px solid var(--black);padding:32px;font-family:'Outfit',sans-serif}
 .modal h3{font-family:'Cormorant Garamond',serif;font-weight:700;font-style:italic;font-size:28px;margin-bottom:8px}
+.modal h3[contenteditable]{outline:none;border-radius:6px;padding:2px 8px;margin-left:-8px;margin-right:-8px;cursor:text;transition:background .15s ease;position:relative}
+.modal h3[contenteditable]:hover{background:rgba(212,132,142,.06)}
+.modal h3[contenteditable]:focus{background:rgba(212,132,142,.14)}
+.modal h3[contenteditable]:empty::before{content:'(sin título)';color:var(--grey);font-style:italic}
 .modal .modal-meta{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:var(--grey);margin-bottom:20px}
 .modal p{font-size:14px;line-height:1.55;margin-bottom:14px}
 .modal-actions{display:flex;gap:10px;justify-content:flex-end;margin-top:24px}
@@ -815,8 +819,8 @@ body{padding-top:env(safe-area-inset-top);padding-bottom:env(safe-area-inset-bot
 <!-- PIECE MODAL (workflow + assignment + product + URLs + comments) -->
 <div class="modal-backdrop" id="urlsModal">
   <div class="modal modal-piece">
-    <div class="modal-meta">Pieza de contenido</div>
-    <h3 data-modal-title>—</h3>
+    <div class="modal-meta">Pieza de contenido · click el título para editarlo</div>
+    <h3 data-modal-title contenteditable="true" spellcheck="false" enterkeyhint="done">—</h3>
 
     <div class="pm-grid">
       <div>
@@ -2162,6 +2166,10 @@ function saveUrlsModal(){
   const piece = state.pieces.find(p => p.id === pieceId);
   if (!piece) return;
 
+  // Título editable: lee del h3 contenteditable y cae al título anterior si quedó vacío
+  const titleEl = modal.querySelector('[data-modal-title]');
+  const newTitle = (titleEl ? titleEl.textContent.trim() : '') || piece.title || 'Pieza';
+
   const imageUrl = modal.querySelector('[data-modal-input="imageUrl"]').value.trim() || null;
   const refUrl = modal.querySelector('[data-modal-input="refUrl"]').value.trim() || null;
   const assignee = modal.querySelector('[data-pm="assignee"]').value || null;
@@ -2183,7 +2191,7 @@ function saveUrlsModal(){
   const fmts = Array.from(modal.querySelectorAll('[data-pm-fmt] input:checked')).map(cb => cb.value);
   const type = fmts.length ? fmts.join(' · ') : (piece.type || 'Post');
 
-  const updated = { ...piece, imageUrl, refUrl, assignee, platform, status, productGid, day, type };
+  const updated = { ...piece, title: newTitle, imageUrl, refUrl, assignee, platform, status, productGid, day, type };
   state.pieces = state.pieces.map(p => p.id === pieceId ? updated : p);
   saveOnePiece(updated);
   closeUrlsModal();
@@ -2304,6 +2312,19 @@ if (urlsModalEl){
   urlsModalEl.querySelector('[data-urls-save]').addEventListener('click', saveUrlsModal);
   urlsModalEl.querySelector('[data-urls-upload]').addEventListener('click', uploadPhotoFromModal);
   urlsModalEl.addEventListener('click', e => { if (e.target === urlsModalEl) closeUrlsModal(); });
+
+  // Título contenteditable: Enter confirma (blur), pegar texto plano sin HTML
+  const titleEl = urlsModalEl.querySelector('[data-modal-title]');
+  if (titleEl){
+    titleEl.addEventListener('keydown', e => {
+      if (e.key === 'Enter') { e.preventDefault(); titleEl.blur(); }
+    });
+    titleEl.addEventListener('paste', e => {
+      e.preventDefault();
+      const text = (e.clipboardData || window.clipboardData).getData('text/plain') || '';
+      document.execCommand('insertText', false, text.replace(/\n/g, ' '));
+    });
+  }
 
   // Status toggle
   urlsModalEl.querySelectorAll('[data-pm-status] button').forEach(b => {
