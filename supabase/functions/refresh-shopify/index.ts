@@ -45,12 +45,12 @@ async function fetchOrders(token: string, sinceISO: string) {
     id: string;
     createdAt: string;
     total: number;
-    lineItems: Array<{ title: string; amount: number }>;
+    lineItems: Array<{ title: string; amount: number; quantity: number }>;
   }> = [];
   let cursor: string | null = null;
   let hasNext = true;
   let pages = 0;
-  while (hasNext && pages < 10) {
+  while (hasNext && pages < 20) {
     pages++;
     const data: any = await shopifyGQL(token, `
       query($cursor: String) {
@@ -62,7 +62,7 @@ async function fetchOrders(token: string, sinceISO: string) {
               createdAt
               currentTotalPriceSet { shopMoney { amount } }
               lineItems(first: 50) {
-                edges { node { title originalTotalSet { shopMoney { amount } } } }
+                edges { node { title quantity originalTotalSet { shopMoney { amount } } } }
               }
             }
           }
@@ -75,6 +75,7 @@ async function fetchOrders(token: string, sinceISO: string) {
       const lineItems = n.lineItems.edges.map((le: any) => ({
         title: le.node.title,
         amount: parseFloat(le.node.originalTotalSet?.shopMoney?.amount || "0"),
+        quantity: parseInt(le.node.quantity ?? "0", 10) || 0,
       }));
       // "gross sales" = suma de lineItems a precio original (antes de descuentos/
       // impuestos/envio), para que coincida con el gross_sales de Shopify Analytics
@@ -254,22 +255,24 @@ async function handler(_req: Request): Promise<Response> {
     }
 
     // Per-calendar window = the 7 days BEFORE the calendar's start_date.
-    // Global fetch from the earliest needed date (also covers rolling -7d for catalog).
+    // Global fetch from the earliest needed date (también cubre rolling -7d y -60d para el catálogo).
     const todayISO = daysAgoISO(0);
-    const rollingStart = daysAgoISO(7);   // last 7 days (days 7..1 ago)
-    const prevWeekStart = daysAgoISO(14); // the 7 days BEFORE that (days 14..8 ago)
-    let earliest = prevWeekStart;
+    const rollingStart = daysAgoISO(7);   // últimos 7 días (días 7..1 atrás)
+    const prevWeekStart = daysAgoISO(14); // los 7 días antes (días 14..8 atrás)
+    const rolling30Start = daysAgoISO(30);  // últimos 30 días
+    const prev30Start = daysAgoISO(60);     // los 30 días antes
+    let earliest = prev30Start;             // 60 días atrás cubre todo
     for (const cal of calendars) {
       const ps = shiftISO(cal.start_date, -7);
       if (ps < earliest) earliest = ps;
     }
     const orders = await fetchOrders(shopifyToken, earliest);
 
-    // Aggregate any [startISO .. startISO+6] window from the fetched orders
-    function buildWindow(startISO: string){
-      const endISO = shiftISO(startISO, 6);
+    // Aggregate any [startISO .. endISO] window from the fetched orders
+    function buildWindow(startISO: string, days: number = 7){
+      const endISO = shiftISO(startISO, days - 1);
       const dayMap: Record<string, { gross: number; orders: number }> = {};
-      const prodMap: Record<string, { gross: number; orderIds: Set<string> }> = {};
+      const prodMap: Record<string, { gross: number; units: number; orderIds: Set<string> }> = {};
       for (const o of orders) {
         const day = bogotaDate(o.createdAt);
         if (day < startISO || day > endISO) continue;
@@ -277,13 +280,14 @@ async function handler(_req: Request): Promise<Response> {
         dayMap[day].gross += o.total;
         dayMap[day].orders += 1;
         for (const li of o.lineItems) {
-          if (!prodMap[li.title]) prodMap[li.title] = { gross: 0, orderIds: new Set() };
+          if (!prodMap[li.title]) prodMap[li.title] = { gross: 0, units: 0, orderIds: new Set() };
           prodMap[li.title].gross += li.amount;
+          prodMap[li.title].units += li.quantity || 0;
           prodMap[li.title].orderIds.add(o.id);
         }
       }
       const series: Array<{ date: string; gross: number; orders: number }> = [];
-      for (let i = 0; i < 7; i++) {
+      for (let i = 0; i < days; i++) {
         const d = shiftISO(startISO, i);
         const e = dayMap[d] || { gross: 0, orders: 0 };
         series.push({ date: d, gross: e.gross, orders: e.orders });
@@ -301,7 +305,7 @@ async function handler(_req: Request): Promise<Response> {
         peak: s.gross === maxV && maxV > 0,
       }));
       const sellersSorted = Object.entries(prodMap)
-        .map(([title, v]) => ({ title, gross: v.gross, orders: v.orderIds.size }))
+        .map(([title, v]) => ({ title, gross: v.gross, units: v.units, orders: v.orderIds.size }))
         .sort((a, b) => b.gross - a.gross);
       const topSellers = sellersSorted.slice(0, 6).map(s => ({
         name: shortName(s.title), sales: fmtM(s.gross), orders: s.orders,
@@ -309,20 +313,34 @@ async function handler(_req: Request): Promise<Response> {
       return { startISO, endISO, prodMap, series, totalGross, totalOrders, bestDay, dailyChart, topSellers, top: sellersSorted[0] };
     }
 
-    // Catalog enriched with last-7d sales + previous-7d sales (week-over-week)
+    // Catalog enriched con ventanas 7d, prev-7d, 30d, prev-30d (units + gross)
     let catalogCount = 0;
     try {
-      const rolling = buildWindow(rollingStart);
-      const prev = buildWindow(prevWeekStart);
+      const rolling = buildWindow(rollingStart, 7);
+      const prev = buildWindow(prevWeekStart, 7);
+      const rolling30 = buildWindow(rolling30Start, 30);
+      const prev30 = buildWindow(prev30Start, 30);
       const catalog = await fetchCatalog(shopifyToken);
       catalogCount = catalog.length;
       for (const p of catalog as any[]) {
         const sold = rolling.prodMap[p.title];
         const soldPrev = prev.prodMap[p.title];
+        const sold30 = rolling30.prodMap[p.title];
+        const soldPrev30 = prev30.prodMap[p.title];
+        // 7d window
         p.sales7d = sold ? Math.round(sold.gross) : 0;
+        p.units7d = sold ? sold.units : 0;
         p.orders7d = sold ? sold.orderIds.size : 0;
         p.salesPrev7d = soldPrev ? Math.round(soldPrev.gross) : 0;
+        p.unitsPrev7d = soldPrev ? soldPrev.units : 0;
         p.ordersPrev7d = soldPrev ? soldPrev.orderIds.size : 0;
+        // 30d window (rolling)
+        p.sales30d = sold30 ? Math.round(sold30.gross) : 0;
+        p.units30d = sold30 ? sold30.units : 0;
+        p.orders30d = sold30 ? sold30.orderIds.size : 0;
+        p.salesPrev30d = soldPrev30 ? Math.round(soldPrev30.gross) : 0;
+        p.unitsPrev30d = soldPrev30 ? soldPrev30.units : 0;
+        p.ordersPrev30d = soldPrev30 ? soldPrev30.orderIds.size : 0;
       }
       await rpcCall('rpc_update_catalog', { data: catalog });
     } catch (err) {
