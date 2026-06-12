@@ -671,7 +671,16 @@ async function enterApp(){
       }
     } catch (err) { console.warn('Auto-redirect skipped', err); }
   }
-  await Promise.all([loadCalendars(), loadProductStatus(), loadPipeline()]);
+  // Cada loader es independiente — si uno falla, los otros NO se caen
+  await Promise.allSettled([
+    loadCalendars().catch(e => { console.error('loadCalendars failed:', e); }),
+    loadProductStatus().catch(e => {
+      console.error('loadProductStatus failed:', e);
+      const el = document.getElementById('prodStatus');
+      if (el) el.innerHTML = `<div class="fa-empty">Error cargando dashboard. ${(e && e.message) || ''}<br>Marketing Dept y Producción siguen funcionando.</div>`;
+    }),
+    loadPipeline().catch(e => { console.error('loadPipeline failed:', e); }),
+  ]);
   // Si la URL pide una sección específica (#marketing | #produccion | #fashionalytics) la abrimos
   if (['marketing','produccion','fashionalytics'].includes(location.hash.slice(1))){
     showHubSection(location.hash.slice(1));
@@ -963,6 +972,17 @@ function fmtMoneyShort(n){
 }
 
 function renderProductStatus(){
+  const el = document.getElementById('prodStatus');
+  if (!el) return;
+  try {
+    _renderProductStatusInner();
+  } catch (err) {
+    console.error('renderProductStatus error:', err);
+    el.innerHTML = `<div class="fa-empty">Error renderizando dashboard: ${(err && err.message) || 'desconocido'}<br><small style="font-size:10px;color:var(--grey)">Marketing Dept y Producción siguen funcionando. Forzá refresh para reintentar.</small></div>`;
+  }
+}
+
+function _renderProductStatusInner(){
   const el = document.getElementById('prodStatus');
   const meta = document.getElementById('prodStatusMeta');
   if (!el) return;
