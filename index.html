@@ -447,7 +447,7 @@ body{padding-top:env(safe-area-inset-top);padding-bottom:env(safe-area-inset-bot
       <button class="hub-back" data-hub-back>Inicio</button>
       <div class="hub-section-title">Fashionalytics</div>
     </div>
-    <h2 class="section-title"><span>Estado de Inventario</span><span class="meta" id="prodStatusMeta">—</span></h2>
+    <h2 class="section-title"><span>Dashboard · Jeans activos</span><span class="meta" id="prodStatusMeta">—</span></h2>
     <div class="prod-status" id="prodStatus"><div class="empty-state">Cargando catálogo…</div></div>
   </section>
 </div>
@@ -789,8 +789,9 @@ function renderProductStatus(){
   if (!el) return;
   if (!catalog.length){ el.innerHTML = '<div class="fa-empty">Sin catálogo aún. Corre el refresh de Shopify.</div>'; return; }
 
-  // Solo productos con ventas o con stock relevante (filtra ruido)
-  const products = catalog.filter(p => (p.total ?? 0) !== 0 || (p.units30d ?? p.units7d ?? 0) > 0);
+  // Solo JEANS activos (excluye tank tops + accesorios) y con stock o ventas
+  const isJean = t => /^JEAN[\s·\-]/i.test((t || '').trim());
+  const products = catalog.filter(p => isJean(p.title) && ((p.total ?? 0) !== 0 || (p.units30d ?? p.units7d ?? 0) > 0));
   const analyzed = products.map(p => ({ p, a: faAnalyze(p) }));
   const anyApprox = analyzed.some(x => x.a.approx);
 
@@ -808,7 +809,7 @@ function renderProductStatus(){
     .slice(0, 10);
   const maxTop = Math.max(1, ...topRolling.map(x => x.a.u30));
 
-  if (meta) meta.textContent = `${analyzed.length} productos · live`;
+  if (meta) meta.textContent = `${analyzed.length} jeans · live Shopify`;
 
   // Filtros
   const filterChips = [
@@ -829,7 +830,7 @@ function renderProductStatus(){
       <div class="fa-kpi">
         <div class="fa-kpi-label">Vendido 30d</div>
         <div class="fa-kpi-num">${sold30}</div>
-        <div class="fa-kpi-sub">unidades · todos los productos</div>
+        <div class="fa-kpi-sub">unidades · jeans activos</div>
       </div>
       <div class="fa-kpi urgente">
         <div class="fa-kpi-label">Restock urgente</div>
