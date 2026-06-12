@@ -148,6 +148,36 @@ header{border-bottom:1px solid var(--black);padding-bottom:24px;margin-bottom:64
 .modal-preview{background:#fff;border:1px solid var(--cream-dark);padding:12px;font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--grey);margin-top:14px;line-height:1.5}
 .modal-preview strong{color:var(--black);font-weight:500}
 
+/* === HUB TILES · departamento home === */
+.hub-tiles{display:grid;grid-template-columns:repeat(2,1fr);gap:14px;margin:18px 0 32px;padding:0}
+.hub-tile{display:flex;flex-direction:column;align-items:flex-start;gap:14px;padding:22px;background:#fff;border:1px solid rgba(0,0,0,.04);border-radius:22px;text-decoration:none;color:var(--black);cursor:pointer;text-align:left;font-family:inherit;box-shadow:0 1px 3px rgba(0,0,0,.04),0 4px 16px rgba(0,0,0,.05);transition:transform .25s cubic-bezier(.16,1,.3,1),box-shadow .25s;position:relative;overflow:hidden;min-height:170px}
+.hub-tile:hover{transform:translateY(-2px);box-shadow:0 6px 20px rgba(0,0,0,.08),0 2px 6px rgba(0,0,0,.04)}
+.hub-tile:active{transform:scale(.97)}
+.hub-tile-icon{font-size:34px;line-height:1;display:flex;align-items:center;justify-content:center;width:54px;height:54px;border-radius:16px;background:var(--cream);flex-shrink:0}
+.hub-tile.whatsapp .hub-tile-icon{background:rgba(37,211,102,.12);color:#25d366}
+.hub-tile[data-section="marketing"] .hub-tile-icon{background:rgba(212,132,142,.14)}
+.hub-tile[data-section="produccion"] .hub-tile-icon{background:rgba(232,165,173,.18)}
+.hub-tile[data-section="fashionalytics"] .hub-tile-icon{background:rgba(26,26,26,.08)}
+.hub-tile-body{flex:1;width:100%}
+.hub-tile-title{font-family:'Cormorant Garamond',serif;font-weight:700;font-size:22px;line-height:1.1;letter-spacing:-.01em;margin-bottom:4px}
+.hub-tile-sub{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--grey);line-height:1.3}
+.hub-tile-arrow{position:absolute;top:22px;right:22px;color:var(--grey);font-size:22px;line-height:1;opacity:.5;transition:opacity .2s,transform .2s}
+.hub-tile:hover .hub-tile-arrow{opacity:1;transform:translateX(2px)}
+
+/* Sección detalle · back button limpio */
+.hub-section{animation:llFadeUp .4s cubic-bezier(.16,1,.3,1) both}
+.hub-back{display:inline-flex;align-items:center;gap:6px;background:transparent;border:none;color:var(--rosa-deep);font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.12em;text-transform:uppercase;cursor:pointer;padding:8px 12px;margin:0 0 18px -12px;border-radius:8px;font-weight:500}
+.hub-back:hover{background:rgba(212,132,142,.08);color:var(--black)}
+
+@media (max-width:480px){
+  .hub-tiles{grid-template-columns:1fr;gap:12px}
+  .hub-tile{min-height:auto;padding:18px;flex-direction:row;align-items:center;gap:16px}
+  .hub-tile-icon{width:48px;height:48px;font-size:28px;border-radius:14px}
+  .hub-tile-title{font-size:20px}
+  .hub-tile-arrow{position:static;font-size:20px}
+  .hub-tile-body{display:flex;flex-direction:column;justify-content:center}
+}
+
 /* === iOS APP SHELL · base === */
 html,body{-webkit-text-size-adjust:100%;-webkit-tap-highlight-color:transparent;overscroll-behavior:none;-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility}
 *{-webkit-touch-callout:none}
@@ -285,27 +315,70 @@ body{padding-top:env(safe-area-inset-top);padding-bottom:env(safe-area-inset-bot
     <button class="signout-btn" id="signOutBtn">Salir</button>
   </div>
 
-  <a class="wa-btn" href="https://chat.whatsapp.com/GCmEivfGHfxL9NwWcES7IF?mode=gi_t" target="_blank" rel="noopener">
-    <span class="wa-ico">💬</span> Grupo de WhatsApp del equipo
-  </a>
+  <!-- HUB HOME · 4 tiles departamento -->
+  <section id="hubHome" class="hub-tiles">
+    <a class="hub-tile whatsapp" href="https://chat.whatsapp.com/GCmEivfGHfxL9NwWcES7IF?mode=gi_t" target="_blank" rel="noopener">
+      <div class="hub-tile-icon">💬</div>
+      <div class="hub-tile-body">
+        <div class="hub-tile-title">WhatsApp</div>
+        <div class="hub-tile-sub">Grupo del equipo</div>
+      </div>
+      <div class="hub-tile-arrow">↗</div>
+    </a>
+    <button class="hub-tile" data-section="marketing">
+      <div class="hub-tile-icon">📅</div>
+      <div class="hub-tile-body">
+        <div class="hub-tile-title">Marketing Dept</div>
+        <div class="hub-tile-sub">Calendarios y contenido</div>
+      </div>
+      <div class="hub-tile-arrow">›</div>
+    </button>
+    <button class="hub-tile" data-section="produccion">
+      <div class="hub-tile-icon">🚚</div>
+      <div class="hub-tile-body">
+        <div class="hub-tile-title">Producción</div>
+        <div class="hub-tile-sub">Qué llega y cuándo</div>
+      </div>
+      <div class="hub-tile-arrow">›</div>
+    </button>
+    <button class="hub-tile" data-section="fashionalytics">
+      <div class="hub-tile-icon">📊</div>
+      <div class="hub-tile-body">
+        <div class="hub-tile-title">Fashionalytics</div>
+        <div class="hub-tile-sub">Estado de inventario</div>
+      </div>
+      <div class="hub-tile-arrow">›</div>
+    </button>
+  </section>
 
-  <h2 class="section-title"><span>Estado de Productos</span><span class="meta" id="prodStatusMeta">—</span></h2>
-  <div class="prod-status" id="prodStatus"><div class="empty-state">Cargando catálogo…</div></div>
+  <!-- MARKETING DEPT · calendarios -->
+  <section id="hubMarketing" class="hub-section" hidden>
+    <button class="hub-back" data-hub-back>← Inicio</button>
+    <h2 class="section-title">
+      <span>Marketing · Calendarios Semanales</span>
+      <button class="new-week-btn" id="newWeekBtn">+ Nueva Semana</button>
+    </h2>
+    <div class="cal-list" id="calList">
+      <div class="empty-state">Cargando…</div>
+    </div>
+  </section>
 
-  <h2 class="section-title">
-    <span>Próximas Entradas</span>
-    <button class="new-week-btn" id="addEntryBtn">+ Agregar entrada</button>
-  </h2>
-  <div class="timeline" id="timeline"><div class="empty-state">Cargando…</div></div>
+  <!-- PRODUCCIÓN · pipeline -->
+  <section id="hubProduccion" class="hub-section" hidden>
+    <button class="hub-back" data-hub-back>← Inicio</button>
+    <h2 class="section-title">
+      <span>Producción · Próximas Entradas</span>
+      <button class="new-week-btn" id="addEntryBtn">+ Agregar entrada</button>
+    </h2>
+    <div class="timeline" id="timeline"><div class="empty-state">Cargando…</div></div>
+  </section>
 
-  <h2 class="section-title">
-    <span>Calendarios Semanales</span>
-    <button class="new-week-btn" id="newWeekBtn">+ Nueva Semana</button>
-  </h2>
-
-  <div class="cal-list" id="calList">
-    <div class="empty-state">Cargando…</div>
-  </div>
+  <!-- FASHIONALYTICS · estado de productos -->
+  <section id="hubFashionalytics" class="hub-section" hidden>
+    <button class="hub-back" data-hub-back>← Inicio</button>
+    <h2 class="section-title"><span>Fashionalytics · Estado de Inventario</span><span class="meta" id="prodStatusMeta">—</span></h2>
+    <div class="prod-status" id="prodStatus"><div class="empty-state">Cargando catálogo…</div></div>
+  </section>
 </div>
 
 <footer class="footer">
@@ -470,9 +543,9 @@ let catalog = [];
 async function enterApp(){
   hideLogin();
   if (editorList) editorList.textContent = user.email;
-  // Auto-redirect al calendario actual si existe y el usuario no agregó ?stay=1
+  // Hub home con los 4 tiles. Solo auto-redirect si la URL trae ?go=current explícito.
   const urlParams = new URLSearchParams(location.search);
-  if (!urlParams.has('stay')){
+  if (urlParams.get('go') === 'current'){
     try {
       const todayISO = new Date().toISOString().slice(0,10);
       const { data: currentCal } = await supabase
@@ -490,7 +563,28 @@ async function enterApp(){
     } catch (err) { console.warn('Auto-redirect skipped', err); }
   }
   await Promise.all([loadCalendars(), loadProductStatus(), loadPipeline()]);
+  // Si la URL pide una sección específica (#marketing | #produccion | #fashionalytics) la abrimos
+  if (['marketing','produccion','fashionalytics'].includes(location.hash.slice(1))){
+    showHubSection(location.hash.slice(1));
+  }
 }
+
+// === HUB NAVEGACIÓN entre tiles y secciones ===
+function showHubSection(name){
+  const map = { home: 'hubHome', marketing: 'hubMarketing', produccion: 'hubProduccion', fashionalytics: 'hubFashionalytics' };
+  Object.keys(map).forEach(k => {
+    const el = document.getElementById(map[k]);
+    if (el) el.hidden = (k !== name);
+  });
+  if (name !== 'home') location.hash = name; else if (location.hash) history.replaceState(null, '', location.pathname + location.search);
+  window.scrollTo({top:0, behavior:'smooth'});
+}
+document.addEventListener('click', e => {
+  const tile = e.target.closest('[data-section]');
+  if (tile){ showHubSection(tile.getAttribute('data-section')); return; }
+  const back = e.target.closest('[data-hub-back]');
+  if (back){ showHubSection('home'); return; }
+});
 
 async function loadProductStatus(){
   const { data } = await supabase.from('shopify_catalog').select('products').eq('id', 1).maybeSingle();
