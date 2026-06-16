@@ -252,6 +252,13 @@ header{border-bottom:1px solid var(--black);padding-bottom:24px;margin-bottom:64
 .tl-copy-link.copied{background:var(--rosa-deep);color:#fff;border-color:var(--rosa-deep)}
 .tl-row{grid-template-columns:auto 1fr auto}
 .tl-row.tl-has-prod{grid-template-areas:"date body actions" "stepper stepper stepper" "summary summary summary" "prodact prodact prodact"}
+/* Lote header card */
+.tl-batch{background:rgba(212,132,142,.05);border:1px solid rgba(212,132,142,.2)}
+.tl-batch .tl-name span:first-child{font-family:'Cormorant Garamond',serif;font-size:18px;font-weight:700}
+/* Variante nested debajo del lote */
+.tl-variant{margin-left:24px;border-left:3px solid rgba(212,132,142,.25);background:rgba(237,235,230,.6)}
+.tl-variant .tl-name span:first-child::before{content:'↳ ';color:var(--rosa-deep);font-weight:400}
+.tl-variant.tl-empty{background:transparent;border-left-style:dashed;display:block;grid-template-columns:1fr;color:var(--grey)}
 .tl-has-prod .tl-date{grid-area:date}
 .tl-has-prod .tl-body{grid-area:body}
 .tl-has-prod .tl-actions{grid-area:actions}
@@ -551,7 +558,10 @@ body{padding-top:env(safe-area-inset-top);padding-bottom:env(safe-area-inset-bot
     </div>
     <h2 class="section-title">
       <span>Próximas Entradas</span>
-      <button class="new-week-btn" id="addEntryBtn">+ Agregar entrada</button>
+      <span style="display:flex;gap:8px">
+        <button class="new-week-btn" id="addBatchBtn">+ Nuevo lote</button>
+        <button class="new-week-btn" id="addEntryBtn" style="background:transparent;color:var(--black);border:1px solid var(--cream-dark)">+ Jean suelto</button>
+      </span>
     </h2>
     <div class="timeline" id="timeline"><div class="empty-state">Cargando…</div></div>
   </section>
@@ -652,6 +662,71 @@ body{padding-top:env(safe-area-inset-top);padding-bottom:env(safe-area-inset-bot
     <div class="modal-actions">
       <button class="modal-btn" id="entryCancel">Cancelar</button>
       <button class="modal-btn primary" id="entrySave">Guardar</button>
+    </div>
+  </div>
+</div>
+
+<!-- BATCH (LOTE) MODAL -->
+<div class="modal-backdrop" id="batchModal">
+  <div class="modal">
+    <div class="modal-meta">Lote de producción</div>
+    <h3 id="batchModalTitle">Nuevo lote</h3>
+    <p>Un lote es la referencia de tela completa. Hasta Lavandería se trata como un todo. En Terminación se subdivide por diseño (variantes).</p>
+
+    <label>Nombre del lote</label>
+    <input type="text" id="batchName" placeholder="ej: Relaxed Fit DB0168" autocomplete="off">
+
+    <label>Cantidad total (unidades)</label>
+    <input type="number" id="batchQty" placeholder="ej: 320" min="0" step="1">
+
+    <label>Fecha tentativa de entrega</label>
+    <input type="date" id="batchDate">
+
+    <label class="ci-toggle">
+      <input type="checkbox" id="batchHasProceso" checked>
+      <span>Pasa por <b>Proceso</b> (bordado / estampado)</span>
+    </label>
+
+    <label>Notas (opcional)</label>
+    <input type="text" id="batchNotes" placeholder="ej: tela negra, 320u total">
+
+    <div class="modal-error" id="batchError"></div>
+
+    <div class="modal-actions">
+      <button class="modal-btn" id="batchCancel">Cancelar</button>
+      <button class="modal-btn primary" id="batchSave">Guardar lote</button>
+    </div>
+  </div>
+</div>
+
+<!-- VARIANT MODAL -->
+<div class="modal-backdrop" id="variantModal">
+  <div class="modal">
+    <div class="modal-meta">Variante de diseño · <span id="variantBatchName">—</span></div>
+    <h3 id="variantModalTitle">Nueva variante</h3>
+    <p>Diseño puntual dentro del lote (ej: Cruces Negras del Relaxed Fit DB0168). Se trackea individualmente desde Terminación.</p>
+
+    <label>Diseño</label>
+    <input type="text" id="variantDesign" placeholder="ej: Cruces Negras" autocomplete="off">
+
+    <label>Cantidad</label>
+    <input type="number" id="variantQty" placeholder="ej: 80" min="0" step="1">
+
+    <label>Curva de tallas</label>
+    <div class="curve-inputs" id="variantCurveInputs">
+      <label class="ci"><span>XS</span><input type="number" data-vsize="XS" min="0" step="1" placeholder="0"></label>
+      <label class="ci"><span>S</span><input type="number" data-vsize="S" min="0" step="1" placeholder="0"></label>
+      <label class="ci"><span>M</span><input type="number" data-vsize="M" min="0" step="1" placeholder="0"></label>
+      <label class="ci"><span>L</span><input type="number" data-vsize="L" min="0" step="1" placeholder="0"></label>
+      <label class="ci"><span>XL</span><input type="number" data-vsize="XL" min="0" step="1" placeholder="0"></label>
+    </div>
+    <div style="font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--grey);margin-top:4px;letter-spacing:.04em">Suma actual: <span id="variantCurveSum">0</span>u</div>
+
+    <div class="modal-error" id="variantError"></div>
+
+    <div class="modal-actions">
+      <button class="modal-btn" id="variantCancel">Cancelar</button>
+      <button class="modal-btn primary" id="variantSave">Guardar variante</button>
     </div>
   </div>
 </div>
@@ -1259,15 +1334,31 @@ document.addEventListener('click', e => {
 });
 
 let pipeline = [];
+let batches = []; // production_batches rows
+
 async function loadPipeline(){
-  const { data, error } = await supabase
-    .from('product_pipeline')
-    .select('*')
-    .order('tentative_date', { ascending: true });
-  if (error){ console.error('pipeline', error); document.getElementById('timeline').innerHTML = `<div class="empty-state">Error: ${escapeHtml(error.message)}</div>`; return; }
-  pipeline = data || [];
+  // Carga batches + pipeline en paralelo
+  const [pipeRes, batchRes] = await Promise.all([
+    supabase.from('product_pipeline').select('*').order('tentative_date', { ascending: true }),
+    supabase.from('production_batches').select('*').order('tentative_date', { ascending: true }),
+  ]);
+  if (pipeRes.error){ console.error('pipeline', pipeRes.error); document.getElementById('timeline').innerHTML = `<div class="empty-state">Error: ${escapeHtml(pipeRes.error.message)}</div>`; return; }
+  pipeline = pipeRes.data || [];
+  batches = batchRes.error ? [] : (batchRes.data || []);
+  if (batchRes.error) console.warn('batches load failed (¿corriste production_batches_upgrade.sql?):', batchRes.error.message);
   renderPipeline();
-  loadSupplierLink(); // cargar el link del proveedor en el box de arriba
+  loadSupplierLink();
+}
+
+// Etapas a nivel LOTE (Corte → Lavandería)
+const BATCH_STAGES = [
+  { key: 'corte',      short: 'Corte',   label: 'Corte' },
+  { key: 'proceso',    short: 'Proc',    label: 'Proceso' },
+  { key: 'confeccion', short: 'Confec',  label: 'Confección' },
+  { key: 'lavanderia', short: 'Lavand',  label: 'Lavandería' },
+];
+function getBatchStages(hasProceso){
+  return hasProceso !== false ? BATCH_STAGES : BATCH_STAGES.filter(s => s.key !== 'proceso');
 }
 
 // Carga el primer proveedor + arma su link para el box arriba de Producción
@@ -1392,82 +1483,195 @@ function renderStepperInline(e){
   return html;
 }
 
+function renderPipelineEntry(e, isVariantNested){
+  const todayStr = new Date().toISOString().slice(0,10);
+  const fmtDM = iso => { const p = iso.split('-'); return `${parseInt(p[2])} ${MONTH_ABBR[parseInt(p[1])-1]}`; };
+  let dateBox;
+  if (e.tentative_date && e.tentative_date_end){
+    dateBox = `<div class="tl-date" style="font-size:16px">${fmtDM(e.tentative_date)}<small>a ${fmtDM(e.tentative_date_end)}</small></div>`;
+  } else if (e.tentative_date){
+    const d = e.tentative_date.split('-');
+    dateBox = `<div class="tl-date">${parseInt(d[2])}<small>${MONTH_ABBR[parseInt(d[1])-1]}</small></div>`;
+  } else {
+    dateBox = `<div class="tl-date">—</div>`;
+  }
+  const effEnd = e.tentative_date_end || e.tentative_date;
+  const overdue = effEnd && effEnd < todayStr && e.status === 'pendiente';
+  const metaBits = [];
+  if (e.entry_type === 'launch' && e.photo_date){
+    const pd = e.photo_date.split('-');
+    const photoOverdue = e.photo_date < todayStr && e.status === 'pendiente';
+    metaBits.push(`<span class="tl-photo ${photoOverdue?'overdue':''}">📸 fotos ${parseInt(pd[2])} ${MONTH_ABBR[parseInt(pd[1])-1]}${photoOverdue?' (atrasado)':''}</span>`);
+  }
+  if (e.quantity) metaBits.push(`<span><b>${e.quantity}u</b></span>`);
+  if (e.size_curve && typeof e.size_curve === 'object'){
+    const curve = Object.entries(e.size_curve).filter(([_,v]) => v > 0).map(([k,v]) => `${k}·${v}`).join(' ');
+    if (curve) metaBits.push(`<span>${escapeHtml(curve)}</span>`);
+  }
+  if (e.notes) metaBits.push(`<span>${escapeHtml(e.notes)}</span>`);
+  if (overdue) metaBits.push(`<span style="color:var(--red-out)">⚠ atrasado</span>`);
+  const metaHtml = metaBits.length ? `<div class="tl-meta">${metaBits.join('')}</div>` : '';
+  // Stepper inline: variantes solo muestran 2 etapas (Term + Entr)
+  const showStepper = e.entry_type === 'restock' || e.entry_type === 'launch';
+  const stepperHtml = showStepper ? (isVariantNested ? renderVariantStepperInline(e) : renderStepperInline(e)) : '';
+  const displayName = isVariantNested && e.design_name ? e.design_name : e.product_name;
+  return `<div class="tl-row ${overdue?'tl-overdue':''} ${showStepper?'tl-has-prod':''} ${isVariantNested ? 'tl-variant' : ''}" data-id="${e.id}">
+    ${dateBox}
+    <div class="tl-body">
+      ${!isVariantNested ? `<span class="tl-type ${e.entry_type}">${e.entry_type === 'launch' ? 'Lanzamiento' : 'Restock'}</span>` : ''}
+      <div class="tl-name" data-edit="${e.id}" title="Click para editar"><span>${escapeHtml(displayName || '—')}</span><span class="tl-edit-mark">✎</span></div>
+      ${metaHtml}
+    </div>
+    <div class="tl-actions">
+      <button class="tl-status ${e.status}" data-toggle="${e.id}">${e.status === 'llego' ? '✓ Llegó' : 'Pendiente'}</button>
+      <button class="tl-del" data-del="${e.id}" title="Eliminar">×</button>
+    </div>
+    ${stepperHtml}
+  </div>`;
+}
+
+// Stepper para VARIANTES: solo 2 etapas (Terminación + Entrega).
+// Las etapas tempranas vienen del lote.
+function renderVariantStepperInline(v){
+  const stages = [
+    { key: 'terminacion', short: 'Term' },
+    { key: 'entrega',     short: 'Entr' },
+  ];
+  const lastDoneIdx = v.stage ? stages.findIndex(s => s.key === v.stage) : -1;
+  const isFullyDone = lastDoneIdx === stages.length - 1;
+  const currentIdx = lastDoneIdx + 1;
+  let html = '<div class="tl-stepper">';
+  stages.forEach((s, i) => {
+    const isDone = i <= lastDoneIdx;
+    const isCur = !isFullyDone && i === currentIdx;
+    const cls = isDone ? 'done' : (isCur ? 'current' : '');
+    html += `<button type="button" class="tl-stage ${cls}" data-set-stage="${s.key}" data-entry="${v.id}" title="Click para marcar ${s.short}"><span class="tl-stage-dot"></span><span class="tl-stage-label">${s.short}</span></button>`;
+    if (i < stages.length - 1) html += `<span class="tl-line ${i < lastDoneIdx ? 'done' : ''}"></span>`;
+  });
+  html += '</div>';
+  if (isFullyDone) html += `<div class="tl-stage-summary done">✓ Entregado</div>`;
+  return html;
+}
+
+function renderBatchCard(batch, variants){
+  const stages = getBatchStages(batch.has_proceso);
+  const lastIdx = batch.batch_stage ? stages.findIndex(s => s.key === batch.batch_stage) : -1;
+  const isLavadero = lastIdx === stages.length - 1; // ya terminó lavandería
+  const currentIdx = lastIdx + 1;
+  const todayStr = new Date().toISOString().slice(0,10);
+  const overdue = batch.tentative_date && batch.tentative_date < todayStr && !isLavadero;
+  let dateBox = '<div class="tl-date">—</div>';
+  if (batch.tentative_date){
+    const d = batch.tentative_date.split('-');
+    dateBox = `<div class="tl-date">${parseInt(d[2])}<small>${MONTH_ABBR[parseInt(d[1])-1]}</small></div>`;
+  }
+  // Mini stepper del lote
+  let stepperHtml = '<div class="tl-stepper">';
+  stages.forEach((s, i) => {
+    const isDone = i <= lastIdx;
+    const isCur = !isLavadero && i === currentIdx;
+    const cls = isDone ? 'done' : (isCur ? 'current' : '');
+    stepperHtml += `<button type="button" class="tl-stage ${cls}" data-batch-set-stage="${s.key}" data-batch="${batch.id}" title="Click para marcar ${s.short}"><span class="tl-stage-dot"></span><span class="tl-stage-label">${s.short}</span></button>`;
+    if (i < stages.length - 1) stepperHtml += `<span class="tl-line ${i < lastIdx ? 'done' : ''}"></span>`;
+  });
+  stepperHtml += '</div>';
+  const summary = isLavadero
+    ? `<div class="tl-stage-summary done">✓ Lote en Lavandería · variantes en Terminación</div>`
+    : (currentIdx >= 0 && currentIdx < stages.length
+        ? `<div class="tl-stage-summary">Lote en <b>${stages[currentIdx].short}</b></div>` : '');
+  const metaBits = [];
+  if (batch.total_quantity) metaBits.push(`<span><b>${batch.total_quantity}u</b> total</span>`);
+  if (variants.length) metaBits.push(`<span>${variants.length} ${variants.length === 1 ? 'variante' : 'variantes'}</span>`);
+  if (batch.notes) metaBits.push(`<span>${escapeHtml(batch.notes)}</span>`);
+  if (overdue) metaBits.push(`<span style="color:var(--red-out)">⚠ atrasado</span>`);
+  const metaHtml = metaBits.length ? `<div class="tl-meta">${metaBits.join('')}</div>` : '';
+
+  let html = `<div class="tl-row tl-batch tl-has-prod ${overdue?'tl-overdue':''}" data-batch-id="${batch.id}">
+    ${dateBox}
+    <div class="tl-body">
+      <span class="tl-type" style="background:var(--rosa-deep);color:#fff">LOTE</span>
+      <div class="tl-name" data-edit-batch="${batch.id}" title="Click para editar"><span>${escapeHtml(batch.name || 'Sin nombre')}</span><span class="tl-edit-mark">✎</span></div>
+      ${metaHtml}
+    </div>
+    <div class="tl-actions">
+      <button class="tl-status" data-add-variant="${batch.id}" title="Agregar variante de diseño" style="font-size:9px;border-color:var(--rosa-deep);color:var(--rosa-deep)">+ Variante</button>
+      <button class="tl-del" data-del-batch="${batch.id}" title="Eliminar lote">×</button>
+    </div>
+    ${stepperHtml}
+    ${summary}
+  </div>`;
+  // Variantes nested abajo
+  if (variants.length){
+    html += variants.map(v => renderPipelineEntry(v, true)).join('');
+  } else {
+    html += `<div class="tl-row tl-variant tl-empty" style="padding:12px 18px;text-align:center;color:var(--grey);font-style:italic;font-size:12.5px">Sin variantes · click "+ Variante" para agregar</div>`;
+  }
+  return html;
+}
+
 function renderPipeline(){
   const el = document.getElementById('timeline');
   if (!el) return;
-  if (!pipeline.length){ el.innerHTML = '<div class="empty-state">Sin entradas. Click "+ Agregar entrada" para registrar un restock o lanzamiento.</div>'; return; }
-  const todayStr = new Date().toISOString().slice(0,10);
-  el.innerHTML = pipeline.map(e => {
-    const fmtDM = iso => { const p = iso.split('-'); return `${parseInt(p[2])} ${MONTH_ABBR[parseInt(p[1])-1]}`; };
-    let dateBox;
-    if (e.tentative_date && e.tentative_date_end){
-      dateBox = `<div class="tl-date" style="font-size:16px">${fmtDM(e.tentative_date)}<small>a ${fmtDM(e.tentative_date_end)}</small></div>`;
-    } else if (e.tentative_date){
-      const d = e.tentative_date.split('-');
-      dateBox = `<div class="tl-date">${parseInt(d[2])}<small>${MONTH_ABBR[parseInt(d[1])-1]}</small></div>`;
+  if (!pipeline.length && !batches.length){
+    el.innerHTML = '<div class="empty-state">Sin entradas. Click "+ Nuevo lote" o "+ Jean suelto".</div>';
+    return;
+  }
+  // Indexá las variantes por batch_id, y separá standalone
+  const variantsByBatch = {};
+  const standalone = [];
+  pipeline.forEach(e => {
+    if (e.batch_id) {
+      if (!variantsByBatch[e.batch_id]) variantsByBatch[e.batch_id] = [];
+      variantsByBatch[e.batch_id].push(e);
     } else {
-      dateBox = `<div class="tl-date">—</div>`;
+      standalone.push(e);
     }
-    const effEnd = e.tentative_date_end || e.tentative_date;
-    const overdue = effEnd && effEnd < todayStr && e.status === 'pendiente';
-    const metaBits = [];
-    if (e.entry_type === 'launch' && e.photo_date){
-      const pd = e.photo_date.split('-');
-      const photoOverdue = e.photo_date < todayStr && e.status === 'pendiente';
-      metaBits.push(`<span class="tl-photo ${photoOverdue?'overdue':''}">📸 fotos ${parseInt(pd[2])} ${MONTH_ABBR[parseInt(pd[1])-1]}${photoOverdue?' (atrasado)':''}</span>`);
-    }
-    if (e.quantity) metaBits.push(`<span><b>${e.quantity}u</b></span>`);
-    if (e.size_curve && typeof e.size_curve === 'object'){
-      const curve = Object.entries(e.size_curve).filter(([_,v]) => v > 0).map(([k,v]) => `${k}·${v}`).join(' ');
-      if (curve) metaBits.push(`<span>${escapeHtml(curve)}</span>`);
-    }
-    if (e.notes) metaBits.push(`<span>${escapeHtml(e.notes)}</span>`);
-    if (overdue) metaBits.push(`<span style="color:var(--red-out)">⚠ atrasado</span>`);
-    const metaHtml = metaBits.length ? `<div class="tl-meta">${metaBits.join('')}</div>` : '';
-    // Stepper inline solo si tiene producción configurada
-    const showStepper = e.entry_type === 'restock' || e.entry_type === 'launch';
-    const stepperHtml = showStepper ? renderStepperInline(e) : '';
-    return `<div class="tl-row ${overdue?'tl-overdue':''} ${showStepper?'tl-has-prod':''}" data-id="${e.id}">
-      ${dateBox}
-      <div class="tl-body">
-        <span class="tl-type ${e.entry_type}">${e.entry_type === 'launch' ? 'Lanzamiento' : 'Restock'}</span>
-        <div class="tl-name" data-edit="${e.id}" title="Click para editar"><span>${escapeHtml(e.product_name)}</span><span class="tl-edit-mark">✎</span></div>
-        ${metaHtml}
-      </div>
-      <div class="tl-actions">
-        <button class="tl-status ${e.status}" data-toggle="${e.id}">${e.status === 'llego' ? '✓ Llegó' : 'Pendiente'}</button>
-        <button class="tl-del" data-del="${e.id}" title="Eliminar">×</button>
-      </div>
-      ${stepperHtml}
-    </div>`;
-  }).join('');
+  });
+  let html = '';
+  // Lotes primero, ordenados por fecha tentativa
+  const sortedBatches = batches.slice().sort((a, b) => (a.tentative_date || '9999') > (b.tentative_date || '9999') ? 1 : -1);
+  sortedBatches.forEach(batch => {
+    html += renderBatchCard(batch, variantsByBatch[batch.id] || []);
+  });
+  // Standalone después
+  if (standalone.length){
+    if (batches.length) html += `<div style="font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.15em;text-transform:uppercase;color:var(--grey);margin:18px 0 6px;padding:0 4px">Jeans sueltos</div>`;
+    html += standalone.map(e => renderPipelineEntry(e, false)).join('');
+  }
+  el.innerHTML = html;
   el.querySelectorAll('[data-toggle]').forEach(b => b.addEventListener('click', () => togglePipelineStatus(b.getAttribute('data-toggle'))));
   el.querySelectorAll('[data-del]').forEach(b => b.addEventListener('click', () => deletePipeline(b.getAttribute('data-del'))));
   el.querySelectorAll('[data-edit]').forEach(b => b.addEventListener('click', () => openEntryModal(b.getAttribute('data-edit'))));
-  // Click en cualquier dot del stepper para que VOS marqués una etapa como completada
+  // Click en dot del stepper variant/standalone
   el.querySelectorAll('[data-set-stage]').forEach(b => b.addEventListener('click', async (ev) => {
     ev.stopPropagation();
     const entryId = b.getAttribute('data-entry');
     const newStage = b.getAttribute('data-set-stage');
     const entry = pipeline.find(x => x.id === entryId);
     if (!entry) return;
-    const stages = getProdStages(entry.has_proceso);
-    const niceName = (stages.find(s => s.key === newStage) || {}).short || newStage;
-    if (entry.stage === newStage){
-      if (!confirm(`"${niceName}" ya está marcada como completada. ¿Forzar otra vez (registrar de nuevo en historial)?`)) return;
-    } else {
-      if (!confirm(`Marcar "${niceName}" como la última etapa completada?`)) return;
-    }
+    if (!confirm(`Marcar "${newStage}" como completada?`)) return;
     const newHistory = Array.isArray(entry.stage_history) ? entry.stage_history.slice() : [];
     newHistory.push({ stage: newStage, at: new Date().toISOString(), by: (user && user.email) || 'team' });
-    const { error } = await supabase.from('product_pipeline')
-      .update({ stage: newStage, stage_history: newHistory })
-      .eq('id', entryId);
-    if (error){
-      alert('Error al guardar: ' + error.message);
-    }
-    // El channel realtime de pipeline va a refrescar la vista
+    const { error } = await supabase.from('product_pipeline').update({ stage: newStage, stage_history: newHistory }).eq('id', entryId);
+    if (error) alert('Error al guardar: ' + error.message);
   }));
+  // Click en dot del stepper LOTE
+  el.querySelectorAll('[data-batch-set-stage]').forEach(b => b.addEventListener('click', async (ev) => {
+    ev.stopPropagation();
+    const batchId = b.getAttribute('data-batch');
+    const newStage = b.getAttribute('data-batch-set-stage');
+    const batch = batches.find(x => x.id === batchId);
+    if (!batch) return;
+    if (!confirm(`Marcar lote "${batch.name}" en etapa "${newStage}"?`)) return;
+    const newHistory = Array.isArray(batch.batch_stage_history) ? batch.batch_stage_history.slice() : [];
+    newHistory.push({ stage: newStage, at: new Date().toISOString(), by: (user && user.email) || 'team' });
+    const { error } = await supabase.from('production_batches').update({ batch_stage: newStage, batch_stage_history: newHistory }).eq('id', batchId);
+    if (error) alert('Error al guardar: ' + error.message);
+  }));
+  // Editar lote / agregar variante / eliminar lote
+  el.querySelectorAll('[data-edit-batch]').forEach(b => b.addEventListener('click', () => openBatchModal(b.getAttribute('data-edit-batch'))));
+  el.querySelectorAll('[data-add-variant]').forEach(b => b.addEventListener('click', () => openVariantModal(b.getAttribute('data-add-variant'))));
+  el.querySelectorAll('[data-del-batch]').forEach(b => b.addEventListener('click', () => deleteBatch(b.getAttribute('data-del-batch'))));
 }
 
 async function togglePipelineStatus(id){
@@ -1581,6 +1785,113 @@ document.getElementById('entrySave').addEventListener('click', async () => {
   if (error){ document.getElementById('entryError').textContent = 'Error: ' + error.message; return; }
   editingEntryId = null;
   entryModal.classList.remove('open');
+});
+
+// === BATCH (LOTE) MODAL ===
+const batchModal = document.getElementById('batchModal');
+let editingBatchId = null;
+function openBatchModal(id){
+  editingBatchId = id || null;
+  const b = id ? batches.find(x => x.id === id) : null;
+  document.getElementById('batchModalTitle').textContent = b ? 'Editar lote' : 'Nuevo lote';
+  document.getElementById('batchName').value = b ? b.name : '';
+  document.getElementById('batchQty').value = b && b.total_quantity ? b.total_quantity : '';
+  document.getElementById('batchDate').value = b && b.tentative_date ? b.tentative_date : '';
+  document.getElementById('batchHasProceso').checked = b ? (b.has_proceso !== false) : true;
+  document.getElementById('batchNotes').value = b && b.notes ? b.notes : '';
+  document.getElementById('batchError').textContent = '';
+  batchModal.classList.add('open');
+  setTimeout(() => document.getElementById('batchName').focus(), 50);
+}
+document.getElementById('addBatchBtn').addEventListener('click', () => openBatchModal(null));
+document.getElementById('batchCancel').addEventListener('click', () => batchModal.classList.remove('open'));
+batchModal.addEventListener('click', e => { if (e.target === batchModal) batchModal.classList.remove('open'); });
+document.getElementById('batchSave').addEventListener('click', async () => {
+  const name = document.getElementById('batchName').value.trim();
+  const qty = parseInt(document.getElementById('batchQty').value, 10) || null;
+  const date = document.getElementById('batchDate').value || null;
+  const hasProceso = document.getElementById('batchHasProceso').checked;
+  const notes = document.getElementById('batchNotes').value.trim() || null;
+  if (!name){ document.getElementById('batchError').textContent = 'Ponele un nombre al lote'; return; }
+  const payload = {
+    name, total_quantity: qty, tentative_date: date,
+    has_proceso: hasProceso, notes,
+    supplier_id: currentSupplier ? currentSupplier.id : null,
+    updated_at: new Date().toISOString(),
+  };
+  let error;
+  if (editingBatchId){
+    ({ error } = await supabase.from('production_batches').update(payload).eq('id', editingBatchId));
+  } else {
+    ({ error } = await supabase.from('production_batches').insert(payload));
+  }
+  if (error){ document.getElementById('batchError').textContent = 'Error: ' + error.message; return; }
+  editingBatchId = null;
+  batchModal.classList.remove('open');
+  await loadPipeline(); // refrescá la timeline
+});
+async function deleteBatch(id){
+  const b = batches.find(x => x.id === id);
+  if (!b) return;
+  if (!confirm(`¿Eliminar lote "${b.name}"? Las variantes quedan sin batch_id.`)) return;
+  const { error } = await supabase.from('production_batches').delete().eq('id', id);
+  if (error) alert('Error: ' + error.message);
+  else await loadPipeline();
+}
+
+// === VARIANT MODAL ===
+const variantModal = document.getElementById('variantModal');
+let variantBatchId = null;
+function openVariantModal(batchId){
+  variantBatchId = batchId;
+  const b = batches.find(x => x.id === batchId);
+  document.getElementById('variantBatchName').textContent = b ? b.name : '—';
+  document.getElementById('variantDesign').value = '';
+  document.getElementById('variantQty').value = '';
+  document.querySelectorAll('#variantCurveInputs input[data-vsize]').forEach(i => i.value = '');
+  document.getElementById('variantCurveSum').textContent = '0';
+  document.getElementById('variantError').textContent = '';
+  variantModal.classList.add('open');
+  setTimeout(() => document.getElementById('variantDesign').focus(), 50);
+}
+document.querySelectorAll('#variantCurveInputs input[data-vsize]').forEach(input => {
+  input.addEventListener('input', () => {
+    const sum = Array.from(document.querySelectorAll('#variantCurveInputs input[data-vsize]'))
+      .reduce((s, i) => s + (parseInt(i.value, 10) || 0), 0);
+    document.getElementById('variantCurveSum').textContent = sum;
+    const qty = document.getElementById('variantQty');
+    if (!qty.value && sum > 0) qty.value = sum;
+  });
+});
+document.getElementById('variantCancel').addEventListener('click', () => variantModal.classList.remove('open'));
+variantModal.addEventListener('click', e => { if (e.target === variantModal) variantModal.classList.remove('open'); });
+document.getElementById('variantSave').addEventListener('click', async () => {
+  const design = document.getElementById('variantDesign').value.trim();
+  const qty = parseInt(document.getElementById('variantQty').value, 10) || null;
+  if (!design){ document.getElementById('variantError').textContent = 'Ponele nombre al diseño'; return; }
+  if (!variantBatchId){ document.getElementById('variantError').textContent = 'Lote no encontrado'; return; }
+  const sizeCurve = {};
+  document.querySelectorAll('#variantCurveInputs input[data-vsize]').forEach(input => {
+    const n = parseInt(input.value, 10);
+    if (n > 0) sizeCurve[input.getAttribute('data-vsize')] = n;
+  });
+  const b = batches.find(x => x.id === variantBatchId);
+  const payload = {
+    product_name: `${b ? b.name + ' · ' : ''}${design}`,
+    design_name: design,
+    entry_type: 'restock',
+    batch_id: variantBatchId,
+    quantity: qty,
+    size_curve: sizeCurve,
+    has_proceso: b ? b.has_proceso : true,
+    tentative_date: b ? b.tentative_date : null,
+    supplier_id: b ? b.supplier_id : (currentSupplier ? currentSupplier.id : null),
+    status: 'pendiente',
+  };
+  const { error } = await supabase.from('product_pipeline').insert(payload);
+  if (error){ document.getElementById('variantError').textContent = 'Error: ' + error.message; return; }
+  variantModal.classList.remove('open');
+  await loadPipeline();
 });
 
 async function loadCalendars(){
@@ -1850,6 +2161,9 @@ supabase.channel('calendars-list')
   .subscribe();
 supabase.channel('pipeline-list')
   .on('postgres_changes', { event: '*', schema: 'public', table: 'product_pipeline' }, () => loadPipeline())
+  .subscribe();
+supabase.channel('batches-list')
+  .on('postgres_changes', { event: '*', schema: 'public', table: 'production_batches' }, () => loadPipeline())
   .subscribe();
 supabase.channel('catalog-hub')
   .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'shopify_catalog', filter: 'id=eq.1' }, p => {

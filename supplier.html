@@ -27,6 +27,36 @@ html,body{background:var(--cream);color:var(--black);font-family:'Outfit',sans-s
 .card.done{border-top-color:var(--green);opacity:.85}
 .card.active{border-top-color:var(--rosa-deep)}
 
+/* Lote (batch) — card grande con sub-cards de variantes adentro */
+.batch{background:#fff;border-radius:20px;padding:20px 18px 16px;box-shadow:0 1px 2px rgba(0,0,0,.04),0 8px 22px rgba(0,0,0,.06);margin-bottom:18px;border-top:3px solid var(--rosa-deep)}
+.batch.batch-done{border-top-color:var(--green);opacity:.92}
+.batch-name{font-family:'Cormorant Garamond',serif;font-weight:700;font-size:22px;line-height:1.15;color:var(--black);margin-bottom:4px}
+.batch-name::before{content:'LOTE · ';font-family:'JetBrains Mono',monospace;font-size:9px;font-style:normal;font-weight:500;letter-spacing:.18em;color:var(--rosa-deep);vertical-align:middle;margin-right:6px}
+.batch-msg{font-family:'Outfit',sans-serif;font-size:12px;color:var(--green);background:rgba(91,154,91,.08);padding:8px 12px;border-radius:10px;margin:10px 0 4px;text-align:center;font-style:italic}
+
+.variants-head{font-family:'JetBrains Mono',monospace;font-size:9.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--grey);margin:16px 0 8px}
+.variant{background:rgba(237,235,230,.55);border-radius:14px;padding:14px 14px 12px;margin-bottom:10px;border-left:3px solid var(--cream-dark);transition:border-left-color .2s ease}
+.variant.active{border-left-color:var(--rosa-deep);background:#fff}
+.variant.done{border-left-color:var(--green);opacity:.85}
+.variant-name{font-family:'Outfit',sans-serif;font-weight:600;font-size:15px;color:var(--black);margin-bottom:4px}
+.variant-name::before{content:'↳ ';color:var(--rosa-deep);font-weight:400}
+.variant-meta{font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--grey);letter-spacing:.04em;margin-bottom:8px;display:flex;flex-wrap:wrap;gap:8px}
+.variant-meta b{color:var(--black);font-weight:500}
+.variant-stepper{display:flex;align-items:center;justify-content:center;gap:6px;margin:8px 0}
+.variant-step{display:flex;flex-direction:column;align-items:center;gap:3px;font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--grey);text-transform:uppercase}
+.variant-step.done{color:var(--rosa-deep);font-weight:500}
+.variant-step.current{color:var(--black);font-weight:600}
+.variant-step-dot{width:14px;height:14px;border-radius:50%;background:#fff;border:2px solid rgba(0,0,0,.15)}
+.variant-step.done .variant-step-dot{background:var(--rosa-deep);border-color:var(--rosa-deep)}
+.variant-step.current .variant-step-dot{border-color:var(--rosa-deep);box-shadow:0 0 0 3px rgba(212,132,142,.15)}
+.variant-step-line{width:18px;height:2px;background:rgba(0,0,0,.08)}
+.variant-step-line.done{background:var(--rosa-deep)}
+.variant-action{text-align:center;margin-top:8px}
+.variant-btn{background:var(--rosa-deep);color:#fff;border:none;padding:10px 18px;font-family:'JetBrains Mono',monospace;font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;cursor:pointer;border-radius:999px;font-weight:500}
+.variant-btn:disabled{background:var(--cream-dark);color:var(--grey);cursor:not-allowed}
+.variant-btn.complete{background:var(--green)}
+.variant-delivered{color:var(--green);font-family:'Cormorant Garamond',serif;font-size:14px;font-style:italic;text-align:center;font-weight:500;padding:4px 0}
+
 .product-name{font-family:'Cormorant Garamond',serif;font-weight:700;font-size:22px;line-height:1.15;color:var(--black);margin-bottom:6px}
 .product-meta{font-family:'JetBrains Mono',monospace;font-size:10.5px;letter-spacing:.04em;color:var(--grey);margin-bottom:12px;display:flex;flex-wrap:wrap;gap:10px}
 .product-meta b{color:var(--black);font-weight:500}
@@ -101,6 +131,10 @@ const STAGES_FULL = [
   { key: 'terminacion', short: 'Term',   label: 'Terminación' },
   { key: 'entrega',     short: 'Entr',   label: 'Entrega' },
 ];
+// Etapas a nivel LOTE (hasta lavandería)
+const BATCH_STAGES_FULL = STAGES_FULL.slice(0, 4); // corte, proceso, confeccion, lavanderia
+// Etapas a nivel VARIANTE (después de lavandería)
+const VARIANT_STAGES = STAGES_FULL.slice(4); // terminacion, entrega
 
 function escapeHtml(s){
   return String(s == null ? '' : s)
@@ -196,6 +230,113 @@ function renderCard(entry, supplierToken){
   </div>`;
 }
 
+function renderBatch(batch, variants, supplierToken){
+  const batchStages = batch.has_proceso !== false ? BATCH_STAGES_FULL : BATCH_STAGES_FULL.filter(s => s.key !== 'proceso');
+  const lastBatchIdx = batch.batch_stage ? batchStages.findIndex(s => s.key === batch.batch_stage) : -1;
+  const batchDoneFully = lastBatchIdx === batchStages.length - 1;
+  const batchCurrentIdx = lastBatchIdx + 1;
+  // Days per batch stage
+  const startedAt = batch.created_at;
+  const now = new Date().toISOString();
+  let prevAt = startedAt;
+  const batchDays = batchStages.map((s, i) => {
+    const isDone = i <= lastBatchIdx;
+    const isCurrent = !batchDoneFully && i === batchCurrentIdx;
+    const h = firstHistory(batch.batch_stage_history, s.key);
+    let d = null;
+    if (isDone){
+      d = daysBetween(prevAt, h && h.at);
+      prevAt = (h && h.at) || prevAt;
+    } else if (isCurrent){
+      d = daysBetween(prevAt, now);
+    }
+    return d;
+  });
+  const entrega = batch.tentative_date ? fmtDateShort(batch.tentative_date + 'T12:00:00') : null;
+  const allVariantsDone = variants.length > 0 && variants.every(v => v.stage === 'entrega');
+  const cardCls = allVariantsDone && batchDoneFully ? 'batch-done' : '';
+  const nextBatchStage = !batchDoneFully && batchCurrentIdx < batchStages.length ? batchStages[batchCurrentIdx] : null;
+
+  let html = `<div class="batch ${cardCls}" data-batch-id="${batch.id}">
+    <div class="batch-name">${escapeHtml(batch.name || 'Lote sin nombre')}</div>
+    <div class="product-meta">
+      ${batch.total_quantity ? `<span><b>${batch.total_quantity}u</b> totales</span>` : ''}
+      ${entrega ? `<span>📅 entrega ${entrega}</span>` : ''}
+      ${variants.length ? `<span><b>${variants.length}</b> ${variants.length === 1 ? 'variante' : 'variantes'}</span>` : ''}
+    </div>
+    ${batch.notes ? `<div class="notes"><b>Nota:</b> ${escapeHtml(batch.notes)}</div>` : ''}
+
+    <div class="stepper">
+      ${batchStages.map((s, i) => {
+        const isDone = i <= lastBatchIdx;
+        const isCur = !batchDoneFully && i === batchCurrentIdx;
+        const cls = isDone ? 'done' : (isCur ? 'current' : '');
+        const d = batchDays[i];
+        const daysLbl = d != null ? `<span class="step-days">${d === 0 ? 'hoy' : `${d}d`}</span>` : '';
+        let h = `<div class="step ${cls}"><span class="step-dot"></span><span class="step-label">${s.short}</span>${daysLbl}</div>`;
+        if (i < batchStages.length - 1) h += `<span class="step-line ${i < lastBatchIdx ? 'done' : ''}"></span>`;
+        return h;
+      }).join('')}
+    </div>
+
+    ${nextBatchStage ? `<div class="step-action">
+      <button class="step-btn" data-batch-advance="${batch.id}" data-stage="${nextBatchStage.key}" data-supplier="${supplierToken}">${escapeHtml(nextBatchStage.label.split(' · ')[0])} terminada</button>
+    </div>` : `<div class="batch-msg">✓ Lote completo hasta Lavandería · ahora subdivide por diseño</div>`}
+  `;
+
+  // Variants section
+  if (variants.length){
+    html += `<div class="variants-head">Variantes de diseño</div>`;
+    html += variants.map(v => renderVariant(v, batch, batchDoneFully, supplierToken)).join('');
+  }
+
+  html += `</div>`;
+  return html;
+}
+
+function renderVariant(v, batch, batchReadyForVariants, supplierToken){
+  // Variantes solo tienen 2 etapas: Terminación + Entrega
+  // Habilitadas solo cuando batch_stage = 'lavanderia' (batchReadyForVariants)
+  const stages = VARIANT_STAGES; // terminacion, entrega
+  // v.stage puede ser null (terminación en curso), 'terminacion' (terminación hecha, entrega en curso), 'entrega' (todo hecho)
+  const lastDoneIdx = v.stage ? stages.findIndex(s => s.key === v.stage) : -1;
+  const isFullyDone = lastDoneIdx === stages.length - 1;
+  const currentIdx = lastDoneIdx + 1;
+  const curveStr = v.size_curve && typeof v.size_curve === 'object'
+    ? Object.entries(v.size_curve).filter(([_,v]) => v > 0).map(([k,n]) => `${k}·${n}`)
+    : [];
+  const cls = isFullyDone ? 'done' : (batchReadyForVariants ? 'active' : '');
+  const designName = v.design_name || v.product_name || 'Variante';
+  let actionHtml = '';
+  if (isFullyDone){
+    actionHtml = `<div class="variant-delivered">✓ Entregado</div>`;
+  } else if (!batchReadyForVariants){
+    actionHtml = `<div class="variant-action"><button class="variant-btn" disabled>Esperando lote en Lavandería</button></div>`;
+  } else {
+    const nextStage = stages[currentIdx];
+    const isLast = currentIdx === stages.length - 1;
+    actionHtml = `<div class="variant-action"><button class="variant-btn ${isLast ? 'complete' : ''}" data-pid="${v.id}" data-stage="${nextStage.key}" data-supplier="${supplierToken}">${isLast ? 'Confirmar entrega' : `${escapeHtml(nextStage.label)} terminada`}</button></div>`;
+  }
+  return `<div class="variant ${cls}" data-id="${v.id}">
+    <div class="variant-name">${escapeHtml(designName)}</div>
+    <div class="variant-meta">
+      ${v.quantity ? `<span><b>${v.quantity}u</b></span>` : ''}
+      ${curveStr.length ? `<span>${curveStr.join(' · ')}</span>` : ''}
+    </div>
+    <div class="variant-stepper">
+      ${stages.map((s, i) => {
+        const isDone = i <= lastDoneIdx;
+        const isCur = !isFullyDone && batchReadyForVariants && i === currentIdx;
+        const sCls = isDone ? 'done' : (isCur ? 'current' : '');
+        let h = `<div class="variant-step ${sCls}"><span class="variant-step-dot"></span><span>${s.short}</span></div>`;
+        if (i < stages.length - 1) h += `<span class="variant-step-line ${i < lastDoneIdx ? 'done' : ''}"></span>`;
+        return h;
+      }).join('')}
+    </div>
+    ${actionHtml}
+  </div>`;
+}
+
 function render(payload, supplierToken){
   const root = document.getElementById('root');
   if (!payload || !payload.supplier){
@@ -203,23 +344,34 @@ function render(payload, supplierToken){
     return;
   }
   const supplier = payload.supplier;
-  const items = Array.isArray(payload.items) ? payload.items : [];
-  const inProgress = items.filter(i => !(i.stage === 'entrega'));
-  const done = items.filter(i => i.stage === 'entrega');
+  // Soportá los 3 formatos: nuevo (batches+standalone), viejo (items), legacy single
+  const batches = Array.isArray(payload.batches) ? payload.batches : [];
+  const standalone = Array.isArray(payload.standalone) ? payload.standalone
+                   : Array.isArray(payload.items) ? payload.items : [];
+  const standaloneInProgress = standalone.filter(i => !(i.stage === 'entrega'));
+  const standaloneDone = standalone.filter(i => i.stage === 'entrega');
   const greeting = supplier.name ? `Hola, ${supplier.name}` : 'Hola';
+  const totalInProgress = batches.length + standaloneInProgress.length;
   let html = `<div class="hi">${escapeHtml(greeting)}</div>`;
-  html += `<div class="count">${inProgress.length} ${inProgress.length === 1 ? 'jean' : 'jeans'} en producción${done.length ? ` · ${done.length} entregados` : ''}</div>`;
-  if (items.length === 0){
+  html += `<div class="count">${batches.length ? `${batches.length} ${batches.length === 1 ? 'lote' : 'lotes'}` : ''}${batches.length && standaloneInProgress.length ? ' · ' : ''}${standaloneInProgress.length ? `${standaloneInProgress.length} ${standaloneInProgress.length === 1 ? 'jean' : 'jeans'} sueltos` : ''}${totalInProgress === 0 ? 'Sin producción activa' : ''}</div>`;
+  if (batches.length === 0 && standalone.length === 0){
     html += `<div class="empty">Sin productos asignados todavía</div>`;
   } else {
-    html += inProgress.map(it => renderCard(it, supplierToken)).join('');
-    if (done.length){
+    // Render batches primero
+    html += batches.map(b => renderBatch(b.batch, b.variants || [], supplierToken)).join('');
+    // Después standalone en curso
+    if (standaloneInProgress.length){
+      if (batches.length) html += `<div class="variants-head" style="margin-top:24px">Jeans sueltos</div>`;
+      html += standaloneInProgress.map(it => renderCard(it, supplierToken)).join('');
+    }
+    // Entregados al final
+    if (standaloneDone.length){
       html += `<div class="count" style="margin:24px 0 10px">Entregados</div>`;
-      html += done.map(it => renderCard(it, supplierToken)).join('');
+      html += standaloneDone.map(it => renderCard(it, supplierToken)).join('');
     }
   }
   root.innerHTML = html;
-  // Wire buttons
+  // Wire buttons de variantes / standalone
   root.querySelectorAll('[data-pid]').forEach(btn => {
     btn.addEventListener('click', async () => {
       const pid = btn.getAttribute('data-pid');
@@ -231,17 +383,35 @@ function render(payload, supplierToken){
       try {
         let res;
         if (currentMode === 'legacy'){
-          // Link viejo /p/{per_product_token} → RPC sin supplier
-          res = await supabase.rpc('advance_stage_by_token', {
-            p_token: token, p_new_stage: stage,
-          });
+          res = await supabase.rpc('advance_stage_by_token', { p_token: token, p_new_stage: stage });
         } else {
-          res = await supabase.rpc('advance_supplier_stage', {
-            p_token: token, p_pipeline_id: pid, p_new_stage: stage,
-          });
+          res = await supabase.rpc('advance_supplier_stage', { p_token: token, p_pipeline_id: pid, p_new_stage: stage });
         }
         if (res.error) throw res.error;
         showToast('✓ Etapa marcada');
+        await refresh();
+      } catch (err) {
+        btn.disabled = false;
+        btn.textContent = original;
+        showToast('Error: ' + (err.message || 'no pudo guardar'));
+      }
+    });
+  });
+  // Wire buttons de LOTE (etapas tempranas Corte→Lavandería)
+  root.querySelectorAll('[data-batch-advance]').forEach(btn => {
+    btn.addEventListener('click', async () => {
+      const batchId = btn.getAttribute('data-batch-advance');
+      const stage = btn.getAttribute('data-stage');
+      const token = btn.getAttribute('data-supplier');
+      btn.disabled = true;
+      const original = btn.textContent;
+      btn.textContent = 'Guardando…';
+      try {
+        const { error } = await supabase.rpc('advance_batch_stage', {
+          p_token: token, p_batch_id: batchId, p_new_stage: stage,
+        });
+        if (error) throw error;
+        showToast('✓ Lote actualizado');
         await refresh();
       } catch (err) {
         btn.disabled = false;
