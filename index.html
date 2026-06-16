@@ -214,7 +214,10 @@ header{border-bottom:1px solid var(--black);padding-bottom:24px;margin-bottom:64
 
 /* Stepper inline en card de pipeline (vista interna) */
 .tl-stepper{grid-column:1/-1;display:flex;align-items:center;gap:0;margin-top:10px;padding-top:10px;border-top:1px dashed rgba(0,0,0,.06)}
-.tl-stage{display:flex;flex-direction:column;align-items:center;flex:1;font-family:'JetBrains Mono',monospace;font-size:8.5px;letter-spacing:.04em;color:var(--grey);text-transform:uppercase;text-align:center;gap:4px;position:relative}
+.tl-stage{display:flex;flex-direction:column;align-items:center;flex:1;font-family:'JetBrains Mono',monospace;font-size:8.5px;letter-spacing:.04em;color:var(--grey);text-transform:uppercase;text-align:center;gap:4px;position:relative;background:transparent;border:none;padding:6px 2px;cursor:pointer;border-radius:8px;transition:background .15s ease}
+.tl-stage:hover{background:rgba(212,132,142,.08)}
+.tl-stage:hover .tl-stage-dot{border-color:var(--rosa-deep)}
+.tl-stage:active{transform:scale(.95)}
 .tl-stage-dot{width:14px;height:14px;border-radius:50%;background:#fff;border:2px solid rgba(0,0,0,.12);transition:all .2s ease}
 .tl-stage.done .tl-stage-dot{background:var(--rosa-deep);border-color:var(--rosa-deep)}
 .tl-stage.done .tl-stage-dot::after{content:'';display:block;width:5px;height:5px;background:#fff;border-radius:50%;margin:2.5px auto}
@@ -1311,7 +1314,8 @@ function renderStepperInline(e){
   items.forEach((it, i) => {
     const cls = it.isDone ? 'done' : (it.isCurrent ? 'current' : '');
     const daysLabel = it.days != null ? `<span class="tl-stage-days">${it.days}d</span>` : '';
-    html += `<div class="tl-stage ${cls}"><span class="tl-stage-dot"></span><span class="tl-stage-label">${it.stage.short}</span>${daysLabel}</div>`;
+    // Cada dot es un botón: vos podés marcar cualquier etapa como completada
+    html += `<button type="button" class="tl-stage ${cls}" data-set-stage="${it.stage.key}" data-entry="${e.id}" title="Click para marcar ${it.stage.short} como la última etapa completada"><span class="tl-stage-dot"></span><span class="tl-stage-label">${it.stage.short}</span>${daysLabel}</button>`;
     if (i < stages.length - 1){
       html += `<span class="tl-line ${i < lastDoneIdx ? 'done' : ''}"></span>`;
     }
@@ -1397,6 +1401,30 @@ function renderPipeline(){
     } catch {
       prompt('Copiá este link y enviáselo al proveedor:', url);
     }
+  }));
+  // Click en cualquier dot del stepper para que VOS marqués una etapa como completada
+  el.querySelectorAll('[data-set-stage]').forEach(b => b.addEventListener('click', async (ev) => {
+    ev.stopPropagation();
+    const entryId = b.getAttribute('data-entry');
+    const newStage = b.getAttribute('data-set-stage');
+    const entry = pipeline.find(x => x.id === entryId);
+    if (!entry) return;
+    const stages = getProdStages(entry.has_proceso);
+    const niceName = (stages.find(s => s.key === newStage) || {}).short || newStage;
+    if (entry.stage === newStage){
+      if (!confirm(`"${niceName}" ya está marcada como completada. ¿Forzar otra vez (registrar de nuevo en historial)?`)) return;
+    } else {
+      if (!confirm(`Marcar "${niceName}" como la última etapa completada?`)) return;
+    }
+    const newHistory = Array.isArray(entry.stage_history) ? entry.stage_history.slice() : [];
+    newHistory.push({ stage: newStage, at: new Date().toISOString(), by: (user && user.email) || 'team' });
+    const { error } = await supabase.from('product_pipeline')
+      .update({ stage: newStage, stage_history: newHistory })
+      .eq('id', entryId);
+    if (error){
+      alert('Error al guardar: ' + error.message);
+    }
+    // El channel realtime de pipeline va a refrescar la vista
   }));
 }
 

@@ -108,7 +108,14 @@ function escapeHtml(s){
 
 function getToken(){
   const params = new URLSearchParams(location.search);
-  return params.get('t') || params.get('token') || '';
+  let t = params.get('t') || params.get('token') || '';
+  if (!t){
+    // Netlify rewrite con 200: /p/{token} → /supplier.html?t=... pero el browser
+    // sigue viendo /p/{token} sin query. Leemos el token del pathname también.
+    const m = location.pathname.match(/\/p\/([^/?#]+)/);
+    if (m) t = decodeURIComponent(m[1]);
+  }
+  return t;
 }
 
 function fmtWhen(iso){
