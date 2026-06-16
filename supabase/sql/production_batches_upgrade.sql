@@ -57,7 +57,7 @@ AS $$
       SELECT jsonb_agg(jsonb_build_object(
         'batch',    to_jsonb(b),
         'variants', COALESCE((
-          SELECT jsonb_agg(to_jsonb(v) ORDER BY v.position, v.design_name, v.product_name)
+          SELECT jsonb_agg(to_jsonb(v) ORDER BY v.design_name NULLS LAST, v.product_name)
           FROM product_pipeline v WHERE v.batch_id = b.id
         ), '[]'::jsonb)
       ) ORDER BY b.tentative_date NULLS LAST, b.name)
