@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no">
+<meta name="theme-color" content="#edebe6">
+<title>LUXUR · Producción</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400&family=Outfit:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --cream:#edebe6; --cream-dark:#dedad3; --rosa:#f2d4d7; --rosa-deep:#d4848e;
+  --black:#1a1a1a; --grey:#7a7570; --green:#5b9a5b; --red:#bd6b6b;
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{background:var(--cream);color:var(--black);font-family:'Outfit',sans-serif;font-weight:300;line-height:1.5;min-height:100vh;-webkit-font-smoothing:antialiased;padding:env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left)}
+
+.wrap{max-width:520px;margin:0 auto;padding:32px 20px 60px}
+
+.brand{font-family:'Cormorant Garamond',serif;font-style:italic;font-weight:700;font-size:24px;letter-spacing:.05em;text-align:center;color:var(--rosa-deep);margin-bottom:6px}
+.tagline{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:var(--grey);text-align:center;margin-bottom:32px}
+
+.card{background:#fff;border-radius:20px;padding:28px 24px;box-shadow:0 1px 2px rgba(0,0,0,.04),0 8px 24px rgba(0,0,0,.06);margin-bottom:18px}
+
+.product-name{font-family:'Cormorant Garamond',serif;font-weight:700;font-size:26px;line-height:1.15;color:var(--black);margin-bottom:6px}
+.product-meta{font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.05em;color:var(--grey);margin-bottom:20px;display:flex;flex-wrap:wrap;gap:14px}
+.product-meta b{color:var(--black);font-weight:500}
+
+.section-label{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:var(--grey);margin:18px 0 10px}
+
+.curve{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px}
+.curve-pill{background:rgba(212,132,142,.1);color:var(--rosa-deep);padding:6px 12px;border-radius:999px;font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:500;letter-spacing:.05em}
+
+.stepper{display:flex;flex-direction:column;gap:0;margin:8px 0 16px}
+.step{display:flex;align-items:flex-start;gap:14px;padding:14px 0;position:relative}
+.step:not(:last-child)::after{content:'';position:absolute;left:13px;top:42px;bottom:-14px;width:2px;background:rgba(0,0,0,.08)}
+.step.done:not(:last-child)::after{background:var(--rosa-deep)}
+.step-dot{width:28px;height:28px;border-radius:50%;background:#fff;border:2px solid rgba(0,0,0,.12);flex-shrink:0;display:flex;align-items:center;justify-content:center;font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--grey);font-weight:500;z-index:1}
+.step.done .step-dot{background:var(--rosa-deep);border-color:var(--rosa-deep);color:#fff;font-size:14px}
+.step.done .step-dot::before{content:'✓'}
+.step.done .step-num{display:none}
+.step.current .step-dot{background:#fff;border-color:var(--rosa-deep);color:var(--rosa-deep);box-shadow:0 0 0 4px rgba(212,132,142,.15);font-weight:700}
+.step-body{flex:1;padding-top:3px;min-width:0}
+.step-name{font-family:'Outfit',sans-serif;font-weight:600;font-size:15px;color:var(--black);line-height:1.2}
+.step.done .step-name{color:var(--grey)}
+.step.upcoming .step-name{color:var(--grey)}
+.step-when{font-family:'JetBrains Mono',monospace;font-size:10.5px;color:var(--grey);margin-top:3px;letter-spacing:.03em}
+.step-action{margin-top:10px}
+.step-btn{background:var(--rosa-deep);color:#fff;border:none;padding:12px 22px;font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.14em;text-transform:uppercase;cursor:pointer;border-radius:999px;font-weight:500;box-shadow:0 1px 2px rgba(0,0,0,.06),0 4px 12px rgba(212,132,142,.25);transition:transform .15s ease,box-shadow .15s ease}
+.step-btn:hover{transform:translateY(-1px);box-shadow:0 2px 4px rgba(0,0,0,.08),0 8px 18px rgba(212,132,142,.3)}
+.step-btn:active{transform:translateY(0)}
+.step-btn:disabled{opacity:.55;cursor:not-allowed}
+
+.notes{font-family:'Outfit',sans-serif;font-size:13px;color:#555;line-height:1.5;background:rgba(237,235,230,.6);padding:14px 16px;border-radius:12px;margin-top:8px}
+.notes b{color:var(--black);font-weight:600}
+
+.status{padding:16px 20px;border-radius:14px;text-align:center;font-family:'Outfit',sans-serif;font-size:14px}
+.status.loading{color:var(--grey);background:#fff}
+.status.error{color:var(--red);background:rgba(189,107,107,.08);border:1px solid rgba(189,107,107,.2)}
+.status.done{color:var(--green);background:rgba(91,154,91,.1);border:1px solid rgba(91,154,91,.25);font-weight:500;font-family:'Cormorant Garamond',serif;font-size:18px;font-style:italic}
+
+.footer{font-family:'JetBrains Mono',monospace;font-size:9.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--grey);text-align:center;margin-top:24px;line-height:1.6}
+
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:var(--black);color:var(--cream);padding:12px 22px;border-radius:999px;font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.1em;opacity:0;transition:opacity .25s ease,transform .25s ease;pointer-events:none;z-index:50}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(-4px)}
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <div class="brand">LUXUR</div>
+  <div class="tagline">Producción · Proveedor</div>
+
+  <div id="root">
+    <div class="status loading card">Cargando…</div>
+  </div>
+
+  <div class="footer">Marcá cada etapa cuando termines.<br>El equipo LUXUR recibe la actualización en vivo.</div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script type="module">
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+
+const SUPABASE_URL = "https://nrpgtlcdvtesjbxpkxha.supabase.co";
+const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5ycGd0bGNkdnRlc2pieHBreGhhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg3ODkzNTAsImV4cCI6MjA5NDM2NTM1MH0.ntRHkFobaVK6RW9EYRwoww1ATr8N0zHMzXHM__5x8E0";
+const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+// Etapas: stage = "última completada". null = corte en curso.
+const STAGES_FULL = [
+  { key: 'corte',       label: 'Corte' },
+  { key: 'proceso',     label: 'Proceso · bordado/estampado' },
+  { key: 'confeccion',  label: 'Confección' },
+  { key: 'lavanderia',  label: 'Lavandería' },
+  { key: 'terminacion', label: 'Terminación' },
+  { key: 'entrega',     label: 'Entrega' },
+];
+
+function escapeHtml(s){
+  return String(s == null ? '' : s)
+    .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
+    .replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+}
+
+function getToken(){
+  const params = new URLSearchParams(location.search);
+  return params.get('t') || params.get('token') || '';
+}
+
+function fmtWhen(iso){
+  if (!iso) return '';
+  const d = new Date(iso);
+  if (isNaN(d.getTime())) return '';
+  const day = d.getDate();
+  const month = ['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'][d.getMonth()];
+  const h = String(d.getHours()).padStart(2,'0');
+  const m = String(d.getMinutes()).padStart(2,'0');
+  return `${day} ${month} · ${h}:${m}`;
+}
+function fmtDateShort(iso){
+  if (!iso) return '';
+  const d = new Date(iso);
+  if (isNaN(d.getTime())) return '';
+  return `${d.getDate()} ${['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'][d.getMonth()]}`;
+}
+
+function showToast(msg){
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2200);
+}
+
+function getStages(hasProceso){
+  return hasProceso ? STAGES_FULL : STAGES_FULL.filter(s => s.key !== 'proceso');
+}
+
+function lastHistoryEntryForStage(history, stageKey){
+  if (!Array.isArray(history)) return null;
+  for (let i = history.length - 1; i >= 0; i--){
+    if (history[i].stage === stageKey) return history[i];
+  }
+  return null;
+}
+
+function render(entry){
+  const root = document.getElementById('root');
+  if (!entry){
+    root.innerHTML = `<div class="status error card">Link inválido o expirado. Pediles a tu contacto que te mande uno nuevo.</div>`;
+    return;
+  }
+  const stages = getStages(entry.has_proceso !== false);
+  // stage = "última etapa completada". null/empty = nada hecho aún
+  const lastDoneIdx = entry.stage ? stages.findIndex(s => s.key === entry.stage) : -1;
+  const isFullyDone = lastDoneIdx === stages.length - 1; // entrega completada
+  const currentIdx = lastDoneIdx + 1; // próxima etapa por marcar
+
+  const curveStr = entry.size_curve && typeof entry.size_curve === 'object'
+    ? Object.entries(entry.size_curve).filter(([_,v]) => v > 0).map(([k,v]) => `${k}·${v}`).join('  ')
+    : '';
+
+  const entrega = entry.tentative_date ? fmtDateShort(entry.tentative_date + 'T12:00:00') : null;
+
+  let html = `<div class="card">
+    <div class="product-name">${escapeHtml(entry.product_name || 'Sin nombre')}</div>
+    <div class="product-meta">
+      ${entry.quantity ? `<span><b>${entry.quantity}u</b> total</span>` : ''}
+      ${entrega ? `<span>📅 entrega <b>${entrega}</b></span>` : ''}
+      ${entry.entry_type ? `<span style="text-transform:capitalize">${escapeHtml(entry.entry_type)}</span>` : ''}
+    </div>
+    ${curveStr ? `<div class="section-label">Curva de tallas</div>
+      <div class="curve">${curveStr.split('  ').map(s => `<span class="curve-pill">${escapeHtml(s)}</span>`).join('')}</div>` : ''}
+    ${entry.notes ? `<div class="notes"><b>Nota:</b> ${escapeHtml(entry.notes)}</div>` : ''}
+
+    <div class="section-label" style="margin-top:24px">Estado de producción</div>
+    <div class="stepper">
+      ${stages.map((s, i) => {
+        const isPast = i <= lastDoneIdx;
+        const isCurrent = !isFullyDone && i === currentIdx;
+        const cls = isPast ? 'done' : (isCurrent ? 'current' : 'upcoming');
+        const hist = lastHistoryEntryForStage(entry.stage_history, s.key);
+        const when = (isPast && hist && hist.at) ? fmtWhen(hist.at) : '';
+        const showBtn = isCurrent;
+        const isLast = i === stages.length - 1;
+        return `<div class="step ${cls}">
+          <div class="step-dot"><span class="step-num">${i+1}</span></div>
+          <div class="step-body">
+            <div class="step-name">${escapeHtml(s.label)}</div>
+            ${when ? `<div class="step-when">✓ ${escapeHtml(when)}</div>` : ''}
+            ${showBtn ? `<div class="step-action"><button class="step-btn" data-mark-done="${s.key}">${isLast ? 'Confirmar entrega' : 'Marcar terminado'}</button></div>` : ''}
+          </div>
+        </div>`;
+      }).join('')}
+    </div>
+
+    ${isFullyDone ? `<div class="status done">✓ Producción completa · jean entregado</div>` : ''}
+  </div>`;
+
+  root.innerHTML = html;
+
+  const btn = root.querySelector('[data-mark-done]');
+  if (btn){
+    btn.addEventListener('click', async () => {
+      btn.disabled = true;
+      const originalText = btn.textContent;
+      btn.textContent = 'Guardando…';
+      const stageToMark = btn.getAttribute('data-mark-done');
+      try {
+        const { data, error } = await supabase.rpc('advance_stage_by_token', {
+          p_token: getToken(),
+          p_new_stage: stageToMark,
+        });
+        if (error) throw error;
+        showToast('✓ Etapa marcada');
+        render(data);
+      } catch (err) {
+        btn.disabled = false;
+        btn.textContent = originalText;
+        document.getElementById('root').insertAdjacentHTML('afterbegin',
+          `<div class="status error card" style="margin-bottom:14px">Error: ${escapeHtml(err.message || 'no pudo guardar')}</div>`);
+      }
+    });
+  }
+}
+
+async function init(){
+  const token = getToken();
+  if (!token){
+    document.getElementById('root').innerHTML = `<div class="status error card">Falta el token en el link.</div>`;
+    return;
+  }
+  try {
+    const { data, error } = await supabase.rpc('get_pipeline_by_token', { p_token: token });
+    if (error) throw error;
+    render(data);
+  } catch (err) {
+    document.getElementById('root').innerHTML = `<div class="status error card">Error: ${escapeHtml(err.message || 'no pudo cargar')}</div>`;
+  }
+}
+
+init();
+</script>
+
+</body>
+</html>

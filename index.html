@@ -177,6 +177,16 @@ header{border-bottom:1px solid var(--black);padding-bottom:24px;margin-bottom:64
   .fa-card{padding:16px}
 }
 
+/* Modal · inputs de curva de tallas + toggle proceso */
+.curve-inputs{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin-top:6px}
+.curve-inputs .ci{display:flex;flex-direction:column;align-items:center;gap:4px;font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.05em;color:var(--grey);text-transform:uppercase}
+.curve-inputs .ci span{font-weight:500;color:var(--black)}
+.curve-inputs .ci input{width:100%;padding:8px 6px;border:1px solid var(--cream-dark);border-radius:8px;text-align:center;font-family:'JetBrains Mono',monospace;font-size:14px;color:var(--black);background:#fff}
+.curve-inputs .ci input:focus{outline:none;border-color:var(--rosa-deep)}
+.ci-toggle{display:flex!important;align-items:center;gap:10px;margin-top:14px;cursor:pointer;text-transform:none!important;letter-spacing:0!important;font-family:'Outfit',sans-serif!important;font-size:13px!important;color:#333}
+.ci-toggle input{width:18px;height:18px;cursor:pointer;accent-color:var(--rosa-deep)}
+.ci-toggle b{color:var(--black);font-weight:600}
+
 /* TIMELINE */
 .timeline{display:flex;flex-direction:column;gap:10px;margin-bottom:40px;min-height:80px}
 .tl-row{background:#fff;padding:16px 18px;border-radius:14px;border:1px solid rgba(0,0,0,.06);box-shadow:0 1px 3px rgba(0,0,0,.04);display:grid;grid-template-columns:auto 1fr auto;gap:14px;align-items:center;transition:transform .2s,box-shadow .2s}
@@ -201,6 +211,30 @@ header{border-bottom:1px solid var(--black);padding-bottom:24px;margin-bottom:64
 .tl-meta{color:var(--grey);font-size:11px;display:flex;gap:8px;flex-wrap:wrap;margin-top:2px}
 .tl-meta .tl-photo{color:var(--rosa-deep);font-weight:600}
 .tl-meta .tl-photo.overdue{color:var(--red-out)}
+
+/* Stepper inline en card de pipeline (vista interna) */
+.tl-stepper{grid-column:1/-1;display:flex;align-items:center;gap:0;margin-top:10px;padding-top:10px;border-top:1px dashed rgba(0,0,0,.06)}
+.tl-stage{display:flex;flex-direction:column;align-items:center;flex:1;font-family:'JetBrains Mono',monospace;font-size:8.5px;letter-spacing:.04em;color:var(--grey);text-transform:uppercase;text-align:center;gap:4px;position:relative}
+.tl-stage-dot{width:14px;height:14px;border-radius:50%;background:#fff;border:2px solid rgba(0,0,0,.12);transition:all .2s ease}
+.tl-stage.done .tl-stage-dot{background:var(--rosa-deep);border-color:var(--rosa-deep)}
+.tl-stage.done .tl-stage-dot::after{content:'';display:block;width:5px;height:5px;background:#fff;border-radius:50%;margin:2.5px auto}
+.tl-stage.current .tl-stage-dot{background:#fff;border-color:var(--rosa-deep);box-shadow:0 0 0 3px rgba(212,132,142,.18)}
+.tl-stage.done .tl-stage-label{color:var(--rosa-deep);font-weight:500}
+.tl-stage.current .tl-stage-label{color:var(--black);font-weight:600}
+.tl-line{flex:0 0 auto;width:14px;height:2px;background:rgba(0,0,0,.08);align-self:flex-start;margin-top:6px}
+.tl-line.done{background:var(--rosa-deep)}
+
+.tl-prod-actions{grid-column:1/-1;display:flex;justify-content:flex-end;gap:8px;margin-top:8px}
+.tl-copy-link{display:inline-flex;align-items:center;gap:6px;background:transparent;border:1px solid var(--cream-dark);color:#555;font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.1em;text-transform:uppercase;padding:6px 12px;border-radius:999px;cursor:pointer;transition:all .15s ease}
+.tl-copy-link:hover{border-color:var(--rosa-deep);color:var(--rosa-deep);background:rgba(212,132,142,.04)}
+.tl-copy-link.copied{background:var(--rosa-deep);color:#fff;border-color:var(--rosa-deep)}
+.tl-row{grid-template-columns:auto 1fr auto}
+.tl-row.tl-has-prod{grid-template-areas:"date body actions" "stepper stepper stepper" "prodact prodact prodact"}
+.tl-has-prod .tl-date{grid-area:date}
+.tl-has-prod .tl-body{grid-area:body}
+.tl-has-prod .tl-actions{grid-area:actions}
+.tl-has-prod .tl-stepper{grid-area:stepper}
+.tl-has-prod .tl-prod-actions{grid-area:prodact}
 @media (max-width:980px){.tl-row{flex-wrap:wrap;gap:10px}}
 
 .footer{border-top:1px solid var(--black);padding:24px 32px;font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.15em;text-transform:uppercase;color:var(--grey);text-align:center;flex-wrap:wrap;gap:8px}
@@ -562,6 +596,24 @@ body{padding-top:env(safe-area-inset-top);padding-bottom:env(safe-area-inset-bot
       <label>📸 Fecha para hacer las fotos <span style="color:var(--grey);text-transform:none;letter-spacing:0">(auto: 5 días antes del lanzamiento, editable)</span></label>
       <input type="date" id="entryPhotoDate">
     </div>
+
+    <label>Cantidad total (unidades)</label>
+    <input type="number" id="entryQuantity" placeholder="ej: 30" min="0" step="1">
+
+    <label>Curva de tallas (cuántas por talla)</label>
+    <div class="curve-inputs" id="entryCurveInputs">
+      <label class="ci"><span>XS</span><input type="number" data-size="XS" min="0" step="1" placeholder="0"></label>
+      <label class="ci"><span>S</span><input type="number" data-size="S" min="0" step="1" placeholder="0"></label>
+      <label class="ci"><span>M</span><input type="number" data-size="M" min="0" step="1" placeholder="0"></label>
+      <label class="ci"><span>L</span><input type="number" data-size="L" min="0" step="1" placeholder="0"></label>
+      <label class="ci"><span>XL</span><input type="number" data-size="XL" min="0" step="1" placeholder="0"></label>
+    </div>
+    <div style="font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--grey);margin-top:4px;letter-spacing:.04em">Suma actual: <span id="entryCurveSum">0</span>u</div>
+
+    <label class="ci-toggle">
+      <input type="checkbox" id="entryHasProceso" checked>
+      <span>Pasa por <b>Proceso</b> (bordado / estampado)</span>
+    </label>
 
     <label>Notas (opcional)</label>
     <input type="text" id="entryNotes" placeholder="ej: solo S y M, viene del taller…">
@@ -1188,6 +1240,37 @@ async function loadPipeline(){
   renderPipeline();
 }
 
+// Etapas de producción · stage = última completada (null = corte en curso)
+const PROD_STAGES_FULL = [
+  { key: 'corte',       short: 'Corte' },
+  { key: 'proceso',     short: 'Proceso' },
+  { key: 'confeccion',  short: 'Confec.' },
+  { key: 'lavanderia',  short: 'Lavand.' },
+  { key: 'terminacion', short: 'Termin.' },
+  { key: 'entrega',     short: 'Entrega' },
+];
+function getProdStages(hasProceso){
+  return hasProceso !== false ? PROD_STAGES_FULL : PROD_STAGES_FULL.filter(s => s.key !== 'proceso');
+}
+function renderStepperInline(e){
+  const stages = getProdStages(e.has_proceso);
+  const lastDoneIdx = e.stage ? stages.findIndex(s => s.key === e.stage) : -1;
+  const isFullyDone = lastDoneIdx === stages.length - 1;
+  const currentIdx = lastDoneIdx + 1;
+  let html = '<div class="tl-stepper">';
+  stages.forEach((s, i) => {
+    const isDone = i <= lastDoneIdx;
+    const isCurrent = !isFullyDone && i === currentIdx;
+    const cls = isDone ? 'done' : (isCurrent ? 'current' : '');
+    html += `<div class="tl-stage ${cls}"><span class="tl-stage-dot"></span><span class="tl-stage-label">${s.short}</span></div>`;
+    if (i < stages.length - 1){
+      html += `<span class="tl-line ${i < lastDoneIdx ? 'done' : ''}"></span>`;
+    }
+  });
+  html += '</div>';
+  return html;
+}
+
 function renderPipeline(){
   const el = document.getElementById('timeline');
   if (!el) return;
@@ -1212,10 +1295,22 @@ function renderPipeline(){
       const photoOverdue = e.photo_date < todayStr && e.status === 'pendiente';
       metaBits.push(`<span class="tl-photo ${photoOverdue?'overdue':''}">📸 fotos ${parseInt(pd[2])} ${MONTH_ABBR[parseInt(pd[1])-1]}${photoOverdue?' (atrasado)':''}</span>`);
     }
+    if (e.quantity) metaBits.push(`<span><b>${e.quantity}u</b></span>`);
+    if (e.size_curve && typeof e.size_curve === 'object'){
+      const curve = Object.entries(e.size_curve).filter(([_,v]) => v > 0).map(([k,v]) => `${k}·${v}`).join(' ');
+      if (curve) metaBits.push(`<span>${escapeHtml(curve)}</span>`);
+    }
     if (e.notes) metaBits.push(`<span>${escapeHtml(e.notes)}</span>`);
     if (overdue) metaBits.push(`<span style="color:var(--red-out)">⚠ atrasado</span>`);
     const metaHtml = metaBits.length ? `<div class="tl-meta">${metaBits.join('')}</div>` : '';
-    return `<div class="tl-row ${overdue?'tl-overdue':''}" data-id="${e.id}">
+    // Stepper inline solo si tiene producción configurada (tiene quantity O tiene stage ya iniciado)
+    const showStepper = e.entry_type === 'restock' || e.entry_type === 'launch';
+    const stepperHtml = showStepper ? renderStepperInline(e) : '';
+    const supplierUrl = e.supplier_token ? `${window.location.origin}/p/${e.supplier_token}` : '';
+    const actionsHtml = supplierUrl ? `<div class="tl-prod-actions">
+      <button class="tl-copy-link" data-copy="${supplierUrl}">📋 Copiar link proveedor</button>
+    </div>` : '';
+    return `<div class="tl-row ${overdue?'tl-overdue':''} ${showStepper?'tl-has-prod':''}" data-id="${e.id}">
       ${dateBox}
       <div class="tl-body">
         <span class="tl-type ${e.entry_type}">${e.entry_type === 'launch' ? 'Lanzamiento' : 'Restock'}</span>
@@ -1226,11 +1321,24 @@ function renderPipeline(){
         <button class="tl-status ${e.status}" data-toggle="${e.id}">${e.status === 'llego' ? '✓ Llegó' : 'Pendiente'}</button>
         <button class="tl-del" data-del="${e.id}" title="Eliminar">×</button>
       </div>
+      ${stepperHtml}
+      ${actionsHtml}
     </div>`;
   }).join('');
   el.querySelectorAll('[data-toggle]').forEach(b => b.addEventListener('click', () => togglePipelineStatus(b.getAttribute('data-toggle'))));
   el.querySelectorAll('[data-del]').forEach(b => b.addEventListener('click', () => deletePipeline(b.getAttribute('data-del'))));
   el.querySelectorAll('[data-edit]').forEach(b => b.addEventListener('click', () => openEntryModal(b.getAttribute('data-edit'))));
+  el.querySelectorAll('[data-copy]').forEach(b => b.addEventListener('click', async () => {
+    const url = b.getAttribute('data-copy');
+    try {
+      await navigator.clipboard.writeText(url);
+      b.classList.add('copied');
+      b.innerHTML = '✓ Link copiado';
+      setTimeout(() => { b.classList.remove('copied'); b.innerHTML = '📋 Copiar link proveedor'; }, 1800);
+    } catch {
+      prompt('Copiá este link y enviáselo al proveedor:', url);
+    }
+  }));
 }
 
 async function togglePipelineStatus(id){
@@ -1259,11 +1367,33 @@ function openEntryModal(id){
   document.getElementById('entryDateEnd').value = e && e.tentative_date_end ? e.tentative_date_end : '';
   document.getElementById('entryNotes').value = e && e.notes ? e.notes : '';
   document.getElementById('entryPhotoDate').value = e && e.photo_date ? e.photo_date : '';
+  document.getElementById('entryQuantity').value = e && e.quantity ? e.quantity : '';
+  document.getElementById('entryHasProceso').checked = e ? (e.has_proceso !== false) : true;
+  // Curva de tallas
+  const curve = (e && e.size_curve && typeof e.size_curve === 'object') ? e.size_curve : {};
+  document.querySelectorAll('#entryCurveInputs input[data-size]').forEach(input => {
+    const sz = input.getAttribute('data-size');
+    input.value = curve[sz] || '';
+  });
+  updateCurveSum();
   document.getElementById('entryError').textContent = '';
   syncPhotoRow();
   entryModal.classList.add('open');
   setTimeout(() => document.getElementById('entryProduct').focus(), 50);
 }
+
+function updateCurveSum(){
+  const sum = Array.from(document.querySelectorAll('#entryCurveInputs input[data-size]'))
+    .reduce((s, input) => s + (parseInt(input.value, 10) || 0), 0);
+  const el = document.getElementById('entryCurveSum');
+  if (el) el.textContent = sum;
+  // Si la cantidad total está vacía, autocompletá con la suma
+  const qtyInput = document.getElementById('entryQuantity');
+  if (qtyInput && !qtyInput.value && sum > 0) qtyInput.value = sum;
+}
+document.querySelectorAll('#entryCurveInputs input[data-size]').forEach(input => {
+  input.addEventListener('input', updateCurveSum);
+});
 
 // Photo task row: visible only for launches; auto-suggest 5 days before launch
 function syncPhotoRow(){
@@ -1299,10 +1429,19 @@ document.getElementById('entrySave').addEventListener('click', async () => {
   if (dateEnd === date) dateEnd = null;
   const photoDate = type === 'launch' ? (document.getElementById('entryPhotoDate').value || null) : null;
   const match = catalog.find(p => p.title.toLowerCase() === name.toLowerCase());
+  // Cantidad + curva + has_proceso (nuevos)
+  const quantity = parseInt(document.getElementById('entryQuantity').value, 10) || null;
+  const hasProceso = document.getElementById('entryHasProceso').checked;
+  const sizeCurve = {};
+  document.querySelectorAll('#entryCurveInputs input[data-size]').forEach(input => {
+    const n = parseInt(input.value, 10);
+    if (n > 0) sizeCurve[input.getAttribute('data-size')] = n;
+  });
   const payload = {
     product_name: name, product_gid: match ? match.gid : null,
     entry_type: type, tentative_date: date, tentative_date_end: dateEnd, notes,
-    photo_date: photoDate
+    photo_date: photoDate,
+    quantity, size_curve: sizeCurve, has_proceso: hasProceso
   };
   let error;
   if (editingEntryId){
