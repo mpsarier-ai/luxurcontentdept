@@ -402,7 +402,7 @@ body{padding-top:env(safe-area-inset-top);padding-bottom:env(safe-area-inset-bot
         Te enviamos un código a <b id="loginEmailLabel">—</b>.<br>
         <small style="opacity:.7">Revisá tu inbox · puede tardar 10-30 segundos.</small>
       </p>
-      <input type="text" id="loginCode" placeholder="000000" inputmode="numeric" autocomplete="one-time-code" maxlength="6" style="letter-spacing:.5em;text-align:center;font-size:24px;font-family:'JetBrains Mono',monospace">
+      <input type="text" id="loginCode" placeholder="código del email" inputmode="numeric" autocomplete="one-time-code" maxlength="10" style="letter-spacing:.3em;text-align:center;font-size:22px;font-family:'JetBrains Mono',monospace">
       <button id="loginVerifyBtn">Entrar</button>
       <button id="loginBackBtn" style="background:transparent;color:var(--grey);border:none;text-decoration:underline;cursor:pointer;font-family:inherit;font-size:12px;margin-top:6px">← Usar otro email</button>
     </div>
@@ -1530,9 +1530,9 @@ async function sendCode(){
 
 async function verifyCode(){
   const token = (loginCode.value || '').replace(/\D/g, '');
-  if (token.length !== 6){
+  if (token.length < 6 || token.length > 10){
     loginStatus.className = 'login-status error';
-    loginStatus.textContent = 'Pega el código de 6 dígitos del email';
+    loginStatus.textContent = 'Pega el código del email (6-10 dígitos)';
     return;
   }
   loginVerifyBtn.disabled = true;
@@ -1559,10 +1559,15 @@ if (loginBtn) loginBtn.addEventListener('click', sendCode);
 if (loginEmail) loginEmail.addEventListener('keydown', e => { if (e.key === 'Enter') sendCode(); });
 if (loginVerifyBtn) loginVerifyBtn.addEventListener('click', verifyCode);
 if (loginCode) loginCode.addEventListener('keydown', e => { if (e.key === 'Enter') verifyCode(); });
+// Auto-submit cuando el input se estabiliza con 6-10 dígitos
+let loginCodeDebounce;
 if (loginCode) loginCode.addEventListener('input', e => {
   const digits = e.target.value.replace(/\D/g, '');
-  e.target.value = digits.slice(0, 6);
-  if (digits.length === 6) verifyCode();
+  e.target.value = digits.slice(0, 10);
+  clearTimeout(loginCodeDebounce);
+  if (digits.length >= 6) {
+    loginCodeDebounce = setTimeout(() => verifyCode(), 600);
+  }
 });
 if (loginBackBtn) loginBackBtn.addEventListener('click', () => { loginCode.value = ''; loginShowStep(1); });
 if (signOutBtn) signOutBtn.addEventListener('click', async () => {
