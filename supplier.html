@@ -22,6 +22,10 @@ html,body{background:var(--cream);color:var(--black);font-family:'Outfit',sans-s
 .tagline{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:var(--grey);text-align:center;margin-bottom:8px}
 .hi{font-family:'Cormorant Garamond',serif;font-size:22px;font-weight:600;color:var(--black);text-align:center;margin-bottom:6px;line-height:1.2}
 .count{font-family:'JetBrains Mono',monospace;font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--grey);text-align:center;margin-bottom:24px}
+.total-units{display:flex;align-items:baseline;justify-content:center;gap:8px;margin:6px 0 8px;flex-wrap:wrap}
+.tu-num{font-family:'Cormorant Garamond',serif;font-weight:700;font-size:42px;line-height:1;color:var(--rosa-deep)}
+.tu-unit{font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:var(--grey);font-weight:500}
+.tu-label{font-family:'Outfit',sans-serif;font-size:13px;color:#555;font-style:italic}
 
 .card{background:#fff;border-radius:18px;padding:20px 18px;box-shadow:0 1px 2px rgba(0,0,0,.04),0 6px 18px rgba(0,0,0,.05);margin-bottom:14px;border-top:3px solid var(--cream-dark);transition:border-top-color .2s ease}
 .card.done{border-top-color:var(--green);opacity:.85}
@@ -352,7 +356,21 @@ function render(payload, supplierToken){
   const standaloneDone = standalone.filter(i => i.stage === 'entrega');
   const greeting = supplier.name ? `Hola, ${supplier.name}` : 'Hola';
   const totalInProgress = batches.length + standaloneInProgress.length;
+
+  // Total de unidades por entregar
+  let batchUnits = 0, standaloneUnits = 0;
+  batches.forEach(b => {
+    const vars = Array.isArray(b.variants) ? b.variants : [];
+    const allDelivered = vars.length > 0 && vars.every(v => v.stage === 'entrega');
+    if (!allDelivered) batchUnits += (b.batch.total_quantity || 0);
+  });
+  standaloneInProgress.forEach(e => { standaloneUnits += (e.quantity || 0); });
+  const totalUnits = batchUnits + standaloneUnits;
+
   let html = `<div class="hi">${escapeHtml(greeting)}</div>`;
+  if (totalUnits > 0){
+    html += `<div class="total-units"><span class="tu-num">${totalUnits.toLocaleString('es-CO')}</span><span class="tu-unit">unds</span><span class="tu-label">por entregar</span></div>`;
+  }
   html += `<div class="count">${batches.length ? `${batches.length} ${batches.length === 1 ? 'lote' : 'lotes'}` : ''}${batches.length && standaloneInProgress.length ? ' · ' : ''}${standaloneInProgress.length ? `${standaloneInProgress.length} ${standaloneInProgress.length === 1 ? 'jean' : 'jeans'} sueltos` : ''}${totalInProgress === 0 ? 'Sin producción activa' : ''}</div>`;
   if (batches.length === 0 && standalone.length === 0){
     html += `<div class="empty">Sin productos asignados todavía</div>`;
