@@ -221,19 +221,26 @@ header{border-bottom:1px solid var(--black);padding-bottom:24px;margin-bottom:64
 .tl-stage.current .tl-stage-dot{background:#fff;border-color:var(--rosa-deep);box-shadow:0 0 0 3px rgba(212,132,142,.18)}
 .tl-stage.done .tl-stage-label{color:var(--rosa-deep);font-weight:500}
 .tl-stage.current .tl-stage-label{color:var(--black);font-weight:600}
+.tl-stage-days{font-family:'JetBrains Mono',monospace;font-size:8.5px;color:var(--grey);letter-spacing:.03em;margin-top:1px;text-transform:none}
+.tl-stage.done .tl-stage-days{color:var(--rosa-deep)}
+.tl-stage.current .tl-stage-days{color:var(--black);font-weight:600}
 .tl-line{flex:0 0 auto;width:14px;height:2px;background:rgba(0,0,0,.08);align-self:flex-start;margin-top:6px}
 .tl-line.done{background:var(--rosa-deep)}
+.tl-stage-summary{margin-top:8px;padding:8px 14px;background:rgba(212,132,142,.08);border-radius:10px;font-family:'Outfit',sans-serif;font-size:12px;color:#555;letter-spacing:.01em;text-align:center}
+.tl-stage-summary b{color:var(--black);font-weight:600}
+.tl-stage-summary.done{background:rgba(91,154,91,.1);color:#3a5a3a}
 
 .tl-prod-actions{grid-column:1/-1;display:flex;justify-content:flex-end;gap:8px;margin-top:8px}
 .tl-copy-link{display:inline-flex;align-items:center;gap:6px;background:transparent;border:1px solid var(--cream-dark);color:#555;font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.1em;text-transform:uppercase;padding:6px 12px;border-radius:999px;cursor:pointer;transition:all .15s ease}
 .tl-copy-link:hover{border-color:var(--rosa-deep);color:var(--rosa-deep);background:rgba(212,132,142,.04)}
 .tl-copy-link.copied{background:var(--rosa-deep);color:#fff;border-color:var(--rosa-deep)}
 .tl-row{grid-template-columns:auto 1fr auto}
-.tl-row.tl-has-prod{grid-template-areas:"date body actions" "stepper stepper stepper" "prodact prodact prodact"}
+.tl-row.tl-has-prod{grid-template-areas:"date body actions" "stepper stepper stepper" "summary summary summary" "prodact prodact prodact"}
 .tl-has-prod .tl-date{grid-area:date}
 .tl-has-prod .tl-body{grid-area:body}
 .tl-has-prod .tl-actions{grid-area:actions}
 .tl-has-prod .tl-stepper{grid-area:stepper}
+.tl-has-prod .tl-stage-summary{grid-area:summary}
 .tl-has-prod .tl-prod-actions{grid-area:prodact}
 @media (max-width:980px){.tl-row{flex-wrap:wrap;gap:10px}}
 
@@ -1252,22 +1259,74 @@ const PROD_STAGES_FULL = [
 function getProdStages(hasProceso){
   return hasProceso !== false ? PROD_STAGES_FULL : PROD_STAGES_FULL.filter(s => s.key !== 'proceso');
 }
+
+// Calcula duración de cada etapa basándose en stage_history
+// Empieza desde created_at (cuando se creó la entrada) o el primer history entry si falta
+function computeStageTimings(entry, stages){
+  const history = Array.isArray(entry.stage_history) ? entry.stage_history : [];
+  // Toma la PRIMERA aparición de cada etapa (no la última — si el proveedor reclickea
+  // queremos el momento real en que terminó)
+  const completedAt = {};
+  for (const h of history){
+    if (h && h.stage && h.at && !completedAt[h.stage]) completedAt[h.stage] = new Date(h.at);
+  }
+  // Punto de partida del flujo: created_at de la entrada
+  const startedAt = entry.created_at ? new Date(entry.created_at) : null;
+  const now = new Date();
+  const lastDoneIdx = entry.stage ? stages.findIndex(s => s.key === entry.stage) : -1;
+  const isFullyDone = lastDoneIdx === stages.length - 1;
+  // Para cada etapa calculá duración (días)
+  const result = [];
+  let prevAt = startedAt;
+  let totalMs = 0;
+  for (let i = 0; i < stages.length; i++){
+    const s = stages[i];
+    const isDone = i <= lastDoneIdx;
+    const isCurrent = !isFullyDone && i === lastDoneIdx + 1;
+    let days = null, isOngoing = false;
+    if (isDone){
+      const at = completedAt[s.key];
+      if (at && prevAt) {
+        days = Math.max(0, Math.round((at - prevAt) / 86400000));
+        totalMs += (at - prevAt);
+      }
+      prevAt = at || prevAt;
+    } else if (isCurrent){
+      if (prevAt){
+        days = Math.max(0, Math.round((now - prevAt) / 86400000));
+        isOngoing = true;
+      }
+    }
+    result.push({ stage: s, isDone, isCurrent, days, isOngoing });
+  }
+  const totalDays = totalMs > 0 ? Math.round(totalMs / 86400000) : null;
+  return { items: result, totalDays, lastDoneIdx, isFullyDone };
+}
+
 function renderStepperInline(e){
   const stages = getProdStages(e.has_proceso);
-  const lastDoneIdx = e.stage ? stages.findIndex(s => s.key === e.stage) : -1;
-  const isFullyDone = lastDoneIdx === stages.length - 1;
+  const { items, totalDays, lastDoneIdx, isFullyDone } = computeStageTimings(e, stages);
   const currentIdx = lastDoneIdx + 1;
   let html = '<div class="tl-stepper">';
-  stages.forEach((s, i) => {
-    const isDone = i <= lastDoneIdx;
-    const isCurrent = !isFullyDone && i === currentIdx;
-    const cls = isDone ? 'done' : (isCurrent ? 'current' : '');
-    html += `<div class="tl-stage ${cls}"><span class="tl-stage-dot"></span><span class="tl-stage-label">${s.short}</span></div>`;
+  items.forEach((it, i) => {
+    const cls = it.isDone ? 'done' : (it.isCurrent ? 'current' : '');
+    const daysLabel = it.days != null ? `<span class="tl-stage-days">${it.days}d</span>` : '';
+    html += `<div class="tl-stage ${cls}"><span class="tl-stage-dot"></span><span class="tl-stage-label">${it.stage.short}</span>${daysLabel}</div>`;
     if (i < stages.length - 1){
       html += `<span class="tl-line ${i < lastDoneIdx ? 'done' : ''}"></span>`;
     }
   });
   html += '</div>';
+  // Resumen abajo: "En [Confección] · 5d · total 12d"
+  if (isFullyDone){
+    html += `<div class="tl-stage-summary done">✓ Entregado${totalDays != null ? ` · ${totalDays}d totales` : ''}</div>`;
+  } else if (currentIdx >= 0 && currentIdx < stages.length){
+    const current = items[currentIdx];
+    const currentLabel = stages[currentIdx].short;
+    const dayStr = current && current.days != null ? `${current.days}d` : 'recién empezó';
+    const totalStr = totalDays != null && totalDays > 0 ? ` · total ${totalDays + (current.days || 0)}d` : '';
+    html += `<div class="tl-stage-summary">En <b>${currentLabel}</b> · ${dayStr}${totalStr}</div>`;
+  }
   return html;
 }
 

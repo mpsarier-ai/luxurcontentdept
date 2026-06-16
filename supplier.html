@@ -46,6 +46,8 @@ html,body{background:var(--cream);color:var(--black);font-family:'Outfit',sans-s
 .step.done .step-name{color:var(--grey)}
 .step.upcoming .step-name{color:var(--grey)}
 .step-when{font-family:'JetBrains Mono',monospace;font-size:10.5px;color:var(--grey);margin-top:3px;letter-spacing:.03em}
+.step-days{font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--grey);margin-top:3px;letter-spacing:.04em;display:block;text-transform:lowercase}
+.step-days.current{color:var(--rosa-deep);font-weight:500}
 .step-action{margin-top:10px}
 .step-btn{background:var(--rosa-deep);color:#fff;border:none;padding:12px 22px;font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.14em;text-transform:uppercase;cursor:pointer;border-radius:999px;font-weight:500;box-shadow:0 1px 2px rgba(0,0,0,.06),0 4px 12px rgba(212,132,142,.25);transition:transform .15s ease,box-shadow .15s ease}
 .step-btn:hover{transform:translateY(-1px);box-shadow:0 2px 4px rgba(0,0,0,.08),0 8px 18px rgba(212,132,142,.3)}
@@ -144,6 +146,23 @@ function lastHistoryEntryForStage(history, stageKey){
   }
   return null;
 }
+function firstHistoryEntryForStage(history, stageKey){
+  if (!Array.isArray(history)) return null;
+  for (let i = 0; i < history.length; i++){
+    if (history[i].stage === stageKey) return history[i];
+  }
+  return null;
+}
+function daysBetween(a, b){
+  if (!a || !b) return null;
+  const diff = (new Date(b) - new Date(a)) / 86400000;
+  return Math.max(0, Math.round(diff));
+}
+function daysText(n){
+  if (n == null) return '';
+  if (n === 0) return 'hoy';
+  return n === 1 ? '1d' : `${n}d`;
+}
 
 function render(entry){
   const root = document.getElementById('root');
@@ -156,6 +175,30 @@ function render(entry){
   const lastDoneIdx = entry.stage ? stages.findIndex(s => s.key === entry.stage) : -1;
   const isFullyDone = lastDoneIdx === stages.length - 1; // entrega completada
   const currentIdx = lastDoneIdx + 1; // próxima etapa por marcar
+
+  // Calcular cuándo terminó cada etapa (primera aparición en history) y cuánto tomó
+  const completedAtMap = {};
+  stages.forEach(s => {
+    const h = firstHistoryEntryForStage(entry.stage_history, s.key);
+    if (h && h.at) completedAtMap[s.key] = h.at;
+  });
+  const startedAt = entry.created_at || null;
+  const now = new Date().toISOString();
+  // duración por etapa (basada en prev → this)
+  let prevAt = startedAt;
+  const stageDays = stages.map((s, i) => {
+    const isDone = i <= lastDoneIdx;
+    const isCurrent = !isFullyDone && i === currentIdx;
+    let d = null;
+    if (isDone){
+      d = daysBetween(prevAt, completedAtMap[s.key]);
+      prevAt = completedAtMap[s.key] || prevAt;
+    } else if (isCurrent){
+      d = daysBetween(prevAt, now);
+    }
+    return d;
+  });
+  const totalDays = isFullyDone ? daysBetween(startedAt, completedAtMap[stages[stages.length-1].key]) : null;
 
   const curveStr = entry.size_curve && typeof entry.size_curve === 'object'
     ? Object.entries(entry.size_curve).filter(([_,v]) => v > 0).map(([k,v]) => `${k}·${v}`).join('  ')
@@ -182,20 +225,31 @@ function render(entry){
         const cls = isPast ? 'done' : (isCurrent ? 'current' : 'upcoming');
         const hist = lastHistoryEntryForStage(entry.stage_history, s.key);
         const when = (isPast && hist && hist.at) ? fmtWhen(hist.at) : '';
+        const days = stageDays[i];
         const showBtn = isCurrent;
         const isLast = i === stages.length - 1;
+        // Etiqueta de duración:
+        // - done: "(4d en esta etapa)"
+        // - current: "Empezó hace 5d" (o "hoy")
+        let daysLabel = '';
+        if (isPast && days != null){
+          daysLabel = `<span class="step-days">${days === 0 ? 'mismo día' : `${days}d en esta etapa`}</span>`;
+        } else if (isCurrent && days != null){
+          daysLabel = `<span class="step-days current">${days === 0 ? 'empezó hoy' : `empezó hace ${days}d`}</span>`;
+        }
         return `<div class="step ${cls}">
           <div class="step-dot"><span class="step-num">${i+1}</span></div>
           <div class="step-body">
             <div class="step-name">${escapeHtml(s.label)}</div>
             ${when ? `<div class="step-when">✓ ${escapeHtml(when)}</div>` : ''}
+            ${daysLabel}
             ${showBtn ? `<div class="step-action"><button class="step-btn" data-mark-done="${s.key}">${isLast ? 'Confirmar entrega' : 'Marcar terminado'}</button></div>` : ''}
           </div>
         </div>`;
       }).join('')}
     </div>
 
-    ${isFullyDone ? `<div class="status done">✓ Producción completa · jean entregado</div>` : ''}
+    ${isFullyDone ? `<div class="status done">✓ Producción completa · jean entregado${totalDays != null ? ` en ${totalDays}d` : ''}</div>` : ''}
   </div>`;
 
   root.innerHTML = html;
