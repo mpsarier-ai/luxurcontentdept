@@ -187,6 +187,15 @@ header{border-bottom:1px solid var(--black);padding-bottom:24px;margin-bottom:64
 .ci-toggle input{width:18px;height:18px;cursor:pointer;accent-color:var(--rosa-deep)}
 .ci-toggle b{color:var(--black);font-weight:600}
 
+/* Total por entregar — bloque hero */
+.prod-total-box{background:linear-gradient(135deg,#fff 0%,rgba(212,132,142,.04) 100%);border-radius:16px;padding:18px 22px;box-shadow:0 1px 2px rgba(0,0,0,.04),0 4px 14px rgba(0,0,0,.05);margin-bottom:18px;border-left:4px solid var(--rosa-deep)}
+.prod-total-box[hidden]{display:none}
+.ptb-label{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:var(--grey);margin-bottom:6px}
+.ptb-number{font-family:'Cormorant Garamond',serif;font-weight:700;font-size:42px;line-height:1;color:var(--rosa-deep);display:flex;align-items:baseline;gap:8px}
+.ptb-unit{font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.18em;color:var(--grey);text-transform:uppercase;font-weight:500}
+.ptb-breakdown{font-family:'Outfit',sans-serif;font-size:12.5px;color:#555;margin-top:8px;line-height:1.5}
+.ptb-breakdown b{color:var(--black);font-weight:600}
+
 /* Caja del link único del proveedor */
 .supplier-link-box{background:#fff;border-radius:14px;padding:14px 18px;box-shadow:0 1px 2px rgba(0,0,0,.04),0 4px 14px rgba(0,0,0,.05);display:flex;align-items:center;gap:14px;margin-bottom:18px}
 .supplier-link-box[hidden]{display:none}
@@ -555,6 +564,12 @@ body{padding-top:env(safe-area-inset-top);padding-bottom:env(safe-area-inset-bot
       <div class="slb-label">Link para tu proveedor</div>
       <div class="slb-name" id="slbName">—</div>
       <button class="slb-copy" id="slbCopy">📋 Copiar link</button>
+    </div>
+    <!-- Total por entregar -->
+    <div class="prod-total-box" id="prodTotalBox" hidden>
+      <div class="ptb-label">Total por entregar</div>
+      <div class="ptb-number"><span id="ptbNum">0</span><span class="ptb-unit">unds</span></div>
+      <div class="ptb-breakdown" id="ptbBreakdown"></div>
     </div>
     <h2 class="section-title">
       <span>Próximas Entradas</span>
@@ -1612,10 +1627,6 @@ function renderBatchCard(batch, variants){
 function renderPipeline(){
   const el = document.getElementById('timeline');
   if (!el) return;
-  if (!pipeline.length && !batches.length){
-    el.innerHTML = '<div class="empty-state">Sin entradas. Click "+ Nuevo lote" o "+ Jean suelto".</div>';
-    return;
-  }
   // Indexá las variantes por batch_id, y separá standalone
   const variantsByBatch = {};
   const standalone = [];
@@ -1627,6 +1638,46 @@ function renderPipeline(){
       standalone.push(e);
     }
   });
+
+  // Total por entregar (unds) — solo lo no entregado
+  let batchUnits = 0;
+  let standaloneUnits = 0;
+  let batchesPending = 0;
+  let standalonePending = 0;
+  batches.forEach(b => {
+    const vars = variantsByBatch[b.id] || [];
+    const allDelivered = vars.length > 0 && vars.every(v => v.stage === 'entrega');
+    if (!allDelivered){
+      batchUnits += (b.total_quantity || 0);
+      batchesPending++;
+    }
+  });
+  standalone.forEach(e => {
+    const delivered = e.stage === 'entrega' || e.status === 'llego';
+    if (!delivered){
+      standaloneUnits += (e.quantity || 0);
+      standalonePending++;
+    }
+  });
+  const totalUnits = batchUnits + standaloneUnits;
+  const totalBox = document.getElementById('prodTotalBox');
+  if (totalBox){
+    if (totalUnits > 0){
+      totalBox.hidden = false;
+      document.getElementById('ptbNum').textContent = totalUnits.toLocaleString('es-CO');
+      const bits = [];
+      if (batchUnits) bits.push(`<b>${batchUnits.toLocaleString('es-CO')}u</b> en ${batchesPending} ${batchesPending === 1 ? 'lote' : 'lotes'}`);
+      if (standaloneUnits) bits.push(`<b>${standaloneUnits.toLocaleString('es-CO')}u</b> en ${standalonePending} ${standalonePending === 1 ? 'jean suelto' : 'jeans sueltos'}`);
+      document.getElementById('ptbBreakdown').innerHTML = bits.join(' · ');
+    } else {
+      totalBox.hidden = true;
+    }
+  }
+
+  if (!pipeline.length && !batches.length){
+    el.innerHTML = '<div class="empty-state">Sin entradas. Click "+ Nuevo lote" o "+ Jean suelto".</div>';
+    return;
+  }
   let html = '';
   // Lotes primero, ordenados por fecha tentativa
   const sortedBatches = batches.slice().sort((a, b) => (a.tentative_date || '9999') > (b.tentative_date || '9999') ? 1 : -1);
