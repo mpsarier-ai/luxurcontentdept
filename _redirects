@@ -7,6 +7,8 @@
 # SPA-like fallback for any unknown calendar URL
 /calendars/calendar  /calendars/calendar.html  200
 
-# Producción · link público del proveedor por token
-# Ej: ops.luxurjeans.com/p/abc-123-def → /supplier.html?t=abc-123-def
+# Producción · link público del proveedor
+# /s/{supplier_token} → vista multi-producto (todos los jeans de ese proveedor)
+# /p/{product_token} → vista legacy de UN producto (back-compat con links viejos)
+/s/*  /supplier.html?t=:splat  200
 /p/*  /supplier.html?t=:splat  200

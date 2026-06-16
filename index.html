@@ -187,6 +187,19 @@ header{border-bottom:1px solid var(--black);padding-bottom:24px;margin-bottom:64
 .ci-toggle input{width:18px;height:18px;cursor:pointer;accent-color:var(--rosa-deep)}
 .ci-toggle b{color:var(--black);font-weight:600}
 
+/* Caja del link único del proveedor */
+.supplier-link-box{background:#fff;border-radius:14px;padding:14px 18px;box-shadow:0 1px 2px rgba(0,0,0,.04),0 4px 14px rgba(0,0,0,.05);display:flex;align-items:center;gap:14px;margin-bottom:18px}
+.supplier-link-box[hidden]{display:none}
+.slb-label{font-family:'JetBrains Mono',monospace;font-size:9.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--grey);flex-shrink:0}
+.slb-name{font-family:'Cormorant Garamond',serif;font-style:italic;font-weight:600;font-size:17px;color:var(--black);flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.slb-copy{background:var(--rosa-deep);color:#fff;border:none;border-radius:999px;padding:9px 16px;font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.12em;text-transform:uppercase;cursor:pointer;font-weight:500;flex-shrink:0;transition:all .15s ease}
+.slb-copy:hover{background:#bf6e78;transform:translateY(-1px)}
+.slb-copy.copied{background:#5b9a5b}
+@media (max-width:480px){
+  .supplier-link-box{flex-wrap:wrap}
+  .slb-name{flex-basis:100%;font-size:15px}
+}
+
 /* TIMELINE */
 .timeline{display:flex;flex-direction:column;gap:10px;margin-bottom:40px;min-height:80px}
 .tl-row{background:#fff;padding:16px 18px;border-radius:14px;border:1px solid rgba(0,0,0,.06);box-shadow:0 1px 3px rgba(0,0,0,.04);display:grid;grid-template-columns:auto 1fr auto;gap:14px;align-items:center;transition:transform .2s,box-shadow .2s}
@@ -529,6 +542,12 @@ body{padding-top:env(safe-area-inset-top);padding-bottom:env(safe-area-inset-bot
     <div class="hub-section-bar">
       <button class="hub-back" data-hub-back>Inicio</button>
       <div class="hub-section-title">Producción</div>
+    </div>
+    <!-- Link único del proveedor -->
+    <div class="supplier-link-box" id="supplierLinkBox" hidden>
+      <div class="slb-label">Link para tu proveedor</div>
+      <div class="slb-name" id="slbName">—</div>
+      <button class="slb-copy" id="slbCopy">📋 Copiar link</button>
     </div>
     <h2 class="section-title">
       <span>Próximas Entradas</span>
@@ -1248,6 +1267,45 @@ async function loadPipeline(){
   if (error){ console.error('pipeline', error); document.getElementById('timeline').innerHTML = `<div class="empty-state">Error: ${escapeHtml(error.message)}</div>`; return; }
   pipeline = data || [];
   renderPipeline();
+  loadSupplierLink(); // cargar el link del proveedor en el box de arriba
+}
+
+// Carga el primer proveedor + arma su link para el box arriba de Producción
+let currentSupplier = null;
+async function loadSupplierLink(){
+  const box = document.getElementById('supplierLinkBox');
+  if (!box) return;
+  try {
+    const { data, error } = await supabase.from('suppliers').select('id,name,token').order('created_at').limit(1);
+    if (error) throw error;
+    if (!data || !data.length){ box.hidden = true; return; }
+    currentSupplier = data[0];
+    document.getElementById('slbName').textContent = currentSupplier.name || 'Proveedor';
+    box.hidden = false;
+  } catch (err) {
+    console.warn('No se pudo cargar el proveedor (¿corriste suppliers_upgrade.sql?):', err && err.message);
+    box.hidden = true;
+  }
+}
+
+// Handler del botón Copiar (el botón ya está en el DOM cuando este módulo corre)
+{
+  const btn = document.getElementById('slbCopy');
+  if (btn){
+    btn.addEventListener('click', async () => {
+      if (!currentSupplier) return;
+      const url = `${window.location.origin}/s/${currentSupplier.token}`;
+      try {
+        await navigator.clipboard.writeText(url);
+        btn.classList.add('copied');
+        const orig = btn.innerHTML;
+        btn.innerHTML = '✓ Link copiado';
+        setTimeout(() => { btn.classList.remove('copied'); btn.innerHTML = orig; }, 1800);
+      } catch {
+        prompt('Copiá este link y enviáselo al proveedor:', url);
+      }
+    });
+  }
 }
 
 // Etapas de producción · stage = última completada (null = corte en curso)
@@ -1366,13 +1424,9 @@ function renderPipeline(){
     if (e.notes) metaBits.push(`<span>${escapeHtml(e.notes)}</span>`);
     if (overdue) metaBits.push(`<span style="color:var(--red-out)">⚠ atrasado</span>`);
     const metaHtml = metaBits.length ? `<div class="tl-meta">${metaBits.join('')}</div>` : '';
-    // Stepper inline solo si tiene producción configurada (tiene quantity O tiene stage ya iniciado)
+    // Stepper inline solo si tiene producción configurada
     const showStepper = e.entry_type === 'restock' || e.entry_type === 'launch';
     const stepperHtml = showStepper ? renderStepperInline(e) : '';
-    const supplierUrl = e.supplier_token ? `${window.location.origin}/p/${e.supplier_token}` : '';
-    const actionsHtml = supplierUrl ? `<div class="tl-prod-actions">
-      <button class="tl-copy-link" data-copy="${supplierUrl}">📋 Copiar link proveedor</button>
-    </div>` : '';
     return `<div class="tl-row ${overdue?'tl-overdue':''} ${showStepper?'tl-has-prod':''}" data-id="${e.id}">
       ${dateBox}
       <div class="tl-body">
@@ -1385,23 +1439,11 @@ function renderPipeline(){
         <button class="tl-del" data-del="${e.id}" title="Eliminar">×</button>
       </div>
       ${stepperHtml}
-      ${actionsHtml}
     </div>`;
   }).join('');
   el.querySelectorAll('[data-toggle]').forEach(b => b.addEventListener('click', () => togglePipelineStatus(b.getAttribute('data-toggle'))));
   el.querySelectorAll('[data-del]').forEach(b => b.addEventListener('click', () => deletePipeline(b.getAttribute('data-del'))));
   el.querySelectorAll('[data-edit]').forEach(b => b.addEventListener('click', () => openEntryModal(b.getAttribute('data-edit'))));
-  el.querySelectorAll('[data-copy]').forEach(b => b.addEventListener('click', async () => {
-    const url = b.getAttribute('data-copy');
-    try {
-      await navigator.clipboard.writeText(url);
-      b.classList.add('copied');
-      b.innerHTML = '✓ Link copiado';
-      setTimeout(() => { b.classList.remove('copied'); b.innerHTML = '📋 Copiar link proveedor'; }, 1800);
-    } catch {
-      prompt('Copiá este link y enviáselo al proveedor:', url);
-    }
-  }));
   // Click en cualquier dot del stepper para que VOS marqués una etapa como completada
   el.querySelectorAll('[data-set-stage]').forEach(b => b.addEventListener('click', async (ev) => {
     ev.stopPropagation();

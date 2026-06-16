@@ -16,51 +16,56 @@
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
 html,body{background:var(--cream);color:var(--black);font-family:'Outfit',sans-serif;font-weight:300;line-height:1.5;min-height:100vh;-webkit-font-smoothing:antialiased;padding:env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left)}
 
-.wrap{max-width:520px;margin:0 auto;padding:32px 20px 60px}
+.wrap{max-width:560px;margin:0 auto;padding:32px 18px 60px}
 
-.brand{font-family:'Cormorant Garamond',serif;font-style:italic;font-weight:700;font-size:24px;letter-spacing:.05em;text-align:center;color:var(--rosa-deep);margin-bottom:6px}
-.tagline{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:var(--grey);text-align:center;margin-bottom:32px}
+.brand{font-family:'Cormorant Garamond',serif;font-style:italic;font-weight:700;font-size:26px;letter-spacing:.05em;text-align:center;color:var(--rosa-deep);margin-bottom:4px}
+.tagline{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:var(--grey);text-align:center;margin-bottom:8px}
+.hi{font-family:'Cormorant Garamond',serif;font-size:22px;font-weight:600;color:var(--black);text-align:center;margin-bottom:6px;line-height:1.2}
+.count{font-family:'JetBrains Mono',monospace;font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--grey);text-align:center;margin-bottom:24px}
 
-.card{background:#fff;border-radius:20px;padding:28px 24px;box-shadow:0 1px 2px rgba(0,0,0,.04),0 8px 24px rgba(0,0,0,.06);margin-bottom:18px}
+.card{background:#fff;border-radius:18px;padding:20px 18px;box-shadow:0 1px 2px rgba(0,0,0,.04),0 6px 18px rgba(0,0,0,.05);margin-bottom:14px;border-top:3px solid var(--cream-dark);transition:border-top-color .2s ease}
+.card.done{border-top-color:var(--green);opacity:.85}
+.card.active{border-top-color:var(--rosa-deep)}
 
-.product-name{font-family:'Cormorant Garamond',serif;font-weight:700;font-size:26px;line-height:1.15;color:var(--black);margin-bottom:6px}
-.product-meta{font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.05em;color:var(--grey);margin-bottom:20px;display:flex;flex-wrap:wrap;gap:14px}
+.product-name{font-family:'Cormorant Garamond',serif;font-weight:700;font-size:22px;line-height:1.15;color:var(--black);margin-bottom:6px}
+.product-meta{font-family:'JetBrains Mono',monospace;font-size:10.5px;letter-spacing:.04em;color:var(--grey);margin-bottom:12px;display:flex;flex-wrap:wrap;gap:10px}
 .product-meta b{color:var(--black);font-weight:500}
 
-.section-label{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:var(--grey);margin:18px 0 10px}
+.curve{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:10px}
+.curve-pill{background:rgba(212,132,142,.1);color:var(--rosa-deep);padding:4px 9px;border-radius:999px;font-family:'JetBrains Mono',monospace;font-size:10.5px;font-weight:500;letter-spacing:.04em}
 
-.curve{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px}
-.curve-pill{background:rgba(212,132,142,.1);color:var(--rosa-deep);padding:6px 12px;border-radius:999px;font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:500;letter-spacing:.05em}
+.stepper{display:flex;align-items:flex-start;justify-content:space-between;gap:0;margin:12px 0 10px;padding:8px 0}
+.step{display:flex;flex-direction:column;align-items:center;flex:1;font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:.04em;color:var(--grey);text-transform:uppercase;text-align:center;gap:4px;position:relative;min-width:0}
+.step-dot{width:18px;height:18px;border-radius:50%;background:#fff;border:2px solid rgba(0,0,0,.12);flex-shrink:0;transition:all .2s ease}
+.step.done .step-dot{background:var(--rosa-deep);border-color:var(--rosa-deep)}
+.step.done .step-dot::after{content:'';display:block;width:6px;height:6px;background:#fff;border-radius:50%;margin:4px auto}
+.step.current .step-dot{background:#fff;border-color:var(--rosa-deep);box-shadow:0 0 0 4px rgba(212,132,142,.15)}
+.step-label{font-size:9px;line-height:1.2;max-width:60px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.step.done .step-label{color:var(--rosa-deep)}
+.step.current .step-label{color:var(--black);font-weight:600}
+.step-days{font-size:8.5px;color:var(--grey);text-transform:lowercase;letter-spacing:.02em}
+.step.current .step-days{color:var(--rosa-deep);font-weight:500}
+.step-line{flex:0 0 auto;height:2px;background:rgba(0,0,0,.08);align-self:flex-start;margin-top:8px;width:8px;flex:1;max-width:30px}
+.step-line.done{background:var(--rosa-deep)}
 
-.stepper{display:flex;flex-direction:column;gap:0;margin:8px 0 16px}
-.step{display:flex;align-items:flex-start;gap:14px;padding:14px 0;position:relative}
-.step:not(:last-child)::after{content:'';position:absolute;left:13px;top:42px;bottom:-14px;width:2px;background:rgba(0,0,0,.08)}
-.step.done:not(:last-child)::after{background:var(--rosa-deep)}
-.step-dot{width:28px;height:28px;border-radius:50%;background:#fff;border:2px solid rgba(0,0,0,.12);flex-shrink:0;display:flex;align-items:center;justify-content:center;font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--grey);font-weight:500;z-index:1}
-.step.done .step-dot{background:var(--rosa-deep);border-color:var(--rosa-deep);color:#fff;font-size:14px}
-.step.done .step-dot::before{content:'✓'}
-.step.done .step-num{display:none}
-.step.current .step-dot{background:#fff;border-color:var(--rosa-deep);color:var(--rosa-deep);box-shadow:0 0 0 4px rgba(212,132,142,.15);font-weight:700}
-.step-body{flex:1;padding-top:3px;min-width:0}
-.step-name{font-family:'Outfit',sans-serif;font-weight:600;font-size:15px;color:var(--black);line-height:1.2}
-.step.done .step-name{color:var(--grey)}
-.step.upcoming .step-name{color:var(--grey)}
-.step-when{font-family:'JetBrains Mono',monospace;font-size:10.5px;color:var(--grey);margin-top:3px;letter-spacing:.03em}
-.step-days{font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--grey);margin-top:3px;letter-spacing:.04em;display:block;text-transform:lowercase}
-.step-days.current{color:var(--rosa-deep);font-weight:500}
-.step-action{margin-top:10px}
+.step-action{margin-top:14px;text-align:center}
 .step-btn{background:var(--rosa-deep);color:#fff;border:none;padding:12px 22px;font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.14em;text-transform:uppercase;cursor:pointer;border-radius:999px;font-weight:500;box-shadow:0 1px 2px rgba(0,0,0,.06),0 4px 12px rgba(212,132,142,.25);transition:transform .15s ease,box-shadow .15s ease}
 .step-btn:hover{transform:translateY(-1px);box-shadow:0 2px 4px rgba(0,0,0,.08),0 8px 18px rgba(212,132,142,.3)}
 .step-btn:active{transform:translateY(0)}
 .step-btn:disabled{opacity:.55;cursor:not-allowed}
+.step-btn.complete{background:var(--green);box-shadow:0 1px 2px rgba(0,0,0,.06),0 4px 12px rgba(91,154,91,.25)}
 
-.notes{font-family:'Outfit',sans-serif;font-size:13px;color:#555;line-height:1.5;background:rgba(237,235,230,.6);padding:14px 16px;border-radius:12px;margin-top:8px}
+.delivered{margin-top:10px;text-align:center;color:var(--green);font-family:'Cormorant Garamond',serif;font-size:16px;font-style:italic;font-weight:500}
+
+.notes{font-family:'Outfit',sans-serif;font-size:12px;color:#555;line-height:1.45;background:rgba(237,235,230,.6);padding:10px 12px;border-radius:10px;margin-top:8px}
 .notes b{color:var(--black);font-weight:600}
 
-.status{padding:16px 20px;border-radius:14px;text-align:center;font-family:'Outfit',sans-serif;font-size:14px}
-.status.loading{color:var(--grey);background:#fff}
-.status.error{color:var(--red);background:rgba(189,107,107,.08);border:1px solid rgba(189,107,107,.2)}
-.status.done{color:var(--green);background:rgba(91,154,91,.1);border:1px solid rgba(91,154,91,.25);font-weight:500;font-family:'Cormorant Garamond',serif;font-size:18px;font-style:italic}
+.status-msg{padding:16px 20px;border-radius:14px;text-align:center;font-family:'Outfit',sans-serif;font-size:14px;margin-bottom:14px}
+.status-msg.loading{color:var(--grey);background:#fff;box-shadow:0 1px 2px rgba(0,0,0,.04)}
+.status-msg.error{color:var(--red);background:rgba(189,107,107,.08);border:1px solid rgba(189,107,107,.2)}
+.status-msg.success{color:var(--green);background:rgba(91,154,91,.08);border:1px solid rgba(91,154,91,.2)}
+
+.empty{background:#fff;border-radius:18px;padding:32px;text-align:center;color:var(--grey);font-family:'Cormorant Garamond',serif;font-size:20px;font-style:italic}
 
 .footer{font-family:'JetBrains Mono',monospace;font-size:9.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--grey);text-align:center;margin-top:24px;line-height:1.6}
 
@@ -72,12 +77,10 @@ html,body{background:var(--cream);color:var(--black);font-family:'Outfit',sans-s
 
 <div class="wrap">
   <div class="brand">LUXUR</div>
-  <div class="tagline">Producción · Proveedor</div>
-
+  <div class="tagline">Producción</div>
   <div id="root">
-    <div class="status loading card">Cargando…</div>
+    <div class="status-msg loading">Cargando…</div>
   </div>
-
   <div class="footer">Marcá cada etapa cuando termines.<br>El equipo LUXUR recibe la actualización en vivo.</div>
 </div>
 
@@ -90,14 +93,13 @@ const SUPABASE_URL = "https://nrpgtlcdvtesjbxpkxha.supabase.co";
 const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5ycGd0bGNkdnRlc2pieHBreGhhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg3ODkzNTAsImV4cCI6MjA5NDM2NTM1MH0.ntRHkFobaVK6RW9EYRwoww1ATr8N0zHMzXHM__5x8E0";
 const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-// Etapas: stage = "última completada". null = corte en curso.
 const STAGES_FULL = [
-  { key: 'corte',       label: 'Corte' },
-  { key: 'proceso',     label: 'Proceso · bordado/estampado' },
-  { key: 'confeccion',  label: 'Confección' },
-  { key: 'lavanderia',  label: 'Lavandería' },
-  { key: 'terminacion', label: 'Terminación' },
-  { key: 'entrega',     label: 'Entrega' },
+  { key: 'corte',       short: 'Corte',  label: 'Corte' },
+  { key: 'proceso',     short: 'Proc',   label: 'Proceso · bordado/estampado' },
+  { key: 'confeccion',  short: 'Conf',   label: 'Confección' },
+  { key: 'lavanderia',  short: 'Lavd',   label: 'Lavandería' },
+  { key: 'terminacion', short: 'Term',   label: 'Terminación' },
+  { key: 'entrega',     short: 'Entr',   label: 'Entrega' },
 ];
 
 function escapeHtml(s){
@@ -105,28 +107,24 @@ function escapeHtml(s){
     .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
     .replace(/"/g,'&quot;').replace(/'/g,'&#39;');
 }
-
 function getToken(){
   const params = new URLSearchParams(location.search);
   let t = params.get('t') || params.get('token') || '';
   if (!t){
-    // Netlify rewrite con 200: /p/{token} → /supplier.html?t=... pero el browser
-    // sigue viendo /p/{token} sin query. Leemos el token del pathname también.
-    const m = location.pathname.match(/\/p\/([^/?#]+)/);
+    const m = location.pathname.match(/\/[ps]\/([^/?#]+)/);
     if (m) t = decodeURIComponent(m[1]);
   }
   return t;
 }
-
-function fmtWhen(iso){
-  if (!iso) return '';
-  const d = new Date(iso);
-  if (isNaN(d.getTime())) return '';
-  const day = d.getDate();
-  const month = ['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'][d.getMonth()];
-  const h = String(d.getHours()).padStart(2,'0');
-  const m = String(d.getMinutes()).padStart(2,'0');
-  return `${day} ${month} · ${h}:${m}`;
+function getStages(hasProceso){ return hasProceso !== false ? STAGES_FULL : STAGES_FULL.filter(s => s.key !== 'proceso'); }
+function firstHistory(history, key){
+  if (!Array.isArray(history)) return null;
+  for (let i = 0; i < history.length; i++) if (history[i].stage === key) return history[i];
+  return null;
+}
+function daysBetween(a, b){
+  if (!a || !b) return null;
+  return Math.max(0, Math.round((new Date(b) - new Date(a)) / 86400000));
 }
 function fmtDateShort(iso){
   if (!iso) return '';
@@ -134,7 +132,6 @@ function fmtDateShort(iso){
   if (isNaN(d.getTime())) return '';
   return `${d.getDate()} ${['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'][d.getMonth()]}`;
 }
-
 function showToast(msg){
   const t = document.getElementById('toast');
   t.textContent = msg;
@@ -142,162 +139,168 @@ function showToast(msg){
   setTimeout(() => t.classList.remove('show'), 2200);
 }
 
-function getStages(hasProceso){
-  return hasProceso ? STAGES_FULL : STAGES_FULL.filter(s => s.key !== 'proceso');
-}
-
-function lastHistoryEntryForStage(history, stageKey){
-  if (!Array.isArray(history)) return null;
-  for (let i = history.length - 1; i >= 0; i--){
-    if (history[i].stage === stageKey) return history[i];
-  }
-  return null;
-}
-function firstHistoryEntryForStage(history, stageKey){
-  if (!Array.isArray(history)) return null;
-  for (let i = 0; i < history.length; i++){
-    if (history[i].stage === stageKey) return history[i];
-  }
-  return null;
-}
-function daysBetween(a, b){
-  if (!a || !b) return null;
-  const diff = (new Date(b) - new Date(a)) / 86400000;
-  return Math.max(0, Math.round(diff));
-}
-function daysText(n){
-  if (n == null) return '';
-  if (n === 0) return 'hoy';
-  return n === 1 ? '1d' : `${n}d`;
-}
-
-function render(entry){
-  const root = document.getElementById('root');
-  if (!entry){
-    root.innerHTML = `<div class="status error card">Link inválido o expirado. Pediles a tu contacto que te mande uno nuevo.</div>`;
-    return;
-  }
+function renderCard(entry, supplierToken){
   const stages = getStages(entry.has_proceso !== false);
-  // stage = "última etapa completada". null/empty = nada hecho aún
   const lastDoneIdx = entry.stage ? stages.findIndex(s => s.key === entry.stage) : -1;
-  const isFullyDone = lastDoneIdx === stages.length - 1; // entrega completada
-  const currentIdx = lastDoneIdx + 1; // próxima etapa por marcar
-
-  // Calcular cuándo terminó cada etapa (primera aparición en history) y cuánto tomó
-  const completedAtMap = {};
-  stages.forEach(s => {
-    const h = firstHistoryEntryForStage(entry.stage_history, s.key);
-    if (h && h.at) completedAtMap[s.key] = h.at;
-  });
-  const startedAt = entry.created_at || null;
+  const isFullyDone = lastDoneIdx === stages.length - 1;
+  const currentIdx = lastDoneIdx + 1;
+  // days per stage
+  const startedAt = entry.created_at;
   const now = new Date().toISOString();
-  // duración por etapa (basada en prev → this)
   let prevAt = startedAt;
   const stageDays = stages.map((s, i) => {
     const isDone = i <= lastDoneIdx;
     const isCurrent = !isFullyDone && i === currentIdx;
+    const h = firstHistory(entry.stage_history, s.key);
     let d = null;
     if (isDone){
-      d = daysBetween(prevAt, completedAtMap[s.key]);
-      prevAt = completedAtMap[s.key] || prevAt;
+      d = daysBetween(prevAt, h && h.at);
+      prevAt = (h && h.at) || prevAt;
     } else if (isCurrent){
       d = daysBetween(prevAt, now);
     }
     return d;
   });
-  const totalDays = isFullyDone ? daysBetween(startedAt, completedAtMap[stages[stages.length-1].key]) : null;
-
+  const totalDays = isFullyDone ? daysBetween(startedAt, firstHistory(entry.stage_history, 'entrega')?.at) : null;
   const curveStr = entry.size_curve && typeof entry.size_curve === 'object'
-    ? Object.entries(entry.size_curve).filter(([_,v]) => v > 0).map(([k,v]) => `${k}·${v}`).join('  ')
-    : '';
-
+    ? Object.entries(entry.size_curve).filter(([_,v]) => v > 0).map(([k,v]) => `${k}·${v}`)
+    : [];
   const entrega = entry.tentative_date ? fmtDateShort(entry.tentative_date + 'T12:00:00') : null;
-
-  let html = `<div class="card">
+  const cardCls = isFullyDone ? 'done' : 'active';
+  const nextLabel = !isFullyDone && currentIdx < stages.length ? stages[currentIdx].label : '';
+  const isLastStage = currentIdx === stages.length - 1;
+  const nextKey = !isFullyDone ? stages[currentIdx].key : '';
+  return `<div class="card ${cardCls}" data-id="${entry.id}">
     <div class="product-name">${escapeHtml(entry.product_name || 'Sin nombre')}</div>
     <div class="product-meta">
-      ${entry.quantity ? `<span><b>${entry.quantity}u</b> total</span>` : ''}
-      ${entrega ? `<span>📅 entrega <b>${entrega}</b></span>` : ''}
+      ${entry.quantity ? `<span><b>${entry.quantity}u</b></span>` : ''}
+      ${entrega ? `<span>📅 ${entrega}</span>` : ''}
       ${entry.entry_type ? `<span style="text-transform:capitalize">${escapeHtml(entry.entry_type)}</span>` : ''}
     </div>
-    ${curveStr ? `<div class="section-label">Curva de tallas</div>
-      <div class="curve">${curveStr.split('  ').map(s => `<span class="curve-pill">${escapeHtml(s)}</span>`).join('')}</div>` : ''}
+    ${curveStr.length ? `<div class="curve">${curveStr.map(s => `<span class="curve-pill">${escapeHtml(s)}</span>`).join('')}</div>` : ''}
     ${entry.notes ? `<div class="notes"><b>Nota:</b> ${escapeHtml(entry.notes)}</div>` : ''}
-
-    <div class="section-label" style="margin-top:24px">Estado de producción</div>
     <div class="stepper">
       ${stages.map((s, i) => {
-        const isPast = i <= lastDoneIdx;
-        const isCurrent = !isFullyDone && i === currentIdx;
-        const cls = isPast ? 'done' : (isCurrent ? 'current' : 'upcoming');
-        const hist = lastHistoryEntryForStage(entry.stage_history, s.key);
-        const when = (isPast && hist && hist.at) ? fmtWhen(hist.at) : '';
-        const days = stageDays[i];
-        const showBtn = isCurrent;
-        const isLast = i === stages.length - 1;
-        // Etiqueta de duración:
-        // - done: "(4d en esta etapa)"
-        // - current: "Empezó hace 5d" (o "hoy")
-        let daysLabel = '';
-        if (isPast && days != null){
-          daysLabel = `<span class="step-days">${days === 0 ? 'mismo día' : `${days}d en esta etapa`}</span>`;
-        } else if (isCurrent && days != null){
-          daysLabel = `<span class="step-days current">${days === 0 ? 'empezó hoy' : `empezó hace ${days}d`}</span>`;
-        }
-        return `<div class="step ${cls}">
-          <div class="step-dot"><span class="step-num">${i+1}</span></div>
-          <div class="step-body">
-            <div class="step-name">${escapeHtml(s.label)}</div>
-            ${when ? `<div class="step-when">✓ ${escapeHtml(when)}</div>` : ''}
-            ${daysLabel}
-            ${showBtn ? `<div class="step-action"><button class="step-btn" data-mark-done="${s.key}">${isLast ? 'Confirmar entrega' : 'Marcar terminado'}</button></div>` : ''}
-          </div>
-        </div>`;
+        const isDone = i <= lastDoneIdx;
+        const isCur = !isFullyDone && i === currentIdx;
+        const cls = isDone ? 'done' : (isCur ? 'current' : '');
+        const d = stageDays[i];
+        const daysLbl = d != null ? `<span class="step-days">${d === 0 ? 'hoy' : `${d}d`}</span>` : '';
+        let html = `<div class="step ${cls}"><span class="step-dot"></span><span class="step-label">${s.short}</span>${daysLbl}</div>`;
+        if (i < stages.length - 1) html += `<span class="step-line ${i < lastDoneIdx ? 'done' : ''}"></span>`;
+        return html;
       }).join('')}
     </div>
-
-    ${isFullyDone ? `<div class="status done">✓ Producción completa · jean entregado${totalDays != null ? ` en ${totalDays}d` : ''}</div>` : ''}
+    ${isFullyDone ? `<div class="delivered">✓ Entregado${totalDays != null ? ` · en ${totalDays}d` : ''}</div>` :
+      `<div class="step-action"><button class="step-btn ${isLastStage ? 'complete' : ''}" data-pid="${entry.id}" data-stage="${nextKey}" data-supplier="${supplierToken}">${isLastStage ? 'Confirmar entrega' : `${escapeHtml(nextLabel)} terminado`}</button></div>`}
   </div>`;
+}
 
+function render(payload, supplierToken){
+  const root = document.getElementById('root');
+  if (!payload || !payload.supplier){
+    root.innerHTML = `<div class="status-msg error">Link inválido o expirado. Pediles a tu contacto que te mande uno nuevo.</div>`;
+    return;
+  }
+  const supplier = payload.supplier;
+  const items = Array.isArray(payload.items) ? payload.items : [];
+  const inProgress = items.filter(i => !(i.stage === 'entrega'));
+  const done = items.filter(i => i.stage === 'entrega');
+  const greeting = supplier.name ? `Hola, ${supplier.name}` : 'Hola';
+  let html = `<div class="hi">${escapeHtml(greeting)}</div>`;
+  html += `<div class="count">${inProgress.length} ${inProgress.length === 1 ? 'jean' : 'jeans'} en producción${done.length ? ` · ${done.length} entregados` : ''}</div>`;
+  if (items.length === 0){
+    html += `<div class="empty">Sin productos asignados todavía</div>`;
+  } else {
+    html += inProgress.map(it => renderCard(it, supplierToken)).join('');
+    if (done.length){
+      html += `<div class="count" style="margin:24px 0 10px">Entregados</div>`;
+      html += done.map(it => renderCard(it, supplierToken)).join('');
+    }
+  }
   root.innerHTML = html;
-
-  const btn = root.querySelector('[data-mark-done]');
-  if (btn){
+  // Wire buttons
+  root.querySelectorAll('[data-pid]').forEach(btn => {
     btn.addEventListener('click', async () => {
+      const pid = btn.getAttribute('data-pid');
+      const stage = btn.getAttribute('data-stage');
+      const token = btn.getAttribute('data-supplier');
       btn.disabled = true;
-      const originalText = btn.textContent;
+      const original = btn.textContent;
       btn.textContent = 'Guardando…';
-      const stageToMark = btn.getAttribute('data-mark-done');
       try {
-        const { data, error } = await supabase.rpc('advance_stage_by_token', {
-          p_token: getToken(),
-          p_new_stage: stageToMark,
-        });
-        if (error) throw error;
+        let res;
+        if (currentMode === 'legacy'){
+          // Link viejo /p/{per_product_token} → RPC sin supplier
+          res = await supabase.rpc('advance_stage_by_token', {
+            p_token: token, p_new_stage: stage,
+          });
+        } else {
+          res = await supabase.rpc('advance_supplier_stage', {
+            p_token: token, p_pipeline_id: pid, p_new_stage: stage,
+          });
+        }
+        if (res.error) throw res.error;
         showToast('✓ Etapa marcada');
-        render(data);
+        await refresh();
       } catch (err) {
         btn.disabled = false;
-        btn.textContent = originalText;
-        document.getElementById('root').insertAdjacentHTML('afterbegin',
-          `<div class="status error card" style="margin-bottom:14px">Error: ${escapeHtml(err.message || 'no pudo guardar')}</div>`);
+        btn.textContent = original;
+        showToast('Error: ' + (err.message || 'no pudo guardar'));
       }
     });
+  });
+}
+
+let currentToken = '';
+let currentMode = 'supplier'; // 'supplier' | 'legacy'
+
+async function refresh(){
+  if (!currentToken) return;
+  try {
+    if (currentMode === 'legacy'){
+      const { data, error } = await supabase.rpc('get_pipeline_by_token', { p_token: currentToken });
+      if (error) throw error;
+      render({ supplier: { name: 'Proveedor' }, items: data ? [data] : [] }, currentToken);
+    } else {
+      const { data, error } = await supabase.rpc('get_supplier_pipeline_by_token', { p_token: currentToken });
+      if (error) throw error;
+      render(data, currentToken);
+    }
+  } catch (err) {
+    document.getElementById('root').innerHTML = `<div class="status-msg error">Error: ${escapeHtml(err.message || 'no pudo cargar')}</div>`;
   }
 }
 
 async function init(){
   const token = getToken();
   if (!token){
-    document.getElementById('root').innerHTML = `<div class="status error card">Falta el token en el link.</div>`;
+    document.getElementById('root').innerHTML = `<div class="status-msg error">Falta el token en el link.</div>`;
     return;
   }
+  currentToken = token;
+  // Primero intentá vista multi-producto (link nuevo /s/{token})
+  try {
+    const { data, error } = await supabase.rpc('get_supplier_pipeline_by_token', { p_token: token });
+    if (error) throw error;
+    if (data && data.supplier){
+      currentMode = 'supplier';
+      render(data, token);
+      return;
+    }
+  } catch (_) { /* cae al legacy */ }
+  // Fallback: link viejo /p/{token} de un solo producto
   try {
     const { data, error } = await supabase.rpc('get_pipeline_by_token', { p_token: token });
     if (error) throw error;
-    render(data);
+    if (!data){
+      document.getElementById('root').innerHTML = `<div class="status-msg error">Link inválido o expirado. Pediles a tu contacto que te mande uno nuevo.</div>`;
+      return;
+    }
+    currentMode = 'legacy';
+    render({ supplier: { name: 'Proveedor' }, items: [data] }, token);
   } catch (err) {
-    document.getElementById('root').innerHTML = `<div class="status error card">Error: ${escapeHtml(err.message || 'no pudo cargar')}</div>`;
+    document.getElementById('root').innerHTML = `<div class="status-msg error">Error: ${escapeHtml(err.message || 'no pudo cargar')}</div>`;
   }
 }
 
