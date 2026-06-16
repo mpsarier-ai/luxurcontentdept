@@ -214,11 +214,11 @@ header{border-bottom:1px solid var(--black);padding-bottom:24px;margin-bottom:64
 .login-tagline{font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:var(--grey);margin-top:6px;margin-bottom:56px}
 .login-title{font-family:'Cormorant Garamond',serif;font-style:italic;font-weight:700;font-size:34px;margin-bottom:12px}
 .login-help{font-size:13px;color:var(--grey);line-height:1.55;margin-bottom:28px}
-#loginEmail{width:100%;padding:13px 16px;font-family:'JetBrains Mono',monospace;font-size:13px;border:1px solid var(--black);background:#fff;outline:none;margin-bottom:10px;text-align:center}
-#loginEmail:focus{border-color:var(--rosa-deep)}
-#loginBtn{width:100%;padding:14px;background:var(--black);color:var(--cream);border:none;font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.18em;text-transform:uppercase;cursor:pointer}
-#loginBtn:hover:not(:disabled){background:var(--rosa-deep)}
-#loginBtn:disabled{opacity:.5;cursor:not-allowed}
+#loginEmail,#loginCode{width:100%;padding:13px 16px;font-family:'JetBrains Mono',monospace;font-size:13px;border:1px solid var(--black);background:#fff;outline:none;margin-bottom:10px;text-align:center}
+#loginEmail:focus,#loginCode:focus{border-color:var(--rosa-deep)}
+#loginBtn,#loginVerifyBtn{width:100%;padding:14px;background:var(--black);color:var(--cream);border:none;font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.18em;text-transform:uppercase;cursor:pointer}
+#loginBtn:hover:not(:disabled),#loginVerifyBtn:hover:not(:disabled){background:var(--rosa-deep)}
+#loginBtn:disabled,#loginVerifyBtn:disabled{opacity:.5;cursor:not-allowed}
 .login-status{margin-top:20px;font-size:13px;color:var(--rosa-deep);min-height:1.2em;line-height:1.55}
 .login-status.error{color:var(--red-out)}
 .login-status.success{color:var(--green-ok)}
@@ -384,15 +384,29 @@ body{padding-top:env(safe-area-inset-top);padding-bottom:env(safe-area-inset-bot
 </head>
 <body>
 
-<!-- LOGIN OVERLAY -->
+<!-- LOGIN OVERLAY · OTP code-based auth -->
 <div class="login-overlay" id="loginOverlay">
   <div class="login-card">
     <div class="login-logo">LUXUR</div>
     <div class="login-tagline">Content Operations</div>
     <h2 class="login-title">Acceso del equipo</h2>
-    <p class="login-help">Pega tu email LUXUR. Te llega un magic link al inbox — un click y entras.</p>
-    <input type="email" id="loginEmail" placeholder="tu@email.com" autocomplete="email" inputmode="email">
-    <button id="loginBtn">Enviar magic link</button>
+
+    <div id="loginStep1">
+      <p class="login-help">Pegá tu email LUXUR. Te llega un código de 6 dígitos al inbox.</p>
+      <input type="email" id="loginEmail" placeholder="tu@email.com" autocomplete="email" inputmode="email">
+      <button id="loginBtn">Enviar código</button>
+    </div>
+
+    <div id="loginStep2" style="display:none">
+      <p class="login-help">
+        Te enviamos un código a <b id="loginEmailLabel">—</b>.<br>
+        <small style="opacity:.7">Revisá tu inbox · puede tardar 10-30 segundos.</small>
+      </p>
+      <input type="text" id="loginCode" placeholder="000000" inputmode="numeric" autocomplete="one-time-code" maxlength="6" style="letter-spacing:.5em;text-align:center;font-size:24px;font-family:'JetBrains Mono',monospace">
+      <button id="loginVerifyBtn">Entrar</button>
+      <button id="loginBackBtn" style="background:transparent;color:var(--grey);border:none;text-decoration:underline;cursor:pointer;font-family:inherit;font-size:12px;margin-top:6px">← Usar otro email</button>
+    </div>
+
     <div class="login-status" id="loginStatus"></div>
   </div>
 </div>
@@ -1472,8 +1486,24 @@ document.addEventListener('keydown', e => {
   if (e.key === 'Escape' && newWeekModal.classList.contains('open')) closeNewWeekModal();
 });
 
-// === LOGIN ===
-async function sendMagicLink(){
+// === LOGIN · OTP code-based auth ===
+const loginStep1 = document.getElementById('loginStep1');
+const loginStep2 = document.getElementById('loginStep2');
+const loginCode = document.getElementById('loginCode');
+const loginVerifyBtn = document.getElementById('loginVerifyBtn');
+const loginBackBtn = document.getElementById('loginBackBtn');
+const loginEmailLabel = document.getElementById('loginEmailLabel');
+let loginCurrentEmail = '';
+
+function loginShowStep(n){
+  loginStep1.style.display = n === 1 ? '' : 'none';
+  loginStep2.style.display = n === 2 ? '' : 'none';
+  loginStatus.className = 'login-status';
+  loginStatus.textContent = '';
+  if (n === 2) setTimeout(() => loginCode?.focus(), 100);
+}
+
+async function sendCode(){
   const email = (loginEmail.value || '').trim().toLowerCase();
   if (!email || !email.includes('@')){
     loginStatus.className = 'login-status error';
@@ -1482,23 +1512,59 @@ async function sendMagicLink(){
   }
   loginBtn.disabled = true;
   loginStatus.className = 'login-status';
-  loginStatus.textContent = 'Enviando link…';
+  loginStatus.textContent = 'Enviando código…';
   const { error } = await supabase.auth.signInWithOtp({
     email,
-    options: { emailRedirectTo: window.location.href.split('#')[0] }
+    options: { shouldCreateUser: true }
   });
+  loginBtn.disabled = false;
   if (error){
     loginStatus.className = 'login-status error';
     loginStatus.textContent = 'Error: ' + error.message;
-    loginBtn.disabled = false;
-  } else {
-    loginStatus.className = 'login-status success';
-    loginStatus.innerHTML = `Te enviamos un magic link a <strong>${escapeHtml(email)}</strong>.`;
+    return;
   }
+  loginCurrentEmail = email;
+  loginEmailLabel.textContent = email;
+  loginShowStep(2);
 }
 
-if (loginBtn) loginBtn.addEventListener('click', sendMagicLink);
-if (loginEmail) loginEmail.addEventListener('keydown', e => { if (e.key === 'Enter') sendMagicLink(); });
+async function verifyCode(){
+  const token = (loginCode.value || '').replace(/\D/g, '');
+  if (token.length !== 6){
+    loginStatus.className = 'login-status error';
+    loginStatus.textContent = 'Pega el código de 6 dígitos del email';
+    return;
+  }
+  loginVerifyBtn.disabled = true;
+  loginStatus.className = 'login-status';
+  loginStatus.textContent = 'Verificando…';
+  const { data, error } = await supabase.auth.verifyOtp({
+    email: loginCurrentEmail,
+    token,
+    type: 'email',
+  });
+  loginVerifyBtn.disabled = false;
+  if (error || !data?.session){
+    loginStatus.className = 'login-status error';
+    loginStatus.textContent = error?.message || 'Código incorrecto o expirado';
+    return;
+  }
+  loginStatus.className = 'login-status success';
+  loginStatus.textContent = 'Adentro, cargando…';
+  hideLogin();
+  setTimeout(() => location.reload(), 300);
+}
+
+if (loginBtn) loginBtn.addEventListener('click', sendCode);
+if (loginEmail) loginEmail.addEventListener('keydown', e => { if (e.key === 'Enter') sendCode(); });
+if (loginVerifyBtn) loginVerifyBtn.addEventListener('click', verifyCode);
+if (loginCode) loginCode.addEventListener('keydown', e => { if (e.key === 'Enter') verifyCode(); });
+if (loginCode) loginCode.addEventListener('input', e => {
+  const digits = e.target.value.replace(/\D/g, '');
+  e.target.value = digits.slice(0, 6);
+  if (digits.length === 6) verifyCode();
+});
+if (loginBackBtn) loginBackBtn.addEventListener('click', () => { loginCode.value = ''; loginShowStep(1); });
 if (signOutBtn) signOutBtn.addEventListener('click', async () => {
   if (!confirm('¿Cerrar sesión?')) return;
   await supabase.auth.signOut();
