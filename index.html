@@ -1347,8 +1347,8 @@ function _renderProductStatusInner(){
           ${sizesHtml}
           <div class="fa-reason">${escapeHtml(a.reason)}</div>
           <div class="fa-actions">
-            <button class="fa-act-btn" data-fa-action="restock" data-fa-product-gid="${escapeAttr(p.gid || '')}">+ Restock</button>
-            <button class="fa-act-btn batch" data-fa-action="batch" data-fa-product-gid="${escapeAttr(p.gid || '')}">+ Lote</button>
+            <button class="fa-act-btn" data-fa-action="restock" data-fa-product-gid="${escapeHtml(p.gid || '')}">+ Restock</button>
+            <button class="fa-act-btn batch" data-fa-action="batch" data-fa-product-gid="${escapeHtml(p.gid || '')}">+ Lote</button>
           </div>
         </div>`;
       }).join('')}
