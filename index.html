@@ -1774,7 +1774,8 @@ document.getElementById('entrySave').addEventListener('click', async () => {
     product_name: name, product_gid: match ? match.gid : null,
     entry_type: type, tentative_date: date, tentative_date_end: dateEnd, notes,
     photo_date: photoDate,
-    quantity, size_curve: sizeCurve, has_proceso: hasProceso
+    quantity, size_curve: sizeCurve, has_proceso: hasProceso,
+    supplier_id: currentSupplier ? currentSupplier.id : null,
   };
   let error;
   if (editingEntryId){
