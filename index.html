@@ -1097,9 +1097,20 @@ function faAnalyze(p){
 // la demanda absoluta es baja, O cuando el producto recién empezó a vender (demoró en salir).
 // Se ejecuta DESPUÉS de calcular stats globales del catálogo.
 function faRefineUrgency(a, medianU30){
-  if (a.cat !== 'r1') return;
   // Piso de velocity absoluta: 40% de la mediana del catálogo, con mínimo de 5u/mes
   const MIN_URGENT = Math.max(5, Math.round(medianU30 * 0.4));
+
+  // Promoción: AGOTADOS con buena velocidad → Restock urgente
+  // Cuando algo se agotó pero vendía bien, ES candidato a restock prioritario
+  // (no quedó "agotado y olvidado"). Saltamos los otros guards porque agotado
+  // por demanda ES la definición de urgente.
+  if (a.cat === 'sold' && a.u30 >= MIN_URGENT){
+    a.cat = 'r1';
+    a.reason = `agotado · vendía ${a.u30}u/mes · restock urgente`;
+    return;
+  }
+
+  if (a.cat !== 'r1') return;
   // Acceleration ratio: velocidad de los últimos 7d vs promedio mensual (u30/4.3)
   const weeklyAvg = a.u30 / 4.3;
   const accelRatio = weeklyAvg > 0.2 ? (a.u7 || 0) / weeklyAvg : 0;
