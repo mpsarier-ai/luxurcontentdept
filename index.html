@@ -138,6 +138,12 @@ header{border-bottom:1px solid var(--black);padding-bottom:24px;margin-bottom:64
 .fa-reason{font-family:'Outfit',sans-serif;font-size:12px;color:#555;line-height:1.4;letter-spacing:.005em;margin-top:8px}
 .fa-reason b{color:var(--black);font-weight:600}
 
+/* Acciones de producción en cada card */
+.fa-actions{display:flex;gap:6px;margin-top:10px;padding-top:10px;border-top:1px dashed rgba(0,0,0,.06)}
+.fa-act-btn{flex:1;font-family:'JetBrains Mono',monospace;font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;padding:8px 8px;border:1px solid var(--cream-dark);border-radius:999px;background:transparent;color:#666;cursor:pointer;font-weight:500;transition:all .15s ease}
+.fa-act-btn:hover{border-color:var(--rosa-deep);color:var(--rosa-deep);background:rgba(212,132,142,.06)}
+.fa-act-btn.batch:hover{border-color:#7891b0;color:#7891b0;background:rgba(120,145,176,.06)}
+
 /* Venta perdida badge en card */
 .fa-lost{background:rgba(168,85,85,.08);border:1px solid rgba(168,85,85,.2);border-radius:10px;padding:6px 10px;font-family:'Outfit',sans-serif;font-size:11.5px;color:#7a3030;margin-bottom:10px;letter-spacing:.01em}
 .fa-lost b{font-family:'JetBrains Mono',monospace;color:#a85555;font-weight:600}
@@ -1329,6 +1335,10 @@ function _renderProductStatusInner(){
           ${lostHtml}
           ${sizesHtml}
           <div class="fa-reason">${escapeHtml(a.reason)}</div>
+          <div class="fa-actions">
+            <button class="fa-act-btn" data-fa-action="restock" data-fa-product-gid="${escapeAttr(p.gid || '')}">+ Restock</button>
+            <button class="fa-act-btn batch" data-fa-action="batch" data-fa-product-gid="${escapeAttr(p.gid || '')}">+ Lote</button>
+          </div>
         </div>`;
       }).join('')}
     </div>
@@ -1346,6 +1356,53 @@ document.addEventListener('click', e => {
   if (!chip) return;
   faActiveFilter = chip.getAttribute('data-fa-filter');
   renderProductStatus();
+});
+
+// Acciones Fashionalytics → Producción (Restock / Lote)
+document.addEventListener('click', e => {
+  const btn = e.target.closest('[data-fa-action]');
+  if (!btn) return;
+  const action = btn.getAttribute('data-fa-action');
+  const gid = btn.getAttribute('data-fa-product-gid');
+  const product = catalog.find(p => p.gid === gid);
+  if (!product) return;
+  // Cantidad sugerida = u30 × 2 (cubrir ~2 meses, considerando lead time 4w)
+  // Redondeada al múltiplo de 10 más cercano, mínimo 20u
+  const u30 = product.units30d_native ?? product.units30d ?? product.units30d_manual ?? Math.round((product.orders7d || 0) * 4.3);
+  const suggestedQty = Math.max(20, Math.round((u30 * 2) / 10) * 10);
+  // Curva sugerida: proporcional al mix de tallas vendidas en 30d
+  const sizes = Array.isArray(product.sizes) ? product.sizes : [];
+  const totalSold = sizes.reduce((s, sz) => s + (sz.units30d || 0), 0);
+  const sizeCurve = {};
+  if (totalSold > 0){
+    sizes.forEach(sz => {
+      const sold = sz.units30d || 0;
+      if (sold > 0 && !/^(default title|talla [úu]nica|[úu]nica)$/i.test(sz.size)){
+        const n = Math.round(suggestedQty * sold / totalSold);
+        if (n > 0) sizeCurve[sz.size] = n;
+      }
+    });
+  }
+  // Navegá a Producción
+  showHubSection('produccion');
+  // Abrí el modal apropiado pre-llenado
+  setTimeout(() => {
+    if (action === 'restock'){
+      openEntryModal(null, {
+        productName: product.title,
+        type: 'restock',
+        quantity: suggestedQty,
+        sizeCurve,
+        notes: `Restock sugerido desde Fashionalytics · u30=${u30}, cob=${u30 > 0 ? ((product.total || 0)/u30).toFixed(1) : '∞'}m`,
+      });
+    } else if (action === 'batch'){
+      openBatchModal(null, {
+        name: product.title,
+        totalQty: suggestedQty,
+        notes: `Lote desde Fashionalytics · u30=${u30}`,
+      });
+    }
+  }, 350); // dejá que termine la transición de slide-in de la sección
 });
 
 let pipeline = [];
@@ -1741,20 +1798,20 @@ async function deletePipeline(id){
 const entryModal = document.getElementById('entryModal');
 let editingEntryId = null;
 
-function openEntryModal(id){
+function openEntryModal(id, prefill){
   editingEntryId = id || null;
   const e = id ? pipeline.find(x => x.id === id) : null;
   document.getElementById('entryModalTitle').textContent = e ? 'Editar entrada' : 'Agregar entrada';
-  document.getElementById('entryProduct').value = e ? e.product_name : '';
-  document.getElementById('entryType').value = e ? e.entry_type : 'restock';
+  document.getElementById('entryProduct').value = e ? e.product_name : (prefill?.productName || '');
+  document.getElementById('entryType').value = e ? e.entry_type : (prefill?.type || 'restock');
   document.getElementById('entryDate').value = e && e.tentative_date ? e.tentative_date : '';
   document.getElementById('entryDateEnd').value = e && e.tentative_date_end ? e.tentative_date_end : '';
-  document.getElementById('entryNotes').value = e && e.notes ? e.notes : '';
+  document.getElementById('entryNotes').value = e && e.notes ? e.notes : (prefill?.notes || '');
   document.getElementById('entryPhotoDate').value = e && e.photo_date ? e.photo_date : '';
-  document.getElementById('entryQuantity').value = e && e.quantity ? e.quantity : '';
+  document.getElementById('entryQuantity').value = e && e.quantity ? e.quantity : (prefill?.quantity || '');
   document.getElementById('entryHasProceso').checked = e ? (e.has_proceso !== false) : true;
   // Curva de tallas
-  const curve = (e && e.size_curve && typeof e.size_curve === 'object') ? e.size_curve : {};
+  const curve = (e && e.size_curve && typeof e.size_curve === 'object') ? e.size_curve : (prefill?.sizeCurve || {});
   document.querySelectorAll('#entryCurveInputs input[data-size]').forEach(input => {
     const sz = input.getAttribute('data-size');
     input.value = curve[sz] || '';
@@ -1842,15 +1899,15 @@ document.getElementById('entrySave').addEventListener('click', async () => {
 // === BATCH (LOTE) MODAL ===
 const batchModal = document.getElementById('batchModal');
 let editingBatchId = null;
-function openBatchModal(id){
+function openBatchModal(id, prefill){
   editingBatchId = id || null;
   const b = id ? batches.find(x => x.id === id) : null;
   document.getElementById('batchModalTitle').textContent = b ? 'Editar lote' : 'Nuevo lote';
-  document.getElementById('batchName').value = b ? b.name : '';
-  document.getElementById('batchQty').value = b && b.total_quantity ? b.total_quantity : '';
+  document.getElementById('batchName').value = b ? b.name : (prefill?.name || '');
+  document.getElementById('batchQty').value = b && b.total_quantity ? b.total_quantity : (prefill?.totalQty || '');
   document.getElementById('batchDate').value = b && b.tentative_date ? b.tentative_date : '';
   document.getElementById('batchHasProceso').checked = b ? (b.has_proceso !== false) : true;
-  document.getElementById('batchNotes').value = b && b.notes ? b.notes : '';
+  document.getElementById('batchNotes').value = b && b.notes ? b.notes : (prefill?.notes || '');
   document.getElementById('batchError').textContent = '';
   batchModal.classList.add('open');
   setTimeout(() => document.getElementById('batchName').focus(), 50);
