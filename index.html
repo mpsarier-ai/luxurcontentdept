@@ -297,9 +297,9 @@ header{border-bottom:1px solid var(--black);padding-bottom:24px;margin-bottom:64
 .login-status.success{color:var(--green-ok)}
 
 /* MODAL */
-.modal-backdrop{position:fixed;inset:0;background:rgba(26,26,26,.65);backdrop-filter:blur(4px);display:none;align-items:center;justify-content:center;z-index:100;padding:24px}
+.modal-backdrop{position:fixed;inset:0;background:rgba(26,26,26,.65);backdrop-filter:blur(4px);display:none;justify-content:center;align-items:safe center;z-index:100;padding:24px;overflow-y:auto;-webkit-overflow-scrolling:touch}
 .modal-backdrop.open{display:flex}
-.modal{background:var(--cream);max-width:520px;width:100%;border:1px solid var(--black);padding:32px;font-family:'Outfit',sans-serif}
+.modal{background:var(--cream);max-width:520px;width:100%;border:1px solid var(--black);padding:32px;font-family:'Outfit',sans-serif;margin:auto 0;flex-shrink:0}
 .modal h3{font-family:'Cormorant Garamond',serif;font-weight:700;font-style:italic;font-size:28px;margin-bottom:8px}
 .modal .modal-meta{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:var(--grey);margin-bottom:20px}
 .modal p{font-size:13px;line-height:1.5;margin-bottom:14px;color:var(--grey)}
