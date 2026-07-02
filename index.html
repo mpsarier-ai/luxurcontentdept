@@ -143,6 +143,10 @@ header{border-bottom:1px solid var(--black);padding-bottom:24px;margin-bottom:64
 .fa-act-btn{flex:1;font-family:'JetBrains Mono',monospace;font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;padding:8px 8px;border:1px solid var(--cream-dark);border-radius:999px;background:transparent;color:#666;cursor:pointer;font-weight:500;transition:all .15s ease}
 .fa-act-btn:hover{border-color:var(--rosa-deep);color:var(--rosa-deep);background:rgba(212,132,142,.06)}
 .fa-act-btn.batch:hover{border-color:#7891b0;color:#7891b0;background:rgba(120,145,176,.06)}
+/* Badge cuando ya hay restock/lote en curso */
+.fa-active-badge{margin-top:10px;padding:8px 14px;border-radius:10px;background:rgba(91,154,91,.1);color:#3a5a3a;font-family:'JetBrains Mono',monospace;font-size:10.5px;letter-spacing:.06em;text-align:center;font-weight:500;border:1px solid rgba(91,154,91,.25);cursor:pointer;transition:background .15s ease}
+.fa-active-badge:hover{background:rgba(91,154,91,.15)}
+.fa-active-badge b{color:#1a1a1a;font-weight:600}
 
 /* Venta perdida badge en card */
 .fa-lost{background:rgba(168,85,85,.08);border:1px solid rgba(168,85,85,.2);border-radius:10px;padding:6px 10px;font-family:'Outfit',sans-serif;font-size:11.5px;color:#7a3030;margin-bottom:10px;letter-spacing:.01em}
@@ -786,6 +790,47 @@ if (window.Capacitor?.isNativePlatform?.()) {
   })();
 }
 
+// === Push Notifications (iOS nativo) ===
+let __pushRegistered = false;
+async function registerPushNotifications(userEmail){
+  if (!userEmail) return;
+  if (__pushRegistered) return;
+  if (!window.Capacitor?.isNativePlatform?.()) return;
+  try {
+    const mod = await import('https://esm.sh/@capacitor/push-notifications@6.0.4');
+    const PushNotifications = mod.PushNotifications;
+    // 1) Pedir permiso
+    const perm = await PushNotifications.requestPermissions();
+    if (perm.receive !== 'granted') { console.warn('push perms denied'); return; }
+    __pushRegistered = true;
+    // 2) Registrar y escuchar el token
+    PushNotifications.addListener('registration', async (token) => {
+      try {
+        await supabase.from('push_tokens').upsert({
+          user_email: userEmail.toLowerCase(),
+          device_token: token.value,
+          platform: 'ios',
+          updated_at: new Date().toISOString(),
+        }, { onConflict: 'device_token' });
+        console.log('push token registrado');
+      } catch (e) { console.error('push_tokens upsert', e); }
+    });
+    PushNotifications.addListener('registrationError', (err) => {
+      console.error('push registration error', err);
+    });
+    // 3) Al tocar una notificación → deep-link al piece
+    PushNotifications.addListener('pushNotificationActionPerformed', (n) => {
+      const data = n?.notification?.data || {};
+      if (data.appUrl && typeof data.appUrl === 'string') {
+        window.location.href = data.appUrl;
+      }
+    });
+    await PushNotifications.register();
+  } catch (err) {
+    console.warn('push init failed', err);
+  }
+}
+
 const SUPABASE_URL = "https://nrpgtlcdvtesjbxpkxha.supabase.co";
 const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5ycGd0bGNkdnRlc2pieHBreGhhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg3ODkzNTAsImV4cCI6MjA5NDM2NTM1MH0.ntRHkFobaVK6RW9EYRwoww1ATr8N0zHMzXHM__5x8E0";
 
@@ -843,6 +888,8 @@ let catalog = [];
 async function enterApp(){
   hideLogin();
   if (editorList) editorList.textContent = user.email;
+  // Push notifications (solo iOS nativo, no-op en web)
+  registerPushNotifications(user.email).catch(e => console.warn('push init', e));
   // Hub home con los 4 tiles. Solo auto-redirect si la URL trae ?go=current explícito.
   const urlParams = new URLSearchParams(location.search);
   if (urlParams.get('go') === 'current'){
@@ -1346,10 +1393,7 @@ function _renderProductStatusInner(){
           ${lostHtml}
           ${sizesHtml}
           <div class="fa-reason">${escapeHtml(a.reason)}</div>
-          <div class="fa-actions">
-            <button class="fa-act-btn" data-fa-action="restock" data-fa-product-gid="${escapeHtml(p.gid || '')}">+ Restock</button>
-            <button class="fa-act-btn batch" data-fa-action="batch" data-fa-product-gid="${escapeHtml(p.gid || '')}">+ Lote</button>
-          </div>
+          ${renderFaProdAction(p)}
         </div>`;
       }).join('')}
     </div>
@@ -1367,6 +1411,66 @@ document.addEventListener('click', e => {
   if (!chip) return;
   faActiveFilter = chip.getAttribute('data-fa-filter');
   renderProductStatus();
+});
+
+// === Helpers para detectar restock/lote ya activo ===
+const PROD_STAGE_LABEL = {
+  corte: 'en Corte', proceso: 'en Proceso', confeccion: 'en Confección',
+  lavanderia: 'en Lavandería', terminacion: 'en Terminación', entrega: '✓ entregado',
+};
+const PROD_NEXT_STAGE_LABEL = {
+  null: 'en Corte', undefined: 'en Corte',
+  corte: 'en Proceso/Confección', proceso: 'en Confección',
+  confeccion: 'en Lavandería', lavanderia: 'en Terminación',
+  terminacion: 'en Entrega', entrega: '✓ entregado',
+};
+function faFindActive(p){
+  if (!p) return null;
+  // 1) Standalone entry (matching gid o nombre exacto), restock pendiente
+  const standalone = pipeline.find(e =>
+    !e.batch_id &&
+    (e.product_gid === p.gid || (e.product_name && e.product_name.toLowerCase() === (p.title || '').toLowerCase())) &&
+    e.entry_type === 'restock' &&
+    e.status !== 'llego' && e.stage !== 'entrega'
+  );
+  if (standalone) return { kind: 'restock', entry: standalone };
+  // 2) Lote (matching nombre)
+  const batch = batches.find(b =>
+    b.name && b.name.toLowerCase() === (p.title || '').toLowerCase() &&
+    b.batch_stage !== 'entrega'
+  );
+  if (batch) return { kind: 'batch', batch };
+  return null;
+}
+function renderFaProdAction(p){
+  const active = faFindActive(p);
+  if (active){
+    let label, qty, stageLabel;
+    if (active.kind === 'batch'){
+      label = 'Lote activo';
+      qty = active.batch.total_quantity;
+      stageLabel = PROD_NEXT_STAGE_LABEL[active.batch.batch_stage];
+    } else {
+      label = 'Restock activo';
+      qty = active.entry.quantity;
+      stageLabel = PROD_NEXT_STAGE_LABEL[active.entry.stage];
+    }
+    const bits = [`<b>${label}</b>`];
+    if (qty) bits.push(`${qty}u`);
+    if (stageLabel) bits.push(stageLabel);
+    return `<div class="fa-active-badge" data-fa-jump-prod="1" title="Ir a Producción">✓ ${bits.join(' · ')}</div>`;
+  }
+  return `<div class="fa-actions">
+    <button class="fa-act-btn" data-fa-action="restock" data-fa-product-gid="${escapeHtml(p.gid || '')}">+ Restock</button>
+    <button class="fa-act-btn batch" data-fa-action="batch" data-fa-product-gid="${escapeHtml(p.gid || '')}">+ Lote</button>
+  </div>`;
+}
+
+// Click en badge "Restock activo" → ir a Producción
+document.addEventListener('click', e => {
+  const badge = e.target.closest('[data-fa-jump-prod]');
+  if (!badge) return;
+  showHubSection('produccion');
 });
 
 // Acciones Fashionalytics → Producción (Restock / Lote)

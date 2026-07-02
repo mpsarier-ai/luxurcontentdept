@@ -940,6 +940,37 @@ if (window.Capacitor?.isNativePlatform?.()) {
   })();
 }
 
+// === Push Notifications (iOS nativo) ===
+let __pushRegistered = false;
+async function registerPushNotifications(userEmail){
+  if (!userEmail) return;
+  if (__pushRegistered) return;
+  if (!window.Capacitor?.isNativePlatform?.()) return;
+  try {
+    const mod = await import('https://esm.sh/@capacitor/push-notifications@6.0.4');
+    const PushNotifications = mod.PushNotifications;
+    const perm = await PushNotifications.requestPermissions();
+    if (perm.receive !== 'granted') { console.warn('push perms denied'); return; }
+    __pushRegistered = true;
+    PushNotifications.addListener('registration', async (token) => {
+      try {
+        await supabase.from('push_tokens').upsert({
+          user_email: userEmail.toLowerCase(),
+          device_token: token.value,
+          platform: 'ios',
+          updated_at: new Date().toISOString(),
+        }, { onConflict: 'device_token' });
+      } catch (e) { console.error('push_tokens upsert', e); }
+    });
+    PushNotifications.addListener('registrationError', (err) => console.error('push reg error', err));
+    PushNotifications.addListener('pushNotificationActionPerformed', (n) => {
+      const data = n?.notification?.data || {};
+      if (data.appUrl && typeof data.appUrl === 'string') window.location.href = data.appUrl;
+    });
+    await PushNotifications.register();
+  } catch (err) { console.warn('push init failed', err); }
+}
+
 const SUPABASE_URL = "https://nrpgtlcdvtesjbxpkxha.supabase.co";
 const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5ycGd0bGNkdnRlc2pieHBreGhhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg3ODkzNTAsImV4cCI6MjA5NDM2NTM1MH0.ntRHkFobaVK6RW9EYRwoww1ATr8N0zHMzXHM__5x8E0";
 const STORAGE_BUCKET = "calendar-photos";
@@ -1107,6 +1138,9 @@ async function boot(){
 async function enterApp(){
   hideLogin();
   if (editorList) editorList.innerHTML = `<span class="editor-chip">${escapeHtml(state.user.email)}</span>`;
+
+  // Push notifications (iOS nativo, no-op en web)
+  registerPushNotifications(state.user.email).catch(e => console.warn('push init', e));
 
   // Determine calendar_id from URL or fall back to most recent active
   const urlId = new URLSearchParams(window.location.search).get('id');
