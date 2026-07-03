@@ -943,20 +943,7 @@ if (window.Capacitor?.isNativePlatform?.()) {
 // === Push Notifications (iOS nativo) ===
 let __pushRegistered = false;
 function pushLog(msg, extra){
-  const line = `[push] ${msg}${extra ? ' ' + JSON.stringify(extra) : ''}`;
-  console.log(line);
-  try {
-    const box = document.getElementById('pushDebugBox') || (() => {
-      const el = document.createElement('div');
-      el.id = 'pushDebugBox';
-      el.style.cssText = 'position:fixed;bottom:8px;left:8px;right:8px;max-height:40vh;overflow:auto;background:rgba(0,0,0,.85);color:#0f0;font:11px/1.4 monospace;padding:8px;border-radius:8px;z-index:9999;white-space:pre-wrap;pointer-events:auto';
-      el.addEventListener('click', () => el.remove());
-      document.body.appendChild(el);
-      return el;
-    })();
-    box.textContent = box.textContent + '\n' + line;
-    box.scrollTop = box.scrollHeight;
-  } catch(_) {}
+  console.log(`[push] ${msg}${extra ? ' ' + JSON.stringify(extra) : ''}`);
 }
 async function registerPushNotifications(userEmail){
   if (!userEmail) return;
