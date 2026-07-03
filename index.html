@@ -792,43 +792,69 @@ if (window.Capacitor?.isNativePlatform?.()) {
 
 // === Push Notifications (iOS nativo) ===
 let __pushRegistered = false;
+function pushLog(msg, extra){
+  const line = `[push] ${msg}${extra ? ' ' + JSON.stringify(extra) : ''}`;
+  console.log(line);
+  try {
+    const box = document.getElementById('pushDebugBox') || (() => {
+      const el = document.createElement('div');
+      el.id = 'pushDebugBox';
+      el.style.cssText = 'position:fixed;bottom:8px;left:8px;right:8px;max-height:40vh;overflow:auto;background:rgba(0,0,0,.85);color:#0f0;font:11px/1.4 monospace;padding:8px;border-radius:8px;z-index:9999;white-space:pre-wrap;pointer-events:auto';
+      el.addEventListener('click', () => el.remove());
+      document.body.appendChild(el);
+      return el;
+    })();
+    box.textContent = box.textContent + '\n' + line;
+    box.scrollTop = box.scrollHeight;
+  } catch(_) {}
+}
 async function registerPushNotifications(userEmail){
   if (!userEmail) return;
   if (__pushRegistered) return;
-  if (!window.Capacitor?.isNativePlatform?.()) return;
+  if (!window.Capacitor?.isNativePlatform?.()) { console.log('[push] no native, skip'); return; }
+  pushLog('start, user=' + userEmail);
+  // Preferir el plugin nativo (registrado por cap sync ios), fallback a esm.sh
+  let PushNotifications = window.Capacitor?.Plugins?.PushNotifications;
+  if (!PushNotifications) {
+    pushLog('no native PushNotifications, trying esm.sh');
+    try {
+      const mod = await import('https://esm.sh/@capacitor/push-notifications@6.0.4');
+      PushNotifications = mod.PushNotifications;
+      window.Capacitor.Plugins = window.Capacitor.Plugins || {};
+      window.Capacitor.Plugins.PushNotifications = PushNotifications;
+    } catch (e) { pushLog('esm.sh import failed', String(e)); return; }
+  } else {
+    pushLog('using native plugin');
+  }
   try {
-    const mod = await import('https://esm.sh/@capacitor/push-notifications@6.0.4');
-    const PushNotifications = mod.PushNotifications;
-    // 1) Pedir permiso
+    pushLog('requesting perms');
     const perm = await PushNotifications.requestPermissions();
-    if (perm.receive !== 'granted') { console.warn('push perms denied'); return; }
+    pushLog('perm result', perm);
+    if (perm.receive !== 'granted') { pushLog('perms not granted'); return; }
     __pushRegistered = true;
-    // 2) Registrar y escuchar el token
     PushNotifications.addListener('registration', async (token) => {
+      pushLog('registration event, token length=' + (token?.value?.length || 0));
       try {
-        await supabase.from('push_tokens').upsert({
+        const { error } = await supabase.from('push_tokens').upsert({
           user_email: userEmail.toLowerCase(),
           device_token: token.value,
           platform: 'ios',
           updated_at: new Date().toISOString(),
         }, { onConflict: 'device_token' });
-        console.log('push token registrado');
-      } catch (e) { console.error('push_tokens upsert', e); }
+        if (error) pushLog('upsert ERROR', error);
+        else pushLog('token upserted OK');
+      } catch (e) { pushLog('upsert exception', String(e)); }
     });
     PushNotifications.addListener('registrationError', (err) => {
-      console.error('push registration error', err);
+      pushLog('registration error', String(err));
     });
-    // 3) Al tocar una notificación → deep-link al piece
     PushNotifications.addListener('pushNotificationActionPerformed', (n) => {
       const data = n?.notification?.data || {};
-      if (data.appUrl && typeof data.appUrl === 'string') {
-        window.location.href = data.appUrl;
-      }
+      if (data.appUrl && typeof data.appUrl === 'string') window.location.href = data.appUrl;
     });
     await PushNotifications.register();
-  } catch (err) {
-    console.warn('push init failed', err);
-  }
+    pushLog('register() called, waiting for APNs...');
+  } catch (err) { pushLog('init failed', String(err)); }
 }
 
 const SUPABASE_URL = "https://nrpgtlcdvtesjbxpkxha.supabase.co";
