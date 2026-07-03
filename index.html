@@ -793,28 +793,7 @@ if (window.Capacitor?.isNativePlatform?.()) {
 // === Push Notifications (iOS nativo) ===
 let __pushRegistered = false;
 function pushLog(msg, extra){
-  const line = `[push] ${msg}${extra ? ' ' + JSON.stringify(extra) : ''}`;
-  console.log(line);
-  try {
-    const box = document.getElementById('pushDebugBox') || (() => {
-      const el = document.createElement('div');
-      el.id = 'pushDebugBox';
-      el.style.cssText = 'position:fixed;bottom:8px;left:8px;right:8px;max-height:50vh;overflow:auto;background:rgba(0,0,0,.9);color:#0f0;font:11px/1.4 monospace;padding:10px;border-radius:8px;z-index:9999;white-space:pre-wrap';
-      const closeBtn = document.createElement('button');
-      closeBtn.textContent = '× cerrar';
-      closeBtn.style.cssText = 'position:absolute;top:4px;right:8px;background:transparent;color:#0f0;border:1px solid #0f0;font:10px monospace;padding:2px 6px;cursor:pointer';
-      closeBtn.onclick = () => el.remove();
-      el.appendChild(closeBtn);
-      const content = document.createElement('div');
-      content.id = 'pushDebugContent';
-      el.appendChild(content);
-      document.body.appendChild(el);
-      return el;
-    })();
-    const content = box.querySelector('#pushDebugContent') || box;
-    content.textContent = content.textContent + '\n' + line;
-    box.scrollTop = box.scrollHeight;
-  } catch(_) {}
+  console.log(`[push] ${msg}${extra ? ' ' + JSON.stringify(extra) : ''}`);
 }
 async function registerPushNotifications(userEmail){
   if (!userEmail) return;
