@@ -135,6 +135,16 @@ const STAGES_FULL = [
   { key: 'terminacion', short: 'Term',   label: 'Terminación' },
   { key: 'entrega',     short: 'Entr',   label: 'Entrega' },
 ];
+// Flujo simple (proveedor tipo AXSPEN): Planeado → Pagado → Entregado → Terminación → Listo
+// (key terminal 'entrega' para compat con la lógica de completado)
+const STAGES_SIMPLE = [
+  { key: 'planeado',    short: 'Plan',   label: 'Planeado' },
+  { key: 'pagado',      short: 'Pagado', label: 'Pagado' },
+  { key: 'entregado',   short: 'Entreg', label: 'Entregado' },
+  { key: 'terminacion', short: 'Term',   label: 'Terminación' },
+  { key: 'entrega',     short: 'Listo',  label: 'Listo' },
+];
+let supplierFlowType = 'full'; // se setea al render con payload.supplier.flow_type
 // Etapas a nivel LOTE (hasta lavandería)
 const BATCH_STAGES_FULL = STAGES_FULL.slice(0, 4); // corte, proceso, confeccion, lavanderia
 // Etapas a nivel VARIANTE (después de lavandería)
@@ -154,7 +164,10 @@ function getToken(){
   }
   return t;
 }
-function getStages(hasProceso){ return hasProceso !== false ? STAGES_FULL : STAGES_FULL.filter(s => s.key !== 'proceso'); }
+function getStages(hasProceso){
+  if (supplierFlowType === 'simple') return STAGES_SIMPLE;
+  return hasProceso !== false ? STAGES_FULL : STAGES_FULL.filter(s => s.key !== 'proceso');
+}
 function firstHistory(history, key){
   if (!Array.isArray(history)) return null;
   for (let i = 0; i < history.length; i++) if (history[i].stage === key) return history[i];
@@ -348,6 +361,7 @@ function render(payload, supplierToken){
     return;
   }
   const supplier = payload.supplier;
+  supplierFlowType = supplier.flow_type === 'simple' ? 'simple' : 'full';
   // Soportá los 3 formatos: nuevo (batches+standalone), viejo (items), legacy single
   const batches = Array.isArray(payload.batches) ? payload.batches : [];
   const standalone = Array.isArray(payload.standalone) ? payload.standalone

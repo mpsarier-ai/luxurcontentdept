@@ -816,6 +816,12 @@ body{padding-top:env(safe-area-inset-top);padding-bottom:env(safe-area-inset-bot
     <label>Costo aproximado por unidad (COP)</label>
     <input type="number" id="supCost" placeholder="25000" min="0" step="500">
 
+    <label>Flujo de producción</label>
+    <select id="supFlow" style="width:100%;padding:11px 13px;font-family:'JetBrains Mono',monospace;font-size:13px;border:1px solid var(--black);background:#fff;outline:none">
+      <option value="full">Taller completo · Corte → Proceso → Confección → Lavandería → Terminación → Entrega</option>
+      <option value="simple">Simple · Planeado → Pedido → Entrega</option>
+    </select>
+
     <label>Notas (opcional)</label>
     <input type="text" id="supNotes" placeholder="Especialidad, detalle logístico…">
 
@@ -1053,6 +1059,9 @@ async function loadProductStatus(){
   const dl = document.getElementById('catalogList');
   if (dl) dl.innerHTML = catalog.map(p => `<option value="${escapeHtml(p.title)}">`).join('');
   renderProductStatus();
+  // El KPI "Stock actual" de Producción lee el catálogo — recalculá si el
+  // pipeline ya renderizó antes de que el catálogo llegara (race en init)
+  try { renderPipeline(); } catch(_) {}
 }
 
 function fmtK(n){ return n >= 1000000 ? `$${(n/1000000).toFixed(1)}M` : `$${Math.round(n/1000)}K`; }
@@ -1649,7 +1658,7 @@ function fmtCOP(n){
 async function loadSuppliers(){
   try {
     const { data, error } = await supabase
-      .from('suppliers').select('id,name,token,default_unit_cost,phone,notes')
+      .from('suppliers').select('id,name,token,default_unit_cost,phone,notes,flow_type')
       .order('created_at');
     if (error) throw error;
     suppliers = data || [];
@@ -1746,7 +1755,7 @@ async function loadSupplierLink(){ await loadSuppliers(); }
   }
 }
 
-// Etapas de producción · stage = última completada (null = corte en curso)
+// Etapas de producción · stage = última completada (null = primera en curso)
 const PROD_STAGES_FULL = [
   { key: 'corte',       short: 'Corte' },
   { key: 'proceso',     short: 'Proceso' },
@@ -1755,8 +1764,23 @@ const PROD_STAGES_FULL = [
   { key: 'terminacion', short: 'Termin.' },
   { key: 'entrega',     short: 'Entrega' },
 ];
+// Flujo simple (ej AXSPEN): Planeado → Pagado → Entregado → Terminación → Listo
+// (key terminal se mantiene 'entrega' para compat con la lógica de completado)
+const PROD_STAGES_SIMPLE = [
+  { key: 'planeado',    short: 'Planeado' },
+  { key: 'pagado',      short: 'Pagado' },
+  { key: 'entregado',   short: 'Entregado' },
+  { key: 'terminacion', short: 'Termin.' },
+  { key: 'entrega',     short: 'Listo' },
+];
 function getProdStages(hasProceso){
   return hasProceso !== false ? PROD_STAGES_FULL : PROD_STAGES_FULL.filter(s => s.key !== 'proceso');
+}
+// Flujo según el proveedor de la entry (simple vs full)
+function getFlowStages(entry){
+  const sup = suppliers.find(s => s.id === entry.supplier_id);
+  if (sup && sup.flow_type === 'simple') return PROD_STAGES_SIMPLE;
+  return getProdStages(entry.has_proceso);
 }
 
 // Calcula duración de cada etapa basándose en stage_history
@@ -1803,7 +1827,7 @@ function computeStageTimings(entry, stages){
 }
 
 function renderStepperInline(e){
-  const stages = getProdStages(e.has_proceso);
+  const stages = getFlowStages(e);
   const { items, totalDays, lastDoneIdx, isFullyDone } = computeStageTimings(e, stages);
   const currentIdx = lastDoneIdx + 1;
   let html = '<div class="tl-stepper">';
@@ -2338,6 +2362,7 @@ function openSupplierModal(id){
   document.getElementById('supName').value  = s ? s.name : '';
   document.getElementById('supPhone').value = s && s.phone ? s.phone : '';
   document.getElementById('supCost').value  = s && s.default_unit_cost ? s.default_unit_cost : '';
+  document.getElementById('supFlow').value  = s && s.flow_type ? s.flow_type : 'full';
   document.getElementById('supNotes').value = s && s.notes ? s.notes : '';
   document.getElementById('supError').textContent = '';
   document.getElementById('supDelete').style.display = id ? 'inline-block' : 'none';
@@ -2352,7 +2377,8 @@ document.getElementById('supSave').addEventListener('click', async () => {
   const cost = parseFloat(document.getElementById('supCost').value) || null;
   const notes = document.getElementById('supNotes').value.trim() || null;
   if (!name){ document.getElementById('supError').textContent = 'Ponele un nombre al proveedor'; return; }
-  const payload = { name, phone, default_unit_cost: cost, notes, updated_at: new Date().toISOString() };
+  const flowType = document.getElementById('supFlow').value || 'full';
+  const payload = { name, phone, default_unit_cost: cost, notes, flow_type: flowType, updated_at: new Date().toISOString() };
   let error;
   if (editingSupplierId){
     ({ error } = await supabase.from('suppliers').update(payload).eq('id', editingSupplierId));
@@ -2654,7 +2680,7 @@ supabase.channel('suppliers-list')
   .subscribe();
 supabase.channel('catalog-hub')
   .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'shopify_catalog', filter: 'id=eq.1' }, p => {
-    if (p.new && Array.isArray(p.new.products)){ catalog = p.new.products; renderProductStatus(); }
+    if (p.new && Array.isArray(p.new.products)){ catalog = p.new.products; renderProductStatus(); try { renderPipeline(); } catch(_) {} }
   })
   .subscribe();
 
