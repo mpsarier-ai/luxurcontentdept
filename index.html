@@ -197,14 +197,33 @@ header{border-bottom:1px solid var(--black);padding-bottom:24px;margin-bottom:64
 .ci-toggle input{width:18px;height:18px;cursor:pointer;accent-color:var(--rosa-deep)}
 .ci-toggle b{color:var(--black);font-weight:600}
 
-/* Total por entregar — bloque hero */
-.prod-total-box{background:linear-gradient(135deg,#fff 0%,rgba(212,132,142,.04) 100%);border-radius:16px;padding:18px 22px;box-shadow:0 1px 2px rgba(0,0,0,.04),0 4px 14px rgba(0,0,0,.05);margin-bottom:18px;border-left:4px solid var(--rosa-deep)}
-.prod-total-box[hidden]{display:none}
-.ptb-label{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:var(--grey);margin-bottom:6px}
-.ptb-number{font-family:'Cormorant Garamond',serif;font-weight:700;font-size:42px;line-height:1;color:var(--rosa-deep);display:flex;align-items:baseline;gap:8px}
-.ptb-unit{font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.18em;color:var(--grey);text-transform:uppercase;font-weight:500}
-.ptb-breakdown{font-family:'Outfit',sans-serif;font-size:12.5px;color:#555;margin-top:8px;line-height:1.5}
-.ptb-breakdown b{color:var(--black);font-weight:600}
+/* Chips de proveedor */
+.supplier-chips{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px;padding:2px 0}
+.sup-chip{background:#fff;border:1px solid rgba(0,0,0,.08);border-radius:999px;padding:9px 16px;font-family:'Outfit',sans-serif;font-size:13px;font-weight:500;color:#555;cursor:pointer;letter-spacing:.01em;transition:all .15s ease;white-space:nowrap;box-shadow:0 1px 2px rgba(0,0,0,.04)}
+.sup-chip:hover{border-color:rgba(212,132,142,.4);color:var(--black)}
+.sup-chip.active{background:var(--black);color:#fff;border-color:var(--black)}
+.sup-chip.add{background:transparent;color:var(--rosa-deep);border-color:rgba(212,132,142,.35);border-style:dashed;font-weight:600}
+.sup-chip.add:hover{background:rgba(212,132,142,.06);border-style:solid}
+
+/* Dashboard 4 KPI tiles · estilo LUXUR */
+.prod-kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:18px}
+.prod-kpi{background:#fff;border-radius:16px;padding:18px 16px 16px;box-shadow:0 1px 2px rgba(0,0,0,.04),0 6px 18px rgba(0,0,0,.05);border-top:3px solid transparent;transition:border-top-color .2s ease}
+.prod-kpi[data-kpi="stock"]{border-top-color:#7ba87b}
+.prod-kpi[data-kpi="prod"]{border-top-color:var(--rosa-deep)}
+.prod-kpi[data-kpi="week"]{border-top-color:#c48a4f}
+.prod-kpi[data-kpi="month"]{border-top-color:#7891b0}
+.pk-label{font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:.16em;text-transform:uppercase;color:var(--grey);margin-bottom:10px;line-height:1.3;min-height:26px}
+.pk-num{font-family:'Cormorant Garamond',serif;font-weight:700;font-size:42px;line-height:.95;color:var(--black);letter-spacing:-.01em;display:flex;align-items:baseline;gap:6px}
+.pk-num span:first-child{font-variant-numeric:tabular-nums}
+.pk-unit{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.14em;color:var(--grey);text-transform:uppercase;font-weight:500}
+.pk-cost{font-family:'JetBrains Mono',monospace;font-size:10.5px;color:var(--rosa-deep);margin-top:8px;letter-spacing:.03em;font-weight:500}
+.pk-cost.zero{color:var(--grey)}
+@media (max-width:640px){
+  .prod-kpis{grid-template-columns:repeat(2,1fr);gap:10px}
+  .prod-kpi{padding:14px 12px}
+  .pk-num{font-size:32px}
+  .pk-label{font-size:8.5px;min-height:24px}
+}
 
 /* Caja del link único del proveedor */
 .supplier-link-box{background:#fff;border-radius:14px;padding:14px 18px;box-shadow:0 1px 2px rgba(0,0,0,.04),0 4px 14px rgba(0,0,0,.05);display:flex;align-items:center;gap:14px;margin-bottom:18px}
@@ -569,17 +588,36 @@ body{padding-top:env(safe-area-inset-top);padding-bottom:env(safe-area-inset-bot
       <button class="hub-back" data-hub-back>Inicio</button>
       <div class="hub-section-title">Producción</div>
     </div>
-    <!-- Link único del proveedor -->
+    <!-- Selector de proveedor (chips) -->
+    <div class="supplier-chips" id="supplierChips"></div>
+    <!-- Dashboard 4 stat tiles -->
+    <div class="prod-kpis" id="prodKpis">
+      <div class="prod-kpi" data-kpi="stock">
+        <div class="pk-label">Stock actual</div>
+        <div class="pk-num"><span id="kpiStockNum">—</span><span class="pk-unit">unds</span></div>
+        <div class="pk-cost" id="kpiStockCost">—</div>
+      </div>
+      <div class="prod-kpi" data-kpi="prod">
+        <div class="pk-label">En producción</div>
+        <div class="pk-num"><span id="kpiProdNum">—</span><span class="pk-unit">unds</span></div>
+        <div class="pk-cost" id="kpiProdCost">—</div>
+      </div>
+      <div class="prod-kpi" data-kpi="week">
+        <div class="pk-label">Entrega próxima semana</div>
+        <div class="pk-num"><span id="kpiWeekNum">—</span><span class="pk-unit">unds</span></div>
+        <div class="pk-cost" id="kpiWeekCost">—</div>
+      </div>
+      <div class="prod-kpi" data-kpi="month">
+        <div class="pk-label">Entrega próximo mes</div>
+        <div class="pk-num"><span id="kpiMonthNum">—</span><span class="pk-unit">unds</span></div>
+        <div class="pk-cost" id="kpiMonthCost">—</div>
+      </div>
+    </div>
+    <!-- Link único del proveedor seleccionado -->
     <div class="supplier-link-box" id="supplierLinkBox" hidden>
       <div class="slb-label">Link para tu proveedor</div>
       <div class="slb-name" id="slbName">—</div>
       <button class="slb-copy" id="slbCopy">📋 Copiar link</button>
-    </div>
-    <!-- Total por entregar -->
-    <div class="prod-total-box" id="prodTotalBox" hidden>
-      <div class="ptb-label">Total por entregar</div>
-      <div class="ptb-number"><span id="ptbNum">0</span><span class="ptb-unit">unds</span></div>
-      <div class="ptb-breakdown" id="ptbBreakdown"></div>
     </div>
     <h2 class="section-title">
       <span>Próximas Entradas</span>
@@ -679,6 +717,9 @@ body{padding-top:env(safe-area-inset-top);padding-bottom:env(safe-area-inset-bot
       <span>Pasa por <b>Proceso</b> (bordado / estampado)</span>
     </label>
 
+    <label>Costo unitario (COP · opcional, override del proveedor)</label>
+    <input type="number" id="entryCost" placeholder="ej: 30000" min="0" step="500">
+
     <label>Notas (opcional)</label>
     <input type="text" id="entryNotes" placeholder="ej: solo S y M, viene del taller…">
 
@@ -711,6 +752,9 @@ body{padding-top:env(safe-area-inset-top);padding-bottom:env(safe-area-inset-bot
       <input type="checkbox" id="batchHasProceso" checked>
       <span>Pasa por <b>Proceso</b> (bordado / estampado)</span>
     </label>
+
+    <label>Costo unitario (COP · opcional, override del proveedor)</label>
+    <input type="number" id="batchCost" placeholder="ej: 30000" min="0" step="500">
 
     <label>Notas (opcional)</label>
     <input type="text" id="batchNotes" placeholder="ej: tela negra, 320u total">
@@ -752,6 +796,35 @@ body{padding-top:env(safe-area-inset-top);padding-bottom:env(safe-area-inset-bot
     <div class="modal-actions">
       <button class="modal-btn" id="variantCancel">Cancelar</button>
       <button class="modal-btn primary" id="variantSave">Guardar variante</button>
+    </div>
+  </div>
+</div>
+
+<!-- SUPPLIER MODAL -->
+<div class="modal-backdrop" id="supplierModal">
+  <div class="modal">
+    <div class="modal-meta">Proveedor</div>
+    <h3 id="supplierModalTitle">Nuevo proveedor</h3>
+    <p>Un proveedor es cada taller / fábrica que produce lotes para LUXUR.</p>
+
+    <label>Nombre</label>
+    <input type="text" id="supName" placeholder="ej: AXSPEN" autocomplete="off">
+
+    <label>Teléfono / WhatsApp (opcional)</label>
+    <input type="text" id="supPhone" placeholder="+57 …" autocomplete="off">
+
+    <label>Costo aproximado por unidad (COP)</label>
+    <input type="number" id="supCost" placeholder="25000" min="0" step="500">
+
+    <label>Notas (opcional)</label>
+    <input type="text" id="supNotes" placeholder="Especialidad, detalle logístico…">
+
+    <div class="modal-error" id="supError"></div>
+
+    <div class="modal-actions">
+      <button class="modal-btn" id="supDelete" style="margin-right:auto;color:var(--red-out);border-color:var(--red-out);display:none">Eliminar</button>
+      <button class="modal-btn" id="supCancel">Cancelar</button>
+      <button class="modal-btn primary" id="supSave">Guardar</button>
     </div>
   </div>
 </div>
@@ -1560,23 +1633,98 @@ function getBatchStages(hasProceso){
   return hasProceso !== false ? BATCH_STAGES : BATCH_STAGES.filter(s => s.key !== 'proceso');
 }
 
-// Carga el primer proveedor + arma su link para el box arriba de Producción
-let currentSupplier = null;
-async function loadSupplierLink(){
-  const box = document.getElementById('supplierLinkBox');
-  if (!box) return;
+// === Sistema multi-proveedor + KPI dashboard ===
+let suppliers = [];              // [{id, name, token, default_unit_cost, ...}]
+let currentSupplierId = null;    // null = "Todos"
+let currentSupplier = null;      // el objeto (o null si "Todos")
+const DEFAULT_COST_COP = 25000;  // fallback si nada seteado
+
+function fmtCOP(n){
+  if (!n || !isFinite(n)) return '$0';
+  if (n >= 1_000_000) return `~$${(n/1_000_000).toFixed(1)}M cop`;
+  if (n >= 10_000)    return `~$${Math.round(n/1000)}K cop`;
+  return `~$${Math.round(n)} cop`;
+}
+
+async function loadSuppliers(){
   try {
-    const { data, error } = await supabase.from('suppliers').select('id,name,token').order('created_at').limit(1);
+    const { data, error } = await supabase
+      .from('suppliers').select('id,name,token,default_unit_cost,phone,notes')
+      .order('created_at');
     if (error) throw error;
-    if (!data || !data.length){ box.hidden = true; return; }
-    currentSupplier = data[0];
-    document.getElementById('slbName').textContent = currentSupplier.name || 'Proveedor';
-    box.hidden = false;
+    suppliers = data || [];
+    renderSupplierChips();
+    updateSupplierLinkBox();
   } catch (err) {
-    console.warn('No se pudo cargar el proveedor (¿corriste suppliers_upgrade.sql?):', err && err.message);
-    box.hidden = true;
+    console.warn('No se pudo cargar suppliers:', err && err.message);
+    suppliers = [];
+    renderSupplierChips();
   }
 }
+
+function renderSupplierChips(){
+  const el = document.getElementById('supplierChips');
+  if (!el) return;
+  const chips = [];
+  chips.push(`<button class="sup-chip ${currentSupplierId === null ? 'active' : ''}" data-sup-select="all">Todos</button>`);
+  for (const s of suppliers){
+    const isActive = s.id === currentSupplierId;
+    chips.push(`<button class="sup-chip ${isActive ? 'active' : ''}" data-sup-select="${s.id}" data-sup-edit>${escapeHtml(s.name)}</button>`);
+  }
+  chips.push(`<button class="sup-chip add" data-sup-new>+ Nuevo</button>`);
+  el.innerHTML = chips.join('');
+  el.querySelectorAll('[data-sup-select]').forEach(b => {
+    b.addEventListener('click', (e) => {
+      const id = b.getAttribute('data-sup-select');
+      // Long-press / doble click abre editar (sino selección normal)
+      if (b.dataset.suppressClick === '1') return;
+      currentSupplierId = id === 'all' ? null : id;
+      currentSupplier = suppliers.find(x => x.id === currentSupplierId) || null;
+      renderSupplierChips();
+      updateSupplierLinkBox();
+      renderPipeline(); // re-filtrar timeline por proveedor
+    });
+    // Editar con dblclick sobre un chip de proveedor real
+    if (b.hasAttribute('data-sup-edit')){
+      b.addEventListener('dblclick', (e) => {
+        e.preventDefault();
+        const id = b.getAttribute('data-sup-select');
+        openSupplierModal(id);
+      });
+    }
+  });
+  const newBtn = el.querySelector('[data-sup-new]');
+  if (newBtn) newBtn.addEventListener('click', () => openSupplierModal(null));
+}
+
+function updateSupplierLinkBox(){
+  const box = document.getElementById('supplierLinkBox');
+  if (!box) return;
+  if (!currentSupplierId){
+    // "Todos" no tiene un link — se oculta
+    box.hidden = true;
+    return;
+  }
+  const s = suppliers.find(x => x.id === currentSupplierId);
+  if (!s){ box.hidden = true; return; }
+  currentSupplier = s;
+  document.getElementById('slbName').textContent = s.name || 'Proveedor';
+  box.hidden = false;
+}
+
+// Costo unitario efectivo de una entry: unit_cost > supplier.default_unit_cost > DEFAULT_COST_COP
+function effectiveCost(entry, supplierId){
+  if (entry && entry.unit_cost) return Number(entry.unit_cost);
+  const sid = supplierId || entry?.supplier_id;
+  if (sid){
+    const sup = suppliers.find(x => x.id === sid);
+    if (sup && sup.default_unit_cost) return Number(sup.default_unit_cost);
+  }
+  return DEFAULT_COST_COP;
+}
+
+// Compat: mantiene el nombre viejo para no romper llamadas anteriores
+async function loadSupplierLink(){ await loadSuppliers(); }
 
 // Handler del botón Copiar (el botón ya está en el DOM cuando este módulo corre)
 {
@@ -1811,10 +1959,16 @@ function renderBatchCard(batch, variants){
 function renderPipeline(){
   const el = document.getElementById('timeline');
   if (!el) return;
+
+  // Filtrado por proveedor seleccionado ("Todos" = sin filtro)
+  const filterSid = currentSupplierId;
+  const filteredBatches = filterSid ? batches.filter(b => b.supplier_id === filterSid) : batches.slice();
+  const filteredPipeline = filterSid ? pipeline.filter(e => e.supplier_id === filterSid) : pipeline.slice();
+
   // Indexá las variantes por batch_id, y separá standalone
   const variantsByBatch = {};
   const standalone = [];
-  pipeline.forEach(e => {
+  filteredPipeline.forEach(e => {
     if (e.batch_id) {
       if (!variantsByBatch[e.batch_id]) variantsByBatch[e.batch_id] = [];
       variantsByBatch[e.batch_id].push(e);
@@ -1823,54 +1977,92 @@ function renderPipeline(){
     }
   });
 
-  // Total por entregar (unds) — solo lo no entregado
-  let batchUnits = 0;
-  let standaloneUnits = 0;
-  let batchesPending = 0;
-  let standalonePending = 0;
-  batches.forEach(b => {
+  // ═══ 4 KPI tiles ═══════════════════════════════════════════════════
+  // Ventanas de fecha (Bogotá UTC-5)
+  const nowStr = new Date(Date.now() - 5*60*60*1000).toISOString().slice(0,10);
+  const in7d = new Date(Date.now() - 5*60*60*1000 + 7*24*60*60*1000).toISOString().slice(0,10);
+  const in30d = new Date(Date.now() - 5*60*60*1000 + 30*24*60*60*1000).toISOString().slice(0,10);
+
+  // ─── 1) Stock actual · TOTAL jean stock (no depende de supplier) ────
+  let stockUnits = 0, stockCost = 0;
+  if (Array.isArray(catalog) && catalog.length){
+    catalog.forEach(p => {
+      const t = (p.title || '').toUpperCase();
+      if (!t.startsWith('JEAN')) return;
+      const stock = Math.max(0, p.total ?? 0);
+      stockUnits += stock;
+      // Costo estimado del stock actual: usá el default global (no atado a lote)
+      stockCost += stock * DEFAULT_COST_COP;
+    });
+  }
+  // ─── 2) En producción (no entregado) ────────────────────────────────
+  let prodUnits = 0, prodCost = 0;
+  filteredBatches.forEach(b => {
     const vars = variantsByBatch[b.id] || [];
     const allDelivered = vars.length > 0 && vars.every(v => v.stage === 'entrega');
     if (!allDelivered){
-      batchUnits += (b.total_quantity || 0);
-      batchesPending++;
+      const q = b.total_quantity || 0;
+      prodUnits += q;
+      prodCost  += q * effectiveCost(b, b.supplier_id);
     }
   });
   standalone.forEach(e => {
     const delivered = e.stage === 'entrega' || e.status === 'llego';
     if (!delivered){
-      standaloneUnits += (e.quantity || 0);
-      standalonePending++;
+      const q = e.quantity || 0;
+      prodUnits += q;
+      prodCost  += q * effectiveCost(e, e.supplier_id);
     }
   });
-  const totalUnits = batchUnits + standaloneUnits;
-  const totalBox = document.getElementById('prodTotalBox');
-  if (totalBox){
-    if (totalUnits > 0){
-      totalBox.hidden = false;
-      document.getElementById('ptbNum').textContent = totalUnits.toLocaleString('es-CO');
-      const bits = [];
-      if (batchUnits) bits.push(`<b>${batchUnits.toLocaleString('es-CO')}u</b> en ${batchesPending} ${batchesPending === 1 ? 'lote' : 'lotes'}`);
-      if (standaloneUnits) bits.push(`<b>${standaloneUnits.toLocaleString('es-CO')}u</b> en ${standalonePending} ${standalonePending === 1 ? 'jean suelto' : 'jeans sueltos'}`);
-      document.getElementById('ptbBreakdown').innerHTML = bits.join(' · ');
-    } else {
-      totalBox.hidden = true;
+  // ─── 3) Entrega próxima semana (tentative_date ≤ hoy + 7d) ──────────
+  // ─── 4) Entrega próximo mes (tentative_date ≤ hoy + 30d) ────────────
+  let weekUnits = 0, weekCost = 0, monthUnits = 0, monthCost = 0;
+  const addToWindow = (date, qty, cost) => {
+    if (!date) return;
+    if (date >= nowStr && date <= in7d)  { weekUnits  += qty; weekCost  += cost; }
+    if (date >= nowStr && date <= in30d) { monthUnits += qty; monthCost += cost; }
+  };
+  filteredBatches.forEach(b => {
+    const vars = variantsByBatch[b.id] || [];
+    const allDelivered = vars.length > 0 && vars.every(v => v.stage === 'entrega');
+    if (!allDelivered){
+      const q = b.total_quantity || 0;
+      addToWindow(b.tentative_date, q, q * effectiveCost(b, b.supplier_id));
     }
-  }
+  });
+  standalone.forEach(e => {
+    const delivered = e.stage === 'entrega' || e.status === 'llego';
+    if (!delivered){
+      const q = e.quantity || 0;
+      addToWindow(e.tentative_date, q, q * effectiveCost(e, e.supplier_id));
+    }
+  });
 
-  if (!pipeline.length && !batches.length){
-    el.innerHTML = '<div class="empty-state">Sin entradas. Click "+ Nuevo lote" o "+ Jean suelto".</div>';
+  // Render KPIs
+  const setKPI = (n, c, el1, el2) => {
+    const numEl = document.getElementById(el1);
+    const costEl = document.getElementById(el2);
+    if (numEl)  numEl.textContent  = (n || 0).toLocaleString('es-CO');
+    if (costEl){ costEl.textContent = fmtCOP(c); costEl.classList.toggle('zero', !c); }
+  };
+  setKPI(stockUnits, stockCost, 'kpiStockNum', 'kpiStockCost');
+  setKPI(prodUnits,  prodCost,  'kpiProdNum',  'kpiProdCost');
+  setKPI(weekUnits,  weekCost,  'kpiWeekNum',  'kpiWeekCost');
+  setKPI(monthUnits, monthCost, 'kpiMonthNum', 'kpiMonthCost');
+
+  if (!filteredPipeline.length && !filteredBatches.length){
+    el.innerHTML = `<div class="empty-state">${currentSupplierId ? 'Este proveedor no tiene nada en producción.' : 'Sin entradas. Click "+ Nuevo lote" o "+ Jean suelto".'}</div>`;
     return;
   }
   let html = '';
   // Lotes primero, ordenados por fecha tentativa
-  const sortedBatches = batches.slice().sort((a, b) => (a.tentative_date || '9999') > (b.tentative_date || '9999') ? 1 : -1);
+  const sortedBatches = filteredBatches.slice().sort((a, b) => (a.tentative_date || '9999') > (b.tentative_date || '9999') ? 1 : -1);
   sortedBatches.forEach(batch => {
     html += renderBatchCard(batch, variantsByBatch[batch.id] || []);
   });
   // Standalone después
   if (standalone.length){
-    if (batches.length) html += `<div style="font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.15em;text-transform:uppercase;color:var(--grey);margin:18px 0 6px;padding:0 4px">Jeans sueltos</div>`;
+    if (filteredBatches.length) html += `<div style="font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.15em;text-transform:uppercase;color:var(--grey);margin:18px 0 6px;padding:0 4px">Jeans sueltos</div>`;
     html += standalone.map(e => renderPipelineEntry(e, false)).join('');
   }
   el.innerHTML = html;
@@ -1936,6 +2128,7 @@ function openEntryModal(id, prefill){
   document.getElementById('entryNotes').value = e && e.notes ? e.notes : (prefill?.notes || '');
   document.getElementById('entryPhotoDate').value = e && e.photo_date ? e.photo_date : '';
   document.getElementById('entryQuantity').value = e && e.quantity ? e.quantity : (prefill?.quantity || '');
+  document.getElementById('entryCost').value = e && e.unit_cost ? e.unit_cost : '';
   document.getElementById('entryHasProceso').checked = e ? (e.has_proceso !== false) : true;
   // Curva de tallas
   const curve = (e && e.size_curve && typeof e.size_curve === 'object') ? e.size_curve : (prefill?.sizeCurve || {});
@@ -2005,12 +2198,14 @@ document.getElementById('entrySave').addEventListener('click', async () => {
     const n = parseInt(input.value, 10);
     if (n > 0) sizeCurve[input.getAttribute('data-size')] = n;
   });
+  const unitCost = parseFloat(document.getElementById('entryCost').value) || null;
   const payload = {
     product_name: name, product_gid: match ? match.gid : null,
     entry_type: type, tentative_date: date, tentative_date_end: dateEnd, notes,
     photo_date: photoDate,
     quantity, size_curve: sizeCurve, has_proceso: hasProceso,
-    supplier_id: currentSupplier ? currentSupplier.id : null,
+    unit_cost: unitCost,
+    supplier_id: currentSupplier ? currentSupplier.id : (suppliers[0]?.id || null),
   };
   let error;
   if (editingEntryId){
@@ -2034,6 +2229,7 @@ function openBatchModal(id, prefill){
   document.getElementById('batchQty').value = b && b.total_quantity ? b.total_quantity : (prefill?.totalQty || '');
   document.getElementById('batchDate').value = b && b.tentative_date ? b.tentative_date : '';
   document.getElementById('batchHasProceso').checked = b ? (b.has_proceso !== false) : true;
+  document.getElementById('batchCost').value = b && b.unit_cost ? b.unit_cost : '';
   document.getElementById('batchNotes').value = b && b.notes ? b.notes : (prefill?.notes || '');
   document.getElementById('batchError').textContent = '';
   batchModal.classList.add('open');
@@ -2049,10 +2245,12 @@ document.getElementById('batchSave').addEventListener('click', async () => {
   const hasProceso = document.getElementById('batchHasProceso').checked;
   const notes = document.getElementById('batchNotes').value.trim() || null;
   if (!name){ document.getElementById('batchError').textContent = 'Ponele un nombre al lote'; return; }
+  const unitCost = parseFloat(document.getElementById('batchCost').value) || null;
   const payload = {
     name, total_quantity: qty, tentative_date: date,
     has_proceso: hasProceso, notes,
-    supplier_id: currentSupplier ? currentSupplier.id : null,
+    unit_cost: unitCost,
+    supplier_id: currentSupplier ? currentSupplier.id : (suppliers[0]?.id || null),
     updated_at: new Date().toISOString(),
   };
   let error;
@@ -2128,6 +2326,56 @@ document.getElementById('variantSave').addEventListener('click', async () => {
   if (error){ document.getElementById('variantError').textContent = 'Error: ' + error.message; return; }
   variantModal.classList.remove('open');
   await loadPipeline();
+});
+
+// === SUPPLIER MODAL ===
+const supplierModal = document.getElementById('supplierModal');
+let editingSupplierId = null;
+function openSupplierModal(id){
+  editingSupplierId = id || null;
+  const s = id ? suppliers.find(x => x.id === id) : null;
+  document.getElementById('supplierModalTitle').textContent = s ? 'Editar proveedor' : 'Nuevo proveedor';
+  document.getElementById('supName').value  = s ? s.name : '';
+  document.getElementById('supPhone').value = s && s.phone ? s.phone : '';
+  document.getElementById('supCost').value  = s && s.default_unit_cost ? s.default_unit_cost : '';
+  document.getElementById('supNotes').value = s && s.notes ? s.notes : '';
+  document.getElementById('supError').textContent = '';
+  document.getElementById('supDelete').style.display = id ? 'inline-block' : 'none';
+  supplierModal.classList.add('open');
+  setTimeout(() => document.getElementById('supName').focus(), 50);
+}
+document.getElementById('supCancel').addEventListener('click', () => supplierModal.classList.remove('open'));
+supplierModal.addEventListener('click', e => { if (e.target === supplierModal) supplierModal.classList.remove('open'); });
+document.getElementById('supSave').addEventListener('click', async () => {
+  const name = document.getElementById('supName').value.trim();
+  const phone = document.getElementById('supPhone').value.trim() || null;
+  const cost = parseFloat(document.getElementById('supCost').value) || null;
+  const notes = document.getElementById('supNotes').value.trim() || null;
+  if (!name){ document.getElementById('supError').textContent = 'Ponele un nombre al proveedor'; return; }
+  const payload = { name, phone, default_unit_cost: cost, notes, updated_at: new Date().toISOString() };
+  let error;
+  if (editingSupplierId){
+    ({ error } = await supabase.from('suppliers').update(payload).eq('id', editingSupplierId));
+  } else {
+    ({ error } = await supabase.from('suppliers').insert(payload));
+  }
+  if (error){ document.getElementById('supError').textContent = 'Error: ' + error.message; return; }
+  supplierModal.classList.remove('open');
+  editingSupplierId = null;
+  await loadSuppliers();
+  renderPipeline();
+});
+document.getElementById('supDelete').addEventListener('click', async () => {
+  if (!editingSupplierId) return;
+  const s = suppliers.find(x => x.id === editingSupplierId);
+  if (!confirm(`¿Eliminar proveedor "${s?.name}"? Sus lotes/jeans quedarán sin proveedor.`)) return;
+  const { error } = await supabase.from('suppliers').delete().eq('id', editingSupplierId);
+  if (error){ document.getElementById('supError').textContent = 'Error: ' + error.message; return; }
+  supplierModal.classList.remove('open');
+  if (currentSupplierId === editingSupplierId) currentSupplierId = null;
+  editingSupplierId = null;
+  await loadSuppliers();
+  renderPipeline();
 });
 
 async function loadCalendars(){
@@ -2400,6 +2648,9 @@ supabase.channel('pipeline-list')
   .subscribe();
 supabase.channel('batches-list')
   .on('postgres_changes', { event: '*', schema: 'public', table: 'production_batches' }, () => loadPipeline())
+  .subscribe();
+supabase.channel('suppliers-list')
+  .on('postgres_changes', { event: '*', schema: 'public', table: 'suppliers' }, async () => { await loadSuppliers(); renderPipeline(); })
   .subscribe();
 supabase.channel('catalog-hub')
   .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'shopify_catalog', filter: 'id=eq.1' }, p => {
