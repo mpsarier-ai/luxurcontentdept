@@ -1037,7 +1037,7 @@ async function registerPushNotifications(userEmail){
       pushLog('registration event, token length=' + (token?.value?.length || 0));
       try {
         const { error } = await supabase.from('push_tokens').upsert({
-          user_email: userEmail.toLowerCase(),
+          user_email: canonicalEmail(userEmail),
           device_token: token.value,
           platform: 'ios',
           updated_at: new Date().toISOString(),
@@ -1188,7 +1188,10 @@ function pieceToRow(p){
 }
 
 // Team helpers
-function teamMember(email){ return state.team.find(m => m.email === email) || null; }
+// Alias: Isa entra con hotmail pero el equipo la tiene con gmail
+const EMAIL_ALIASES = { 'isasazar@hotmail.com': 'isabellasalazara13@gmail.com' };
+function canonicalEmail(e){ const low = (e || '').toLowerCase(); return EMAIL_ALIASES[low] || low; }
+function teamMember(email){ const c = canonicalEmail(email); return state.team.find(m => canonicalEmail(m.email) === c) || null; }
 function myMember(){ return state.user ? teamMember(state.user.email) : null; }
 function canApprove(){ const m = myMember(); return !!(m && m.can_approve); }
 function initials(name){ return (name||'?').trim().split(/\s+/).map(w=>w[0]).slice(0,2).join('').toUpperCase(); }

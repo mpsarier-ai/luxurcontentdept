@@ -1055,7 +1055,7 @@ async function registerPushNotifications(userEmail){
       pushLog('registration event, token length=' + (token?.value?.length || 0));
       try {
         const { error } = await supabase.from('push_tokens').upsert({
-          user_email: userEmail.toLowerCase(),
+          user_email: canonicalEmail(userEmail),
           device_token: token.value,
           platform: 'ios',
           updated_at: new Date().toISOString(),
@@ -1130,6 +1130,17 @@ async function boot(){
 
 let catalog = [];
 
+// Alias de emails: alguien puede loguearse con un correo distinto al que
+// está en team_members (ej: Isa entra con hotmail pero el equipo la tiene
+// con gmail). Siempre resolver al canónico antes de buscar nombre/tareas.
+const EMAIL_ALIASES = {
+  'isasazar@hotmail.com': 'isabellasalazara13@gmail.com',
+};
+function canonicalEmail(e){
+  const low = (e || '').toLowerCase();
+  return EMAIL_ALIASES[low] || low;
+}
+
 // === Saludo por hora del día · "Bienvenida de vuelta, Sofía" ===
 async function setGreeting(u){
   const el = document.getElementById('hubGreeting');
@@ -1137,7 +1148,7 @@ async function setGreeting(u){
   // Nombre: team_members.name → fallback al prefijo del email capitalizado
   let name = '';
   try {
-    const { data } = await supabase.from('team_members').select('name').eq('email', u.email.toLowerCase()).maybeSingle();
+    const { data } = await supabase.from('team_members').select('name').eq('email', canonicalEmail(u.email)).maybeSingle();
     if (data && data.name) name = data.name.split(' ')[0];
   } catch(_) {}
   if (!name){
@@ -1205,7 +1216,7 @@ async function loadDailyBrief(){
   const { data: pieces } = await supabase.from('calendar_pieces')
     .select('id,day,type,title,assignee,status,approved')
     .eq('calendar_id', cal.id).eq('day', dayKey).order('position');
-  const mine = (pieces||[]).filter(p => (p.assignee||'').toLowerCase() === user.email.toLowerCase());
+  const mine = (pieces||[]).filter(p => canonicalEmail(p.assignee) === canonicalEmail(user.email));
   if (!mine.length){
     elT.innerHTML = '<div class="brief-empty done">✓ Sin tareas asignadas hoy</div>';
   } else {
@@ -1217,7 +1228,7 @@ async function loadDailyBrief(){
   }
   // "Para aprobar" — solo leads, toda la semana
   try {
-    const { data: tm } = await supabase.from('team_members').select('role').eq('email', user.email.toLowerCase()).maybeSingle();
+    const { data: tm } = await supabase.from('team_members').select('role').eq('email', canonicalEmail(user.email)).maybeSingle();
     const wrap = document.getElementById('briefApprovalsWrap');
     const elA = document.getElementById('briefApprovals');
     if (tm && (tm.role === 'lead' || tm.role === 'admin') && wrap && elA){
@@ -1282,7 +1293,7 @@ function renderBriefPayments(){
   const wrap = document.getElementById('briefPaymentsWrap');
   const el = document.getElementById('briefPayments');
   if (!wrap || !el) return;
-  if (!user || !PAYMENTS_VIEWERS.includes((user.email || '').toLowerCase())){ wrap.hidden = true; return; }
+  if (!user || !PAYMENTS_VIEWERS.includes(canonicalEmail(user.email))){ wrap.hidden = true; return; }
 
   // Cascada de costo (igual que los KPIs de Producción)
   const productCostOf = p => {
