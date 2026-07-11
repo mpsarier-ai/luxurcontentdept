@@ -630,6 +630,8 @@ header,.hub-header{position:static !important;background:transparent !important;
 .brief-arrow{color:#c7c7cc;font-size:16px;flex-shrink:0}
 .brief-empty{padding:18px 16px;color:#8e8e93;font-size:14px;text-align:center}
 .brief-empty.done{color:#1e7b34}
+.brief-amt{flex-shrink:0;font-size:13px;font-weight:600;color:var(--rosa-deep);font-variant-numeric:tabular-nums}
+.brief-amt.total{color:var(--black);font-size:14px}
 .brief-wa{display:flex;align-items:center;justify-content:center;gap:8px;margin-top:22px;padding:13px;background:rgba(37,211,102,.12);color:#128c4b;border-radius:999px;text-decoration:none;font-size:14px;font-weight:600}
 .brief-wa:active{opacity:.7}
 
@@ -709,6 +711,11 @@ header,.hub-header{position:static !important;background:transparent !important;
 
     <h2 class="brief-title">A tener en cuenta</h2>
     <div id="briefAlerts" class="brief-list"><div class="brief-empty">Cargando…</div></div>
+
+    <div id="briefPaymentsWrap" hidden>
+      <h2 class="brief-title">Próximos pagos a proveedores</h2>
+      <div id="briefPayments" class="brief-list"></div>
+    </div>
 
     <a class="brief-wa" href="https://chat.whatsapp.com/GCmEivfGHfxL9NwWcES7IF?mode=gi_t" target="_blank" rel="noopener">💬 Grupo del equipo <span>↗</span></a>
   </section>
@@ -1257,12 +1264,98 @@ function renderBriefAlerts(){
     .forEach(b => rows.push({ ico:'🚚', t:`Llega lote ${b.name}`, s:`${fmtD(b.tentative_date)}${b.total_quantity ? ' · '+b.total_quantity+'u' : ''}`, go:'produccion' }));
   (pipeline||[]).filter(e => !e.batch_id && pending(e) && e.tentative_date && e.tentative_date < nowStr).slice(0,2)
     .forEach(e => rows.push({ ico:'⚠️', t:`${e.product_name} atrasado`, s:`era para ${fmtD(e.tentative_date)}`, go:'produccion' }));
-  if (!rows.length){ el.innerHTML = '<div class="brief-empty done">✓ Todo en orden</div>'; return; }
-  el.innerHTML = rows.slice(0,6).map(r => `<button class="brief-row" data-brief-go="${r.go}">
-    <span class="brief-ico">${r.ico}</span>
-    <span class="brief-body"><span class="brief-row-title">${escapeHtml(r.t)}</span><span class="brief-row-sub">${escapeHtml(r.s)}</span></span>
-    <span class="brief-arrow">›</span></button>`).join('');
-  el.querySelectorAll('[data-brief-go]').forEach(b => b.addEventListener('click', () => showHubSection(b.getAttribute('data-brief-go'))));
+  if (!rows.length){ el.innerHTML = '<div class="brief-empty done">✓ Todo en orden</div>'; }
+  else {
+    el.innerHTML = rows.slice(0,6).map(r => `<button class="brief-row" data-brief-go="${r.go}">
+      <span class="brief-ico">${r.ico}</span>
+      <span class="brief-body"><span class="brief-row-title">${escapeHtml(r.t)}</span><span class="brief-row-sub">${escapeHtml(r.s)}</span></span>
+      <span class="brief-arrow">›</span></button>`).join('');
+    el.querySelectorAll('[data-brief-go]').forEach(b => b.addEventListener('click', () => showHubSection(b.getAttribute('data-brief-go'))));
+  }
+  renderBriefPayments();
+}
+
+// === Próximos pagos a proveedores · solo Paulina + Isabella ===
+const PAYMENTS_VIEWERS = ['mpsarier@gmail.com', 'isabellasalazara13@gmail.com', 'isasazar@hotmail.com'];
+function renderBriefPayments(){
+  const wrap = document.getElementById('briefPaymentsWrap');
+  const el = document.getElementById('briefPayments');
+  if (!wrap || !el) return;
+  if (!user || !PAYMENTS_VIEWERS.includes((user.email || '').toLowerCase())){ wrap.hidden = true; return; }
+
+  // Cascada de costo (igual que los KPIs de Producción)
+  const productCostOf = p => {
+    if (!Array.isArray(p.sizes)) return 0;
+    const s = p.sizes.find(x => Number(x.cost) > 0);
+    return s ? Number(s.cost) : 0;
+  };
+  const allCosts = [];
+  (catalog||[]).forEach(p => {
+    if (!(p.title||'').toUpperCase().startsWith('JEAN') || !Array.isArray(p.sizes)) return;
+    p.sizes.forEach(sz => { if (Number(sz.cost) > 0) allCosts.push(Number(sz.cost)); });
+  });
+  const avgCost = allCosts.length ? allCosts.reduce((a,b) => a+b, 0) / allCosts.length : DEFAULT_COST_COP;
+  const unitCostFor = (e) => {
+    if (e.unit_cost) return Number(e.unit_cost);
+    const name = (e.product_name || e.name || '').toLowerCase();
+    const m = (catalog||[]).find(p => (e.product_gid && p.gid === e.product_gid) || (name && (p.title||'').toLowerCase() === name));
+    if (m){ const c = productCostOf(m); if (c > 0) return c; }
+    const sup = suppliers.find(x => x.id === e.supplier_id);
+    if (sup && sup.default_unit_cost && Number(sup.default_unit_cost) !== DEFAULT_COST_COP) return Number(sup.default_unit_cost);
+    return avgCost;
+  };
+  const fmtD = iso => { const p = iso.split('-'); return `${parseInt(p[2])} ${MONTH_ABBR[parseInt(p[1])-1]}`; };
+
+  // Agrupar deuda pendiente por proveedor
+  const bySup = {}; // sid -> {units, amount, nextDate}
+  const add = (sid, qty, amount, date) => {
+    if (!sid || !qty) return;
+    if (!bySup[sid]) bySup[sid] = { units: 0, amount: 0, nextDate: null };
+    bySup[sid].units += qty;
+    bySup[sid].amount += amount;
+    if (date && (!bySup[sid].nextDate || date < bySup[sid].nextDate)) bySup[sid].nextDate = date;
+  };
+  const variantsByBatch2 = {};
+  (pipeline||[]).forEach(e => { if (e.batch_id){ (variantsByBatch2[e.batch_id] = variantsByBatch2[e.batch_id] || []).push(e); } });
+  (batches||[]).forEach(b => {
+    const vars = variantsByBatch2[b.id] || [];
+    const allDelivered = vars.length > 0 && vars.every(v => v.stage === 'entrega');
+    if (allDelivered) return;
+    const q = b.total_quantity || 0;
+    add(b.supplier_id, q, q * unitCostFor({ unit_cost: b.unit_cost, product_name: b.name, supplier_id: b.supplier_id }), b.tentative_date);
+  });
+  (pipeline||[]).forEach(e => {
+    if (e.batch_id) return;
+    if (e.stage === 'entrega' || e.status === 'llego') return;
+    const q = e.quantity || 0;
+    add(e.supplier_id, q, q * unitCostFor(e), e.tentative_date);
+  });
+
+  const entries = Object.entries(bySup)
+    .map(([sid, v]) => ({ sid, ...v, name: (suppliers.find(s => s.id === sid) || {}).name || 'Proveedor' }))
+    .filter(x => x.amount > 0)
+    .sort((a,b) => (a.nextDate || '9999') < (b.nextDate || '9999') ? -1 : 1);
+
+  if (!entries.length){ wrap.hidden = true; return; }
+  wrap.hidden = false;
+  const total = entries.reduce((s,x) => s + x.amount, 0);
+  el.innerHTML = entries.map(x => `<button class="brief-row" data-pay-sup="${x.sid}">
+    <span class="brief-ico">💸</span>
+    <span class="brief-body"><span class="brief-row-title">${escapeHtml(x.name)}</span><span class="brief-row-sub">${x.units.toLocaleString('es-CO')}u en producción${x.nextDate ? ' · próx. entrega ' + fmtD(x.nextDate) : ''}</span></span>
+    <span class="brief-amt">${fmtCOP(x.amount)}</span>
+  </button>`).join('') + `<div class="brief-row" style="cursor:default">
+    <span class="brief-ico">Σ</span>
+    <span class="brief-body"><span class="brief-row-title">Total estimado</span></span>
+    <span class="brief-amt total">${fmtCOP(total)}</span>
+  </div>`;
+  el.querySelectorAll('[data-pay-sup]').forEach(b => b.addEventListener('click', () => {
+    currentSupplierId = b.getAttribute('data-pay-sup');
+    currentSupplier = suppliers.find(x => x.id === currentSupplierId) || null;
+    renderSupplierChips();
+    updateSupplierLinkBox();
+    renderPipeline();
+    showHubSection('produccion');
+  }));
 }
 
 async function enterApp(){
