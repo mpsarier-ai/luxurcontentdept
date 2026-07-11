@@ -632,6 +632,7 @@ header,.hub-header{position:static !important;background:transparent !important;
 .brief-empty.done{color:#1e7b34}
 .brief-amt{flex-shrink:0;font-size:13px;font-weight:600;color:var(--rosa-deep);font-variant-numeric:tabular-nums}
 .brief-amt.total{color:var(--black);font-size:14px}
+.brief-week-head{display:flex;justify-content:space-between;align-items:center;padding:10px 16px 6px;background:#faf9f7;font-size:12px;font-weight:600;color:#8e8e93;text-transform:uppercase;letter-spacing:.04em;border-bottom:1px solid rgba(0,0,0,.045)}
 .brief-wa{display:flex;align-items:center;justify-content:center;gap:8px;margin-top:22px;padding:13px;background:rgba(37,211,102,.12);color:#128c4b;border-radius:999px;text-decoration:none;font-size:14px;font-weight:600}
 .brief-wa:active{opacity:.7}
 
@@ -1306,48 +1307,90 @@ function renderBriefPayments(){
   };
   const fmtD = iso => { const p = iso.split('-'); return `${parseInt(p[2])} ${MONTH_ABBR[parseInt(p[1])-1]}`; };
 
-  // Agrupar deuda pendiente por proveedor
-  const bySup = {}; // sid -> {units, amount, nextDate}
-  const add = (sid, qty, amount, date) => {
-    if (!sid || !qty) return;
-    if (!bySup[sid]) bySup[sid] = { units: 0, amount: 0, nextDate: null };
-    bySup[sid].units += qty;
-    bySup[sid].amount += amount;
-    if (date && (!bySup[sid].nextDate || date < bySup[sid].nextDate)) bySup[sid].nextDate = date;
+  // ¿Ya está pago? Proveedores de flujo simple (AXSPEN) pagan al montar la
+  // orden: si la etapa ya pasó por 'pagado', no es un pago pendiente.
+  const yaEstaPago = (sid, stage) => {
+    const sup = suppliers.find(x => x.id === sid);
+    if (!sup || sup.flow_type !== 'simple') return false;
+    return ['pagado','entregado','terminacion','entrega'].includes(stage || '');
   };
+
+  // Ítems pendientes de pago: {sid, qty, amount, date}
+  const items = [];
   const variantsByBatch2 = {};
   (pipeline||[]).forEach(e => { if (e.batch_id){ (variantsByBatch2[e.batch_id] = variantsByBatch2[e.batch_id] || []).push(e); } });
   (batches||[]).forEach(b => {
     const vars = variantsByBatch2[b.id] || [];
     const allDelivered = vars.length > 0 && vars.every(v => v.stage === 'entrega');
     if (allDelivered) return;
+    if (yaEstaPago(b.supplier_id, b.batch_stage)) return;
     const q = b.total_quantity || 0;
-    add(b.supplier_id, q, q * unitCostFor({ unit_cost: b.unit_cost, product_name: b.name, supplier_id: b.supplier_id }), b.tentative_date);
+    if (!q || !b.supplier_id) return;
+    items.push({ sid: b.supplier_id, qty: q, amount: q * unitCostFor({ unit_cost: b.unit_cost, product_name: b.name, supplier_id: b.supplier_id }), date: b.tentative_date || null });
   });
   (pipeline||[]).forEach(e => {
     if (e.batch_id) return;
     if (e.stage === 'entrega' || e.status === 'llego') return;
+    if (yaEstaPago(e.supplier_id, e.stage)) return;
     const q = e.quantity || 0;
-    add(e.supplier_id, q, q * unitCostFor(e), e.tentative_date);
+    if (!q || !e.supplier_id) return;
+    items.push({ sid: e.supplier_id, qty: q, amount: q * unitCostFor(e), date: e.tentative_date || null });
   });
 
-  const entries = Object.entries(bySup)
-    .map(([sid, v]) => ({ sid, ...v, name: (suppliers.find(s => s.id === sid) || {}).name || 'Proveedor' }))
-    .filter(x => x.amount > 0)
-    .sort((a,b) => (a.nextDate || '9999') < (b.nextDate || '9999') ? -1 : 1);
-
-  if (!entries.length){ wrap.hidden = true; return; }
+  if (!items.length){ wrap.hidden = true; return; }
   wrap.hidden = false;
-  const total = entries.reduce((s,x) => s + x.amount, 0);
-  el.innerHTML = entries.map(x => `<button class="brief-row" data-pay-sup="${x.sid}">
-    <span class="brief-ico">💸</span>
-    <span class="brief-body"><span class="brief-row-title">${escapeHtml(x.name)}</span><span class="brief-row-sub">${x.units.toLocaleString('es-CO')}u en producción${x.nextDate ? ' · próx. entrega ' + fmtD(x.nextDate) : ''}</span></span>
-    <span class="brief-amt">${fmtCOP(x.amount)}</span>
-  </button>`).join('') + `<div class="brief-row" style="cursor:default">
+
+  // Agrupar por SEMANA (lunes como inicio) y adentro por proveedor
+  const todayStr2 = new Date(Date.now() - 5*60*60*1000).toISOString().slice(0,10);
+  const weekStartOf = iso => {
+    const d = new Date(iso + 'T12:00:00');
+    const dow = (d.getDay() + 6) % 7; // lunes=0
+    d.setDate(d.getDate() - dow);
+    return d.toISOString().slice(0,10);
+  };
+  const thisWeek = weekStartOf(todayStr2);
+  const weekLabel = ws => {
+    if (!ws) return 'Sin fecha definida';
+    if (ws === thisWeek) return 'Esta semana';
+    const next = new Date(thisWeek + 'T12:00:00'); next.setDate(next.getDate() + 7);
+    if (ws === next.toISOString().slice(0,10)) return 'Próxima semana';
+    return `Semana del ${fmtD(ws)}`;
+  };
+
+  const byWeek = {}; // ws -> { sid -> {units, amount} }
+  items.forEach(it => {
+    const ws = it.date ? weekStartOf(it.date) : '';
+    if (!byWeek[ws]) byWeek[ws] = {};
+    if (!byWeek[ws][it.sid]) byWeek[ws][it.sid] = { units: 0, amount: 0 };
+    byWeek[ws][it.sid].units += it.qty;
+    byWeek[ws][it.sid].amount += it.amount;
+  });
+
+  const weekKeys = Object.keys(byWeek).sort((a,b) => {
+    if (!a) return 1; if (!b) return -1; // sin fecha al final
+    return a < b ? -1 : 1;
+  });
+  const grandTotal = items.reduce((s,x) => s + x.amount, 0);
+
+  let html = '';
+  weekKeys.forEach(ws => {
+    const sups = Object.entries(byWeek[ws])
+      .map(([sid, v]) => ({ sid, ...v, name: (suppliers.find(s => s.id === sid) || {}).name || 'Proveedor' }))
+      .sort((a,b) => b.amount - a.amount);
+    const weekTotal = sups.reduce((s,x) => s + x.amount, 0);
+    html += `<div class="brief-week-head"><span>${escapeHtml(weekLabel(ws))}</span><span class="brief-amt">${fmtCOP(weekTotal)}</span></div>`;
+    html += sups.map(x => `<button class="brief-row" data-pay-sup="${x.sid}">
+      <span class="brief-ico">💸</span>
+      <span class="brief-body"><span class="brief-row-title">${escapeHtml(x.name)}</span><span class="brief-row-sub">${x.units.toLocaleString('es-CO')}u</span></span>
+      <span class="brief-amt">${fmtCOP(x.amount)}</span>
+    </button>`).join('');
+  });
+  html += `<div class="brief-row" style="cursor:default">
     <span class="brief-ico">Σ</span>
     <span class="brief-body"><span class="brief-row-title">Total estimado</span></span>
-    <span class="brief-amt total">${fmtCOP(total)}</span>
+    <span class="brief-amt total">${fmtCOP(grandTotal)}</span>
   </div>`;
+  el.innerHTML = html;
   el.querySelectorAll('[data-pay-sup]').forEach(b => b.addEventListener('click', () => {
     currentSupplierId = b.getAttribute('data-pay-sup');
     currentSupplier = suppliers.find(x => x.id === currentSupplierId) || null;
