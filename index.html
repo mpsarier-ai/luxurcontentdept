@@ -7,7 +7,7 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="LUXUR Ops">
 <meta name="format-detection" content="telephone=no">
-<meta name="theme-color" content="#f2f2f7">
+<meta name="theme-color" content="#edebe6">
 <title>LUXUR — Content Operations</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -464,7 +464,7 @@ body{padding-top:env(safe-area-inset-top);padding-bottom:env(safe-area-inset-bot
 /* === IG-STYLE MOBILE SHELL (base, mantengo) === */
 @media (max-width:768px){
   /* Header compact + sticky con blur */
-  header,.hub-header{padding:10px 16px!important;position:sticky;top:0;z-index:40;background:rgba(242,242,247,.92);backdrop-filter:saturate(180%) blur(18px);-webkit-backdrop-filter:saturate(180%) blur(18px);border-bottom:1px solid rgba(0,0,0,.05)}
+  header,.hub-header{padding:10px 16px!important;position:sticky;top:0;z-index:40;background:rgba(237,235,230,.92);backdrop-filter:saturate(180%) blur(18px);-webkit-backdrop-filter:saturate(180%) blur(18px);border-bottom:1px solid rgba(0,0,0,.05)}
 
   /* Cards estilo IG: rounded, sombra sutil */
   .week-card,.product-card,.pipeline-card,.calendar-card{border-radius:14px!important;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.05),0 1px 2px rgba(0,0,0,.04);border:1px solid rgba(0,0,0,.04)}
@@ -550,10 +550,10 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text','Outfit',sans-se
 /* ═══════════ APPLE THEME v2 · rediseño completo ═══════════
    Fondo iOS grouped, fuente del sistema en TODO (serif y mono fuera),
    el logo LUXUR queda en Montserrat SemiBold. */
-:root{--cream:#f2f2f7;--cream-dark:#e5e5ea;--rosa:#f5dfe2}
+/* Fondo = cream LUXUR #EDEBE6 (variables originales intactas) */
 *{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text','SF Pro Display',system-ui,'Helvetica Neue',sans-serif !important;font-style:normal !important}
 .logo,.login-logo{font-family:'Montserrat',sans-serif !important;font-weight:600 !important}
-html,body{background:#f2f2f7}
+html,body{background:#edebe6}
 
 /* Tagline y subtítulos → footnote iOS */
 .tagline{letter-spacing:.08em;color:#8e8e93;font-weight:500}
@@ -596,10 +596,13 @@ html,body{background:#f2f2f7}
 .greeting b{color:var(--black);font-weight:600}
 
 /* Fix nav bar de secciones (Marketing/Producción/Fashionalytics):
-   la barra cubre el safe-area del notch con blur — el contenido ya no
-   se ve por encima ni se pisa con la hora del iPhone */
-.hub-section{padding-top:0 !important}
-.hub-section-bar{position:sticky;top:0;z-index:30;margin:0 -22px 18px;padding:calc(env(safe-area-inset-top) + 10px) 22px 12px;background:rgba(242,242,247,.9);backdrop-filter:saturate(180%) blur(18px);-webkit-backdrop-filter:saturate(180%) blur(18px);border-bottom:1px solid rgba(0,0,0,.06)}
+   position:fixed en vez de sticky — Safari iOS rompe sticky dentro de
+   contenedores con transform + overflow scroll (por eso la barra quedaba
+   flotando a mitad de pantalla). Fixed dentro del section transformado se
+   ancla a su borde superior = borde físico de la pantalla, y se desliza
+   junto con la sección en la animación. */
+.hub-section{padding-top:calc(env(safe-area-inset-top) + 62px) !important}
+.hub-section-bar{position:fixed !important;top:0;left:0;right:0;margin:0 !important;z-index:30;padding:calc(env(safe-area-inset-top) + 10px) 22px 12px;background:rgba(237,235,230,.92);backdrop-filter:saturate(180%) blur(18px);-webkit-backdrop-filter:saturate(180%) blur(18px);border-bottom:1px solid rgba(0,0,0,.06)}
 
 /* El degradé de marca vive en los BOTONES primarios (no en secciones) */
 .modal-btn.primary,.slb-copy,#loginBtn,#loginVerifyBtn,.step-btn{background:linear-gradient(135deg,#e0949e 0%,var(--rosa-deep) 55%,#c4737d 100%)!important;color:#fff!important;border:none!important}
@@ -2309,29 +2312,52 @@ function renderPipeline(){
   el.querySelectorAll('[data-toggle]').forEach(b => b.addEventListener('click', () => togglePipelineStatus(b.getAttribute('data-toggle'))));
   el.querySelectorAll('[data-del]').forEach(b => b.addEventListener('click', () => deletePipeline(b.getAttribute('data-del'))));
   el.querySelectorAll('[data-edit]').forEach(b => b.addEventListener('click', () => openEntryModal(b.getAttribute('data-edit'))));
-  // Click en dot del stepper variant/standalone
+  // Click en dot del stepper variant/standalone.
+  // Si tocás el ÚLTIMO dot hecho → lo desmarca (retrocede una etapa). Cualquier otro dot → salta ahí.
   el.querySelectorAll('[data-set-stage]').forEach(b => b.addEventListener('click', async (ev) => {
     ev.stopPropagation();
     const entryId = b.getAttribute('data-entry');
-    const newStage = b.getAttribute('data-set-stage');
+    const clicked = b.getAttribute('data-set-stage');
     const entry = pipeline.find(x => x.id === entryId);
     if (!entry) return;
-    if (!confirm(`Marcar "${newStage}" como completada?`)) return;
+    const stages = getFlowStages(entry);
+    let newStage;
+    if (entry.stage === clicked){
+      // Desmarcar: volver a la etapa anterior (o a "sin empezar")
+      const idx = stages.findIndex(s => s.key === clicked);
+      const prev = idx > 0 ? stages[idx - 1] : null;
+      if (!confirm(`¿Desmarcar "${clicked}"? Vuelve a ${prev ? '"' + prev.short + '"' : 'sin empezar'}.`)) return;
+      newStage = prev ? prev.key : null;
+    } else {
+      if (!confirm(`Marcar "${clicked}" como completada?`)) return;
+      newStage = clicked;
+    }
     const newHistory = Array.isArray(entry.stage_history) ? entry.stage_history.slice() : [];
-    newHistory.push({ stage: newStage, at: new Date().toISOString(), by: (user && user.email) || 'team' });
+    newHistory.push({ stage: newStage || 'none', at: new Date().toISOString(), by: (user && user.email) || 'team' });
     const { error } = await supabase.from('product_pipeline').update({ stage: newStage, stage_history: newHistory }).eq('id', entryId);
     if (error) alert('Error al guardar: ' + error.message);
   }));
-  // Click en dot del stepper LOTE
+  // Click en dot del stepper LOTE — misma lógica de desmarcar
   el.querySelectorAll('[data-batch-set-stage]').forEach(b => b.addEventListener('click', async (ev) => {
     ev.stopPropagation();
     const batchId = b.getAttribute('data-batch');
-    const newStage = b.getAttribute('data-batch-set-stage');
+    const clicked = b.getAttribute('data-batch-set-stage');
     const batch = batches.find(x => x.id === batchId);
     if (!batch) return;
-    if (!confirm(`Marcar lote "${batch.name}" en etapa "${newStage}"?`)) return;
+    const bsup = suppliers.find(s => s.id === batch.supplier_id);
+    const stages = (bsup && bsup.flow_type === 'simple') ? PROD_STAGES_SIMPLE : getBatchStages(batch.has_proceso);
+    let newStage;
+    if (batch.batch_stage === clicked){
+      const idx = stages.findIndex(s => s.key === clicked);
+      const prev = idx > 0 ? stages[idx - 1] : null;
+      if (!confirm(`¿Desmarcar "${clicked}" del lote "${batch.name}"? Vuelve a ${prev ? '"' + prev.short + '"' : 'sin empezar'}.`)) return;
+      newStage = prev ? prev.key : null;
+    } else {
+      if (!confirm(`Marcar lote "${batch.name}" en etapa "${clicked}"?`)) return;
+      newStage = clicked;
+    }
     const newHistory = Array.isArray(batch.batch_stage_history) ? batch.batch_stage_history.slice() : [];
-    newHistory.push({ stage: newStage, at: new Date().toISOString(), by: (user && user.email) || 'team' });
+    newHistory.push({ stage: newStage || 'none', at: new Date().toISOString(), by: (user && user.email) || 'team' });
     const { error } = await supabase.from('production_batches').update({ batch_stage: newStage, batch_stage_history: newHistory }).eq('id', batchId);
     if (error) alert('Error al guardar: ' + error.message);
   }));

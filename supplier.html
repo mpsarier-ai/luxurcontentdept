@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no">
-<meta name="theme-color" content="#f2f2f7">
+<meta name="theme-color" content="#edebe6">
 <title>LUXUR · Producción</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -106,10 +106,9 @@ html,body{background:var(--cream);color:var(--black);font-family:'Outfit',sans-s
 .toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:var(--black);color:var(--cream);padding:12px 22px;border-radius:999px;font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.1em;opacity:0;transition:opacity .25s ease,transform .25s ease;pointer-events:none;z-index:50}
 .toast.show{opacity:1;transform:translateX(-50%) translateY(-4px)}
 /* ═══════════ APPLE THEME v2 ═══════════ */
-:root{--cream:#f2f2f7;--cream-dark:#e5e5ea;--rosa:#f5dfe2}
 *{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text','SF Pro Display',system-ui,'Helvetica Neue',sans-serif !important;font-style:normal !important}
 .brand{font-family:'Montserrat',sans-serif !important;font-weight:600 !important}
-html,body{background:#f2f2f7}
+html,body{background:#edebe6}
 .tagline{letter-spacing:.08em;color:#8e8e93;font-weight:500}
 .hi{font-weight:700;letter-spacing:-.02em;font-size:24px}
 .count{letter-spacing:.02em;text-transform:none;font-weight:500}
@@ -122,6 +121,9 @@ html,body{background:#f2f2f7}
 .card,.batch{box-shadow:0 1px 3px rgba(0,0,0,.05)}
 .delivered,.variant-delivered{font-weight:600}
 .footer{letter-spacing:.02em;text-transform:none;color:#aeaeb2}
+.revert-row{text-align:center;margin-top:10px}
+.revert-btn{background:transparent;border:none;color:#8e8e93;font-size:12px;font-weight:500;text-decoration:underline;cursor:pointer;padding:6px 10px}
+.revert-btn:active{opacity:.6}
 </style>
 </head>
 <body>
@@ -261,6 +263,7 @@ function renderCard(entry, supplierToken){
     </div>
     ${isFullyDone ? `<div class="delivered">✓ Entregado${totalDays != null ? ` · en ${totalDays}d` : ''}</div>` :
       `<div class="step-action"><button class="step-btn ${isLastStage ? 'complete' : ''}" data-pid="${entry.id}" data-stage="${nextKey}" data-supplier="${supplierToken}">${isLastStage ? 'Confirmar entrega' : `${escapeHtml(nextLabel)} terminado`}</button></div>`}
+    ${lastDoneIdx >= 0 ? `<div class="revert-row"><button class="revert-btn" data-revert-pid="${entry.id}" data-revert-stage="${lastDoneIdx > 0 ? stages[lastDoneIdx-1].key : 'none'}" data-supplier="${supplierToken}">↩ Me equivoqué · desmarcar última etapa</button></div>` : ''}
   </div>`;
 }
 
@@ -318,6 +321,7 @@ function renderBatch(batch, variants, supplierToken){
     ${nextBatchStage ? `<div class="step-action">
       <button class="step-btn" data-batch-advance="${batch.id}" data-stage="${nextBatchStage.key}" data-supplier="${supplierToken}">${escapeHtml(nextBatchStage.label.split(' · ')[0])} terminada</button>
     </div>` : `<div class="batch-msg">${supplierFlowType === 'simple' ? '✓ Listo · producción completa' : '✓ Lote completo hasta Lavandería · ahora subdivide por diseño'}</div>`}
+    ${lastBatchIdx >= 0 ? `<div class="revert-row"><button class="revert-btn" data-revert-batch="${batch.id}" data-revert-stage="${lastBatchIdx > 0 ? batchStages[lastBatchIdx-1].key : 'none'}" data-supplier="${supplierToken}">↩ Me equivoqué · desmarcar última etapa</button></div>` : ''}
   `;
 
   // Variants section
@@ -446,6 +450,42 @@ function render(payload, supplierToken){
         btn.textContent = original;
         showToast('Error: ' + (err.message || 'no pudo guardar'));
       }
+    });
+  });
+  // Botones "Me equivoqué" — retroceden una etapa
+  root.querySelectorAll('[data-revert-pid]').forEach(btn => {
+    btn.addEventListener('click', async () => {
+      if (!confirm('¿Desmarcar la última etapa? Vuelve un paso atrás.')) return;
+      btn.disabled = true;
+      const pid = btn.getAttribute('data-revert-pid');
+      const stage = btn.getAttribute('data-revert-stage');
+      const token = btn.getAttribute('data-supplier');
+      try {
+        let res;
+        if (currentMode === 'legacy'){
+          res = await supabase.rpc('advance_stage_by_token', { p_token: token, p_new_stage: stage });
+        } else {
+          res = await supabase.rpc('advance_supplier_stage', { p_token: token, p_pipeline_id: pid, p_new_stage: stage });
+        }
+        if (res.error) throw res.error;
+        showToast('↩ Etapa corregida');
+        await refresh();
+      } catch (err) { btn.disabled = false; showToast('Error: ' + (err.message || 'no pudo guardar')); }
+    });
+  });
+  root.querySelectorAll('[data-revert-batch]').forEach(btn => {
+    btn.addEventListener('click', async () => {
+      if (!confirm('¿Desmarcar la última etapa del lote? Vuelve un paso atrás.')) return;
+      btn.disabled = true;
+      const batchId = btn.getAttribute('data-revert-batch');
+      const stage = btn.getAttribute('data-revert-stage');
+      const token = btn.getAttribute('data-supplier');
+      try {
+        const { error } = await supabase.rpc('advance_batch_stage', { p_token: token, p_batch_id: batchId, p_new_stage: stage });
+        if (error) throw error;
+        showToast('↩ Etapa corregida');
+        await refresh();
+      } catch (err) { btn.disabled = false; showToast('Error: ' + (err.message || 'no pudo guardar')); }
     });
   });
   // Wire buttons de LOTE (etapas tempranas Corte→Lavandería)
