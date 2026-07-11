@@ -1323,6 +1323,16 @@ async function loadCalendar(){
   state.initialized = true;
   renderPiecesViews();
 
+  // Deep-link ?piece={id} → abre la pieza directo (viene del brief del hub
+  // "Para aprobar" / notificaciones push). Una sola vez.
+  if (!state.__pieceDeepLinkDone){
+    state.__pieceDeepLinkDone = true;
+    const wantedPiece = new URLSearchParams(window.location.search).get('piece');
+    if (wantedPiece && state.pieces.some(p => p.id === wantedPiece)){
+      setTimeout(() => { try { openUrlsModal(wantedPiece); } catch(e){ console.warn('deep-link piece', e); } }, 350);
+    }
+  }
+
   state.dayProducts = {};
   if (fieldsRes.data){
     fieldsRes.data.forEach(f => {

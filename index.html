@@ -591,6 +591,11 @@ html,body{background:#edebe6}
 /* Empty states */
 .empty-state{color:#8e8e93;font-size:14px}
 
+/* Link a inventario dentro de Fashionalytics */
+.fa-inv-link{display:flex;align-items:center;justify-content:space-between;background:#fff;border-radius:14px;padding:14px 16px;margin-bottom:16px;text-decoration:none;color:var(--black);font-size:15px;font-weight:500;box-shadow:0 1px 3px rgba(0,0,0,.05)}
+.fa-inv-link span{color:#c7c7cc}
+.fa-inv-link:active{background:rgba(0,0,0,.03)}
+
 /* ═══ TAB BAR · pill flotante Liquid Glass (iOS 26) ═══ */
 .hub-tabbar{position:fixed;left:16px;right:16px;bottom:calc(12px + env(safe-area-inset-bottom));z-index:120;display:flex;justify-content:space-around;align-items:center;border-radius:999px;background:rgba(255,255,255,.55);backdrop-filter:saturate(200%) blur(28px);-webkit-backdrop-filter:saturate(200%) blur(28px);border:1px solid rgba(255,255,255,.65);box-shadow:0 12px 36px rgba(0,0,0,.14),0 2px 8px rgba(0,0,0,.06),inset 0 1px 0 rgba(255,255,255,.85);padding:7px 10px;max-width:480px;margin:0 auto}
 .ht-tab{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;background:transparent;border:none;color:#8e8e93;font-size:11px;font-weight:500;cursor:pointer;padding:4px 2px;-webkit-tap-highlight-color:transparent}
@@ -628,9 +633,9 @@ header,.hub-header{position:static !important;background:transparent !important;
 .brief-wa{display:flex;align-items:center;justify-content:center;gap:8px;margin-top:22px;padding:13px;background:rgba(37,211,102,.12);color:#128c4b;border-radius:999px;text-decoration:none;font-size:14px;font-weight:600}
 .brief-wa:active{opacity:.7}
 
-/* Saludo por hora en el header */
-.greeting{font-size:15px;color:#8e8e93;font-weight:500;margin-top:4px;letter-spacing:-.01em;min-height:20px}
-.greeting b{color:var(--black);font-weight:600}
+/* Saludo por hora en el header · hero grande */
+.greeting{font-size:30px;color:var(--black);font-weight:700;margin-top:10px;letter-spacing:-.03em;line-height:1.15;min-height:36px}
+.greeting b{color:var(--rosa-deep);font-weight:700}
 
 /* Secciones sin barra flotante: solo un back '‹ Inicio' simple que
    scrollea con el contenido (sin breadcrumbs ni solapador) */
@@ -768,6 +773,7 @@ header,.hub-header{position:static !important;background:transparent !important;
   <section id="hubFashionalytics" class="hub-section" hidden>
     <button class="hub-back" data-hub-back>Inicio</button>
     <h2 class="section-title"><span>Dashboard · Jeans activos</span><span class="meta" id="prodStatusMeta">—</span></h2>
+    <a class="fa-inv-link" href="calendars/calendar.html?view=inventory">📦 Ver inventario completo por tallas <span>›</span></a>
     <div class="prod-status" id="prodStatus"><div class="empty-state">Cargando catálogo…</div></div>
   </section>
 </div>
@@ -778,7 +784,6 @@ header,.hub-header{position:static !important;background:transparent !important;
   <button class="ht-tab" data-ht="marketing"><span class="vt-ico">📅</span><span class="vt-lbl">Marketing</span></button>
   <button class="ht-tab" data-ht="produccion"><span class="vt-ico">🚚</span><span class="vt-lbl">Producción</span></button>
   <button class="ht-tab" data-ht="fashionalytics"><span class="vt-ico">📊</span><span class="vt-lbl">Analytics</span></button>
-  <a class="ht-tab" href="calendars/calendar.html?view=inventory"><span class="vt-ico">📦</span><span class="vt-lbl">Inventario</span></a>
 </nav>
 
 <footer class="footer">
