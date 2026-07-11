@@ -632,14 +632,10 @@ header,.hub-header{position:static !important;background:transparent !important;
 .greeting{font-size:15px;color:#8e8e93;font-weight:500;margin-top:4px;letter-spacing:-.01em;min-height:20px}
 .greeting b{color:var(--black);font-weight:600}
 
-/* Fix nav bar de secciones (Marketing/Producción/Fashionalytics):
-   position:fixed en vez de sticky — Safari iOS rompe sticky dentro de
-   contenedores con transform + overflow scroll (por eso la barra quedaba
-   flotando a mitad de pantalla). Fixed dentro del section transformado se
-   ancla a su borde superior = borde físico de la pantalla, y se desliza
-   junto con la sección en la animación. */
-.hub-section{padding-top:calc(env(safe-area-inset-top) + 62px) !important}
-.hub-section-bar{position:fixed !important;top:0;left:0;right:0;margin:0 !important;z-index:30;padding:calc(env(safe-area-inset-top) + 10px) 22px 12px;background:rgba(237,235,230,.92);backdrop-filter:saturate(180%) blur(18px);-webkit-backdrop-filter:saturate(180%) blur(18px);border-bottom:1px solid rgba(0,0,0,.06)}
+/* Secciones sin barra flotante: solo un back '‹ Inicio' simple que
+   scrollea con el contenido (sin breadcrumbs ni solapador) */
+.hub-section{padding-top:calc(env(safe-area-inset-top) + 12px) !important}
+.hub-back{display:inline-flex;align-items:center;margin:0 0 14px -8px;font-size:16px;color:var(--rosa-deep);font-weight:500;background:transparent;border:none;padding:8px 10px;cursor:pointer}
 
 /* El degradé de marca vive en los BOTONES primarios (no en secciones) */
 .modal-btn.primary,.slb-copy,#loginBtn,#loginVerifyBtn,.step-btn{background:linear-gradient(135deg,#e0949e 0%,var(--rosa-deep) 55%,#c4737d 100%)!important;color:#fff!important;border:none!important}
@@ -714,10 +710,7 @@ header,.hub-header{position:static !important;background:transparent !important;
 
   <!-- MARKETING DEPT · calendarios -->
   <section id="hubMarketing" class="hub-section" hidden>
-    <div class="hub-section-bar">
-      <button class="hub-back" data-hub-back>Inicio</button>
-      <div class="hub-section-title">Marketing Dept</div>
-    </div>
+    <button class="hub-back" data-hub-back>Inicio</button>
     <h2 class="section-title">
       <span>Calendarios Semanales</span>
       <button class="new-week-btn" id="newWeekBtn">+ Nueva Semana</button>
@@ -729,10 +722,7 @@ header,.hub-header{position:static !important;background:transparent !important;
 
   <!-- PRODUCCIÓN · pipeline -->
   <section id="hubProduccion" class="hub-section" hidden>
-    <div class="hub-section-bar">
-      <button class="hub-back" data-hub-back>Inicio</button>
-      <div class="hub-section-title">Producción</div>
-    </div>
+    <button class="hub-back" data-hub-back>Inicio</button>
     <!-- Selector de proveedor (chips) -->
     <div class="supplier-chips" id="supplierChips"></div>
     <!-- Dashboard 4 stat tiles -->
@@ -776,10 +766,7 @@ header,.hub-header{position:static !important;background:transparent !important;
 
   <!-- FASHIONALYTICS · estado de productos -->
   <section id="hubFashionalytics" class="hub-section" hidden>
-    <div class="hub-section-bar">
-      <button class="hub-back" data-hub-back>Inicio</button>
-      <div class="hub-section-title">Fashionalytics</div>
-    </div>
+    <button class="hub-back" data-hub-back>Inicio</button>
     <h2 class="section-title"><span>Dashboard · Jeans activos</span><span class="meta" id="prodStatusMeta">—</span></h2>
     <div class="prod-status" id="prodStatus"><div class="empty-state">Cargando catálogo…</div></div>
   </section>
