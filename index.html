@@ -422,7 +422,7 @@ body{padding-top:env(safe-area-inset-top);padding-bottom:env(safe-area-inset-bot
 /* === MAX IMPACT MOBILE — premium app feel === */
 @media (max-width:768px){
   /* HEADER hero gradient + display serif */
-  header,.hub-header{padding:22px 16px 26px!important;background:linear-gradient(180deg,rgba(242,212,215,.65) 0%,rgba(237,235,230,.92) 100%)!important;border-bottom:none!important}
+  header,.hub-header{padding:22px 16px 26px!important;background:transparent!important;border-bottom:none!important}
   header h1,.hub-header h1{font-family:'Cormorant Garamond',serif!important;font-weight:700!important;font-size:36px!important;letter-spacing:-.02em;animation:llFadeUp .6s cubic-bezier(.16,1,.3,1)}
 
   /* PAGE INTRO fade+slide */
@@ -464,7 +464,7 @@ body{padding-top:env(safe-area-inset-top);padding-bottom:env(safe-area-inset-bot
 /* === IG-STYLE MOBILE SHELL (base, mantengo) === */
 @media (max-width:768px){
   /* Header compact + sticky con blur */
-  header,.hub-header{padding:10px 16px!important;position:sticky;top:0;z-index:40;background:rgba(237,235,230,.92);backdrop-filter:saturate(180%) blur(18px);-webkit-backdrop-filter:saturate(180%) blur(18px);border-bottom:1px solid rgba(0,0,0,.05)}
+  header,.hub-header{padding:10px 16px!important;position:sticky;top:0;z-index:40;background:rgba(242,242,247,.92);backdrop-filter:saturate(180%) blur(18px);-webkit-backdrop-filter:saturate(180%) blur(18px);border-bottom:1px solid rgba(0,0,0,.05)}
 
   /* Cards estilo IG: rounded, sombra sutil */
   .week-card,.product-card,.pipeline-card,.calendar-card{border-radius:14px!important;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.05),0 1px 2px rgba(0,0,0,.04);border:1px solid rgba(0,0,0,.04)}
@@ -590,6 +590,16 @@ html,body{background:#f2f2f7}
 
 /* Empty states */
 .empty-state{color:#8e8e93;font-size:14px}
+
+/* Saludo por hora en el header */
+.greeting{font-size:15px;color:#8e8e93;font-weight:500;margin-top:4px;letter-spacing:-.01em;min-height:20px}
+.greeting b{color:var(--black);font-weight:600}
+
+/* El degradé de marca vive en los BOTONES primarios (no en secciones) */
+.modal-btn.primary,.slb-copy,#loginBtn,#loginVerifyBtn,.step-btn{background:linear-gradient(135deg,#e0949e 0%,var(--rosa-deep) 55%,#c4737d 100%)!important;color:#fff!important;border:none!important}
+.modal-btn.primary:hover,.slb-copy:hover,#loginBtn:hover:not(:disabled),#loginVerifyBtn:hover:not(:disabled){filter:brightness(1.05)}
+.new-week-btn{background:linear-gradient(135deg,rgba(224,148,158,.18),rgba(212,132,142,.14))}
+.slb-copy.copied{background:#5b9a5b!important}
 </style>
 </head>
 <body>
@@ -625,9 +635,8 @@ html,body{background:#f2f2f7}
   <header>
     <div>
       <div class="logo">LUXUR</div>
-      <div class="tagline">Content Operations · Calendar Hub</div>
+      <div class="greeting" id="hubGreeting"></div>
     </div>
-    <div class="year">2026</div>
   </header>
 
   <div class="session-bar">
@@ -1084,9 +1093,56 @@ async function boot(){
 
 let catalog = [];
 
+// === Saludo por hora del día · "Bienvenida de vuelta, Sofía" ===
+async function setGreeting(u){
+  const el = document.getElementById('hubGreeting');
+  if (!el || !u) return;
+  // Nombre: team_members.name → fallback al prefijo del email capitalizado
+  let name = '';
+  try {
+    const { data } = await supabase.from('team_members').select('name').eq('email', u.email.toLowerCase()).maybeSingle();
+    if (data && data.name) name = data.name.split(' ')[0];
+  } catch(_) {}
+  if (!name){
+    const raw = (u.email || '').split('@')[0].replace(/[._-]+/g, ' ').split(' ')[0];
+    name = raw.charAt(0).toUpperCase() + raw.slice(1);
+  }
+  const h = new Date().getHours();
+  let pool;
+  if (h >= 5 && h < 12) {
+    pool = [
+      `Buenos días, <b>${name}</b> ☀️`,
+      `Bienvenida de vuelta, <b>${name}</b>`,
+      `Arrancamos, <b>${name}</b>?`,
+    ];
+  } else if (h >= 12 && h < 19) {
+    pool = [
+      `Buenas tardes, <b>${name}</b>`,
+      `Bienvenida de vuelta, <b>${name}</b>`,
+      `¿Cómo va el día, <b>${name}</b>?`,
+    ];
+  } else if (h >= 19 && h < 23) {
+    pool = [
+      `Buenas noches, <b>${name}</b> 🌙`,
+      `Cerrando el día, <b>${name}</b>?`,
+      `Bienvenida de vuelta, <b>${name}</b>`,
+    ];
+  } else {
+    pool = [
+      `Working late, <b>${name}</b>? 🌙`,
+      `¿Trabajando tarde, <b>${name}</b>?`,
+      `El denim no duerme, <b>${name}</b> ✨`,
+    ];
+  }
+  // Rota por día para no repetir siempre el mismo mensaje del slot
+  const idx = (new Date().getDate() + h) % pool.length;
+  el.innerHTML = pool[idx];
+}
+
 async function enterApp(){
   hideLogin();
   if (editorList) editorList.textContent = user.email;
+  setGreeting(user);
   // Push notifications (solo iOS nativo, no-op en web)
   registerPushNotifications(user.email).catch(e => console.warn('push init', e));
   // Hub home con los 4 tiles. Solo auto-redirect si la URL trae ?go=current explícito.
@@ -1772,6 +1828,9 @@ async function loadSuppliers(){
     suppliers = data || [];
     renderSupplierChips();
     updateSupplierLinkBox();
+    // Re-render del pipeline: los steppers dependen del flow_type del proveedor
+    // y este fetch termina DESPUÉS del primer renderPipeline (race en init)
+    try { renderPipeline(); } catch(_) {}
   } catch (err) {
     console.warn('No se pudo cargar suppliers:', err && err.message);
     suppliers = [];
@@ -2033,9 +2092,12 @@ function renderVariantStepperInline(v){
 }
 
 function renderBatchCard(batch, variants){
-  const stages = getBatchStages(batch.has_proceso);
+  // Flow-aware: lotes de proveedor "simple" (AXSPEN) usan su propio flujo
+  const bsup = suppliers.find(s => s.id === batch.supplier_id);
+  const isSimpleFlow = !!(bsup && bsup.flow_type === 'simple');
+  const stages = isSimpleFlow ? PROD_STAGES_SIMPLE : getBatchStages(batch.has_proceso);
   const lastIdx = batch.batch_stage ? stages.findIndex(s => s.key === batch.batch_stage) : -1;
-  const isLavadero = lastIdx === stages.length - 1; // ya terminó lavandería
+  const isLavadero = lastIdx === stages.length - 1; // terminó su flujo de lote
   const currentIdx = lastIdx + 1;
   const todayStr = new Date().toISOString().slice(0,10);
   const overdue = batch.tentative_date && batch.tentative_date < todayStr && !isLavadero;
@@ -2055,7 +2117,7 @@ function renderBatchCard(batch, variants){
   });
   stepperHtml += '</div>';
   const summary = isLavadero
-    ? `<div class="tl-stage-summary done">✓ Lote en Lavandería · variantes en Terminación</div>`
+    ? `<div class="tl-stage-summary done">${isSimpleFlow ? '✓ Listo' : '✓ Lote en Lavandería · variantes en Terminación'}</div>`
     : (currentIdx >= 0 && currentIdx < stages.length
         ? `<div class="tl-stage-summary">Lote en <b>${stages[currentIdx].short}</b></div>` : '');
   const metaBits = [];

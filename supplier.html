@@ -265,7 +265,9 @@ function renderCard(entry, supplierToken){
 }
 
 function renderBatch(batch, variants, supplierToken){
-  const batchStages = batch.has_proceso !== false ? BATCH_STAGES_FULL : BATCH_STAGES_FULL.filter(s => s.key !== 'proceso');
+  const batchStages = supplierFlowType === 'simple'
+    ? STAGES_SIMPLE
+    : (batch.has_proceso !== false ? BATCH_STAGES_FULL : BATCH_STAGES_FULL.filter(s => s.key !== 'proceso'));
   const lastBatchIdx = batch.batch_stage ? batchStages.findIndex(s => s.key === batch.batch_stage) : -1;
   const batchDoneFully = lastBatchIdx === batchStages.length - 1;
   const batchCurrentIdx = lastBatchIdx + 1;
@@ -315,7 +317,7 @@ function renderBatch(batch, variants, supplierToken){
 
     ${nextBatchStage ? `<div class="step-action">
       <button class="step-btn" data-batch-advance="${batch.id}" data-stage="${nextBatchStage.key}" data-supplier="${supplierToken}">${escapeHtml(nextBatchStage.label.split(' · ')[0])} terminada</button>
-    </div>` : `<div class="batch-msg">✓ Lote completo hasta Lavandería · ahora subdivide por diseño</div>`}
+    </div>` : `<div class="batch-msg">${supplierFlowType === 'simple' ? '✓ Listo · producción completa' : '✓ Lote completo hasta Lavandería · ahora subdivide por diseño'}</div>`}
   `;
 
   // Variants section
