@@ -595,6 +595,12 @@ html,body{background:#f2f2f7}
 .greeting{font-size:15px;color:#8e8e93;font-weight:500;margin-top:4px;letter-spacing:-.01em;min-height:20px}
 .greeting b{color:var(--black);font-weight:600}
 
+/* Fix nav bar de secciones (Marketing/Producción/Fashionalytics):
+   la barra cubre el safe-area del notch con blur — el contenido ya no
+   se ve por encima ni se pisa con la hora del iPhone */
+.hub-section{padding-top:0 !important}
+.hub-section-bar{position:sticky;top:0;z-index:30;margin:0 -22px 18px;padding:calc(env(safe-area-inset-top) + 10px) 22px 12px;background:rgba(242,242,247,.9);backdrop-filter:saturate(180%) blur(18px);-webkit-backdrop-filter:saturate(180%) blur(18px);border-bottom:1px solid rgba(0,0,0,.06)}
+
 /* El degradé de marca vive en los BOTONES primarios (no en secciones) */
 .modal-btn.primary,.slb-copy,#loginBtn,#loginVerifyBtn,.step-btn{background:linear-gradient(135deg,#e0949e 0%,var(--rosa-deep) 55%,#c4737d 100%)!important;color:#fff!important;border:none!important}
 .modal-btn.primary:hover,.slb-copy:hover,#loginBtn:hover:not(:disabled),#loginVerifyBtn:hover:not(:disabled){filter:brightness(1.05)}
