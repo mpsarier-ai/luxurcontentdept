@@ -2339,7 +2339,15 @@ function renderPipeline(){
   };
 
   // ─── 1) Stock actual · costo Shopify + PVP total ────────────────────
-  let stockUnits = 0, stockCost = 0, stockPVP = 0;
+  // Si una talla no tiene costo registrado en Shopify, usa el costo promedio
+  // del catálogo para no subestimar (y se reporta cuántas unidades son aprox.)
+  let stockUnits = 0, stockCost = 0, stockPVP = 0, unitsSinCosto = 0;
+  const allCosts = [];
+  (catalog || []).forEach(p => {
+    if (!(p.title || '').toUpperCase().startsWith('JEAN') || !Array.isArray(p.sizes)) return;
+    p.sizes.forEach(sz => { if (Number(sz.cost) > 0) allCosts.push(Number(sz.cost)); });
+  });
+  const avgJeanCost = allCosts.length ? allCosts.reduce((a,b) => a+b, 0) / allCosts.length : 0;
   (catalog || []).forEach(p => {
     const t = (p.title || '').toUpperCase();
     if (!t.startsWith('JEAN')) return;
@@ -2348,24 +2356,38 @@ function renderPipeline(){
       const qty = Math.max(0, sz.available ?? 0);
       if (!qty) return;
       stockUnits += qty;
-      stockCost  += qty * (Number(sz.cost)  || 0);
-      stockPVP   += qty * (Number(sz.price) || 0);
+      const c = Number(sz.cost) || 0;
+      if (c > 0) stockCost += qty * c;
+      else { stockCost += qty * avgJeanCost; unitsSinCosto += qty; }
+      stockPVP += qty * (Number(sz.price) || 0);
     });
   });
-  // ─── 2) En producción · costo proveedor + PVP estimado ──────────────
-  let prodUnits = 0, prodCost = 0, prodPVP = 0;
+  // ─── 2) En producción · costo con cascada completa + PVP estimado ────
+  // Cascada de costo: override del lote/pieza → costo Shopify del producto
+  // matcheado → default del proveedor → promedio del catálogo → $25.000
   const pvpOf = (e, qty) => {
     const m = matchCatalog(e);
     const price = m ? productPrice(m) : avgJeanPrice;
     return qty * (price || avgJeanPrice || 0);
   };
+  const costOf = (e, qty) => {
+    if (e.unit_cost) return qty * Number(e.unit_cost);
+    const m = matchCatalog(e);
+    if (m){ const c = productCost(m); if (c > 0) return qty * c; }
+    const sup = suppliers.find(x => x.id === e.supplier_id);
+    if (sup && sup.default_unit_cost && Number(sup.default_unit_cost) !== DEFAULT_COST_COP){
+      return qty * Number(sup.default_unit_cost);
+    }
+    return qty * (avgJeanCost || (sup && Number(sup.default_unit_cost)) || DEFAULT_COST_COP);
+  };
+  let prodUnits = 0, prodCost = 0, prodPVP = 0;
   filteredBatches.forEach(b => {
     const vars = variantsByBatch[b.id] || [];
     const allDelivered = vars.length > 0 && vars.every(v => v.stage === 'entrega');
     if (!allDelivered){
       const q = b.total_quantity || 0;
       prodUnits += q;
-      prodCost  += q * effectiveCost(b, b.supplier_id);
+      prodCost  += costOf({ unit_cost: b.unit_cost, product_name: b.name, supplier_id: b.supplier_id }, q);
       prodPVP   += pvpOf({ product_name: b.name }, q);
     }
   });
@@ -2374,7 +2396,7 @@ function renderPipeline(){
     if (!delivered){
       const q = e.quantity || 0;
       prodUnits += q;
-      prodCost  += q * effectiveCost(e, e.supplier_id);
+      prodCost  += costOf(e, q);
       prodPVP   += pvpOf(e, q);
     }
   });
@@ -2390,31 +2412,32 @@ function renderPipeline(){
     const allDelivered = vars.length > 0 && vars.every(v => v.stage === 'entrega');
     if (!allDelivered){
       const q = b.total_quantity || 0;
-      addToWindow(b.tentative_date, q, q * effectiveCost(b, b.supplier_id), pvpOf({ product_name: b.name }, q));
+      addToWindow(b.tentative_date, q, costOf({ unit_cost: b.unit_cost, product_name: b.name, supplier_id: b.supplier_id }, q), pvpOf({ product_name: b.name }, q));
     }
   });
   standalone.forEach(e => {
     const delivered = e.stage === 'entrega' || e.status === 'llego';
     if (!delivered){
       const q = e.quantity || 0;
-      addToWindow(e.tentative_date, q, q * effectiveCost(e, e.supplier_id), pvpOf(e, q));
+      addToWindow(e.tentative_date, q, costOf(e, q), pvpOf(e, q));
     }
   });
 
   // Render KPIs · dos líneas: Costo + PVP
-  const setKPI = (n, cost, pvp, el1, el2) => {
+  const setKPI = (n, cost, pvp, el1, el2, note) => {
     const numEl = document.getElementById(el1);
     const costEl = document.getElementById(el2);
     if (numEl)  numEl.textContent  = (n || 0).toLocaleString('es-CO');
     if (costEl){
       const bits = [];
-      bits.push(`<span class="pk-cost-line">Costo ${cost ? fmtCOP(cost) : '—'}</span>`);
+      bits.push(`<span class="pk-cost-line">Costo ${cost ? fmtCOP(cost) : '—'}${note ? ' ' + note : ''}</span>`);
       bits.push(`<span class="pk-pvp-line">PVP ${pvp ? fmtCOP(pvp) : '—'}</span>`);
       costEl.innerHTML = bits.join('');
       costEl.classList.toggle('zero', !cost && !pvp);
     }
   };
-  setKPI(stockUnits, stockCost, stockPVP, 'kpiStockNum', 'kpiStockCost');
+  setKPI(stockUnits, stockCost, stockPVP, 'kpiStockNum', 'kpiStockCost',
+    unitsSinCosto > 0 ? `<span title="${unitsSinCosto} unidades sin costo registrado en Shopify, estimadas al promedio">(${unitsSinCosto}u aprox)</span>` : '');
   setKPI(prodUnits,  prodCost,  prodPVP,  'kpiProdNum',  'kpiProdCost');
   setKPI(weekUnits,  weekCost,  weekPVP,  'kpiWeekNum',  'kpiWeekCost');
   setKPI(monthUnits, monthCost, monthPVP, 'kpiMonthNum', 'kpiMonthCost');
