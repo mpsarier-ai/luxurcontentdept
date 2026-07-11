@@ -1251,6 +1251,13 @@ async function enterApp(){
   }
 
   await loadCalendar();
+
+  // ?view=inventory (o calendar/today) — abre esa vista directo, ej. desde
+  // el tab Inventario del hub
+  const wantedView = new URLSearchParams(window.location.search).get('view');
+  if (wantedView && ['today','calendar','inventory'].includes(wantedView)){
+    switchView(wantedView);
+  }
 }
 
 async function loadCalendar(){

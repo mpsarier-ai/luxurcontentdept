@@ -603,6 +603,9 @@ html,body{background:#edebe6}
 .hub-section{padding-bottom:calc(env(safe-area-inset-bottom) + 140px) !important}
 .footer{padding-bottom:110px}
 
+/* Header 100% transparente — sin blur ni fondo que difiera del body */
+header,.hub-header{position:static !important;background:transparent !important;backdrop-filter:none !important;-webkit-backdrop-filter:none !important;border-bottom:none !important;box-shadow:none !important}
+
 /* ═══ HUB BRIEF · tus tareas del día ═══ */
 .hub-brief{display:flex;flex-direction:column;gap:2px;animation:llFadeUp .4s cubic-bezier(.16,1,.3,1) both}
 .brief-date{font-size:13px;color:#8e8e93;font-weight:500;margin-bottom:2px;text-transform:capitalize}
@@ -612,9 +615,9 @@ html,body{background:#edebe6}
 .brief-row:last-child{border-bottom:none}
 .brief-row:active{background:rgba(0,0,0,.03)}
 .brief-ico{font-size:20px;flex-shrink:0;width:28px;text-align:center}
-.brief-body{flex:1;min-width:0}
-.brief-row-title{font-size:15px;font-weight:500;line-height:1.3;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.brief-row-sub{font-size:12.5px;color:#8e8e93;margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.brief-body{flex:1;min-width:0;display:flex;flex-direction:column;overflow:hidden}
+.brief-row-title{display:block;font-size:15px;font-weight:500;line-height:1.3;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.brief-row-sub{display:block;font-size:12.5px;color:#8e8e93;margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .brief-chip{flex-shrink:0;font-size:11px;font-weight:600;padding:4px 10px;border-radius:999px}
 .brief-chip.pendiente{background:rgba(255,159,10,.15);color:#c07000}
 .brief-chip.listo{background:rgba(52,199,89,.15);color:#1e7b34}
@@ -788,6 +791,7 @@ html,body{background:#edebe6}
   <button class="ht-tab" data-ht="marketing"><span class="vt-ico">📅</span><span class="vt-lbl">Marketing</span></button>
   <button class="ht-tab" data-ht="produccion"><span class="vt-ico">🚚</span><span class="vt-lbl">Producción</span></button>
   <button class="ht-tab" data-ht="fashionalytics"><span class="vt-ico">📊</span><span class="vt-lbl">Analytics</span></button>
+  <a class="ht-tab" href="calendars/calendar.html?view=inventory"><span class="vt-ico">📦</span><span class="vt-lbl">Inventario</span></a>
 </nav>
 
 <footer class="footer">
@@ -1342,7 +1346,8 @@ function showHubSection(name){
 }
 document.addEventListener('click', e => {
   const htab = e.target.closest('.ht-tab');
-  if (htab){ showHubSection(htab.getAttribute('data-ht')); return; }
+  if (htab && htab.hasAttribute('data-ht')){ showHubSection(htab.getAttribute('data-ht')); return; }
+  if (htab) return; // ht-tab tipo <a> (Inventario) → navegación normal
   const tile = e.target.closest('[data-section]');
   if (tile){ showHubSection(tile.getAttribute('data-section')); return; }
   const back = e.target.closest('[data-hub-back]');
