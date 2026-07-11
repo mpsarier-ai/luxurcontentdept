@@ -7,7 +7,7 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="LUXUR Ops">
 <meta name="format-detection" content="telephone=no">
-<meta name="theme-color" content="#edebe6">
+<meta name="theme-color" content="#f2f2f7">
 <title>LUXUR — Content Calendar</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -612,6 +612,59 @@ body{padding-top:env(safe-area-inset-top);padding-bottom:env(safe-area-inset-bot
   /* Typography más prominente IG-style */
   .calendar-header h1,.week-title{font-family:'Cormorant Garamond',serif;font-weight:700}
 }
+/* ═══════════ APPLE THEME v2 · rediseño completo ═══════════
+   Fondo iOS grouped, fuente del sistema en TODO (serif y mono fuera),
+   logo LUXUR en Montserrat SemiBold. Cero bordes negros duros. */
+:root{--cream:#f2f2f7;--cream-dark:#e5e5ea;--rosa:#f5dfe2}
+*{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text','SF Pro Display',system-ui,'Helvetica Neue',sans-serif !important;font-style:normal !important}
+.logo,.login-logo{font-family:'Montserrat',sans-serif !important;font-weight:600 !important}
+html,body{background:#f2f2f7}
+
+/* Header y secciones sin líneas negras */
+.brand-header{border-bottom:none;padding-bottom:12px;margin-bottom:28px}
+.section-title{border-bottom:none;font-weight:700;font-size:24px;letter-spacing:-.02em;padding-bottom:4px}
+.section-title .meta{font-size:12px;letter-spacing:0;text-transform:none;font-weight:400;color:#8e8e93}
+.footer{border-top:none;font-size:11px;letter-spacing:.02em;text-transform:none;color:#aeaeb2}
+.tagline,.week-status{letter-spacing:.06em;color:#8e8e93;font-weight:500}
+.week-num{font-weight:700;letter-spacing:-.02em}
+.week-range{color:#8e8e93}
+
+/* Títulos que eran serif → SF bold */
+.today-title{font-weight:700;letter-spacing:-.03em}
+.today-title .today-dnum{font-weight:800}
+.today-card-title{font-weight:600;letter-spacing:-.01em;font-size:16px}
+.kanban-card .kc-title{font-weight:600;font-size:15px;letter-spacing:-.01em}
+.week-title{font-weight:700;letter-spacing:-.02em}
+.login-title{font-weight:700;font-size:26px;letter-spacing:-.02em}
+.piece .ptitle{font-weight:600}
+
+/* Modales estilo iOS */
+.modal{border:none;border-radius:24px;background:#fff;box-shadow:0 8px 20px rgba(0,0,0,.08),0 24px 60px rgba(0,0,0,.18)}
+.modal h3{font-weight:700;font-size:21px;letter-spacing:-.01em}
+.modal .modal-meta{font-size:12px;letter-spacing:0;text-transform:none;color:#8e8e93;font-weight:500}
+.modal label,.pm-label{font-size:12px;letter-spacing:0;text-transform:none;font-weight:600;color:#6e6e73}
+.modal input,.modal select,.pm-input{border:none !important;border-radius:12px;background:#f2f2f0;font-size:15px;transition:box-shadow .15s ease}
+.modal input:focus,.modal select:focus,.pm-input:focus{box-shadow:0 0 0 3px rgba(212,132,142,.35);background:#fff}
+.modal-btn{border:none;border-radius:999px;background:rgba(0,0,0,.05);color:var(--black);font-size:14px;font-weight:600;letter-spacing:0;text-transform:none;padding:11px 20px}
+.modal-btn:hover{background:rgba(0,0,0,.1);color:var(--black)}
+.modal-btn.primary{background:var(--rosa-deep);color:#fff}
+.modal-btn.primary:hover{background:#bf6e78;color:#fff}
+.pm-mini-btn{border:none;border-radius:12px;background:rgba(0,0,0,.05);font-weight:600;letter-spacing:0;text-transform:none}
+
+/* Login */
+#loginEmail,#loginCode{border:none;border-radius:14px;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.08);font-size:16px}
+#loginEmail:focus,#loginCode:focus{box-shadow:0 0 0 3px rgba(212,132,142,.35)}
+#loginBtn,#loginVerifyBtn{border-radius:999px;font-size:15px;font-weight:600;letter-spacing:0;text-transform:none}
+.login-help{color:#6e6e73}
+
+/* Cards y superficies suaves */
+.day-card,.kanban-card,.piece,.inv-row,.dash-block{box-shadow:0 1px 3px rgba(0,0,0,.05)}
+.back-link{letter-spacing:0;text-transform:none;font-size:14px;color:#8e8e93}
+.editor-chip{border-radius:999px;font-weight:500}
+.shopify-stamp{letter-spacing:.02em;text-transform:none}
+
+/* Botones de estado en pill limpio */
+.pm-status-toggle button,.pm-approve-btn{border-radius:999px;font-weight:600;letter-spacing:0;text-transform:none;font-size:13px}
 </style>
 </head>
 <body>

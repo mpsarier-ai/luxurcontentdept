@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no">
-<meta name="theme-color" content="#edebe6">
+<meta name="theme-color" content="#f2f2f7">
 <title>LUXUR · Producción</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -105,6 +105,23 @@ html,body{background:var(--cream);color:var(--black);font-family:'Outfit',sans-s
 
 .toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:var(--black);color:var(--cream);padding:12px 22px;border-radius:999px;font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.1em;opacity:0;transition:opacity .25s ease,transform .25s ease;pointer-events:none;z-index:50}
 .toast.show{opacity:1;transform:translateX(-50%) translateY(-4px)}
+/* ═══════════ APPLE THEME v2 ═══════════ */
+:root{--cream:#f2f2f7;--cream-dark:#e5e5ea;--rosa:#f5dfe2}
+*{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text','SF Pro Display',system-ui,'Helvetica Neue',sans-serif !important;font-style:normal !important}
+.brand{font-family:'Montserrat',sans-serif !important;font-weight:600 !important}
+html,body{background:#f2f2f7}
+.tagline{letter-spacing:.08em;color:#8e8e93;font-weight:500}
+.hi{font-weight:700;letter-spacing:-.02em;font-size:24px}
+.count{letter-spacing:.02em;text-transform:none;font-weight:500}
+.product-name,.batch-name{font-weight:700;letter-spacing:-.01em}
+.batch-name::before{letter-spacing:.1em}
+.tu-num{font-weight:800;letter-spacing:-.03em}
+.tu-unit{letter-spacing:.02em}
+.step-name,.variant-name{font-weight:600}
+.step-btn,.variant-btn{letter-spacing:0;text-transform:none;font-weight:600;font-size:13px}
+.card,.batch{box-shadow:0 1px 3px rgba(0,0,0,.05)}
+.delivered,.variant-delivered{font-weight:600}
+.footer{letter-spacing:.02em;text-transform:none;color:#aeaeb2}
 </style>
 </head>
 <body>

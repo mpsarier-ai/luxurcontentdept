@@ -7,7 +7,7 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="LUXUR Ops">
 <meta name="format-detection" content="telephone=no">
-<meta name="theme-color" content="#edebe6">
+<meta name="theme-color" content="#f2f2f7">
 <title>LUXUR — Content Operations</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -546,6 +546,50 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text','Outfit',sans-se
 /* Chips proveedor → segmented feel */
 .sup-chip{font-family:-apple-system,sans-serif;box-shadow:0 1px 2px rgba(0,0,0,.03)}
 .fa-chip{font-family:-apple-system,sans-serif}
+
+/* ═══════════ APPLE THEME v2 · rediseño completo ═══════════
+   Fondo iOS grouped, fuente del sistema en TODO (serif y mono fuera),
+   el logo LUXUR queda en Montserrat SemiBold. */
+:root{--cream:#f2f2f7;--cream-dark:#e5e5ea;--rosa:#f5dfe2}
+*{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text','SF Pro Display',system-ui,'Helvetica Neue',sans-serif !important;font-style:normal !important}
+.logo,.login-logo{font-family:'Montserrat',sans-serif !important;font-weight:600 !important}
+html,body{background:#f2f2f7}
+
+/* Tagline y subtítulos → footnote iOS */
+.tagline{letter-spacing:.08em;color:#8e8e93;font-weight:500}
+.hub-tile-title{font-weight:600;font-size:17px;letter-spacing:-.01em}
+.hub-tile-sub{text-transform:none;letter-spacing:0;font-size:13px;color:#8e8e93;font-weight:400}
+.hub-tile-arrow{color:#c7c7cc}
+.hub-section-title{font-weight:600;font-size:17px;letter-spacing:-.01em}
+.hub-back{font-size:15px;letter-spacing:0;text-transform:none;font-weight:400}
+
+/* Números hero → SF bold tracking apretado */
+.pk-num,.fa-kpi-num{font-weight:700;letter-spacing:-.03em}
+.fa-metric-val{font-weight:700;font-size:19px;letter-spacing:-.02em}
+.tl-date{font-weight:700;letter-spacing:-.02em}
+.slb-name{font-weight:600;font-size:16px}
+.fa-title{font-weight:600}
+.batch-name,.product-name{font-weight:700;letter-spacing:-.01em}
+.tl-batch .tl-name span:first-child{font-weight:700;font-size:16px;letter-spacing:-.01em}
+
+/* Labels mini → estilo iOS grouped-list header */
+.pk-label,.fa-kpi-label,.slb-label,.fa-top-head,.fa-filters-head,.variants-head,.fa-metric-label,.fa-cat,.tl-type,.tl-stage-label{letter-spacing:.04em;font-weight:600}
+.pk-cost-line,.pk-pvp-line,.fa-kpi-sub,.tl-stage-days,.fa-st-row,.fa-bar-val{letter-spacing:0;font-weight:500}
+
+/* Cards y superficies */
+.hub-tile,.prod-kpi,.fa-kpi,.fa-card,.fa-top,.fa-mix,.tl-row,.supplier-link-box{box-shadow:0 1px 3px rgba(0,0,0,.05)}
+.tl-row{border:none}
+.tl-batch{border:none;background:#fff}
+.tl-variant{background:#fafafa;border-left-color:#e5e5ea}
+
+/* Status pills sin borde duro */
+.tl-status{border:none;background:rgba(0,0,0,.05);color:#3a3a3c}
+.tl-status.pendiente{background:rgba(255,159,10,.15);color:#c07000;border:none}
+.tl-status.llego{background:rgba(52,199,89,.15);color:#1e7b34;border:none}
+.tl-del{border:none;background:rgba(0,0,0,.04)}
+
+/* Empty states */
+.empty-state{color:#8e8e93;font-size:14px}
 </style>
 </head>
 <body>
