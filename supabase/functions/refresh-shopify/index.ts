@@ -146,6 +146,7 @@ async function fetchCatalog(token: string) {
                     title
                     price
                     inventoryItem {
+                      unitCost { amount }
                       inventoryLevels(first: 10) {
                         edges { node { quantities(names: ["available"]) { name quantity } } }
                       }
@@ -161,7 +162,7 @@ async function fetchCatalog(token: string) {
     const conn = data.products;
     for (const e of conn.edges) {
       const n = e.node;
-      const sizeMap: Record<string, { available: number; price?: number }> = {};
+      const sizeMap: Record<string, { available: number; price?: number; cost?: number }> = {};
       for (const ve of n.variants.edges) {
         const v = ve.node;
         let avail = 0;
@@ -170,11 +171,13 @@ async function fetchCatalog(token: string) {
           if (q) avail += q.quantity || 0;
         }
         const price = v.price ? parseFloat(v.price) : undefined;
-        if (!sizeMap[v.title]) sizeMap[v.title] = { available: 0, price };
+        const cost = v.inventoryItem?.unitCost?.amount ? parseFloat(v.inventoryItem.unitCost.amount) : undefined;
+        if (!sizeMap[v.title]) sizeMap[v.title] = { available: 0, price, cost };
         sizeMap[v.title].available += avail;
         if (price && !sizeMap[v.title].price) sizeMap[v.title].price = price;
+        if (cost && !sizeMap[v.title].cost) sizeMap[v.title].cost = cost;
       }
-      const sizes = Object.entries(sizeMap).map(([size, v]) => ({ size, available: v.available, price: v.price }));
+      const sizes = Object.entries(sizeMap).map(([size, v]) => ({ size, available: v.available, price: v.price, cost: v.cost }));
       const total = sizes.reduce((s, x) => s + x.available, 0);
       products.push({
         gid: n.id, title: n.title, total,

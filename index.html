@@ -216,8 +216,10 @@ header{border-bottom:1px solid var(--black);padding-bottom:24px;margin-bottom:64
 .pk-num{font-family:'Cormorant Garamond',serif;font-weight:700;font-size:42px;line-height:.95;color:var(--black);letter-spacing:-.01em;display:flex;align-items:baseline;gap:6px}
 .pk-num span:first-child{font-variant-numeric:tabular-nums}
 .pk-unit{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.14em;color:var(--grey);text-transform:uppercase;font-weight:500}
-.pk-cost{font-family:'JetBrains Mono',monospace;font-size:10.5px;color:var(--rosa-deep);margin-top:8px;letter-spacing:.03em;font-weight:500}
-.pk-cost.zero{color:var(--grey)}
+.pk-cost{margin-top:8px;display:flex;flex-direction:column;gap:2px}
+.pk-cost.zero{opacity:.5}
+.pk-cost-line{font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--grey);letter-spacing:.03em;font-weight:500}
+.pk-pvp-line{font-family:'JetBrains Mono',monospace;font-size:10.5px;color:var(--rosa-deep);letter-spacing:.03em;font-weight:600}
 @media (max-width:640px){
   .prod-kpis{grid-template-columns:repeat(2,1fr);gap:10px}
   .prod-kpi{padding:14px 12px}
@@ -482,6 +484,68 @@ body{padding-top:env(safe-area-inset-top);padding-bottom:env(safe-area-inset-bot
   /* Typography display IG-style */
   h1,h2{font-family:'Cormorant Garamond',serif;font-weight:700}
 }
+/* ═══════════════ APPLE POLISH · pase de diseño estilo iOS ═══════════════
+   Superficie limpia, radios continuos, sin bordes negros duros, tipografía
+   del sistema para UI (serif Cormorant queda solo en números hero y logo). */
+
+/* Tipografía base del sistema (los elementos con font-family propio no cambian) */
+body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text','Outfit',sans-serif}
+
+/* Section titles → iOS large title (sin subrayado duro) */
+.section-title{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','Outfit',sans-serif;font-style:normal;font-weight:700;font-size:26px;letter-spacing:-.02em;border-bottom:none;padding-bottom:2px}
+.section-title .meta{font-family:-apple-system,sans-serif;font-size:12px;letter-spacing:0;text-transform:none;font-weight:400;color:#8e8e93}
+
+/* Modales → cards flotantes iOS */
+.modal{border:none;border-radius:24px;background:#fff;box-shadow:0 8px 20px rgba(0,0,0,.08),0 24px 60px rgba(0,0,0,.18);padding:28px 24px}
+.modal h3{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display',sans-serif;font-style:normal;font-weight:700;font-size:22px;letter-spacing:-.01em}
+.modal .modal-meta{font-family:-apple-system,sans-serif;font-size:12px;letter-spacing:0;text-transform:none;color:#8e8e93;font-weight:500}
+.modal p{color:#6e6e73;font-size:13.5px}
+.modal label{font-family:-apple-system,sans-serif;font-size:12px;letter-spacing:0;text-transform:none;font-weight:600;color:#6e6e73}
+.modal input,.modal select{border:none;border-radius:12px;background:#f2f2f0;font-family:-apple-system,sans-serif;font-size:15px;padding:12px 14px;transition:box-shadow .15s ease}
+.modal input:focus,.modal select:focus{border:none;box-shadow:0 0 0 3px rgba(212,132,142,.35);background:#fff}
+.curve-inputs .ci input{border:none;border-radius:10px;background:#f2f2f0}
+.curve-inputs .ci input:focus{border:none;box-shadow:0 0 0 3px rgba(212,132,142,.35);background:#fff}
+
+/* Botones → pills iOS */
+.modal-btn{border:none;border-radius:999px;background:rgba(0,0,0,.05);color:var(--black);font-family:-apple-system,sans-serif;font-size:14px;font-weight:600;letter-spacing:0;text-transform:none;padding:11px 20px;transition:background .15s ease}
+.modal-btn:hover{background:rgba(0,0,0,.1);color:var(--black)}
+.modal-btn.primary{background:var(--rosa-deep);color:#fff}
+.modal-btn.primary:hover{background:#bf6e78;color:#fff}
+.new-week-btn{border:none;border-radius:999px;background:rgba(212,132,142,.12);color:var(--rosa-deep);font-family:-apple-system,sans-serif;font-size:13px;font-weight:600;letter-spacing:0;text-transform:none;padding:9px 16px;transition:background .15s ease}
+.new-week-btn:hover{background:rgba(212,132,142,.2);color:var(--rosa-deep)}
+#addEntryBtn{background:rgba(0,0,0,.05)!important;color:var(--black)!important;border:none!important}
+#addEntryBtn:hover{background:rgba(0,0,0,.1)!important}
+
+/* Login → inputs suaves y botón pill */
+#loginEmail,#loginCode{border:none;border-radius:14px;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.08);font-size:16px;padding:15px 16px}
+#loginEmail:focus,#loginCode:focus{box-shadow:0 0 0 3px rgba(212,132,142,.35)}
+#loginBtn,#loginVerifyBtn{border-radius:999px;font-family:-apple-system,sans-serif;font-size:15px;font-weight:600;letter-spacing:0;text-transform:none;background:var(--black)}
+#loginBtn:hover:not(:disabled),#loginVerifyBtn:hover:not(:disabled){background:var(--rosa-deep)}
+.login-help{color:#6e6e73}
+
+/* Footer sin borde duro */
+.footer{border-top:none;font-family:-apple-system,sans-serif;font-size:11px;letter-spacing:.02em;text-transform:none;color:#aeaeb2}
+
+/* Labels mono → sistema, menos agresivos */
+.pk-label,.fa-kpi-label,.ptb-label,.slb-label,.fa-top-head,.fa-filters-head,.variants-head{font-family:-apple-system,sans-serif;letter-spacing:.04em;font-weight:600;color:#8e8e93}
+
+/* Timeline rows y cards → radios más generosos, sin hard borders */
+.tl-row{border-radius:18px;border-color:rgba(0,0,0,.04)}
+.tl-status{border-radius:999px;font-family:-apple-system,sans-serif;font-size:12px;font-weight:600;letter-spacing:0;text-transform:none;border-color:rgba(0,0,0,.15)}
+.tl-type{font-family:-apple-system,sans-serif;font-weight:600;letter-spacing:.02em}
+.tl-batch{border:1px solid rgba(212,132,142,.15);border-radius:20px}
+
+/* Hub tiles ya son apple — refinar sombra */
+.hub-tile{box-shadow:0 1px 2px rgba(0,0,0,.03),0 6px 20px rgba(0,0,0,.05)}
+.hub-tile:active{transform:scale(.98)}
+
+/* KPI números → SF rounded feel */
+.pk-num,.fa-kpi-num{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display',sans-serif;font-weight:700;letter-spacing:-.03em;font-size:38px}
+.pk-unit{font-family:-apple-system,sans-serif;font-weight:500;letter-spacing:.02em;text-transform:lowercase}
+
+/* Chips proveedor → segmented feel */
+.sup-chip{font-family:-apple-system,sans-serif;box-shadow:0 1px 2px rgba(0,0,0,.03)}
+.fa-chip{font-family:-apple-system,sans-serif}
 </style>
 </head>
 <body>
@@ -2007,20 +2071,53 @@ function renderPipeline(){
   const in7d = new Date(Date.now() - 5*60*60*1000 + 7*24*60*60*1000).toISOString().slice(0,10);
   const in30d = new Date(Date.now() - 5*60*60*1000 + 30*24*60*60*1000).toISOString().slice(0,10);
 
-  // ─── 1) Stock actual · TOTAL jean stock (no depende de supplier) ────
-  let stockUnits = 0, stockCost = 0;
-  if (Array.isArray(catalog) && catalog.length){
-    catalog.forEach(p => {
-      const t = (p.title || '').toUpperCase();
-      if (!t.startsWith('JEAN')) return;
-      const stock = Math.max(0, p.total ?? 0);
-      stockUnits += stock;
-      // Costo estimado del stock actual: usá el default global (no atado a lote)
-      stockCost += stock * DEFAULT_COST_COP;
-    });
+  // Precio/costo por producto del catálogo (Shopify)
+  // price = PVP de la primera talla con precio; cost = costo registrado en Shopify
+  const productPrice = p => {
+    if (!Array.isArray(p.sizes)) return 0;
+    const s = p.sizes.find(x => x.price > 0);
+    return s ? Number(s.price) : 0;
+  };
+  const productCost = p => {
+    if (!Array.isArray(p.sizes)) return 0;
+    const s = p.sizes.find(x => x.cost > 0);
+    return s ? Number(s.cost) : 0;
+  };
+  // PVP promedio de jeans (para estimar PVP de producción sin producto en Shopify aún)
+  let avgJeanPrice = 0;
+  {
+    const prices = (catalog || []).filter(p => (p.title||'').toUpperCase().startsWith('JEAN')).map(productPrice).filter(v => v > 0);
+    if (prices.length) avgJeanPrice = prices.reduce((a,b) => a+b, 0) / prices.length;
   }
-  // ─── 2) En producción (no entregado) ────────────────────────────────
-  let prodUnits = 0, prodCost = 0;
+  // Busca el producto Shopify que corresponde a una entry de producción
+  const matchCatalog = (e) => {
+    if (e.product_gid) { const m = (catalog||[]).find(p => p.gid === e.product_gid); if (m) return m; }
+    const name = (e.product_name || e.name || '').toLowerCase();
+    if (!name) return null;
+    return (catalog||[]).find(p => (p.title||'').toLowerCase() === name) || null;
+  };
+
+  // ─── 1) Stock actual · costo Shopify + PVP total ────────────────────
+  let stockUnits = 0, stockCost = 0, stockPVP = 0;
+  (catalog || []).forEach(p => {
+    const t = (p.title || '').toUpperCase();
+    if (!t.startsWith('JEAN')) return;
+    if (!Array.isArray(p.sizes)) return;
+    p.sizes.forEach(sz => {
+      const qty = Math.max(0, sz.available ?? 0);
+      if (!qty) return;
+      stockUnits += qty;
+      stockCost  += qty * (Number(sz.cost)  || 0);
+      stockPVP   += qty * (Number(sz.price) || 0);
+    });
+  });
+  // ─── 2) En producción · costo proveedor + PVP estimado ──────────────
+  let prodUnits = 0, prodCost = 0, prodPVP = 0;
+  const pvpOf = (e, qty) => {
+    const m = matchCatalog(e);
+    const price = m ? productPrice(m) : avgJeanPrice;
+    return qty * (price || avgJeanPrice || 0);
+  };
   filteredBatches.forEach(b => {
     const vars = variantsByBatch[b.id] || [];
     const allDelivered = vars.length > 0 && vars.every(v => v.stage === 'entrega');
@@ -2028,6 +2125,7 @@ function renderPipeline(){
       const q = b.total_quantity || 0;
       prodUnits += q;
       prodCost  += q * effectiveCost(b, b.supplier_id);
+      prodPVP   += pvpOf({ product_name: b.name }, q);
     }
   });
   standalone.forEach(e => {
@@ -2036,43 +2134,49 @@ function renderPipeline(){
       const q = e.quantity || 0;
       prodUnits += q;
       prodCost  += q * effectiveCost(e, e.supplier_id);
+      prodPVP   += pvpOf(e, q);
     }
   });
-  // ─── 3) Entrega próxima semana (tentative_date ≤ hoy + 7d) ──────────
-  // ─── 4) Entrega próximo mes (tentative_date ≤ hoy + 30d) ────────────
-  let weekUnits = 0, weekCost = 0, monthUnits = 0, monthCost = 0;
-  const addToWindow = (date, qty, cost) => {
+  // ─── 3+4) Entregas próximas (7d / 30d) ──────────────────────────────
+  let weekUnits = 0, weekCost = 0, weekPVP = 0, monthUnits = 0, monthCost = 0, monthPVP = 0;
+  const addToWindow = (date, qty, cost, pvp) => {
     if (!date) return;
-    if (date >= nowStr && date <= in7d)  { weekUnits  += qty; weekCost  += cost; }
-    if (date >= nowStr && date <= in30d) { monthUnits += qty; monthCost += cost; }
+    if (date >= nowStr && date <= in7d)  { weekUnits  += qty; weekCost  += cost; weekPVP  += pvp; }
+    if (date >= nowStr && date <= in30d) { monthUnits += qty; monthCost += cost; monthPVP += pvp; }
   };
   filteredBatches.forEach(b => {
     const vars = variantsByBatch[b.id] || [];
     const allDelivered = vars.length > 0 && vars.every(v => v.stage === 'entrega');
     if (!allDelivered){
       const q = b.total_quantity || 0;
-      addToWindow(b.tentative_date, q, q * effectiveCost(b, b.supplier_id));
+      addToWindow(b.tentative_date, q, q * effectiveCost(b, b.supplier_id), pvpOf({ product_name: b.name }, q));
     }
   });
   standalone.forEach(e => {
     const delivered = e.stage === 'entrega' || e.status === 'llego';
     if (!delivered){
       const q = e.quantity || 0;
-      addToWindow(e.tentative_date, q, q * effectiveCost(e, e.supplier_id));
+      addToWindow(e.tentative_date, q, q * effectiveCost(e, e.supplier_id), pvpOf(e, q));
     }
   });
 
-  // Render KPIs
-  const setKPI = (n, c, el1, el2) => {
+  // Render KPIs · dos líneas: Costo + PVP
+  const setKPI = (n, cost, pvp, el1, el2) => {
     const numEl = document.getElementById(el1);
     const costEl = document.getElementById(el2);
     if (numEl)  numEl.textContent  = (n || 0).toLocaleString('es-CO');
-    if (costEl){ costEl.textContent = fmtCOP(c); costEl.classList.toggle('zero', !c); }
+    if (costEl){
+      const bits = [];
+      bits.push(`<span class="pk-cost-line">Costo ${cost ? fmtCOP(cost) : '—'}</span>`);
+      bits.push(`<span class="pk-pvp-line">PVP ${pvp ? fmtCOP(pvp) : '—'}</span>`);
+      costEl.innerHTML = bits.join('');
+      costEl.classList.toggle('zero', !cost && !pvp);
+    }
   };
-  setKPI(stockUnits, stockCost, 'kpiStockNum', 'kpiStockCost');
-  setKPI(prodUnits,  prodCost,  'kpiProdNum',  'kpiProdCost');
-  setKPI(weekUnits,  weekCost,  'kpiWeekNum',  'kpiWeekCost');
-  setKPI(monthUnits, monthCost, 'kpiMonthNum', 'kpiMonthCost');
+  setKPI(stockUnits, stockCost, stockPVP, 'kpiStockNum', 'kpiStockCost');
+  setKPI(prodUnits,  prodCost,  prodPVP,  'kpiProdNum',  'kpiProdCost');
+  setKPI(weekUnits,  weekCost,  weekPVP,  'kpiWeekNum',  'kpiWeekCost');
+  setKPI(monthUnits, monthCost, monthPVP, 'kpiMonthNum', 'kpiMonthCost');
 
   if (!filteredPipeline.length && !filteredBatches.length){
     el.innerHTML = `<div class="empty-state">${currentSupplierId ? 'Este proveedor no tiene nada en producción.' : 'Sin entradas. Click "+ Nuevo lote" o "+ Jean suelto".'}</div>`;
