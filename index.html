@@ -591,6 +591,18 @@ html,body{background:#edebe6}
 /* Empty states */
 .empty-state{color:#8e8e93;font-size:14px}
 
+/* ═══ TAB BAR estilo WhatsApp · hub ═══ */
+.hub-tabbar{position:fixed;bottom:0;left:0;right:0;z-index:120;display:flex;justify-content:space-around;align-items:center;background:rgba(255,255,255,.94);backdrop-filter:saturate(180%) blur(24px);-webkit-backdrop-filter:saturate(180%) blur(24px);border-top:1px solid rgba(0,0,0,.06);padding:8px 8px calc(8px + env(safe-area-inset-bottom));box-shadow:0 -1px 0 rgba(0,0,0,.04)}
+.ht-tab{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;background:transparent;border:none;color:#8e8e93;font-size:11px;font-weight:500;cursor:pointer;padding:4px 2px;-webkit-tap-highlight-color:transparent}
+.ht-tab .vt-ico{font-size:22px;line-height:1.2;padding:4px 18px;border-radius:999px;transition:background .2s ease}
+.ht-tab .vt-lbl{font-size:11px;line-height:1.2}
+.ht-tab.active{color:var(--black);font-weight:600}
+.ht-tab.active .vt-ico{background:var(--rosa)}
+.ht-tab:active{opacity:.6}
+.wrap{padding-bottom:130px}
+.hub-section{padding-bottom:calc(env(safe-area-inset-bottom) + 140px) !important}
+.footer{padding-bottom:110px}
+
 /* Saludo por hora en el header */
 .greeting{font-size:15px;color:#8e8e93;font-weight:500;margin-top:4px;letter-spacing:-.01em;min-height:20px}
 .greeting b{color:var(--black);font-weight:600}
@@ -765,6 +777,14 @@ html,body{background:#edebe6}
     <div class="prod-status" id="prodStatus"><div class="empty-state">Cargando catálogo…</div></div>
   </section>
 </div>
+
+<!-- TAB BAR estilo WhatsApp · navegación principal del hub -->
+<nav class="hub-tabbar" id="hubTabbar">
+  <button class="ht-tab active" data-ht="home"><span class="vt-ico">🏠</span><span class="vt-lbl">Inicio</span></button>
+  <button class="ht-tab" data-ht="marketing"><span class="vt-ico">📅</span><span class="vt-lbl">Marketing</span></button>
+  <button class="ht-tab" data-ht="produccion"><span class="vt-ico">🚚</span><span class="vt-lbl">Producción</span></button>
+  <button class="ht-tab" data-ht="fashionalytics"><span class="vt-ico">📊</span><span class="vt-lbl">Analytics</span></button>
+</nav>
 
 <footer class="footer">
   LUXUR Content Operations
@@ -1192,6 +1212,9 @@ async function enterApp(){
 // === HUB NAVEGACIÓN tipo iOS · slide-in desde la derecha ===
 const HUB_SECTIONS = { marketing: 'hubMarketing', produccion: 'hubProduccion', fashionalytics: 'hubFashionalytics' };
 function showHubSection(name){
+  // Sync del tab bar
+  const activeTab = (name && HUB_SECTIONS[name]) ? name : 'home';
+  document.querySelectorAll('.ht-tab').forEach(t => t.classList.toggle('active', t.getAttribute('data-ht') === activeTab));
   // Cerrar todas
   Object.values(HUB_SECTIONS).forEach(id => {
     const el = document.getElementById(id);
@@ -1214,6 +1237,8 @@ function showHubSection(name){
   location.hash = name;
 }
 document.addEventListener('click', e => {
+  const htab = e.target.closest('.ht-tab');
+  if (htab){ showHubSection(htab.getAttribute('data-ht')); return; }
   const tile = e.target.closest('[data-section]');
   if (tile){ showHubSection(tile.getAttribute('data-section')); return; }
   const back = e.target.closest('[data-hub-back]');

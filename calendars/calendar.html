@@ -664,6 +664,18 @@ html,body{background:#edebe6}
 
 /* Botones de estado en pill limpio */
 .pm-status-toggle button,.pm-approve-btn{border-radius:999px;font-weight:600;letter-spacing:0;text-transform:none;font-size:13px}
+
+/* ═══ TAB BAR estilo WhatsApp (universal, desktop y mobile) ═══ */
+#kanbanView{display:none !important} /* Kanban eliminado del producto */
+.view-nav{position:fixed !important;bottom:0;left:0;right:0;z-index:60;display:flex !important;justify-content:space-around;align-items:center;gap:0 !important;margin:0 !important;border:none !important;border-top:1px solid rgba(0,0,0,.06) !important;background:rgba(255,255,255,.94) !important;backdrop-filter:saturate(180%) blur(24px) !important;-webkit-backdrop-filter:saturate(180%) blur(24px) !important;padding:8px 8px calc(8px + env(safe-area-inset-bottom)) !important;box-shadow:0 -1px 0 rgba(0,0,0,.04)}
+.view-nav .view-tab{flex:1;display:flex !important;flex-direction:column;align-items:center;justify-content:center;gap:2px;border:none !important;background:transparent !important;padding:4px 2px !important;text-decoration:none;color:#8e8e93 !important;font-size:11px !important;font-weight:500 !important;text-transform:none !important;letter-spacing:0 !important;min-height:auto !important;margin:0 !important;transform:none !important}
+.view-nav .vt-ico{font-size:22px;line-height:1.2;padding:4px 18px;border-radius:999px;transition:background .2s ease}
+.view-nav .vt-lbl{font-size:11px;line-height:1.2}
+.view-nav .view-tab.active{color:var(--black) !important;font-weight:600 !important}
+.view-nav .view-tab.active .vt-ico{background:var(--rosa)}
+.view-nav .view-tab.active::before{display:none !important}
+.view-nav .fab-add{width:54px;height:54px;font-size:26px;margin:-26px 6px 0 !important;border:4px solid #fff !important;flex:0 0 auto !important;box-shadow:0 6px 18px rgba(212,132,142,.5),0 2px 6px rgba(0,0,0,.12) !important}
+.container{padding-bottom:130px !important}
 </style>
 </head>
 <body>
@@ -742,26 +754,29 @@ html,body{background:#edebe6}
     </div>
   </div>
 
-  <!-- VIEW NAV -->
+  <!-- VIEW NAV · tab bar estilo WhatsApp: icono arriba + label abajo.
+       Semana ya no vive acá (vista alterna desde Hoy). Kanban eliminado. -->
   <div class="view-nav">
-    <button class="view-tab active" data-view="today">⭐ Hoy</button>
-    <button class="view-tab" data-view="calendar">📅 Semana</button>
+    <a class="view-tab vt-home" href="../index.html?stay=1"><span class="vt-ico">🏠</span><span class="vt-lbl">Inicio</span></a>
+    <button class="view-tab active" data-view="today"><span class="vt-ico">⭐</span><span class="vt-lbl">Hoy</span></button>
     <button class="fab-add" id="fabAdd" aria-label="Agregar pieza" title="Agregar pieza">+</button>
-    <button class="view-tab" data-view="kanban">📋 Kanban</button>
-    <button class="view-tab" data-view="inventory">📦 Inventario</button>
+    <button class="view-tab" data-view="inventory"><span class="vt-ico">📦</span><span class="vt-lbl">Inventario</span></button>
   </div>
 
   <!-- VISTA HOY · piezas filtradas por día (swipe horizontal pa cambiar) -->
   <div id="todayView">
     <div class="today-head">
       <h2 class="today-title" id="todayTitle">Hoy</h2>
-      <button class="today-jump" data-jump-week>Ver semana completa →</button>
+      <button class="today-jump" data-jump-week>📅 Ver semana</button>
     </div>
     <div class="today-day-nav" id="todayDayNav" title="Swipe para navegar días"></div>
     <div id="todayList" class="today-list"></div>
   </div>
 
   <div id="calendarView" style="display:none">
+
+  <!-- Volver a Hoy (Semana es vista alterna, no tab) -->
+  <button class="today-jump" data-back-today style="margin-bottom:16px">← Volver a Hoy</button>
 
   <!-- ALERTA DE SEMANA (lanzamientos / llegadas / fotos) -->
   <div id="weekAlerts"></div>
@@ -2525,6 +2540,8 @@ document.addEventListener('keydown', e => {
 });
 
 // "Ver semana completa" en la vista HOY
+const backTodayBtn = document.querySelector('[data-back-today]');
+if (backTodayBtn){ backTodayBtn.addEventListener('click', () => switchView('today')); }
 const jumpWeekBtn = document.querySelector('[data-jump-week]');
 if (jumpWeekBtn){
   jumpWeekBtn.addEventListener('click', () => switchView('calendar'));
@@ -2559,8 +2576,8 @@ if (mineToggleBtn){
   });
 }
 
-// View tabs
-document.querySelectorAll('.view-tab').forEach(tab => {
+// View tabs (el tab Inicio es un <a> sin data-view — navega al hub, no switchea)
+document.querySelectorAll('.view-tab[data-view]').forEach(tab => {
   tab.addEventListener('click', () => switchView(tab.getAttribute('data-view')));
 });
 
