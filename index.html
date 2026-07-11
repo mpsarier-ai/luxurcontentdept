@@ -591,8 +591,8 @@ html,body{background:#edebe6}
 /* Empty states */
 .empty-state{color:#8e8e93;font-size:14px}
 
-/* ═══ TAB BAR estilo WhatsApp · hub ═══ */
-.hub-tabbar{position:fixed;bottom:0;left:0;right:0;z-index:120;display:flex;justify-content:space-around;align-items:center;background:rgba(255,255,255,.94);backdrop-filter:saturate(180%) blur(24px);-webkit-backdrop-filter:saturate(180%) blur(24px);border-top:1px solid rgba(0,0,0,.06);padding:8px 8px calc(8px + env(safe-area-inset-bottom));box-shadow:0 -1px 0 rgba(0,0,0,.04)}
+/* ═══ TAB BAR · pill flotante Liquid Glass (iOS 26) ═══ */
+.hub-tabbar{position:fixed;left:16px;right:16px;bottom:calc(12px + env(safe-area-inset-bottom));z-index:120;display:flex;justify-content:space-around;align-items:center;border-radius:999px;background:rgba(255,255,255,.55);backdrop-filter:saturate(200%) blur(28px);-webkit-backdrop-filter:saturate(200%) blur(28px);border:1px solid rgba(255,255,255,.65);box-shadow:0 12px 36px rgba(0,0,0,.14),0 2px 8px rgba(0,0,0,.06),inset 0 1px 0 rgba(255,255,255,.85);padding:7px 10px;max-width:480px;margin:0 auto}
 .ht-tab{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;background:transparent;border:none;color:#8e8e93;font-size:11px;font-weight:500;cursor:pointer;padding:4px 2px;-webkit-tap-highlight-color:transparent}
 .ht-tab .vt-ico{font-size:22px;line-height:1.2;padding:4px 18px;border-radius:999px;transition:background .2s ease}
 .ht-tab .vt-lbl{font-size:11px;line-height:1.2}
@@ -602,6 +602,28 @@ html,body{background:#edebe6}
 .wrap{padding-bottom:130px}
 .hub-section{padding-bottom:calc(env(safe-area-inset-bottom) + 140px) !important}
 .footer{padding-bottom:110px}
+
+/* ═══ HUB BRIEF · tus tareas del día ═══ */
+.hub-brief{display:flex;flex-direction:column;gap:2px;animation:llFadeUp .4s cubic-bezier(.16,1,.3,1) both}
+.brief-date{font-size:13px;color:#8e8e93;font-weight:500;margin-bottom:2px;text-transform:capitalize}
+.brief-title{font-size:20px;font-weight:700;letter-spacing:-.02em;color:var(--black);margin:18px 0 10px}
+.brief-list{display:flex;flex-direction:column;gap:1px;background:#fff;border-radius:16px;overflow:hidden;box-shadow:0 1px 3px rgba(0,0,0,.05)}
+.brief-row{display:flex;align-items:center;gap:12px;padding:14px 16px;background:#fff;border:none;width:100%;text-align:left;cursor:pointer;text-decoration:none;color:var(--black);border-bottom:1px solid rgba(0,0,0,.045)}
+.brief-row:last-child{border-bottom:none}
+.brief-row:active{background:rgba(0,0,0,.03)}
+.brief-ico{font-size:20px;flex-shrink:0;width:28px;text-align:center}
+.brief-body{flex:1;min-width:0}
+.brief-row-title{font-size:15px;font-weight:500;line-height:1.3;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.brief-row-sub{font-size:12.5px;color:#8e8e93;margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.brief-chip{flex-shrink:0;font-size:11px;font-weight:600;padding:4px 10px;border-radius:999px}
+.brief-chip.pendiente{background:rgba(255,159,10,.15);color:#c07000}
+.brief-chip.listo{background:rgba(52,199,89,.15);color:#1e7b34}
+.brief-chip.aprobado{background:rgba(212,132,142,.18);color:#a8515c}
+.brief-arrow{color:#c7c7cc;font-size:16px;flex-shrink:0}
+.brief-empty{padding:18px 16px;color:#8e8e93;font-size:14px;text-align:center}
+.brief-empty.done{color:#1e7b34}
+.brief-wa{display:flex;align-items:center;justify-content:center;gap:8px;margin-top:22px;padding:13px;background:rgba(37,211,102,.12);color:#128c4b;border-radius:999px;text-decoration:none;font-size:14px;font-weight:600}
+.brief-wa:active{opacity:.7}
 
 /* Saludo por hora en el header */
 .greeting{font-size:15px;color:#8e8e93;font-weight:500;margin-top:4px;letter-spacing:-.01em;min-height:20px}
@@ -669,40 +691,22 @@ html,body{background:#edebe6}
     <button class="signout-btn" id="signOutBtn">Salir</button>
   </div>
 
-  <!-- HUB HOME · 4 tiles departamento -->
-  <section id="hubHome" class="hub-tiles">
-    <a class="hub-tile whatsapp" href="https://chat.whatsapp.com/GCmEivfGHfxL9NwWcES7IF?mode=gi_t" target="_blank" rel="noopener">
-      <div class="hub-tile-icon">💬</div>
-      <div class="hub-tile-body">
-        <div class="hub-tile-title">WhatsApp</div>
-        <div class="hub-tile-sub">Grupo del equipo</div>
-      </div>
-      <div class="hub-tile-arrow">↗</div>
-    </a>
-    <button class="hub-tile" data-section="marketing">
-      <div class="hub-tile-icon">📅</div>
-      <div class="hub-tile-body">
-        <div class="hub-tile-title">Marketing Dept</div>
-        <div class="hub-tile-sub">Calendarios y contenido</div>
-      </div>
-      <div class="hub-tile-arrow">›</div>
-    </button>
-    <button class="hub-tile" data-section="produccion">
-      <div class="hub-tile-icon">🚚</div>
-      <div class="hub-tile-body">
-        <div class="hub-tile-title">Producción</div>
-        <div class="hub-tile-sub">Qué llega y cuándo</div>
-      </div>
-      <div class="hub-tile-arrow">›</div>
-    </button>
-    <button class="hub-tile" data-section="fashionalytics">
-      <div class="hub-tile-icon">📊</div>
-      <div class="hub-tile-body">
-        <div class="hub-tile-title">Fashionalytics</div>
-        <div class="hub-tile-sub">Estado de inventario</div>
-      </div>
-      <div class="hub-tile-arrow">›</div>
-    </button>
+  <!-- HUB HOME · brief del día: tus tareas + a tener en cuenta -->
+  <section id="hubHome" class="hub-brief">
+    <div class="brief-date" id="briefDate">—</div>
+
+    <h2 class="brief-title">Tus tareas de hoy</h2>
+    <div id="briefTasks" class="brief-list"><div class="brief-empty">Cargando…</div></div>
+
+    <div id="briefApprovalsWrap" hidden>
+      <h2 class="brief-title">Para aprobar</h2>
+      <div id="briefApprovals" class="brief-list"></div>
+    </div>
+
+    <h2 class="brief-title">A tener en cuenta</h2>
+    <div id="briefAlerts" class="brief-list"><div class="brief-empty">Cargando…</div></div>
+
+    <a class="brief-wa" href="https://chat.whatsapp.com/GCmEivfGHfxL9NwWcES7IF?mode=gi_t" target="_blank" rel="noopener">💬 Grupo del equipo <span>↗</span></a>
   </section>
 
   <!-- MARKETING DEPT · calendarios -->
@@ -1168,6 +1172,103 @@ async function setGreeting(u){
   el.innerHTML = pool[idx];
 }
 
+// === HUB BRIEF · tus tareas de hoy + a tener en cuenta ===
+async function loadDailyBrief(){
+  const elT = document.getElementById('briefTasks');
+  if (!elT || !user) return;
+  const now = new Date(Date.now() - 5*60*60*1000); // Bogotá UTC-5
+  const DOWF = ['domingo','lunes','martes','miércoles','jueves','viernes','sábado'];
+  const MESF = ['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'];
+  const dEl = document.getElementById('briefDate');
+  if (dEl) dEl.textContent = `${DOWF[now.getUTCDay()]} ${now.getUTCDate()} de ${MESF[now.getUTCMonth()]}`;
+  const todayISO = now.toISOString().slice(0,10);
+  const dayKey = `${DOW_ABBR[now.getUTCDay()]} ${now.getUTCDate()}`;
+  // Calendario de esta semana
+  const { data: cal } = await supabase.from('calendars').select('id')
+    .lte('start_date', todayISO).gte('end_date', todayISO)
+    .order('start_date', { ascending: false }).limit(1).maybeSingle();
+  if (!cal){ elT.innerHTML = '<div class="brief-empty">No hay calendario activo esta semana</div>'; renderBriefAlerts(); return; }
+  const link = p => `calendars/calendar.html?id=${encodeURIComponent(cal.id)}&piece=${encodeURIComponent(p.id)}`;
+  const typeIco = t => {
+    const s = (t||'').toLowerCase();
+    if (s.includes('reel')) return '🎬';
+    if (s.includes('stories')) return '⚡';
+    if (s.includes('tiktok')) return '🎵';
+    if (s.includes('post')) return '🖼️';
+    return '📌';
+  };
+  // Mis tareas de HOY
+  const { data: pieces } = await supabase.from('calendar_pieces')
+    .select('id,day,type,title,assignee,status,approved')
+    .eq('calendar_id', cal.id).eq('day', dayKey).order('position');
+  const mine = (pieces||[]).filter(p => (p.assignee||'').toLowerCase() === user.email.toLowerCase());
+  if (!mine.length){
+    elT.innerHTML = '<div class="brief-empty done">✓ Sin tareas asignadas hoy</div>';
+  } else {
+    elT.innerHTML = mine.map(p => `<a class="brief-row" href="${link(p)}">
+      <span class="brief-ico">${typeIco(p.type)}</span>
+      <span class="brief-body"><span class="brief-row-title">${escapeHtml(p.title||p.type)}</span><span class="brief-row-sub">${escapeHtml(p.type||'')}</span></span>
+      <span class="brief-chip ${p.approved?'aprobado':(p.status==='listo'?'listo':'pendiente')}">${p.approved?'Aprobado':(p.status==='listo'?'Listo':'Pendiente')}</span>
+    </a>`).join('');
+  }
+  // "Para aprobar" — solo leads, toda la semana
+  try {
+    const { data: tm } = await supabase.from('team_members').select('role').eq('email', user.email.toLowerCase()).maybeSingle();
+    const wrap = document.getElementById('briefApprovalsWrap');
+    const elA = document.getElementById('briefApprovals');
+    if (tm && (tm.role === 'lead' || tm.role === 'admin') && wrap && elA){
+      const { data: toApprove } = await supabase.from('calendar_pieces')
+        .select('id,day,type,title,assignee')
+        .eq('calendar_id', cal.id).eq('status', 'listo').eq('approved', false)
+        .order('position').limit(6);
+      if (toApprove && toApprove.length){
+        const { data: team } = await supabase.from('team_members').select('email,name');
+        const nameOf = em => { const t = (team||[]).find(x => x.email.toLowerCase() === (em||'').toLowerCase()); return t ? t.name.split(' ')[0] : (em||'').split('@')[0]; };
+        wrap.hidden = false;
+        elA.innerHTML = toApprove.map(p => `<a class="brief-row" href="${link(p)}">
+          <span class="brief-ico">☑️</span>
+          <span class="brief-body"><span class="brief-row-title">${escapeHtml(p.title||p.type)}</span><span class="brief-row-sub">${escapeHtml(p.day)} · ${escapeHtml(nameOf(p.assignee))}</span></span>
+          <span class="brief-arrow">›</span></a>`).join('');
+      } else { wrap.hidden = true; }
+    }
+  } catch(_) {}
+  renderBriefAlerts();
+}
+
+// Alertas del brief · derivadas de catalog + pipeline + batches (globals ya cargados)
+function renderBriefAlerts(){
+  const el = document.getElementById('briefAlerts');
+  if (!el) return;
+  const rows = [];
+  const nowStr = new Date(Date.now()-5*60*60*1000).toISOString().slice(0,10);
+  const in7 = new Date(Date.now()-5*60*60*1000+7*86400000).toISOString().slice(0,10);
+  // Inventario crítico (mismo criterio que Fashionalytics)
+  const jeans = (catalog||[]).filter(p => (p.title||'').toUpperCase().startsWith('JEAN'));
+  const u30of = p => p.units30d_native ?? p.units30d_manual ?? p.units30d ?? 0;
+  const meds = jeans.map(u30of).filter(v => v > 0).sort((a,b) => a-b);
+  const med = meds.length ? meds[Math.floor(meds.length/2)] : 5;
+  const MIN = Math.max(5, Math.round(med*0.4));
+  jeans.filter(p => (p.total??0) <= 0 && u30of(p) >= MIN).slice(0,2)
+    .forEach(p => rows.push({ ico:'🚨', t:`${shortNameFa(p.title)} agotado`, s:`vendía ${u30of(p)}u/mes · restock ya`, go:'fashionalytics' }));
+  jeans.filter(p => (p.total??0) > 0 && (p.total??0) <= 5 && u30of(p) >= MIN).slice(0,2)
+    .forEach(p => rows.push({ ico:'🔥', t:`${shortNameFa(p.title)} casi agotado`, s:`quedan ${p.total}u`, go:'fashionalytics' }));
+  // Producción: llegadas de la semana + atrasados
+  const pending = e => !(e.stage === 'entrega' || e.status === 'llego');
+  const fmtD = iso => { const p = iso.split('-'); return `${parseInt(p[2])} ${MONTH_ABBR[parseInt(p[1])-1]}`; };
+  (pipeline||[]).filter(e => !e.batch_id && pending(e) && e.tentative_date && e.tentative_date >= nowStr && e.tentative_date <= in7).slice(0,2)
+    .forEach(e => rows.push({ ico:'🚚', t:`Llega ${e.product_name}`, s:`${fmtD(e.tentative_date)}${e.quantity ? ' · '+e.quantity+'u' : ''}`, go:'produccion' }));
+  (batches||[]).filter(b => b.tentative_date && b.tentative_date >= nowStr && b.tentative_date <= in7).slice(0,2)
+    .forEach(b => rows.push({ ico:'🚚', t:`Llega lote ${b.name}`, s:`${fmtD(b.tentative_date)}${b.total_quantity ? ' · '+b.total_quantity+'u' : ''}`, go:'produccion' }));
+  (pipeline||[]).filter(e => !e.batch_id && pending(e) && e.tentative_date && e.tentative_date < nowStr).slice(0,2)
+    .forEach(e => rows.push({ ico:'⚠️', t:`${e.product_name} atrasado`, s:`era para ${fmtD(e.tentative_date)}`, go:'produccion' }));
+  if (!rows.length){ el.innerHTML = '<div class="brief-empty done">✓ Todo en orden</div>'; return; }
+  el.innerHTML = rows.slice(0,6).map(r => `<button class="brief-row" data-brief-go="${r.go}">
+    <span class="brief-ico">${r.ico}</span>
+    <span class="brief-body"><span class="brief-row-title">${escapeHtml(r.t)}</span><span class="brief-row-sub">${escapeHtml(r.s)}</span></span>
+    <span class="brief-arrow">›</span></button>`).join('');
+  el.querySelectorAll('[data-brief-go]').forEach(b => b.addEventListener('click', () => showHubSection(b.getAttribute('data-brief-go'))));
+}
+
 async function enterApp(){
   hideLogin();
   if (editorList) editorList.textContent = user.email;
@@ -1194,6 +1295,7 @@ async function enterApp(){
     } catch (err) { console.warn('Auto-redirect skipped', err); }
   }
   // Cada loader es independiente — si uno falla, los otros NO se caen
+  loadDailyBrief().catch(e => { console.error('brief failed:', e); });
   await Promise.allSettled([
     loadCalendars().catch(e => { console.error('loadCalendars failed:', e); }),
     loadProductStatus().catch(e => {
@@ -1203,6 +1305,8 @@ async function enterApp(){
     }),
     loadPipeline().catch(e => { console.error('loadPipeline failed:', e); }),
   ]);
+  // Con catálogo + pipeline cargados, refrescá las alertas del brief
+  try { renderBriefAlerts(); } catch(_) {}
   // Si la URL pide una sección específica (#marketing | #produccion | #fashionalytics) la abrimos
   if (['marketing','produccion','fashionalytics'].includes(location.hash.slice(1))){
     showHubSection(location.hash.slice(1));
