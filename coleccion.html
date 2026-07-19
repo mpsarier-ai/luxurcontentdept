@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="es"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#3A3330">
+<title>LUXUR — Plataforma de Colección</title>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600&display=swap" rel="stylesheet">
+<style>
+:root{--crema:#EDEBE6;--rosa:#EDCDCD;--carbon:#3A3330;--gris:#8A817C;--verde:#375E3A;--rojo:#9C2A2A;--amarillo:#F5E6A3;--linea:#D8D0CB;}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,"Helvetica Neue",Helvetica,Arial,sans-serif;font-weight:300;background:var(--crema);color:var(--carbon);line-height:1.45}
+.top{background:var(--carbon);color:#fff;padding:calc(env(safe-area-inset-top) + 14px) 22px 14px;display:flex;align-items:center;gap:18px;position:sticky;top:0;z-index:20;flex-wrap:wrap}
+.logo{font-family:"Montserrat",sans-serif;font-weight:600;letter-spacing:0;font-size:22px}
+.top .sub{font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--rosa)}
+.top .back{color:var(--rosa);text-decoration:none;font-size:13px;margin-right:4px}
+.tabs{margin-left:auto;display:flex;gap:6px;flex-wrap:wrap}
+.tabs button{background:transparent;border:1px solid #55504c;color:#fff;padding:8px 16px;border-radius:20px;font-size:13px;cursor:pointer;font-family:inherit}
+.tabs button.on{background:var(--rosa);color:var(--carbon);border-color:var(--rosa)}
+.wrap{max-width:1180px;margin:0 auto;padding:26px 20px 60px}
+h2{font-weight:400;font-size:14px;letter-spacing:1px;text-transform:uppercase;color:var(--gris);margin-bottom:4px}
+.bar{display:flex;align-items:center;gap:12px;margin-bottom:18px;flex-wrap:wrap}
+.btn{background:var(--carbon);color:#fff;border:none;padding:9px 18px;border-radius:22px;font-size:13px;cursor:pointer;font-family:inherit}
+.btn.rosa{background:var(--rosa);color:var(--carbon)}
+.btn.ghost{background:#fff;color:var(--carbon);border:1px solid var(--linea)}
+.btn.sm{padding:5px 12px;font-size:12px}
+.btn:disabled{opacity:.55;cursor:not-allowed}
+.muted{color:var(--gris);font-size:12px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:18px}
+.rcard{background:#fff;border:1px solid var(--linea);border-radius:14px;overflow:hidden;display:flex;flex-direction:column}
+.rcard .ph{aspect-ratio:3/4;background:var(--crema) center/cover no-repeat;display:flex;align-items:center;justify-content:center;color:var(--gris);font-size:12px;border-bottom:1px solid var(--linea)}
+.thumbs{display:flex;gap:4px;padding:8px 14px 0}
+.thumbs .t{width:44px;height:56px;border-radius:6px;border:1px solid var(--linea);background:var(--crema) center/cover no-repeat}
+.thumbs .lb{font-size:9px;color:var(--gris);text-align:center;line-height:1.1;margin-top:2px}
+.rcard .bd{padding:10px 14px 14px}
+.rcard .cod{font-size:11px;letter-spacing:1px;color:var(--gris);text-transform:uppercase}
+.rcard .nm{font-size:15px;margin:2px 0 6px}
+.rcard .fit{display:inline-block;background:var(--rosa);border-radius:20px;padding:1px 10px;font-size:11px;margin-bottom:8px}
+.spec{font-size:12px;margin:3px 0}.spec b{color:var(--gris);font-weight:400}
+.sizes{display:flex;gap:4px;margin:8px 0}
+.sizes span{background:var(--crema);border:1px solid var(--linea);border-radius:6px;padding:2px 7px;font-size:11px}
+.pr{display:flex;justify-content:space-between;font-size:12px;border-top:1px solid var(--linea);margin-top:8px;padding-top:8px}
+.pr .m{color:var(--verde);font-weight:600}
+.rcard .act{display:flex;gap:6px;padding:0 14px 14px}
+.ov{position:fixed;inset:0;background:rgba(58,51,48,.45);display:none;align-items:flex-start;justify-content:center;z-index:40;overflow:auto;padding:30px 16px}
+.ov.on{display:flex}
+.modal{background:#fff;border-radius:16px;max-width:760px;width:100%;padding:26px 22px}
+.modal h3{font-weight:400;font-size:20px;margin-bottom:16px}
+.form{display:grid;grid-template-columns:1fr 1fr;gap:12px 16px}
+.f{display:flex;flex-direction:column;gap:3px}.f.full{grid-column:1/-1}
+.f label{font-size:11px;text-transform:uppercase;letter-spacing:.5px;color:var(--gris)}
+.f input,.f select,.f textarea{border:1px solid var(--linea);border-radius:8px;padding:8px 10px;font-family:inherit;font-size:13px;font-weight:300}
+.szrow{display:flex;gap:8px}.szrow .f{flex:1}
+.photos{grid-column:1/-1;display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+.drop{border:2px dashed var(--linea);border-radius:12px;padding:10px;text-align:center;color:var(--gris);font-size:11px;cursor:pointer;background:var(--crema);min-height:130px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px}
+.drop.hv{border-color:var(--rosa);background:#fff}
+.drop.main{border-color:var(--rosa)}
+.drop b{font-size:11px;color:var(--carbon)}
+.drop img{max-height:90px;max-width:100%;border-radius:6px}
+.mact{display:flex;justify-content:flex-end;gap:10px;margin-top:20px}
+.ocard{background:#fff;border:1px solid var(--linea);border-radius:14px;padding:18px;margin-bottom:16px}
+.ohead{display:flex;align-items:center;gap:16px;flex-wrap:wrap}.ohead .qn{font-size:17px}
+.dates{display:flex;gap:20px;margin:8px 0;flex-wrap:wrap}.dates div{font-size:12px}.dates b{display:block;font-size:14px}
+table{width:100%;border-collapse:collapse;font-size:12.5px;margin-top:10px}
+th,td{padding:7px 9px;text-align:center;border-bottom:1px solid var(--linea)}
+th:first-child,td:first-child{text-align:left}
+thead th{background:var(--rosa);font-weight:400;text-transform:uppercase;font-size:10px;letter-spacing:.4px}
+tr.tot td{font-weight:700;border-top:2px solid var(--carbon);background:var(--crema)}
+.chip{display:inline-block;background:var(--crema);border:1px solid var(--linea);border-radius:20px;padding:2px 10px;font-size:11px;margin:2px}
+.empty{background:#fff;border:1px dashed var(--linea);border-radius:14px;padding:40px;text-align:center;color:var(--gris)}
+.gate{max-width:420px;margin:80px auto;text-align:center;padding:30px;background:#fff;border-radius:16px;border:1px solid var(--linea)}
+#printArea{display:none}
+@media print{body>*{display:none!important}#printArea{display:block!important}.top,.tabs,.bar{display:none!important}@page{size:A4;margin:12mm}}
+.pline{display:grid;grid-template-columns:repeat(2,1fr);gap:16px;margin-top:12px}
+.pl{border:1px solid var(--linea);border-radius:10px;overflow:hidden;display:flex;gap:10px;padding:10px}
+.pl .pi{width:110px;min-width:110px;aspect-ratio:3/4;background:var(--crema) center/cover no-repeat;border-radius:6px}
+.pl .pt{display:flex;gap:4px;margin-top:5px}
+.pl .pt .x{width:34px;height:44px;border-radius:4px;background:var(--crema) center/cover no-repeat;border:1px solid var(--linea)}
+.pl .pb{font-size:11px}
+.plogo{font-family:Montserrat,sans-serif;font-weight:600;font-size:26px}
+@media (max-width:640px){ .form{grid-template-columns:1fr} .photos{grid-template-columns:repeat(2,1fr)} .pline{grid-template-columns:1fr} }
+</style></head><body>
+
+<div class="top">
+<a class="back" href="index.html#produccion">‹ Inicio</a>
+<div><div class="logo">LUXUR</div><div class="sub">Plataforma de colección</div></div>
+<div class="tabs">
+<button id="tabRef" class="on" onclick="show('ref')">Referencias</button>
+<button id="tabOrd" onclick="show('ord')">Órdenes de compra</button>
+<button onclick="exportData()">⇩ Respaldo</button>
+</div>
+</div>
+
+<div class="gate" id="gate">Verificando acceso…</div>
+
+<div class="wrap" id="viewRef" style="display:none">
+<div class="bar"><div><h2>Referencias de la colección</h2><div class="muted" id="refCount"></div></div>
+<button class="btn" style="margin-left:auto" onclick="openRef()">+ Nueva referencia</button></div>
+<div id="refGrid" class="grid"></div>
+<div id="refEmpty" class="empty">Aún no hay referencias. Crea la primera con <b>+ Nueva referencia</b> — puedes subir hasta 4 fotos por referencia.</div>
+</div>
+
+<div class="wrap" id="viewOrd" style="display:none">
+<div class="bar"><div><h2>Órdenes de compra · One Look</h2><div class="muted">Lead time 45 días hábiles · una orden por quincena</div></div>
+<button class="btn" style="margin-left:auto" onclick="openOrd()">+ Nueva orden (15 días)</button></div>
+<div id="ordList"></div>
+<div id="ordEmpty" class="empty">Aún no hay órdenes. Crea una con <b>+ Nueva orden</b>.</div>
+</div>
+
+<div class="ov" id="ovRef"><div class="modal">
+<h3 id="refTitle">Nueva referencia</h3>
+<div class="form">
+<div class="photos" id="photos"></div>
+<div class="f"><label>Código / Ref</label><input id="f_cod" placeholder="LX-001"></div>
+<div class="f"><label>Nombre</label><input id="f_nm" placeholder="Red Riders Azul Dirty"></div>
+<div class="f"><label>Fit</label><select id="f_fit"><option>The Wide Leg</option><option>The Motel</option><option selected>The Relaxed</option><option>The Zara</option><option>The Destroyed</option></select></div>
+<div class="f"><label>Color</label><input id="f_col" list="dcol" placeholder="Azul"><datalist id="dcol"><option>Azul</option><option>Negro</option><option>Rosado</option><option>Beige/Crema</option><option>Gris</option><option>Café</option><option>Verde</option><option>Crudo</option></datalist></div>
+<div class="f"><label>Tela</label><input id="f_tela" list="dtela" placeholder="Denim rígido"><datalist id="dtela"><option>DJ Rufus (velvet)</option><option>DJ Paris (visos)</option><option>DJ Ferry (waffle)</option><option>DJ Avicci (leopardo)</option><option>DJ Aly (zebra)</option><option>DJ Miyux (animal print lavado)</option><option>DJ Ovy (estampado)</option><option>Denim 12oz</option></datalist></div>
+<div class="f"><label>Composición</label><input id="f_comp" placeholder="98% algodón · 2% elastano"></div>
+<div class="f"><label>Lavado / detalle</label><input id="f_lav" placeholder="Dirty wash / estrellas"></div>
+<div class="f"><label>Notas de diseño</label><input id="f_notas" placeholder="Estrellas bordadas, taches..."></div>
+<div class="f full"><label>Curva de tallas (unidades)</label><div class="szrow">
+  <div class="f"><label>4 (XS)</label><input id="s4" type="number" min="0" value="0"></div>
+  <div class="f"><label>6 (S)</label><input id="s6" type="number" min="0" value="0"></div>
+  <div class="f"><label>8 (M)</label><input id="s8" type="number" min="0" value="0"></div>
+  <div class="f"><label>10 (L)</label><input id="s10" type="number" min="0" value="0"></div>
+  <div class="f"><label>12 (XL)</label><input id="s12" type="number" min="0" value="0"></div></div></div>
+<div class="f"><label>Costo unitario (COP) — lo da el proveedor</label><input id="f_costo" type="number" placeholder="Por confirmar" oninput="calcM()"></div>
+<div class="f"><label>Precio retail (COP)</label><input id="f_retail" type="number" placeholder="Tu precio de venta" oninput="calcM()"></div>
+<div class="f"><label>Margen bruto</label><input id="f_marg" disabled></div>
+<div class="f"><label>MOQ (mínimo)</label><input id="f_moq" type="number" value="0"></div>
+</div>
+<div class="mact"><button class="btn ghost" onclick="closeRef()">Cancelar</button><button class="btn" id="btnSaveRef" onclick="saveRef()">Guardar referencia</button></div>
+</div></div>
+
+<div class="ov" id="ovOrd"><div class="modal">
+<h3>Nueva orden de compra</h3>
+<div class="form">
+<div class="f"><label>Fecha de compra (orden)</label><input id="o_fecha" type="date" onchange="calcFechas()"></div>
+<div class="f"><label>Fecha de envío del pedido</label><input id="o_envio" type="date"></div>
+<div class="f"><label>Lead time (días hábiles)</label><input id="o_lead" type="number" value="45" onchange="calcFechas()"></div>
+<div class="f"><label>Entrega estimada (auto)</label><input id="o_entrega" disabled></div>
+<div class="f full"><label>Nombre / quincena</label><input id="o_nombre" placeholder="Orden Q1 · Drop semana 39"></div>
+<div class="f"><label>Referencia</label><select id="o_ref"></select></div>
+<div class="f"><label>Cantidad</label><input id="o_qty" type="number" min="1" value="0"></div>
+<div class="f full"><button class="btn ghost sm" onclick="addItem()">+ Agregar a la orden</button></div>
+<div class="f full"><table id="o_tbl"></table></div>
+</div>
+<div class="mact"><button class="btn ghost" onclick="closeOrd()">Cancelar</button><button class="btn" id="btnSaveOrd" onclick="saveOrd()">Guardar orden</button></div>
+</div></div>
+
+<div id="printArea"></div>
+
+<script type="module">
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+
+const SUPABASE_URL = "https://nrpgtlcdvtesjbxpkxha.supabase.co";
+const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5ycGd0bGNkdnRlc2pieHBreGhhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg3ODkzNTAsImV4cCI6MjA5NDM2NTM1MH0.ntRHkFobaVK6RW9EYRwoww1ATr8N0zHMzXHM__5x8E0";
+const STORAGE_BUCKET = "calendar-photos";
+const ALLOWED = ['mpsarier@gmail.com','isabellasalazara13@gmail.com','isasazar@hotmail.com'];
+const sb = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+const PK=[['principal','Principal',true],['lavado','Lavado / detalle',false],['tela','Tela',false],['notas','Notas de diseño',false]];
+let REFS=[], ORDS=[];
+let editId=null, curPhotos={principal:'',lavado:'',tela:'',notas:''}, orderItems=[];
+const fmt=v=>'$'+Math.round(v||0).toLocaleString('es-CO');
+const esc=s=>String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+
+/* ── Auth gate: sesión del equipo + whitelist ── */
+async function boot(){
+  const { data: { session } } = await sb.auth.getSession();
+  if (!session || !session.user){ location.href = 'index.html'; return; }
+  const email = (session.user.email || '').toLowerCase();
+  if (!ALLOWED.includes(email)){
+    document.getElementById('gate').innerHTML = 'Esta sección es privada.<br><a href="index.html">← Volver al inicio</a>';
+    return;
+  }
+  document.getElementById('gate').style.display='none';
+  document.getElementById('viewRef').style.display='block';
+  await loadAll();
+}
+
+/* ── Persistencia Supabase ── */
+async function loadAll(){
+  const [r1, r2] = await Promise.all([
+    sb.from('collection_refs').select('*').order('created_at'),
+    sb.from('collection_orders').select('*').order('fecha'),
+  ]);
+  if (r1.error){ alert('Error cargando referencias: '+r1.error.message); return; }
+  if (r2.error){ alert('Error cargando órdenes: '+r2.error.message); return; }
+  REFS = (r1.data||[]).map(r => ({
+    id:r.id, cod:r.cod||'', nm:r.nm||'', fit:r.fit||'The Relaxed', col:r.col||'',
+    tela:r.tela||'', comp:r.comp||'', lav:r.lav||'', notas:r.notas||'',
+    sz: Array.isArray(r.sz)&&r.sz.length===5 ? r.sz : [0,0,0,0,0],
+    costo:r.costo!=null?Number(r.costo):null, retail:r.retail!=null?Number(r.retail):null,
+    moq:r.moq||0, photos:{principal:'',lavado:'',tela:'',notas:'',...(r.photos||{})},
+  }));
+  ORDS = (r2.data||[]).map(o => ({ id:o.id, fecha:o.fecha, envio:o.envio||o.fecha, lead:o.lead||45, nombre:o.nombre||'', items:o.items||[] }));
+  renderRefs(); renderOrds();
+}
+
+// Sube un dataURL al bucket y devuelve la URL pública; si ya es URL http la deja igual
+async function ensureUploaded(dataUrl, refId, key){
+  if (!dataUrl || !dataUrl.startsWith('data:')) return dataUrl || '';
+  const blob = await (await fetch(dataUrl)).blob();
+  const path = `coleccion/${refId}-${key}-${Date.now()}.jpg`;
+  const { error } = await sb.storage.from(STORAGE_BUCKET).upload(path, blob, { contentType:'image/jpeg', upsert:true });
+  if (error) throw new Error('Foto '+key+': '+error.message);
+  return sb.storage.from(STORAGE_BUCKET).getPublicUrl(path).data.publicUrl;
+}
+
+function show(v){viewRef.style.display=v=='ref'?'block':'none';viewOrd.style.display=v=='ord'?'block':'none';tabRef.className=v=='ref'?'on':'';tabOrd.className=v=='ord'?'on':'';}
+function addBusinessDays(s,n){let d=new Date(s+'T00:00:00'),a=0;while(a<n){d.setDate(d.getDate()+1);const w=d.getDay();if(w!==0&&w!==6)a++;}return d;}
+const dfmt=d=>d.toLocaleDateString('es-CO',{day:'2-digit',month:'short',year:'numeric'});
+
+/* ---- drops de fotos (4) ---- */
+function buildDrops(){const c=document.getElementById('photos');c.innerHTML='';PK.forEach(([k,lb,main])=>{
+ const d=document.createElement('div');d.className='drop'+(main?' main':'');d.id='drop_'+k;
+ d.innerHTML=`<b>${lb}</b><div id="dt_${k}">${curPhotos[k]?`<img src="${esc(curPhotos[k])}">`:'arrastra o clic'}</div><input type="file" id="file_${k}" accept="image/*" style="display:none">`;
+ c.appendChild(d);
+ d.addEventListener('click',()=>document.getElementById('file_'+k).click());
+ ['dragover','dragenter'].forEach(e=>d.addEventListener(e,ev=>{ev.preventDefault();d.classList.add('hv');}));
+ ['dragleave'].forEach(e=>d.addEventListener(e,ev=>{ev.preventDefault();d.classList.remove('hv');}));
+ d.addEventListener('drop',ev=>{ev.preventDefault();d.classList.remove('hv');const f=ev.dataTransfer.files[0];if(f)readImg(f,k);});
+ document.getElementById('file_'+k).addEventListener('change',ev=>{const f=ev.target.files[0];if(f)readImg(f,k);});
+});}
+function readImg(f,k){const r=new FileReader();r.onload=e=>{const img=new Image();img.onload=()=>{const max=900;let w=img.width,h=img.height;if(w>max||h>max){if(w>=h){h=Math.round(h*max/w);w=max;}else{w=Math.round(w*max/h);h=max;}}const c=document.createElement('canvas');c.width=w;c.height=h;c.getContext('2d').drawImage(img,0,0,w,h);curPhotos[k]=c.toDataURL('image/jpeg',0.72);document.getElementById('dt_'+k).innerHTML=`<img src="${curPhotos[k]}">`;};img.onerror=()=>{curPhotos[k]=e.target.result;document.getElementById('dt_'+k).innerHTML=`<img src="${curPhotos[k]}">`;};img.src=e.target.result;};r.readAsDataURL(f);}
+
+function calcM(){if(!f_costo.value){f_marg.value='Falta costo';return;}const c=+f_costo.value,r=+f_retail.value;f_marg.value=r>0?((r-c)/r*100).toFixed(0)+'%':'—';}
+function openRef(id){editId=id??null;const r=id!=null?REFS.find(x=>x.id==id):null;
+ curPhotos=r?{...{principal:'',lavado:'',tela:'',notas:''},...r.photos}:{principal:'',lavado:'',tela:'',notas:''};
+ refTitle.textContent=r?'Editar referencia':'Nueva referencia';
+ f_cod.value=r?r.cod:'';f_nm.value=r?r.nm:'';f_fit.value=r?r.fit:'The Relaxed';f_col.value=r?r.col:'';
+ f_tela.value=r?r.tela:'';f_comp.value=r?r.comp:'';f_lav.value=r?r.lav:'';f_notas.value=r?r.notas:'';
+ s4.value=r?r.sz[0]:0;s6.value=r?r.sz[1]:0;s8.value=r?r.sz[2]:0;s10.value=r?r.sz[3]:0;s12.value=r?r.sz[4]:0;
+ f_costo.value=(r&&r.costo)?r.costo:'';f_retail.value=(r&&r.retail)?r.retail:'';f_moq.value=r?r.moq:0;calcM();buildDrops();ovRef.classList.add('on');}
+function closeRef(){ovRef.classList.remove('on');}
+
+async function saveRef(){
+ const btn=document.getElementById('btnSaveRef');btn.disabled=true;btn.textContent='Guardando…';
+ try{
+  const refId = editId ?? crypto.randomUUID();
+  // Subir fotos nuevas (dataURL → storage → URL pública)
+  const photos = {};
+  for (const [k] of PK){ photos[k] = await ensureUploaded(curPhotos[k], refId, k); }
+  const row = { id: refId, cod:f_cod.value, nm:f_nm.value, fit:f_fit.value, col:f_col.value,
+    tela:f_tela.value, comp:f_comp.value, lav:f_lav.value, notas:f_notas.value,
+    sz:[+s4.value,+s6.value,+s8.value,+s10.value,+s12.value],
+    costo:f_costo.value?+f_costo.value:null, retail:f_retail.value?+f_retail.value:null,
+    moq:+f_moq.value, photos, updated_at:new Date().toISOString() };
+  const { error } = await sb.from('collection_refs').upsert(row, { onConflict:'id' });
+  if (error) throw error;
+  await loadAll(); closeRef();
+ }catch(e){ alert('No se pudo guardar: '+(e.message||e)); }
+ finally{ btn.disabled=false;btn.textContent='Guardar referencia'; }
+}
+async function delRef(id){
+ if(!confirm('¿Eliminar esta referencia?'))return;
+ const { error } = await sb.from('collection_refs').delete().eq('id', id);
+ if (error){ alert('Error: '+error.message); return; }
+ await loadAll();
+}
+function renderRefs(){refGrid.innerHTML='';refEmpty.style.display=REFS.length?'none':'block';
+ refCount.textContent=REFS.length+' referencias · '+REFS.reduce((s,r)=>s+r.sz.reduce((a,b)=>a+b,0),0)+' unidades';
+ REFS.forEach(r=>{const tot=r.sz.reduce((a,b)=>a+b,0),p=r.photos||{};const costoTxt=r.costo?fmt(r.costo):'Por confirmar';const retailTxt=r.retail?fmt(r.retail):'—';const margTxt=(r.costo&&r.retail)?((r.retail-r.costo)/r.retail*100).toFixed(0)+'%':'—';
+ const th=[['lavado','Lavado'],['tela','Tela'],['notas','Notas']].map(([k,l])=>p[k]?`<div><div class="t" style="background-image:url('${esc(p[k])}')"></div><div class="lb">${l}</div></div>`:'').join('');
+ refGrid.innerHTML+=`<div class="rcard"><div class="ph" style="${p.principal?`background-image:url('${esc(p.principal)}')`:''}">${p.principal?'':'sin foto'}</div>
+ ${th?`<div class="thumbs">${th}</div>`:''}
+ <div class="bd"><div class="cod">${esc(r.cod)||'—'}</div><div class="nm">${esc(r.nm)||'Sin nombre'}</div><span class="fit">${esc(r.fit)}</span>
+ <div class="spec"><b>Color:</b> ${esc(r.col)||'—'} · <b>Lavado:</b> ${esc(r.lav)||'—'}</div>
+ <div class="spec"><b>Tela:</b> ${esc(r.tela)||'—'}${r.comp?' · '+esc(r.comp):''}</div>
+ ${r.notas?`<div class="spec"><b>Detalle:</b> ${esc(r.notas)}</div>`:''}
+ <div class="sizes"><span>4·${r.sz[0]}</span><span>6·${r.sz[1]}</span><span>8·${r.sz[2]}</span><span>10·${r.sz[3]}</span><span>12·${r.sz[4]}</span></div>
+ <div class="pr"><span>Cant: <b>${tot}</b></span><span>Costo ${costoTxt}</span></div>
+ <div class="pr"><span>Retail ${retailTxt}</span><span class="m">Margen ${margTxt}</span></div></div>
+ <div class="act"><button class="btn ghost sm" onclick="openRef('${r.id}')">Editar</button><button class="btn ghost sm" onclick="delRef('${r.id}')">Eliminar</button></div></div>`;});}
+
+function calcFechas(){if(!o_fecha.value)return;if(!o_envio.value)o_envio.value=o_fecha.value;o_entrega.value=dfmt(addBusinessDays(o_fecha.value,+o_lead.value||45));}
+function openOrd(){editId=null;orderItems=[];o_fecha.value=new Date().toISOString().slice(0,10);o_envio.value=o_fecha.value;o_lead.value=45;o_nombre.value='';o_qty.value=0;calcFechas();
+ o_ref.innerHTML=REFS.map(r=>`<option value="${r.id}">${esc(r.cod)||''} ${esc(r.nm)||'Sin nombre'}</option>`).join('')||'<option value="">— crea referencias primero —</option>';
+ renderItems();ovOrd.classList.add('on');}
+function closeOrd(){ovOrd.classList.remove('on');}
+function addItem(){const id=o_ref.value,q=+o_qty.value;if(!id||q<=0)return;const e=orderItems.find(i=>i.id==id);if(e)e.q+=q;else orderItems.push({id,q});o_qty.value=0;renderItems();}
+function delItem(id){orderItems=orderItems.filter(i=>i.id!=id);renderItems();}
+function renderItems(){let h='<thead><tr><th>Ref</th><th>Fit</th><th>Cant</th><th>Costo</th><th></th></tr></thead><tbody>',tu=0,tc=0,pend=false;
+ orderItems.forEach(i=>{const r=REFS.find(x=>x.id==i.id);if(!r)return;tu+=i.q;const lc=r.costo?i.q*r.costo:0;tc+=lc;if(!r.costo)pend=true;
+ h+=`<tr><td>${esc(r.cod)||''} ${esc(r.nm)||''}</td><td>${esc(r.fit)}</td><td>${i.q}</td><td>${r.costo?fmt(lc):'Por confirmar'}</td><td><button class="btn ghost sm" onclick="delItem('${i.id}')">✕</button></td></tr>`;});
+ h+=`<tr class="tot"><td>TOTAL</td><td></td><td>${tu}</td><td>${fmt(tc)}${pend?' *':''}</td><td></td></tr></tbody>`;o_tbl.innerHTML=h+(pend?'<div class="muted">* faltan costos por confirmar del proveedor</div>':'');}
+
+async function saveOrd(){
+ if(!orderItems.length){alert('Agrega al menos una referencia.');return;}
+ const btn=document.getElementById('btnSaveOrd');btn.disabled=true;btn.textContent='Guardando…';
+ try{
+  const { error } = await sb.from('collection_orders').insert({
+    fecha:o_fecha.value, envio:o_envio.value||o_fecha.value, lead:+o_lead.value||45,
+    nombre:o_nombre.value, items:orderItems });
+  if (error) throw error;
+  await loadAll(); closeOrd();
+ }catch(e){ alert('No se pudo guardar: '+(e.message||e)); }
+ finally{ btn.disabled=false;btn.textContent='Guardar orden'; }
+}
+async function delOrd(id){
+ if(!confirm('¿Eliminar esta orden?'))return;
+ const { error } = await sb.from('collection_orders').delete().eq('id', id);
+ if (error){ alert('Error: '+error.message); return; }
+ await loadAll();
+}
+function renderOrds(){ordList.innerHTML='';ordEmpty.style.display=ORDS.length?'none':'block';
+ ORDS.slice().sort((a,b)=>a.fecha.localeCompare(b.fecha)).forEach((o,idx)=>{const ent=dfmt(addBusinessDays(o.fecha,o.lead));let tu=0,tc=0;
+ let pend=false;let rows=o.items.map(i=>{const r=REFS.find(x=>x.id==i.id);if(!r)return'';tu+=i.q;const lc=r.costo?i.q*r.costo:0;tc+=lc;if(!r.costo)pend=true;return`<tr><td>${esc(r.cod)||''} ${esc(r.nm)||''}</td><td>${esc(r.fit)}</td><td>${esc(r.col)||''}</td><td>${esc(r.tela)||''}</td><td>${i.q}</td><td>${r.costo?fmt(lc):'Por confirmar'}</td></tr>`;}).join('');
+ ordList.innerHTML+=`<div class="ocard"><div class="ohead"><div class="qn">${esc(o.nombre)||'Orden '+(idx+1)}</div><span class="chip">${o.items.length} refs · ${tu} uds · ${fmt(tc)}${pend?' *':''}</span><div style="margin-left:auto"><button class="btn rosa sm" onclick="printOrd('${o.id}')">Imprimir linesheet + OC</button> <button class="btn ghost sm" onclick="delOrd('${o.id}')">Eliminar</button></div></div>
+ <div class="dates"><div><span class="muted">Fecha de compra</span><b>${dfmt(new Date(o.fecha+'T00:00:00'))}</b></div><div><span class="muted">Fecha de envío</span><b>${dfmt(new Date((o.envio||o.fecha)+'T00:00:00'))}</b></div><div><span class="muted">Entrega estimada (+${o.lead} háb.)</span><b style="color:var(--verde)">${ent}</b></div></div>
+ <table><thead><tr><th>Ref</th><th>Fit</th><th>Color</th><th>Tela</th><th>Cant</th><th>Costo</th></tr></thead><tbody>${rows}<tr class="tot"><td>TOTAL</td><td></td><td></td><td></td><td>${tu}</td><td>${fmt(tc)}${pend?' *':''}</td></tr></tbody></table>${pend?'<div class="muted">* faltan costos por confirmar del proveedor</div>':''}</div>`;});}
+
+function printOrd(id){const o=ORDS.find(x=>x.id==id),ent=dfmt(addBusinessDays(o.fecha,o.lead));let tu=0,tc=0;
+ let pend=false;let rows=o.items.map(i=>{const r=REFS.find(x=>x.id==i.id);if(!r)return'';tu+=i.q;const lc=r.costo?i.q*r.costo:0;tc+=lc;if(!r.costo)pend=true;
+  return`<tr><td>${esc(r.cod)||''}</td><td style="text-align:left">${esc(r.nm)||''}</td><td>${esc(r.fit)}</td><td>${esc(r.col)||''}</td><td>${esc(r.tela)||''} ${esc(r.comp)||''}</td><td>${esc(r.lav)||''}</td><td>${r.sz.join(' · ')}</td><td>${i.q}</td><td>${r.costo?fmt(r.costo):'Pend.'}</td><td>${r.costo?fmt(lc):'Pend.'}</td></tr>`;}).join('');
+ let cards=o.items.map(i=>{const r=REFS.find(x=>x.id==i.id);if(!r)return'';const p=r.photos||{};
+  const th=['lavado','tela','notas'].map(k=>p[k]?`<div class="x" style="background-image:url('${esc(p[k])}')"></div>`:'').join('');
+  return`<div class="pl"><div class="pi" style="${p.principal?`background-image:url('${esc(p.principal)}')`:''}"></div><div class="pb"><b>${esc(r.cod)||''} · ${esc(r.nm)||''}</b><br>${esc(r.fit)} · ${esc(r.col)||''}<br>Tela: ${esc(r.tela)||''} ${esc(r.comp)||''}<br>Lavado: ${esc(r.lav)||''}<br>Tallas 4·6·8·10·12: ${r.sz.join(' · ')} → ${i.q} uds<br>${esc(r.notas)||''}<div class="pt">${th}</div></div></div>`;}).join('');
+ printArea.innerHTML=`<div style="display:flex;justify-content:space-between;border-bottom:2px solid #3A3330;padding-bottom:12px;align-items:flex-start">
+ <div><div class="plogo">LUXUR</div><div style="font-size:11px;letter-spacing:2px;color:#8A817C">ORDEN DE COMPRA · ONE LOOK</div></div>
+ <div style="text-align:right;font-size:12px;color:#8A817C">${esc(o.nombre)||''}<br>Compra: <b style="color:#3A3330">${dfmt(new Date(o.fecha+'T00:00:00'))}</b><br>Envío: <b style="color:#3A3330">${dfmt(new Date((o.envio||o.fecha)+'T00:00:00'))}</b><br>Entrega estimada: <b style="color:#375E3A">${ent}</b> (+${o.lead} días háb.)</div></div>
+ <h3 style="font-weight:400;font-size:13px;letter-spacing:1px;text-transform:uppercase;color:#8A817C;margin:18px 0 6px">Linesheet</h3>
+ <div class="pline">${cards}</div>
+ <h3 style="font-weight:400;font-size:13px;letter-spacing:1px;text-transform:uppercase;color:#8A817C;margin:20px 0 6px">Orden de compra</h3>
+ <table><thead><tr><th>Ref</th><th style="text-align:left">Nombre</th><th>Fit</th><th>Color</th><th>Tela / comp.</th><th>Lavado</th><th>Tallas</th><th>Cant</th><th>Costo u.</th><th>Total</th></tr></thead>
+ <tbody>${rows}<tr class="tot"><td colspan="7">TOTAL ORDEN</td><td>${tu}</td><td></td><td>${fmt(tc)}${pend?' *':''}</td></tr></tbody></table>
+ ${pend?'<div style="font-size:11px;color:#8A817C;margin-top:6px">* Costos pendientes por confirmar con el proveedor.</div>':''}
+ <div style="display:flex;justify-content:space-between;margin-top:50px;font-size:12px;color:#8A817C"><div style="border-top:1px solid #3A3330;padding-top:6px;width:44%;text-align:center">Autoriza — LUXUR United S.A.S</div><div style="border-top:1px solid #3A3330;padding-top:6px;width:44%;text-align:center">Recibe — One Look</div></div>`;
+ window.print();}
+
+function exportData(){const b=new Blob([JSON.stringify({REFS,ORDS},null,2)],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='LUXUR-coleccion-respaldo.json';a.click();}
+
+// Los onclick inline necesitan las funciones en window (esto es un module)
+Object.assign(window, { show, exportData, openRef, closeRef, saveRef, delRef, calcM, calcFechas, openOrd, closeOrd, addItem, delItem, saveOrd, delOrd, printOrd });
+
+boot();
+</script>
+</body></html>

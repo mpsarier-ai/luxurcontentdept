@@ -736,6 +736,8 @@ header,.hub-header{position:static !important;background:transparent !important;
   <!-- PRODUCCIÓN · pipeline -->
   <section id="hubProduccion" class="hub-section" hidden>
     <button class="hub-back" data-hub-back>Inicio</button>
+    <!-- Colección (solo Paulina + Isabella) -->
+    <a class="fa-inv-link" id="colLink" href="coleccion.html" hidden>🧵 Colección · referencias y órdenes One Look <span>›</span></a>
     <!-- Selector de proveedor (chips) -->
     <div class="supplier-chips" id="supplierChips"></div>
     <!-- Dashboard 4 stat tiles -->
@@ -1293,7 +1295,11 @@ function renderBriefPayments(){
   const wrap = document.getElementById('briefPaymentsWrap');
   const el = document.getElementById('briefPayments');
   if (!wrap || !el) return;
-  if (!user || !PAYMENTS_VIEWERS.includes(canonicalEmail(user.email))){ wrap.hidden = true; return; }
+  const isViewer = user && PAYMENTS_VIEWERS.includes(canonicalEmail(user.email));
+  // El link a Colección comparte la misma whitelist
+  const colLink = document.getElementById('colLink');
+  if (colLink) colLink.hidden = !isViewer;
+  if (!isViewer){ wrap.hidden = true; return; }
 
   // Cascada de costo (igual que los KPIs de Producción)
   const productCostOf = p => {
