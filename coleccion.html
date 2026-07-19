@@ -292,6 +292,21 @@ function openRef(id){editId=id??null;const r=id!=null?REFS.find(x=>x.id==id):nul
  ovRef.classList.add('on');}
 function closeRef(){ovRef.classList.remove('on');}
 
+// Duplicar: todo igual, ref NUEVA — cambiás el color y el código se rearma solo
+function dupRef(id){
+ const r = REFS.find(x=>x.id==id); if(!r) return;
+ editId = null;
+ curPhotos = {...{principal:'',lavado:'',tela:'',notas:''}, ...r.photos};
+ refTitle.textContent='Duplicar referencia';
+ f_cod.value='';f_nm.value=r.nm;f_fit.value=r.fit;f_col.value=r.col;
+ f_tela.value=r.tela;f_comp.value=r.comp;f_lav.value=r.lav;f_notas.value=r.notas;
+ s4.value=r.sz[0];s6.value=r.sz[1];s8.value=r.sz[2];s10.value=r.sz[3];s12.value=r.sz[4];
+ f_costo.value=r.costo||'';f_retail.value=r.retail||'';f_moq.value=r.moq;
+ calcM();buildDrops();autoCod();
+ ovRef.classList.add('on');
+ setTimeout(()=>{ f_col.focus(); f_col.select(); }, 100);
+}
+
 async function saveRef(){
  const btn=document.getElementById('btnSaveRef');btn.disabled=true;btn.textContent='Guardando…';
  try{
@@ -334,7 +349,7 @@ function renderRefs(){refGrid.innerHTML='';refEmpty.style.display=REFS.length?'n
  <div class="sizes"><span>4·${r.sz[0]}</span><span>6·${r.sz[1]}</span><span>8·${r.sz[2]}</span><span>10·${r.sz[3]}</span><span>12·${r.sz[4]}</span></div>
  <div class="pr"><span>Cant: <b>${tot}</b></span><span>Costo ${costoTxt}</span></div>
  <div class="pr"><span>Retail ${retailTxt}</span><span class="m">Margen ${margTxt}</span></div></div>
- <div class="act"><button class="btn ghost sm" onclick="openRef('${r.id}')">Editar</button><button class="btn ghost sm" onclick="delRef('${r.id}')">Eliminar</button></div></div>`;});}
+ <div class="act"><button class="btn ghost sm" onclick="openRef('${r.id}')">Editar</button><button class="btn ghost sm" onclick="dupRef('${r.id}')">⧉ Duplicar</button><button class="btn ghost sm" onclick="delRef('${r.id}')">Eliminar</button></div></div>`;});}
 
 function calcFechas(){if(!o_fecha.value)return;if(!o_envio.value)o_envio.value=o_fecha.value;o_entrega.value=dfmt(addBusinessDays(o_fecha.value,+o_lead.value||45));}
 function openOrd(){editId=null;orderItems=[];o_fecha.value=new Date().toISOString().slice(0,10);o_envio.value=o_fecha.value;o_lead.value=45;o_nombre.value='';o_qty.value=0;calcFechas();
@@ -393,7 +408,7 @@ function printOrd(id){const o=ORDS.find(x=>x.id==id),ent=dfmt(addBusinessDays(o.
 
 function exportData(){const b=new Blob([JSON.stringify({REFS,ORDS},null,2)],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='LUXUR-atelier-respaldo.json';a.click();}
 
-Object.assign(window, { show, exportData, openRef, closeRef, saveRef, delRef, calcM, calcFechas, openOrd, closeOrd, addItem, delItem, saveOrd, delOrd, printOrd, autoCod });
+Object.assign(window, { show, exportData, openRef, closeRef, saveRef, delRef, dupRef, calcM, calcFechas, openOrd, closeOrd, addItem, delItem, saveOrd, delOrd, printOrd, autoCod });
 
 boot();
 </script>
