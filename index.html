@@ -316,26 +316,36 @@ header{border-bottom:1px solid var(--black);padding-bottom:24px;margin-bottom:64
 .tl-meta .tl-photo{color:var(--rosa-deep);font-weight:600}
 .tl-meta .tl-photo.overdue{color:var(--red-out)}
 
-/* Stepper inline en card de pipeline (vista interna) */
-.tl-stepper{grid-column:1/-1;display:flex;align-items:center;gap:0;margin-top:10px;padding-top:10px;border-top:1px dashed rgba(0,0,0,.06)}
-.tl-stage{display:flex;flex-direction:column;align-items:center;flex:1;font-family:'JetBrains Mono',monospace;font-size:8.5px;letter-spacing:.04em;color:var(--grey);text-transform:uppercase;text-align:center;gap:4px;position:relative;background:transparent;border:none;padding:6px 2px;cursor:pointer;border-radius:8px;transition:background .15s ease}
-.tl-stage:hover{background:rgba(212,132,142,.08)}
+/* Stepper: checklist VERTICAL estilo Apple — círculos grandes con ✓,
+   nombre completo de la etapa, días a la derecha, línea que conecta */
+.tl-stepper{grid-column:1/-1;display:flex;flex-direction:column;align-items:stretch;gap:0;margin-top:12px;padding-top:8px;border-top:1px solid rgba(0,0,0,.05)}
+.tl-stage{display:flex;flex-direction:row;align-items:center;gap:12px;flex:none;text-align:left;font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text',sans-serif;font-size:14.5px;letter-spacing:0;text-transform:none;color:#8e8e93;background:transparent;border:none;padding:8px 6px;cursor:pointer;border-radius:12px;transition:background .15s ease;position:relative;width:100%}
+.tl-stage:hover{background:rgba(212,132,142,.07)}
 .tl-stage:hover .tl-stage-dot{border-color:var(--rosa-deep)}
-.tl-stage:active{transform:scale(.95)}
-.tl-stage-dot{width:14px;height:14px;border-radius:50%;background:#fff;border:2px solid rgba(0,0,0,.12);transition:all .2s ease}
+.tl-stage:active{background:rgba(212,132,142,.12)}
+.tl-stage-dot{width:24px;height:24px;border-radius:50%;background:#fff;border:2px solid rgba(0,0,0,.14);flex:none;display:flex;align-items:center;justify-content:center;transition:all .2s ease}
 .tl-stage.done .tl-stage-dot{background:var(--rosa-deep);border-color:var(--rosa-deep)}
-.tl-stage.done .tl-stage-dot::after{content:'';display:block;width:5px;height:5px;background:#fff;border-radius:50%;margin:2.5px auto}
-.tl-stage.current .tl-stage-dot{background:#fff;border-color:var(--rosa-deep);box-shadow:0 0 0 3px rgba(212,132,142,.18)}
-.tl-stage.done .tl-stage-label{color:var(--rosa-deep);font-weight:500}
-.tl-stage.current .tl-stage-label{color:var(--black);font-weight:600}
-.tl-stage-days{font-family:'JetBrains Mono',monospace;font-size:8.5px;color:var(--grey);letter-spacing:.03em;margin-top:1px;text-transform:none}
-.tl-stage.done .tl-stage-days{color:var(--rosa-deep)}
+.tl-stage.done .tl-stage-dot::after{content:'✓';color:#fff;font-size:12px;font-weight:700;line-height:1}
+.tl-stage.current .tl-stage-dot{background:#fff;border-color:var(--rosa-deep);box-shadow:0 0 0 4px rgba(212,132,142,.18)}
+.tl-stage.current .tl-stage-dot::after{content:'';width:10px;height:10px;border-radius:50%;background:var(--rosa-deep)}
+.tl-stage-label{font-weight:500}
+.tl-stage.done .tl-stage-label{color:var(--black)}
+.tl-stage.current .tl-stage-label{color:var(--black);font-weight:700}
+.tl-stage-days{margin-left:auto;font-family:inherit;font-size:12.5px;color:#8e8e93;letter-spacing:0;text-transform:none;font-variant-numeric:tabular-nums}
+.tl-stage.done .tl-stage-days{color:var(--rosa-deep);font-weight:600}
 .tl-stage.current .tl-stage-days{color:var(--black);font-weight:600}
-.tl-line{flex:0 0 auto;width:14px;height:2px;background:rgba(0,0,0,.08);align-self:flex-start;margin-top:6px}
+.tl-line{flex:none;width:2px;height:14px;background:rgba(0,0,0,.1);align-self:flex-start;margin:-7px 0 -7px 17px}
 .tl-line.done{background:var(--rosa-deep)}
-.tl-stage-summary{margin-top:8px;padding:8px 14px;background:rgba(212,132,142,.08);border-radius:10px;font-family:'Outfit',sans-serif;font-size:12px;color:#555;letter-spacing:.01em;text-align:center}
+.tl-stage-summary{margin-top:8px;padding:9px 14px;background:rgba(212,132,142,.08);border-radius:12px;font-family:-apple-system,sans-serif;font-size:12.5px;color:#555;letter-spacing:.01em;text-align:center}
 .tl-stage-summary b{color:var(--black);font-weight:600}
 .tl-stage-summary.done{background:rgba(91,154,91,.1);color:#3a5a3a}
+/* Variantes: stepper colapsado — un chip de estado lo abre/cierra */
+.tl-variant .tl-stepper,.tl-variant .tl-stage-summary{display:none}
+.tl-variant.open .tl-stepper{display:flex}
+.tl-variant.open .tl-stage-summary{display:block}
+.tl-vstate{background:var(--cream);border:none;border-radius:999px;padding:6px 12px;font-size:11px;font-weight:600;font-family:-apple-system,sans-serif;color:var(--black);cursor:pointer;white-space:nowrap}
+.tl-vstate.done{background:#e2efe5;color:#3e7a4e}
+.tl-vstate:active{opacity:.6}
 
 .tl-prod-actions{grid-column:1/-1;display:flex;justify-content:flex-end;gap:8px;margin-top:8px}
 .tl-copy-link{display:inline-flex;align-items:center;gap:6px;background:transparent;border:1px solid var(--cream-dark);color:#555;font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.1em;text-transform:uppercase;padding:6px 12px;border-radius:999px;cursor:pointer;transition:all .15s ease}
@@ -2286,21 +2296,21 @@ async function loadSupplierLink(){ await loadSuppliers(); }
 
 // Etapas de producción · stage = última completada (null = primera en curso)
 const PROD_STAGES_FULL = [
-  { key: 'corte',       short: 'Corte' },
-  { key: 'proceso',     short: 'Proceso' },
-  { key: 'confeccion',  short: 'Confec.' },
-  { key: 'lavanderia',  short: 'Lavand.' },
-  { key: 'terminacion', short: 'Termin.' },
-  { key: 'entrega',     short: 'Entrega' },
+  { key: 'corte', short: 'Corte', long: 'Corte' },
+  { key: 'proceso', short: 'Proceso', long: 'Proceso' },
+  { key: 'confeccion', short: 'Confec.', long: 'Confección' },
+  { key: 'lavanderia', short: 'Lavand.', long: 'Lavandería' },
+  { key: 'terminacion', short: 'Termin.', long: 'Terminación' },
+  { key: 'entrega', short: 'Entrega', long: 'Entrega' },
 ];
 // Flujo simple (ej AXSPEN): Planeado → Pagado → Entregado → Terminación → Listo
 // (key terminal se mantiene 'entrega' para compat con la lógica de completado)
 const PROD_STAGES_SIMPLE = [
-  { key: 'planeado',    short: 'Planeado' },
-  { key: 'pagado',      short: 'Pagado' },
-  { key: 'entregado',   short: 'Entregado' },
-  { key: 'terminacion', short: 'Termin.' },
-  { key: 'entrega',     short: 'Listo' },
+  { key: 'planeado', short: 'Planeado', long: 'Planeado' },
+  { key: 'pagado', short: 'Pagado', long: 'Pagado' },
+  { key: 'entregado', short: 'Entregado', long: 'Entregado' },
+  { key: 'terminacion', short: 'Termin.', long: 'Terminación' },
+  { key: 'entrega', short: 'Listo', long: 'Listo' },
 ];
 function getProdStages(hasProceso){
   return hasProceso !== false ? PROD_STAGES_FULL : PROD_STAGES_FULL.filter(s => s.key !== 'proceso');
@@ -2364,7 +2374,7 @@ function renderStepperInline(e){
     const cls = it.isDone ? 'done' : (it.isCurrent ? 'current' : '');
     const daysLabel = it.days != null ? `<span class="tl-stage-days">${it.days}d</span>` : '';
     // Cada dot es un botón: vos podés marcar cualquier etapa como completada
-    html += `<button type="button" class="tl-stage ${cls}" data-set-stage="${it.stage.key}" data-entry="${e.id}" title="Click para marcar ${it.stage.short} como la última etapa completada"><span class="tl-stage-dot"></span><span class="tl-stage-label">${it.stage.short}</span>${daysLabel}</button>`;
+    html += `<button type="button" class="tl-stage ${cls}" data-set-stage="${it.stage.key}" data-entry="${e.id}" title="Click para marcar ${it.stage.long || it.stage.short} como la última etapa completada"><span class="tl-stage-dot"></span><span class="tl-stage-label">${it.stage.long || it.stage.short}</span>${daysLabel}</button>`;
     if (i < stages.length - 1){
       html += `<span class="tl-line ${i < lastDoneIdx ? 'done' : ''}"></span>`;
     }
@@ -2375,7 +2385,7 @@ function renderStepperInline(e){
     html += `<div class="tl-stage-summary done">✓ Entregado${totalDays != null ? ` · ${totalDays}d totales` : ''}</div>`;
   } else if (currentIdx >= 0 && currentIdx < stages.length){
     const current = items[currentIdx];
-    const currentLabel = stages[currentIdx].short;
+    const currentLabel = stages[currentIdx].long || stages[currentIdx].short;
     const dayStr = current && current.days != null ? `${current.days}d` : 'recién empezó';
     const totalStr = totalDays != null && totalDays > 0 ? ` · total ${totalDays + (current.days || 0)}d` : '';
     html += `<div class="tl-stage-summary">En <b>${currentLabel}</b> · ${dayStr}${totalStr}</div>`;
@@ -2423,7 +2433,13 @@ function renderPipelineEntry(e, isVariantNested){
       ${metaHtml}
     </div>
     <div class="tl-actions">
-      <button class="tl-status ${e.status}" data-toggle="${e.id}">${e.status === 'llego' ? '✓ Llegó' : 'Pendiente'}</button>
+      ${isVariantNested
+        ? (() => {
+            const done = e.stage === 'entrega' || e.status === 'llego';
+            const lbl = done ? '✓ Entregado' : (e.stage === 'terminacion' ? 'En Entrega' : 'En Terminación');
+            return `<button class="tl-vstate ${done ? 'done' : ''}" data-vtoggle="${e.id}" title="Ver/ocultar etapas">${lbl} ▾</button>`;
+          })()
+        : `<button class="tl-status ${e.status}" data-toggle="${e.id}">${e.status === 'llego' ? '✓ Llegó' : 'Pendiente'}</button>`}
       <button class="tl-del" data-del="${e.id}" title="Eliminar">×</button>
     </div>
     ${stepperHtml}
@@ -2434,8 +2450,8 @@ function renderPipelineEntry(e, isVariantNested){
 // Las etapas tempranas vienen del lote.
 function renderVariantStepperInline(v){
   const stages = [
-    { key: 'terminacion', short: 'Term' },
-    { key: 'entrega',     short: 'Entr' },
+    { key: 'terminacion', short: 'Term', long: 'Terminación' },
+    { key: 'entrega', short: 'Entr', long: 'Entrega' },
   ];
   const lastDoneIdx = v.stage ? stages.findIndex(s => s.key === v.stage) : -1;
   const isFullyDone = lastDoneIdx === stages.length - 1;
@@ -2445,7 +2461,7 @@ function renderVariantStepperInline(v){
     const isDone = i <= lastDoneIdx;
     const isCur = !isFullyDone && i === currentIdx;
     const cls = isDone ? 'done' : (isCur ? 'current' : '');
-    html += `<button type="button" class="tl-stage ${cls}" data-set-stage="${s.key}" data-entry="${v.id}" title="Click para marcar ${s.short}"><span class="tl-stage-dot"></span><span class="tl-stage-label">${s.short}</span></button>`;
+    html += `<button type="button" class="tl-stage ${cls}" data-set-stage="${s.key}" data-entry="${v.id}" title="Click para marcar ${s.long || s.short}"><span class="tl-stage-dot"></span><span class="tl-stage-label">${s.long || s.short}</span></button>`;
     if (i < stages.length - 1) html += `<span class="tl-line ${i < lastDoneIdx ? 'done' : ''}"></span>`;
   });
   html += '</div>';
@@ -2474,14 +2490,14 @@ function renderBatchCard(batch, variants){
     const isDone = i <= lastIdx;
     const isCur = !isLavadero && i === currentIdx;
     const cls = isDone ? 'done' : (isCur ? 'current' : '');
-    stepperHtml += `<button type="button" class="tl-stage ${cls}" data-batch-set-stage="${s.key}" data-batch="${batch.id}" title="Click para marcar ${s.short}"><span class="tl-stage-dot"></span><span class="tl-stage-label">${s.short}</span></button>`;
+    stepperHtml += `<button type="button" class="tl-stage ${cls}" data-batch-set-stage="${s.key}" data-batch="${batch.id}" title="Click para marcar ${s.long || s.label || s.short}"><span class="tl-stage-dot"></span><span class="tl-stage-label">${s.long || s.label || s.short}</span></button>`;
     if (i < stages.length - 1) stepperHtml += `<span class="tl-line ${i < lastIdx ? 'done' : ''}"></span>`;
   });
   stepperHtml += '</div>';
   const summary = isLavadero
     ? `<div class="tl-stage-summary done">${isSimpleFlow ? '✓ Listo' : '✓ Lote en Lavandería · variantes en Terminación'}</div>`
     : (currentIdx >= 0 && currentIdx < stages.length
-        ? `<div class="tl-stage-summary">Lote en <b>${stages[currentIdx].short}</b></div>` : '');
+        ? `<div class="tl-stage-summary">Lote en <b>${stages[currentIdx].long || stages[currentIdx].label || stages[currentIdx].short}</b></div>` : '');
   const metaBits = [];
   if (batch.total_quantity) metaBits.push(`<span><b>${batch.total_quantity}u</b> total</span>`);
   if (variants.length) metaBits.push(`<span>${variants.length} ${variants.length === 1 ? 'variante' : 'variantes'}</span>`);
@@ -2890,6 +2906,7 @@ function renderPipeline(){
   }
   el.innerHTML = '';
   const wireEl = sheetBody || el;
+  wireEl.querySelectorAll('[data-vtoggle]').forEach(b => b.addEventListener('click', () => b.closest('.tl-row')?.classList.toggle('open')));
   wireEl.querySelectorAll('[data-toggle]').forEach(b => b.addEventListener('click', () => togglePipelineStatus(b.getAttribute('data-toggle'))));
   wireEl.querySelectorAll('[data-del]').forEach(b => b.addEventListener('click', () => deletePipeline(b.getAttribute('data-del'))));
   wireEl.querySelectorAll('[data-edit]').forEach(b => b.addEventListener('click', () => openEntryModal(b.getAttribute('data-edit'))));
