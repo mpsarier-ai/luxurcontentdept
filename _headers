@@ -3,5 +3,9 @@
   Content-Type: application/json
 
 # iOS PWA / app shell tags
+# no-cache: el WebView de la app revalida SIEMPRE contra Netlify (ETag →
+# 304 si no cambió, versión nueva si cambió). Arregla el bug de que la app
+# se quede pegada mostrando una versión vieja después de cada deploy.
 /*
   X-Content-Type-Options: nosniff
+  Cache-Control: no-cache, must-revalidate
