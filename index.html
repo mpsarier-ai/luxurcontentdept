@@ -199,6 +199,31 @@ header{border-bottom:1px solid var(--black);padding-bottom:24px;margin-bottom:64
 
 /* Chips de proveedor */
 .supplier-chips{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px;padding:2px 0}
+/* ── Entregas por semana (rail con swipe) ── */
+.wk-head{display:flex;justify-content:space-between;align-items:baseline;margin:18px 4px 8px;font-size:15px;font-weight:700}
+.wk-head .wk-hint{font-size:11px;color:var(--grey);font-weight:500}
+.week-rail{display:flex;gap:10px;overflow-x:auto;scroll-snap-type:x mandatory;-webkit-overflow-scrolling:touch;padding:2px 2px 14px;scrollbar-width:none}
+.week-rail::-webkit-scrollbar{display:none}
+.wk-card{flex:0 0 82%;max-width:340px;scroll-snap-align:center;background:#fff;border-radius:18px;padding:14px 16px;box-shadow:0 1px 3px rgba(0,0,0,.05),0 6px 18px rgba(0,0,0,.05)}
+@media(min-width:700px){.wk-card{flex-basis:320px}}
+.wk-card.cur{box-shadow:0 0 0 2px var(--rosa-deep),0 6px 18px rgba(0,0,0,.06)}
+.wk-t{display:flex;justify-content:space-between;align-items:baseline;gap:8px}
+.wk-sem{font-weight:700;font-size:15px;white-space:nowrap}
+.wk-rng{font-size:11px;color:var(--grey);white-space:nowrap}
+.wk-tot{font-size:11px;font-weight:600;background:var(--cream);border-radius:999px;padding:2px 10px;white-space:nowrap}
+.wk-items{margin-top:10px;display:flex;flex-direction:column;gap:8px}
+.wk-it{border-top:1px solid rgba(0,0,0,.05);padding-top:8px}
+.wk-it .n{font-size:12.5px;font-weight:600;line-height:1.3}
+.wk-it .m{font-size:11px;color:var(--grey);margin-top:1px}
+.wk-b{display:inline-block;font-size:10px;font-weight:700;border-radius:999px;padding:2px 8px;margin-top:4px;margin-right:4px}
+.wk-b.ok{background:#e2efe5;color:#3e7a4e}
+.wk-b.late{background:#f7dedc;color:#b23a35}
+.wk-b.part{background:#fdf3d7;color:#8a6d1a}
+.wk-b.go{background:var(--rosa);color:var(--black)}
+.wk-mv{margin-top:6px;background:rgba(0,0,0,.05);border:none;border-radius:999px;padding:5px 12px;font-size:11px;font-weight:600;font-family:inherit;color:var(--black);cursor:pointer}
+.wk-mv:active{opacity:.6}
+.wk-late-h{font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#b23a35;margin-top:12px}
+.wk-empty{font-size:12px;color:var(--grey);margin-top:10px}
 .sup-chip{background:#fff;border:1px solid rgba(0,0,0,.08);border-radius:999px;padding:9px 16px;font-family:'Outfit',sans-serif;font-size:13px;font-weight:500;color:#555;cursor:pointer;letter-spacing:.01em;transition:all .15s ease;white-space:nowrap;box-shadow:0 1px 2px rgba(0,0,0,.04)}
 .sup-chip:hover{border-color:rgba(212,132,142,.4);color:var(--black)}
 .sup-chip.active{background:var(--black);color:#fff;border-color:var(--black)}
@@ -763,6 +788,9 @@ header,.hub-header{position:static !important;background:transparent !important;
         <div class="pk-cost" id="kpiMonthCost">—</div>
       </div>
     </div>
+    <!-- Entregas semana a semana (swipe) -->
+    <div class="wk-head" id="weekRailHead" hidden><span>Entregas por semana</span><span class="wk-hint">‹ desliza ›</span></div>
+    <div class="week-rail" id="weekRail" hidden></div>
     <!-- Link único del proveedor seleccionado -->
     <div class="supplier-link-box" id="supplierLinkBox" hidden>
       <div class="slb-label">Link para tu proveedor</div>
@@ -2438,6 +2466,137 @@ function renderBatchCard(batch, variants){
   return html;
 }
 
+// ═══ Entregas por semana · rail con swipe ═══════════════════════════════
+// Las semanas siguen la numeración ISO (semana 29 = 13-19 jul), igual que
+// las semanas de contenido. Lo atrasado se "arrastra" a la semana actual.
+function wkMonday(dateStr){
+  const d = new Date(dateStr + 'T12:00:00');
+  d.setDate(d.getDate() - ((d.getDay() + 6) % 7));
+  return d.toISOString().slice(0, 10);
+}
+function wkNum(dateStr){
+  const t = new Date(dateStr + 'T12:00:00');
+  t.setDate(t.getDate() + 3 - ((t.getDay() + 6) % 7));
+  const w1 = new Date(t.getFullYear(), 0, 4);
+  return 1 + Math.round(((t - w1) / 864e5 - 3 + ((w1.getDay() + 6) % 7)) / 7);
+}
+function wkRangeLabel(mon){
+  const MES = ['ene','feb','mar','abr','may','jun','jul','ago','sep','oct','nov','dic'];
+  const a = new Date(mon + 'T12:00:00'), b = new Date(a); b.setDate(b.getDate() + 6);
+  return `${a.getDate()} ${MES[a.getMonth()]} – ${b.getDate()} ${MES[b.getMonth()]}`;
+}
+let weekRailScrolled = false;
+function renderWeekRail(fBatches, fStandalone, variantsByBatch){
+  const rail = document.getElementById('weekRail');
+  const head = document.getElementById('weekRailHead');
+  if (!rail) return;
+  const keepScroll = rail.scrollLeft;
+  const today = new Date(Date.now() - 5*3600e3).toISOString().slice(0, 10);
+  const curMon = wkMonday(today);
+  const supName = id => { const s = suppliers.find(x => x.id === id); return s ? s.name : ''; };
+
+  // Aplaná lotes + jeans sueltos a items con fecha
+  const items = [];
+  fBatches.forEach(b => {
+    const vars = variantsByBatch[b.id] || [];
+    const dCount = vars.filter(v => v.stage === 'entrega' || v.status === 'llego').length;
+    const delivered = vars.length ? dCount === vars.length : b.batch_stage === 'entrega';
+    items.push({
+      kind: 'batch', id: b.id, name: b.name, qty: b.total_quantity || 0,
+      date: b.tentative_date, delivered,
+      partial: dCount > 0 && !delivered,
+      sub: vars.length ? `${dCount} de ${vars.length} diseños entregados` : '',
+      stageLbl: delivered ? '' : (PROD_NEXT_STAGE_LABEL[b.batch_stage] || ''),
+      supplier: supName(b.supplier_id),
+    });
+  });
+  fStandalone.forEach(e => {
+    const delivered = e.stage === 'entrega' || e.status === 'llego';
+    items.push({
+      kind: 'entry', id: e.id, name: e.product_name, qty: e.quantity || 0,
+      date: e.tentative_date, delivered, partial: false, sub: '',
+      stageLbl: delivered ? '' : (PROD_NEXT_STAGE_LABEL[e.stage] || ''),
+      supplier: supName(e.supplier_id),
+    });
+  });
+  const dated = items.filter(i => i.date);
+  if (!dated.length){ rail.hidden = true; if (head) head.hidden = true; return; }
+  rail.hidden = false; if (head) head.hidden = false;
+
+  // Atrasadas: fecha en semana pasada y sin entregar → se muestran en la semana ACTUAL
+  const late = dated.filter(i => wkMonday(i.date) < curMon && !i.delivered);
+  // Rango del rail: semana pasada → última semana futura con entregas (mín. actual+1)
+  const addDays = (mon, n) => { const d = new Date(mon + 'T12:00:00'); d.setDate(d.getDate() + n); return d.toISOString().slice(0, 10); };
+  const futureMons = dated.map(i => wkMonday(i.date)).filter(m => m >= curMon);
+  let maxMon = addDays(curMon, 7);
+  futureMons.forEach(m => { if (m > maxMon) maxMon = m; });
+  const mons = [];
+  for (let m = addDays(curMon, -7); m <= maxMon; m = addDays(m, 7)) mons.push(m);
+
+  const nextMon = addDays(curMon, 7);
+  const badge = i => {
+    if (i.delivered) return '<span class="wk-b ok">✓ Entregado</span>';
+    let b = '';
+    if (i.partial) b += '<span class="wk-b part">Entrega parcial</span>';
+    if (i.date && wkMonday(i.date) < curMon) b += `<span class="wk-b late">Atrasado · era sem ${wkNum(i.date)}</span>`;
+    if (i.stageLbl && i.stageLbl !== '✓ entregado') b += `<span class="wk-b go">${i.stageLbl}</span>`;
+    return b;
+  };
+  const itHtml = (i, showMove) => `
+    <div class="wk-it">
+      <div class="n">${escapeHtml(i.name || '')}</div>
+      <div class="m">${i.qty ? i.qty.toLocaleString('es-CO') + 'u' : ''}${i.supplier && !currentSupplierId ? ' · ' + escapeHtml(i.supplier) : ''}${i.sub ? ' · ' + escapeHtml(i.sub) : ''}</div>
+      ${badge(i)}
+      ${showMove ? `<div><button class="wk-mv" data-wk-move="${i.kind}:${i.id}">→ mover a sem ${wkNum(nextMon)}</button></div>` : ''}
+    </div>`;
+
+  rail.innerHTML = mons.map(mon => {
+    const inWeek = dated.filter(i => wkMonday(i.date) === mon);
+    const isCur = mon === curMon;
+    const lateHere = isCur ? late : [];
+    // Semanas pasadas: solo lo que sí se entregó (lo atrasado vive en la semana actual)
+    const shown = isCur ? inWeek.filter(i => !late.includes(i)) : (mon < curMon ? inWeek.filter(i => i.delivered) : inWeek);
+    const totalU = shown.concat(lateHere).filter(i => !i.delivered).reduce((a, i) => a + (i.qty || 0), 0);
+    return `<div class="wk-card${isCur ? ' cur' : ''}">
+      <div class="wk-t">
+        <span class="wk-sem">Semana ${wkNum(mon)}${isCur ? ' · hoy' : ''}</span>
+        <span class="wk-rng">${wkRangeLabel(mon)}</span>
+        ${totalU ? `<span class="wk-tot">${totalU.toLocaleString('es-CO')}u</span>` : ''}
+      </div>
+      ${shown.length ? `<div class="wk-items">${shown.map(i => itHtml(i, false)).join('')}</div>` : ''}
+      ${lateHere.length ? `<div class="wk-late-h">Atrasadas de semanas anteriores</div><div class="wk-items">${lateHere.map(i => itHtml(i, true)).join('')}</div>` : ''}
+      ${!shown.length && !lateHere.length ? '<div class="wk-empty">Sin entregas programadas</div>' : ''}
+    </div>`;
+  }).join('');
+
+  // Reprogramar atrasadas a la próxima semana (lote arrastra sus diseños)
+  rail.querySelectorAll('[data-wk-move]').forEach(b => b.addEventListener('click', async () => {
+    const [kind, id] = b.getAttribute('data-wk-move').split(':');
+    b.disabled = true; b.textContent = 'Moviendo…';
+    try {
+      if (kind === 'batch'){
+        await supabase.from('production_batches').update({ tentative_date: nextMon }).eq('id', id);
+        await supabase.from('product_pipeline').update({ tentative_date: nextMon }).eq('batch_id', id);
+        const bt = batches.find(x => x.id === id); if (bt) bt.tentative_date = nextMon;
+        pipeline.forEach(e => { if (e.batch_id === id) e.tentative_date = nextMon; });
+      } else {
+        await supabase.from('product_pipeline').update({ tentative_date: nextMon }).eq('id', id);
+        const e = pipeline.find(x => x.id === id); if (e) e.tentative_date = nextMon;
+      }
+      renderPipeline();
+    } catch(err){ b.disabled = false; b.textContent = 'Error, reintentá'; }
+  }));
+
+  // Primera vez: arrancá parado en la semana actual; después respetá el scroll del usuario
+  if (!weekRailScrolled){
+    const cur = rail.querySelector('.wk-card.cur');
+    if (cur) rail.scrollLeft = Math.max(0, cur.offsetLeft - 16);
+    weekRailScrolled = true;
+  } else {
+    rail.scrollLeft = keepScroll;
+  }
+}
+
 function renderPipeline(){
   const el = document.getElementById('timeline');
   if (!el) return;
@@ -2594,6 +2753,9 @@ function renderPipeline(){
   setKPI(prodUnits,  prodCost,  prodPVP,  'kpiProdNum',  'kpiProdCost');
   setKPI(weekUnits,  weekCost,  weekPVP,  'kpiWeekNum',  'kpiWeekCost');
   setKPI(monthUnits, monthCost, monthPVP, 'kpiMonthNum', 'kpiMonthCost');
+
+  // Rail de entregas semana a semana (swipe)
+  try { renderWeekRail(filteredBatches, standalone, variantsByBatch); } catch(_) {}
 
   if (!filteredPipeline.length && !filteredBatches.length){
     el.innerHTML = `<div class="empty-state">${currentSupplierId ? 'Este proveedor no tiene nada en producción.' : 'Sin entradas. Click "+ Nuevo lote" o "+ Jean suelto".'}</div>`;
