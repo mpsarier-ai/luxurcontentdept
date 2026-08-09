@@ -319,10 +319,7 @@ header{border-bottom:1px solid var(--black);padding-bottom:24px;margin-bottom:64
 /* Stepper: checklist VERTICAL estilo Apple — círculos grandes con ✓,
    nombre completo de la etapa, días a la derecha, línea que conecta */
 .tl-stepper{grid-column:1/-1;display:flex;flex-direction:column;align-items:stretch;gap:0;margin-top:12px;padding-top:8px;border-top:1px solid rgba(0,0,0,.05)}
-.tl-stage{display:flex;flex-direction:row;align-items:center;gap:12px;flex:none;text-align:left;font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text',sans-serif;font-size:14.5px;letter-spacing:0;text-transform:none;color:#8e8e93;background:transparent;border:none;padding:8px 6px;cursor:pointer;border-radius:12px;transition:background .15s ease;position:relative;width:100%}
-.tl-stage:hover{background:rgba(212,132,142,.07)}
-.tl-stage:hover .tl-stage-dot{border-color:var(--rosa-deep)}
-.tl-stage:active{background:rgba(212,132,142,.12)}
+.tl-stage{display:flex;flex-direction:row;align-items:center;gap:12px;flex:none;text-align:left;font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text',sans-serif;font-size:14.5px;letter-spacing:0;text-transform:none;color:#8e8e93;background:transparent;border:none;padding:7px 6px;border-radius:12px;position:relative;width:100%}
 .tl-stage-dot{width:24px;height:24px;border-radius:50%;background:#fff;border:2px solid rgba(0,0,0,.14);flex:none;display:flex;align-items:center;justify-content:center;transition:all .2s ease}
 .tl-stage.done .tl-stage-dot{background:var(--rosa-deep);border-color:var(--rosa-deep)}
 .tl-stage.done .tl-stage-dot::after{content:'✓';color:#fff;font-size:12px;font-weight:700;line-height:1}
@@ -346,6 +343,13 @@ header{border-bottom:1px solid var(--black);padding-bottom:24px;margin-bottom:64
 .tl-vstate{background:var(--cream);border:none;border-radius:999px;padding:6px 12px;font-size:11px;font-weight:600;font-family:-apple-system,sans-serif;color:var(--black);cursor:pointer;white-space:nowrap}
 .tl-vstate.done{background:#e2efe5;color:#3e7a4e}
 .tl-vstate:active{opacity:.6}
+/* CTA del pipeline: un solo botón grande para avanzar + deshacer discreto */
+.tl-cta-row{grid-column:1/-1;display:flex;gap:8px;align-items:center;margin-top:10px}
+.tl-adv{flex:1;background:linear-gradient(135deg,#e0949e 0%,var(--rosa-deep) 55%,#c4737d 100%);color:#fff;border:none;border-radius:999px;padding:13px 18px;font-size:14.5px;font-weight:600;font-family:-apple-system,BlinkMacSystemFont,sans-serif;cursor:pointer;box-shadow:0 1px 2px rgba(0,0,0,.06),0 4px 12px rgba(212,132,142,.3)}
+.tl-adv:active{transform:scale(.98);opacity:.9}
+.tl-adv:disabled{opacity:.5}
+.tl-undo{background:none;border:none;color:#8e8e93;font-size:12.5px;font-weight:500;font-family:-apple-system,sans-serif;cursor:pointer;padding:10px 8px;white-space:nowrap}
+.tl-undo:active{opacity:.5}
 
 .tl-prod-actions{grid-column:1/-1;display:flex;justify-content:flex-end;gap:8px;margin-top:8px}
 .tl-copy-link{display:inline-flex;align-items:center;gap:6px;background:transparent;border:1px solid var(--cream-dark);color:#555;font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.1em;text-transform:uppercase;padding:6px 12px;border-radius:999px;cursor:pointer;transition:all .15s ease}
@@ -2374,7 +2378,7 @@ function renderStepperInline(e){
     const cls = it.isDone ? 'done' : (it.isCurrent ? 'current' : '');
     const daysLabel = it.days != null ? `<span class="tl-stage-days">${it.days}d</span>` : '';
     // Cada dot es un botón: vos podés marcar cualquier etapa como completada
-    html += `<button type="button" class="tl-stage ${cls}" data-set-stage="${it.stage.key}" data-entry="${e.id}" title="Click para marcar ${it.stage.long || it.stage.short} como la última etapa completada"><span class="tl-stage-dot"></span><span class="tl-stage-label">${it.stage.long || it.stage.short}</span>${daysLabel}</button>`;
+    html += `<div class="tl-stage ${cls}"><span class="tl-stage-dot"></span><span class="tl-stage-label">${it.stage.long || it.stage.short}</span>${daysLabel}</div>`;
     if (i < stages.length - 1){
       html += `<span class="tl-line ${i < lastDoneIdx ? 'done' : ''}"></span>`;
     }
@@ -2390,6 +2394,10 @@ function renderStepperInline(e){
     const totalStr = totalDays != null && totalDays > 0 ? ` · total ${totalDays + (current.days || 0)}d` : '';
     html += `<div class="tl-stage-summary">En <b>${currentLabel}</b> · ${dayStr}${totalStr}</div>`;
   }
+  html += `<div class="tl-cta-row">
+    ${!isFullyDone && currentIdx < stages.length ? `<button class="tl-adv" data-adv-entry="${e.id}">✓ Marcar ${stages[currentIdx].long || stages[currentIdx].short}</button>` : ''}
+    ${lastDoneIdx >= 0 ? `<button class="tl-undo" data-undo-entry="${e.id}">↩ Me equivoqué</button>` : ''}
+  </div>`;
   return html;
 }
 
@@ -2461,11 +2469,15 @@ function renderVariantStepperInline(v){
     const isDone = i <= lastDoneIdx;
     const isCur = !isFullyDone && i === currentIdx;
     const cls = isDone ? 'done' : (isCur ? 'current' : '');
-    html += `<button type="button" class="tl-stage ${cls}" data-set-stage="${s.key}" data-entry="${v.id}" title="Click para marcar ${s.long || s.short}"><span class="tl-stage-dot"></span><span class="tl-stage-label">${s.long || s.short}</span></button>`;
+    html += `<div class="tl-stage ${cls}"><span class="tl-stage-dot"></span><span class="tl-stage-label">${s.long || s.short}</span></div>`;
     if (i < stages.length - 1) html += `<span class="tl-line ${i < lastDoneIdx ? 'done' : ''}"></span>`;
   });
   html += '</div>';
   if (isFullyDone) html += `<div class="tl-stage-summary done">✓ Entregado</div>`;
+  html += `<div class="tl-cta-row">
+    ${!isFullyDone ? `<button class="tl-adv" data-adv-entry="${v.id}">✓ Marcar ${stages[currentIdx].long}</button>` : ''}
+    ${lastDoneIdx >= 0 ? `<button class="tl-undo" data-undo-entry="${v.id}">↩ Me equivoqué</button>` : ''}
+  </div>`;
   return html;
 }
 
@@ -2490,10 +2502,14 @@ function renderBatchCard(batch, variants){
     const isDone = i <= lastIdx;
     const isCur = !isLavadero && i === currentIdx;
     const cls = isDone ? 'done' : (isCur ? 'current' : '');
-    stepperHtml += `<button type="button" class="tl-stage ${cls}" data-batch-set-stage="${s.key}" data-batch="${batch.id}" title="Click para marcar ${s.long || s.label || s.short}"><span class="tl-stage-dot"></span><span class="tl-stage-label">${s.long || s.label || s.short}</span></button>`;
+    stepperHtml += `<div class="tl-stage ${cls}"><span class="tl-stage-dot"></span><span class="tl-stage-label">${s.long || s.label || s.short}</span></div>`;
     if (i < stages.length - 1) stepperHtml += `<span class="tl-line ${i < lastIdx ? 'done' : ''}"></span>`;
   });
   stepperHtml += '</div>';
+  const batchCta = `<div class="tl-cta-row">
+    ${!isLavadero && currentIdx < stages.length ? `<button class="tl-adv" data-adv-batch="${batch.id}">✓ Marcar ${stages[currentIdx].long || stages[currentIdx].label || stages[currentIdx].short}</button>` : ''}
+    ${lastIdx >= 0 ? `<button class="tl-undo" data-undo-batch="${batch.id}">↩ Me equivoqué</button>` : ''}
+  </div>`;
   const summary = isLavadero
     ? `<div class="tl-stage-summary done">${isSimpleFlow ? '✓ Listo' : '✓ Lote en Lavandería · variantes en Terminación'}</div>`
     : (currentIdx >= 0 && currentIdx < stages.length
@@ -2518,6 +2534,7 @@ function renderBatchCard(batch, variants){
     </div>
     ${stepperHtml}
     ${summary}
+    ${batchCta}
   </div>`;
   // Variantes nested abajo
   if (variants.length){
@@ -2910,54 +2927,55 @@ function renderPipeline(){
   wireEl.querySelectorAll('[data-toggle]').forEach(b => b.addEventListener('click', () => togglePipelineStatus(b.getAttribute('data-toggle'))));
   wireEl.querySelectorAll('[data-del]').forEach(b => b.addEventListener('click', () => deletePipeline(b.getAttribute('data-del'))));
   wireEl.querySelectorAll('[data-edit]').forEach(b => b.addEventListener('click', () => openEntryModal(b.getAttribute('data-edit'))));
-  // Click en dot del stepper variant/standalone.
-  // Si tocás el ÚLTIMO dot hecho → lo desmarca (retrocede una etapa). Cualquier otro dot → salta ahí.
-  wireEl.querySelectorAll('[data-set-stage]').forEach(b => b.addEventListener('click', async (ev) => {
+  // CTA del pipeline: "✓ Marcar [etapa]" avanza una etapa al instante
+  // (sin dialogs — equivocarse se arregla con "↩ Me equivoqué")
+  const VARIANT_FLOW = [
+    { key: 'terminacion', long: 'Terminación' },
+    { key: 'entrega', long: 'Entrega' },
+  ];
+  const stampHist = (arr, stage) => {
+    const h = Array.isArray(arr) ? arr.slice() : [];
+    h.push({ stage: stage || 'none', at: new Date().toISOString(), by: (user && user.email) || 'team' });
+    return h;
+  };
+  wireEl.querySelectorAll('[data-adv-entry],[data-undo-entry]').forEach(b => b.addEventListener('click', async (ev) => {
     ev.stopPropagation();
-    const entryId = b.getAttribute('data-entry');
-    const clicked = b.getAttribute('data-set-stage');
-    const entry = pipeline.find(x => x.id === entryId);
+    const isUndo = b.hasAttribute('data-undo-entry');
+    const id = b.getAttribute(isUndo ? 'data-undo-entry' : 'data-adv-entry');
+    const entry = pipeline.find(x => x.id === id);
     if (!entry) return;
-    const stages = getFlowStages(entry);
-    let newStage;
-    if (entry.stage === clicked){
-      // Desmarcar: volver a la etapa anterior (o a "sin empezar")
-      const idx = stages.findIndex(s => s.key === clicked);
-      const prev = idx > 0 ? stages[idx - 1] : null;
-      if (!confirm(`¿Desmarcar "${clicked}"? Vuelve a ${prev ? '"' + prev.short + '"' : 'sin empezar'}.`)) return;
-      newStage = prev ? prev.key : null;
-    } else {
-      if (!confirm(`Marcar "${clicked}" como completada?`)) return;
-      newStage = clicked;
-    }
-    const newHistory = Array.isArray(entry.stage_history) ? entry.stage_history.slice() : [];
-    newHistory.push({ stage: newStage || 'none', at: new Date().toISOString(), by: (user && user.email) || 'team' });
-    const { error } = await supabase.from('product_pipeline').update({ stage: newStage, stage_history: newHistory }).eq('id', entryId);
-    if (error) alert('Error al guardar: ' + error.message);
+    const stages = entry.batch_id ? VARIANT_FLOW : getFlowStages(entry);
+    const idx = entry.stage ? stages.findIndex(x => x.key === entry.stage) : -1;
+    const nIdx = isUndo ? idx - 1 : idx + 1;
+    if (!isUndo && nIdx >= stages.length) return;
+    const newStage = nIdx >= 0 ? stages[nIdx].key : null;
+    const hist = stampHist(entry.stage_history, newStage);
+    b.disabled = true;
+    const { error } = await supabase.from('product_pipeline').update({ stage: newStage, stage_history: hist }).eq('id', id);
+    if (error){ alert('Error al guardar: ' + error.message); b.disabled = false; return; }
+    entry.stage = newStage;
+    entry.stage_history = hist;
+    renderPipeline();
   }));
-  // Click en dot del stepper LOTE — misma lógica de desmarcar
-  wireEl.querySelectorAll('[data-batch-set-stage]').forEach(b => b.addEventListener('click', async (ev) => {
+  wireEl.querySelectorAll('[data-adv-batch],[data-undo-batch]').forEach(b => b.addEventListener('click', async (ev) => {
     ev.stopPropagation();
-    const batchId = b.getAttribute('data-batch');
-    const clicked = b.getAttribute('data-batch-set-stage');
-    const batch = batches.find(x => x.id === batchId);
+    const isUndo = b.hasAttribute('data-undo-batch');
+    const id = b.getAttribute(isUndo ? 'data-undo-batch' : 'data-adv-batch');
+    const batch = batches.find(x => x.id === id);
     if (!batch) return;
-    const bsup = suppliers.find(s => s.id === batch.supplier_id);
+    const bsup = suppliers.find(x => x.id === batch.supplier_id);
     const stages = (bsup && bsup.flow_type === 'simple') ? PROD_STAGES_SIMPLE : getBatchStages(batch.has_proceso);
-    let newStage;
-    if (batch.batch_stage === clicked){
-      const idx = stages.findIndex(s => s.key === clicked);
-      const prev = idx > 0 ? stages[idx - 1] : null;
-      if (!confirm(`¿Desmarcar "${clicked}" del lote "${batch.name}"? Vuelve a ${prev ? '"' + prev.short + '"' : 'sin empezar'}.`)) return;
-      newStage = prev ? prev.key : null;
-    } else {
-      if (!confirm(`Marcar lote "${batch.name}" en etapa "${clicked}"?`)) return;
-      newStage = clicked;
-    }
-    const newHistory = Array.isArray(batch.batch_stage_history) ? batch.batch_stage_history.slice() : [];
-    newHistory.push({ stage: newStage || 'none', at: new Date().toISOString(), by: (user && user.email) || 'team' });
-    const { error } = await supabase.from('production_batches').update({ batch_stage: newStage, batch_stage_history: newHistory }).eq('id', batchId);
-    if (error) alert('Error al guardar: ' + error.message);
+    const idx = batch.batch_stage ? stages.findIndex(x => x.key === batch.batch_stage) : -1;
+    const nIdx = isUndo ? idx - 1 : idx + 1;
+    if (!isUndo && nIdx >= stages.length) return;
+    const newStage = nIdx >= 0 ? stages[nIdx].key : null;
+    const hist = stampHist(batch.batch_stage_history, newStage);
+    b.disabled = true;
+    const { error } = await supabase.from('production_batches').update({ batch_stage: newStage, batch_stage_history: hist }).eq('id', id);
+    if (error){ alert('Error al guardar: ' + error.message); b.disabled = false; return; }
+    batch.batch_stage = newStage;
+    batch.batch_stage_history = hist;
+    renderPipeline();
   }));
   // Editar lote / agregar variante / eliminar lote
   wireEl.querySelectorAll('[data-edit-batch]').forEach(b => b.addEventListener('click', () => openBatchModal(b.getAttribute('data-edit-batch'))));
