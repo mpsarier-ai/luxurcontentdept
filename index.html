@@ -222,6 +222,13 @@ header{border-bottom:1px solid var(--black);padding-bottom:24px;margin-bottom:64
 .wk-b.go{background:var(--rosa);color:var(--black)}
 .wk-mv{margin-top:6px;background:rgba(0,0,0,.05);border:none;border-radius:999px;padding:5px 12px;font-size:11px;font-weight:600;font-family:inherit;color:var(--black);cursor:pointer}
 .wk-mv:active{opacity:.6}
+.wk-it[data-wk-open]{cursor:pointer;border-radius:10px;margin:0 -6px;padding:8px 6px 6px;transition:background .15s ease;position:relative}
+.wk-it[data-wk-open]:active{background:var(--cream)}
+.wk-it[data-wk-open] .n::after{content:' ›';color:var(--rosa-deep);font-weight:700}
+.wk-it.sel{background:#faf4f5;box-shadow:inset 0 0 0 1.5px var(--rosa-deep)}
+.tl-close-row{display:flex;justify-content:flex-end;margin-bottom:8px}
+.tl-close{background:rgba(0,0,0,.05);border:none;border-radius:999px;padding:6px 14px;font-size:12px;font-weight:600;font-family:inherit;color:var(--black);cursor:pointer}
+.tl-hint{font-size:12.5px;color:var(--grey);text-align:center;padding:22px 20px;background:#fff;border:1px dashed rgba(0,0,0,.12);border-radius:16px}
 .wk-late-h{font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#b23a35;margin-top:12px}
 .wk-empty{font-size:12px;color:var(--grey);margin-top:10px}
 .sup-chip{background:#fff;border:1px solid rgba(0,0,0,.08);border-radius:999px;padding:9px 16px;font-family:'Outfit',sans-serif;font-size:13px;font-weight:500;color:#555;cursor:pointer;letter-spacing:.01em;transition:all .15s ease;white-space:nowrap;box-shadow:0 1px 2px rgba(0,0,0,.04)}
@@ -798,7 +805,7 @@ header,.hub-header{position:static !important;background:transparent !important;
       <button class="slb-copy" id="slbCopy">📋 Copiar link</button>
     </div>
     <h2 class="section-title">
-      <span>Próximas Entradas</span>
+      <span>Desglose</span>
       <span style="display:flex;gap:8px">
         <button class="new-week-btn" id="addBatchBtn">+ Nuevo lote</button>
         <button class="new-week-btn" id="addEntryBtn" style="background:transparent;color:var(--black);border:1px solid var(--cream-dark)">+ Jean suelto</button>
@@ -2032,7 +2039,9 @@ function renderFaProdAction(p){
     const bits = [`<b>${label}</b>`];
     if (qty) bits.push(`${qty}u`);
     if (stageLabel) bits.push(stageLabel);
-    return `<div class="fa-active-badge" data-fa-jump-prod="1" title="Ir a Producción">✓ ${bits.join(' · ')}</div>`;
+    const jumpKind = active.kind === 'batch' ? 'batch' : 'entry';
+    const jumpId = active.kind === 'batch' ? active.batch.id : active.entry.id;
+    return `<div class="fa-active-badge" data-fa-jump-prod="1" data-fa-jump-kind="${jumpKind}" data-fa-jump-id="${jumpId}" title="Ir a Producción">✓ ${bits.join(' · ')}</div>`;
   }
   return `<div class="fa-actions">
     <button class="fa-act-btn" data-fa-action="restock" data-fa-product-gid="${escapeHtml(p.gid || '')}">+ Restock</button>
@@ -2040,11 +2049,15 @@ function renderFaProdAction(p){
   </div>`;
 }
 
-// Click en badge "Restock activo" → ir a Producción
+// Click en badge "Restock activo" → ir a Producción con su desglose abierto
 document.addEventListener('click', e => {
   const badge = e.target.closest('[data-fa-jump-prod]');
   if (!badge) return;
+  const kind = badge.getAttribute('data-fa-jump-kind');
+  const id = badge.getAttribute('data-fa-jump-id');
+  if (kind && id) selectedProdItem = { kind, id };
   showHubSection('produccion');
+  try { renderPipeline(); } catch(_) {}
 });
 
 // Acciones Fashionalytics → Producción (Restock / Lote)
@@ -2486,6 +2499,7 @@ function wkRangeLabel(mon){
   return `${a.getDate()} ${MES[a.getMonth()]} – ${b.getDate()} ${MES[b.getMonth()]}`;
 }
 let weekRailScrolled = false;
+let selectedProdItem = null; // {kind:'batch'|'entry', id} → desglose abierto abajo del rail
 function renderWeekRail(fBatches, fStandalone, variantsByBatch){
   const rail = document.getElementById('weekRail');
   const head = document.getElementById('weekRailHead');
@@ -2543,13 +2557,14 @@ function renderWeekRail(fBatches, fStandalone, variantsByBatch){
     return b;
   };
   const itHtml = (i, showMove) => `
-    <div class="wk-it">
+    <div class="wk-it${selectedProdItem && selectedProdItem.kind === i.kind && selectedProdItem.id === i.id ? ' sel' : ''}" data-wk-open="${i.kind}:${i.id}">
       <div class="n">${escapeHtml(i.name || '')}</div>
       <div class="m">${i.qty ? i.qty.toLocaleString('es-CO') + 'u' : ''}${i.supplier && !currentSupplierId ? ' · ' + escapeHtml(i.supplier) : ''}${i.sub ? ' · ' + escapeHtml(i.sub) : ''}</div>
       ${badge(i)}
       ${showMove ? `<div><button class="wk-mv" data-wk-move="${i.kind}:${i.id}">→ mover a sem ${wkNum(nextMon)}</button></div>` : ''}
     </div>`;
 
+  const undated = items.filter(i => !i.date);
   rail.innerHTML = mons.map(mon => {
     const inWeek = dated.filter(i => wkMonday(i.date) === mon);
     const isCur = mon === curMon;
@@ -2567,7 +2582,23 @@ function renderWeekRail(fBatches, fStandalone, variantsByBatch){
       ${lateHere.length ? `<div class="wk-late-h">Atrasadas de semanas anteriores</div><div class="wk-items">${lateHere.map(i => itHtml(i, true)).join('')}</div>` : ''}
       ${!shown.length && !lateHere.length ? '<div class="wk-empty">Sin entregas programadas</div>' : ''}
     </div>`;
-  }).join('');
+  }).join('') + (undated.length ? `<div class="wk-card">
+      <div class="wk-t"><span class="wk-sem">Sin fecha</span></div>
+      <div class="wk-items">${undated.map(i => itHtml(i, false)).join('')}</div>
+    </div>` : '');
+
+  // Click en una referencia → abrir su desglose abajo
+  rail.querySelectorAll('[data-wk-open]').forEach(card => card.addEventListener('click', (ev) => {
+    if (ev.target.closest('[data-wk-move]')) return; // el botón de reprogramar no abre desglose
+    const [kind, id] = card.getAttribute('data-wk-open').split(':');
+    if (selectedProdItem && selectedProdItem.kind === kind && selectedProdItem.id === id){
+      selectedProdItem = null; // segundo tap: cerrar
+    } else {
+      selectedProdItem = { kind, id };
+    }
+    renderPipeline();
+    if (selectedProdItem) setTimeout(() => document.getElementById('timeline')?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 60);
+  }));
 
   // Reprogramar atrasadas a la próxima semana (lote arrastra sus diseños)
   rail.querySelectorAll('[data-wk-move]').forEach(b => b.addEventListener('click', async () => {
@@ -2761,18 +2792,25 @@ function renderPipeline(){
     el.innerHTML = `<div class="empty-state">${currentSupplierId ? 'Este proveedor no tiene nada en producción.' : 'Sin entradas. Click "+ Nuevo lote" o "+ Jean suelto".'}</div>`;
     return;
   }
+  // El timeline ahora es el DESGLOSE de la referencia seleccionada en el rail.
+  // Sin selección → hint. La selección puede desaparecer al cambiar el filtro
+  // de proveedor o al borrarse el item: en ese caso volvé al hint.
   let html = '';
-  // Lotes primero, ordenados por fecha tentativa
-  const sortedBatches = filteredBatches.slice().sort((a, b) => (a.tentative_date || '9999') > (b.tentative_date || '9999') ? 1 : -1);
-  sortedBatches.forEach(batch => {
-    html += renderBatchCard(batch, variantsByBatch[batch.id] || []);
-  });
-  // Standalone después
-  if (standalone.length){
-    if (filteredBatches.length) html += `<div style="font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.15em;text-transform:uppercase;color:var(--grey);margin:18px 0 6px;padding:0 4px">Jeans sueltos</div>`;
-    html += standalone.map(e => renderPipelineEntry(e, false)).join('');
+  if (selectedProdItem){
+    if (selectedProdItem.kind === 'batch'){
+      const b = filteredBatches.find(x => x.id === selectedProdItem.id);
+      if (b) html = renderBatchCard(b, variantsByBatch[b.id] || []);
+    } else {
+      const e = standalone.find(x => x.id === selectedProdItem.id);
+      if (e) html = renderPipelineEntry(e, false);
+    }
+    if (html) html = `<div class="tl-close-row"><button class="tl-close" id="tlCloseBtn">✕ Cerrar desglose</button></div>` + html;
+    else selectedProdItem = null;
   }
+  if (!html) html = `<div class="tl-hint">Toca una referencia en las semanas de arriba para ver su desglose: diseños, etapas, curva y fechas.</div>`;
   el.innerHTML = html;
+  const tlClose = document.getElementById('tlCloseBtn');
+  if (tlClose) tlClose.addEventListener('click', () => { selectedProdItem = null; renderPipeline(); });
   el.querySelectorAll('[data-toggle]').forEach(b => b.addEventListener('click', () => togglePipelineStatus(b.getAttribute('data-toggle'))));
   el.querySelectorAll('[data-del]').forEach(b => b.addEventListener('click', () => deletePipeline(b.getAttribute('data-del'))));
   el.querySelectorAll('[data-edit]').forEach(b => b.addEventListener('click', () => openEntryModal(b.getAttribute('data-edit'))));
@@ -2940,8 +2978,14 @@ document.getElementById('entrySave').addEventListener('click', async () => {
   let error;
   if (editingEntryId){
     ({ error } = await supabase.from('product_pipeline').update(payload).eq('id', editingEntryId));
+    if (!error){
+      const prev = pipeline.find(x => x.id === editingEntryId);
+      selectedProdItem = prev && prev.batch_id ? { kind: 'batch', id: prev.batch_id } : { kind: 'entry', id: editingEntryId };
+    }
   } else {
-    ({ error } = await supabase.from('product_pipeline').insert({ ...payload, status: 'pendiente' }));
+    const res = await supabase.from('product_pipeline').insert({ ...payload, status: 'pendiente' }).select('id').single();
+    error = res.error;
+    if (!error && res.data) selectedProdItem = { kind: 'entry', id: res.data.id }; // abrí el desglose del jean nuevo
   }
   if (error){ document.getElementById('entryError').textContent = 'Error: ' + error.message; return; }
   editingEntryId = null;
@@ -2986,8 +3030,11 @@ document.getElementById('batchSave').addEventListener('click', async () => {
   let error;
   if (editingBatchId){
     ({ error } = await supabase.from('production_batches').update(payload).eq('id', editingBatchId));
+    if (!error) selectedProdItem = { kind: 'batch', id: editingBatchId };
   } else {
-    ({ error } = await supabase.from('production_batches').insert(payload));
+    const res = await supabase.from('production_batches').insert(payload).select('id').single();
+    error = res.error;
+    if (!error && res.data) selectedProdItem = { kind: 'batch', id: res.data.id }; // abrí el desglose del lote nuevo
   }
   if (error){ document.getElementById('batchError').textContent = 'Error: ' + error.message; return; }
   editingBatchId = null;
