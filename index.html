@@ -342,9 +342,26 @@ header{border-bottom:1px solid var(--black);padding-bottom:24px;margin-bottom:64
 .tl-stage-summary b{color:var(--black);font-weight:600}
 .tl-stage-summary.done{background:rgba(91,154,91,.1);color:#3a5a3a}
 /* Variantes: stepper colapsado — un chip de estado lo abre/cierra */
-.tl-variant .tl-stepper,.tl-variant .tl-stage-summary{display:none}
+.tl-variant .tl-stepper,.tl-variant .tl-stage-summary,.tl-variant .tl-cta-row{display:none}
 .tl-variant.open .tl-stepper{display:flex}
 .tl-variant.open .tl-stage-summary{display:block}
+.tl-variant.open .tl-cta-row{display:flex}
+/* Desglose de lote en el sheet */
+.ps-card{background:#fff;border-radius:16px;padding:14px 16px;box-shadow:0 1px 3px rgba(0,0,0,.05),0 4px 14px rgba(0,0,0,.04)}
+.ps-sec{font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#8e8e93;margin:16px 4px 8px}
+.ps-meta{display:flex;gap:6px;flex-wrap:wrap}
+.ps-chip{background:var(--cream);border-radius:999px;padding:4px 12px;font-size:12px;font-weight:600}
+.ps-chip.red{background:#f7dedc;color:#b23a35}
+.ps-v{padding:12px 0;border-top:1px solid rgba(0,0,0,.05)}
+.ps-v:first-child{border-top:none;padding-top:2px}
+.ps-v-h{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.ps-v-n{font-size:14.5px;font-weight:600;cursor:pointer}
+.ps-v-n .tl-edit-mark{font-size:11px;color:#c7c7cc}
+.ps-v-m{font-size:12px;color:#8e8e93;margin-top:1px}
+.ps-actions{display:flex;gap:8px;justify-content:center;margin-top:16px;flex-wrap:wrap}
+.ps-act{background:rgba(0,0,0,.05);border:none;border-radius:999px;padding:9px 16px;font-size:12.5px;font-weight:600;font-family:-apple-system,sans-serif;color:var(--black);cursor:pointer}
+.ps-act:active{opacity:.6}
+.ps-act.danger{color:#b23a35}
 .tl-vstate{background:var(--cream);border:none;border-radius:999px;padding:6px 12px;font-size:11px;font-weight:600;font-family:-apple-system,sans-serif;color:var(--black);cursor:pointer;white-space:nowrap}
 .tl-vstate.done{background:#e2efe5;color:#3e7a4e}
 .tl-vstate:active{opacity:.6}
@@ -2530,6 +2547,90 @@ function renderVariantStepperInline(v){
   return html;
 }
 
+// Desglose de lote para el bottom sheet: resumen arriba, diseños como
+// lista limpia (sin tarjetas anidadas ni cajones de fecha)
+function renderBatchSheet(batch, variants){
+  const bsup = suppliers.find(x => x.id === batch.supplier_id);
+  const isSimpleFlow = !!(bsup && bsup.flow_type === 'simple');
+  const stages = isSimpleFlow ? PROD_STAGES_SIMPLE : getBatchStages(batch.has_proceso);
+  const bTimings = computeStageTimings({
+    stage: batch.batch_stage, stage_history: batch.batch_stage_history,
+    created_at: batch.created_at, supplier_id: batch.supplier_id,
+  }, stages);
+  const lastIdx = bTimings.lastDoneIdx, currentIdx = lastIdx + 1;
+  const flowDone = bTimings.isFullyDone;
+
+  // Chips de resumen: unidades · diseños · fecha · atraso
+  const chips = [];
+  if (batch.total_quantity) chips.push(`<span class="ps-chip">${batch.total_quantity.toLocaleString('es-CO')}u</span>`);
+  if (variants.length) chips.push(`<span class="ps-chip">${variants.length} diseños</span>`);
+  if (batch.tentative_date){
+    const d = batch.tentative_date.split('-');
+    chips.push(`<span class="ps-chip">entrega ${parseInt(d[2])} ${MONTH_ABBR[parseInt(d[1])-1]}</span>`);
+  }
+  const todayB = new Date(Date.now() - 5*3600e3).toISOString().slice(0, 10);
+  const orig = batch.original_date || batch.tentative_date;
+  if (orig && batch.tentative_date){
+    const ref = batch.tentative_date < todayB ? wkMonday(todayB) : wkMonday(batch.tentative_date);
+    if (wkMonday(orig) < ref){
+      const w = Math.max(1, Math.round((new Date(ref + 'T12:00:00') - new Date(wkMonday(orig) + 'T12:00:00')) / 6048e5));
+      chips.push(`<span class="ps-chip red">${w} sem de atraso · era sem ${wkNum(orig)}</span>`);
+    }
+  }
+
+  // Checklist del lote
+  let steps = '<div class="tl-stepper" style="border-top:none;margin-top:8px;padding-top:0">';
+  bTimings.items.forEach((it, i) => {
+    const cls = it.isDone ? 'done' : (it.isCurrent ? 'current' : '');
+    steps += `<div class="tl-stage ${cls}"><span class="tl-stage-dot"></span><span class="tl-stage-label">${it.stage.long || it.stage.label || it.stage.short}</span>${stageDaysLabel(it)}</div>`;
+    if (i < stages.length - 1) steps += `<span class="tl-line ${i < lastIdx ? 'done' : ''}"></span>`;
+  });
+  steps += '</div>';
+  let bRemaining = bTimings.remainingDays;
+  if (!isSimpleFlow && bRemaining != null){
+    bRemaining += (stageGoalDays(batch.supplier_id, 'terminacion') || 0) + (stageGoalDays(batch.supplier_id, 'entrega') || 0);
+  }
+  const proj = projectionHtml(bRemaining, flowDone && isSimpleFlow, batch.tentative_date);
+  const cta = `<div class="tl-cta-row">
+    ${!flowDone && currentIdx < stages.length ? `<button class="tl-adv" data-adv-batch="${batch.id}">✓ Marcar ${stages[currentIdx].long || stages[currentIdx].label || stages[currentIdx].short}</button>` : ''}
+    ${lastIdx >= 0 ? `<button class="tl-undo" data-undo-batch="${batch.id}">↩ Me equivoqué</button>` : ''}
+  </div>`;
+
+  // Diseños: lista simple con chip de estado; tap en el chip abre su checklist
+  const varRows = variants.map(v => {
+    const done = v.stage === 'entrega' || v.status === 'llego';
+    const vLbl = done ? '✓ Entregado'
+      : v.stage === 'terminacion' ? 'En Entrega'
+      : (PROD_NEXT_STAGE_LABEL[batch.batch_stage] || 'en Corte');
+    const chip = `<button class="tl-vstate ${done ? 'done' : ''}" data-vtoggle="${v.id}">${vLbl} ▾</button>`;
+    return `<div class="ps-v tl-variant" data-id="${v.id}">
+      <div class="ps-v-h">
+        <div>
+          <div class="ps-v-n" data-edit="${v.id}" title="Editar">${escapeHtml(v.design_name || v.product_name || '—')} <span class="tl-edit-mark">✎</span></div>
+          <div class="ps-v-m">${v.quantity ? v.quantity.toLocaleString('es-CO') + 'u' : ''}</div>
+        </div>
+        ${chip}
+      </div>
+      ${renderVariantStepperInline(v)}
+    </div>`;
+  }).join('');
+
+  return `
+    <div class="ps-card">
+      <div class="ps-meta">${chips.join('')}</div>
+      ${steps}
+      ${proj}
+      ${cta}
+    </div>
+    <div class="ps-sec">Diseños</div>
+    <div class="ps-card">${varRows || '<div class="ps-v-m">Este lote no tiene diseños aún</div>'}</div>
+    <div class="ps-actions">
+      <button class="ps-act" data-edit-batch="${batch.id}">✎ Editar lote</button>
+      <button class="ps-act" data-add-variant="${batch.id}">+ Añadir diseño</button>
+      <button class="ps-act danger" data-del-batch="${batch.id}">Eliminar</button>
+    </div>`;
+}
+
 function renderBatchCard(batch, variants){
   // Flow-aware: lotes de proveedor "simple" (AXSPEN) usan su propio flujo
   const bsup = suppliers.find(s => s.id === batch.supplier_id);
@@ -2664,7 +2765,7 @@ function renderWeekRail(fBatches, fStandalone, variantsByBatch){
         date: v.tentative_date || b.tentative_date, delivered, partial: false,
         original: v.original_date || b.original_date || null,
         lote: b.name,
-        stageLbl: delivered ? '' : (PROD_NEXT_STAGE_LABEL[v.stage] || ''),
+        stageLbl: delivered ? '' : (v.stage ? (PROD_NEXT_STAGE_LABEL[v.stage] || '') : (PROD_NEXT_STAGE_LABEL[b.batch_stage] || 'en Corte')),
         supplier: supName(b.supplier_id),
       });
     });
@@ -2984,7 +3085,7 @@ function renderPipeline(){
   if (selectedProdItem){
     if (selectedProdItem.kind === 'batch'){
       const b = filteredBatches.find(x => x.id === selectedProdItem.id);
-      if (b){ html = renderBatchCard(b, variantsByBatch[b.id] || []); sheetName = b.name; }
+      if (b){ html = renderBatchSheet(b, variantsByBatch[b.id] || []); sheetName = b.name; }
     } else {
       const e = standalone.find(x => x.id === selectedProdItem.id);
       if (e){ html = renderPipelineEntry(e, false); sheetName = e.product_name; }
@@ -3001,7 +3102,7 @@ function renderPipeline(){
   }
   el.innerHTML = '';
   const wireEl = sheetBody || el;
-  wireEl.querySelectorAll('[data-vtoggle]').forEach(b => b.addEventListener('click', () => b.closest('.tl-row')?.classList.toggle('open')));
+  wireEl.querySelectorAll('[data-vtoggle]').forEach(b => b.addEventListener('click', () => b.closest('.tl-variant')?.classList.toggle('open')));
   wireEl.querySelectorAll('[data-toggle]').forEach(b => b.addEventListener('click', () => togglePipelineStatus(b.getAttribute('data-toggle'))));
   wireEl.querySelectorAll('[data-del]').forEach(b => b.addEventListener('click', () => deletePipeline(b.getAttribute('data-del'))));
   wireEl.querySelectorAll('[data-edit]').forEach(b => b.addEventListener('click', () => openEntryModal(b.getAttribute('data-edit'))));
