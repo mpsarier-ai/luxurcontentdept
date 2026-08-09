@@ -108,7 +108,7 @@ tr.tot td{font-weight:700;border-top:2px solid var(--black);background:var(--cre
 <a class="back" href="index.html#produccion">‹ Inicio</a>
 <div class="logo">LUXUR</div>
 <div class="sub">Atelier</div>
-<div class="subsub">Colección · referencias y órdenes One Look</div>
+<div class="subsub">Colección · referencias y órdenes de compra</div>
 </div>
 <div class="tabs">
 <button id="tabRef" class="on" onclick="show('ref')">Referencias</button>
@@ -126,8 +126,8 @@ tr.tot td{font-weight:700;border-top:2px solid var(--black);background:var(--cre
 </div>
 
 <div class="wrap" id="viewOrd" style="display:none">
-<div class="bar"><div><h2>Órdenes de compra · One Look</h2><div class="muted">Lead time 45 días hábiles · una orden por quincena</div></div>
-<button class="btn" style="margin-left:auto" onclick="openOrd()">+ Nueva orden (15 días)</button></div>
+<div class="bar"><div><h2>Órdenes de compra</h2><div class="muted">Elige el proveedor · la orden crea su lote en Producción automáticamente</div></div>
+<button class="btn" style="margin-left:auto" onclick="openOrd()">+ Nueva orden</button></div>
 <div id="ordList"></div>
 <div id="ordEmpty" class="empty">Aún no hay órdenes. Crea una con <b>+ Nueva orden</b>.</div>
 </div>
@@ -161,6 +161,7 @@ tr.tot td{font-weight:700;border-top:2px solid var(--black);background:var(--cre
 <div class="ov" id="ovOrd"><div class="modal">
 <h3>Nueva orden de compra</h3>
 <div class="form">
+<div class="f full"><label>Proveedor</label><select id="o_sup"></select></div>
 <div class="f"><label>Fecha de compra (orden)</label><input id="o_fecha" type="date" onchange="calcFechas()"></div>
 <div class="f"><label>Fecha de envío del pedido</label><input id="o_envio" type="date"></div>
 <div class="f"><label>Lead time (días hábiles)</label><input id="o_lead" type="number" value="45" onchange="calcFechas()"></div>
@@ -168,7 +169,7 @@ tr.tot td{font-weight:700;border-top:2px solid var(--black);background:var(--cre
 <div class="f full"><label>Nombre / quincena</label><input id="o_nombre" placeholder="Orden Q1 · Drop semana 39"></div>
 <div class="f"><label>Referencia</label><select id="o_ref"></select></div>
 <div class="f"><label>Cantidad</label><input id="o_qty" type="number" min="1" value="0"></div>
-<div class="f full"><button class="btn ghost sm" onclick="addItem()">+ Agregar a la orden</button></div>
+<div class="f full"><button class="btn ghost sm" onclick="addItem()">+ Agregar a la orden</button> <button class="btn ghost sm" onclick="addAllItems()">+ Agregar TODAS las refs (con su curva)</button></div>
 <div class="f full"><table id="o_tbl"></table></div>
 </div>
 <div class="mact"><button class="btn ghost" onclick="closeOrd()">Cancelar</button><button class="btn" id="btnSaveOrd" onclick="saveOrd()">Guardar orden</button></div>
@@ -352,9 +353,25 @@ function renderRefs(){refGrid.innerHTML='';refEmpty.style.display=REFS.length?'n
  <div class="act"><button class="btn ghost sm" onclick="openRef('${r.id}')">Editar</button><button class="btn ghost sm" onclick="dupRef('${r.id}')">⧉ Duplicar</button><button class="btn ghost sm" onclick="delRef('${r.id}')">Eliminar</button></div></div>`;});}
 
 function calcFechas(){if(!o_fecha.value)return;if(!o_envio.value)o_envio.value=o_fecha.value;o_entrega.value=dfmt(addBusinessDays(o_fecha.value,+o_lead.value||45));}
+let SUPS = [];
+async function loadSuppliers(){
+  const { data } = await sb.from('suppliers').select('id,name,flow_type').order('name');
+  SUPS = data || [];
+}
+function addAllItems(){
+  REFS.forEach(r => {
+    if (orderItems.find(i => i.id == r.id)) return;
+    const q = r.sz.reduce((a,b)=>a+b,0);
+    if (q > 0) orderItems.push({ id: r.id, q });
+  });
+  renderItems();
+}
 function openOrd(){editId=null;orderItems=[];o_fecha.value=new Date().toISOString().slice(0,10);o_envio.value=o_fecha.value;o_lead.value=45;o_nombre.value='';o_qty.value=0;calcFechas();
+ o_sup.innerHTML=SUPS.map(x=>`<option value="${x.id}">${esc(x.name)}</option>`).join('')||'<option value="">— sin proveedores —</option>';
  o_ref.innerHTML=REFS.map(r=>`<option value="${r.id}">${esc(r.cod)||''} ${esc(r.nm)||'Sin nombre'}</option>`).join('')||'<option value="">— crea referencias primero —</option>';
+ syncQty();o_ref.onchange=syncQty;
  renderItems();ovOrd.classList.add('on');}
+function syncQty(){const r=REFS.find(x=>x.id==o_ref.value);if(r)o_qty.value=r.sz.reduce((a,b)=>a+b,0);}
 function closeOrd(){ovOrd.classList.remove('on');}
 function addItem(){const id=o_ref.value,q=+o_qty.value;if(!id||q<=0)return;const e=orderItems.find(i=>i.id==id);if(e)e.q+=q;else orderItems.push({id,q});o_qty.value=0;renderItems();}
 function delItem(id){orderItems=orderItems.filter(i=>i.id!=id);renderItems();}
@@ -363,15 +380,56 @@ function renderItems(){let h='<thead><tr><th>Ref</th><th>Fit</th><th>Cant</th><t
  h+=`<tr><td>${esc(r.cod)||''} ${esc(r.nm)||''}</td><td>${esc(r.fit)}</td><td>${i.q}</td><td>${r.costo?fmt(lc):'Por confirmar'}</td><td><button class="btn ghost sm" onclick="delItem('${i.id}')">✕</button></td></tr>`;});
  h+=`<tr class="tot"><td>TOTAL</td><td></td><td>${tu}</td><td>${fmt(tc)}${pend?' *':''}</td><td></td></tr></tbody>`;o_tbl.innerHTML=h+(pend?'<div class="muted">* faltan costos por confirmar del proveedor</div>':'');}
 
+// Escala la curva de la ref a la cantidad pedida (método del mayor residuo)
+function scaleCurve(sz, q){
+  const tot = sz.reduce((a,b)=>a+b,0);
+  if (!tot || !q) return { '4':0,'6':0,'8':0,'10':0,'12':0 };
+  const keys = ['4','6','8','10','12'];
+  const raw = sz.map(v => v * q / tot);
+  const flo = raw.map(Math.floor);
+  let rest = q - flo.reduce((a,b)=>a+b,0);
+  const order = raw.map((v,i)=>({i, r: v - flo[i]})).sort((a,b)=>b.r-a.r);
+  for (let k = 0; k < rest; k++) flo[order[k % order.length].i]++;
+  const out = {}; keys.forEach((k,i)=>out[k]=flo[i]); return out;
+}
 async function saveOrd(){
  if(!orderItems.length){alert('Agrega al menos una referencia.');return;}
+ if(!o_sup.value){alert('Elige el proveedor.');return;}
  const btn=document.getElementById('btnSaveOrd');btn.disabled=true;btn.textContent='Guardando…';
  try{
+  const sup = SUPS.find(x=>x.id===o_sup.value);
+  const entregaISO = addBusinessDays(o_fecha.value, +o_lead.value||45).toISOString().slice(0,10);
+  const totalU = orderItems.reduce((a,i)=>a+i.q,0);
+  const ocName = o_nombre.value || ('OC ' + o_fecha.value + ' · ' + (sup?sup.name:''));
+  // 1) Lote en Producción (para seguir el avance con el proveedor)
+  const { data: nb, error: bErr } = await sb.from('production_batches').insert({
+    supplier_id: o_sup.value, name: ocName, total_quantity: totalU,
+    tentative_date: entregaISO, original_date: entregaISO, has_proceso: true,
+    notes: 'Creado desde Atelier · ' + ocName,
+  }).select('id').single();
+  if (bErr) throw bErr;
+  // 2) Un diseño por referencia, con curva escalada y foto de Atelier
+  const rows = orderItems.map(i => {
+    const r = REFS.find(x=>x.id==i.id); if(!r) return null;
+    return {
+      product_name: r.nm, design_name: (r.nm||'').replace(/^JEANS?\s+/i,''),
+      entry_type: 'launch', status: 'pendiente', quantity: i.q,
+      size_curve: scaleCurve(r.sz, i.q),
+      tentative_date: entregaISO, original_date: entregaISO,
+      supplier_id: o_sup.value, batch_id: nb.id, has_proceso: true,
+      photo_url: (r.photos&&r.photos.principal)||null,
+      unit_cost: r.costo||null, notes: (r.tela||'') + ' · ' + (r.cod||''),
+    };
+  }).filter(Boolean);
+  const { error: pErr } = await sb.from('product_pipeline').insert(rows);
+  if (pErr) throw pErr;
+  // 3) La orden en Atelier, ligada al lote
   const { error } = await sb.from('collection_orders').insert({
     fecha:o_fecha.value, envio:o_envio.value||o_fecha.value, lead:+o_lead.value||45,
-    nombre:o_nombre.value, items:orderItems });
+    nombre:ocName, items:orderItems, supplier_id:o_sup.value, batch_id:nb.id });
   if (error) throw error;
   await loadAll(); closeOrd();
+  alert('Orden guardada ✓ y lote creado en Producción con ' + rows.length + ' diseños.');
  }catch(e){ alert('No se pudo guardar: '+(e.message||e)); }
  finally{ btn.disabled=false;btn.textContent='Guardar orden'; }
 }
@@ -384,7 +442,8 @@ async function delOrd(id){
 function renderOrds(){ordList.innerHTML='';ordEmpty.style.display=ORDS.length?'none':'block';
  ORDS.slice().sort((a,b)=>a.fecha.localeCompare(b.fecha)).forEach((o,idx)=>{const ent=dfmt(addBusinessDays(o.fecha,o.lead));let tu=0,tc=0;
  let pend=false;let rows=o.items.map(i=>{const r=REFS.find(x=>x.id==i.id);if(!r)return'';tu+=i.q;const lc=r.costo?i.q*r.costo:0;tc+=lc;if(!r.costo)pend=true;return`<tr><td>${esc(r.cod)||''} ${esc(r.nm)||''}</td><td>${esc(r.fit)}</td><td>${esc(r.col)||''}</td><td>${esc(r.tela)||''}</td><td>${i.q}</td><td>${r.costo?fmt(lc):'Por confirmar'}</td></tr>`;}).join('');
- ordList.innerHTML+=`<div class="ocard"><div class="ohead"><div class="qn">${esc(o.nombre)||'Orden '+(idx+1)}</div><span class="chip">${o.items.length} refs · ${tu} uds · ${fmt(tc)}${pend?' *':''}</span><div style="margin-left:auto"><button class="btn rosa sm" onclick="printOrd('${o.id}')">Imprimir linesheet + OC</button> <button class="btn ghost sm" onclick="delOrd('${o.id}')">Eliminar</button></div></div>
+ const supN = (SUPS.find(x=>x.id===o.supplier_id)||{}).name||'';
+ ordList.innerHTML+=`<div class="ocard"><div class="ohead"><div class="qn">${esc(o.nombre)||'Orden '+(idx+1)}</div>${supN?`<span class="chip">${esc(supN)}</span>`:''}<span class="chip">${o.items.length} refs · ${tu} uds · ${fmt(tc)}${pend?' *':''}</span><div style="margin-left:auto"><button class="btn rosa sm" onclick="printOrd('${o.id}')">Imprimir linesheet + OC</button> <button class="btn ghost sm" onclick="delOrd('${o.id}')">Eliminar</button></div></div>
  <div class="dates"><div><span class="muted">Fecha de compra</span><b>${dfmt(new Date(o.fecha+'T00:00:00'))}</b></div><div><span class="muted">Fecha de envío</span><b>${dfmt(new Date((o.envio||o.fecha)+'T00:00:00'))}</b></div><div><span class="muted">Entrega estimada (+${o.lead} háb.)</span><b style="color:var(--verde)">${ent}</b></div></div>
  <table><thead><tr><th>Ref</th><th>Fit</th><th>Color</th><th>Tela</th><th>Cant</th><th>Costo</th></tr></thead><tbody>${rows}<tr class="tot"><td>TOTAL</td><td></td><td></td><td></td><td>${tu}</td><td>${fmt(tc)}${pend?' *':''}</td></tr></tbody></table>${pend?'<div class="muted">* faltan costos por confirmar del proveedor</div>':''}</div>`;});}
 
@@ -395,7 +454,7 @@ function printOrd(id){const o=ORDS.find(x=>x.id==id),ent=dfmt(addBusinessDays(o.
   const th=['lavado','tela','notas'].map(k=>p[k]?`<div class="x" style="background-image:url('${esc(p[k])}')"></div>`:'').join('');
   return`<div class="pl"><div class="pi" style="${p.principal?`background-image:url('${esc(p.principal)}')`:''}"></div><div class="pb"><b>${esc(r.cod)||''} · ${esc(r.nm)||''}</b><br>${esc(r.fit)} · ${esc(r.col)||''}<br>Tela: ${esc(r.tela)||''} ${esc(r.comp)||''}<br>Lavado: ${esc(r.lav)||''}<br>Tallas 4·6·8·10·12: ${r.sz.join(' · ')} → ${i.q} uds<br>${esc(r.notas)||''}<div class="pt">${th}</div></div></div>`;}).join('');
  printArea.innerHTML=`<div style="display:flex;justify-content:space-between;border-bottom:2px solid #3A3330;padding-bottom:12px;align-items:flex-start">
- <div><div class="plogo">LUXUR</div><div style="font-size:11px;letter-spacing:2px;color:#8A817C">ORDEN DE COMPRA · ONE LOOK</div></div>
+ <div><div class="plogo">LUXUR</div><div style="font-size:11px;letter-spacing:2px;color:#8A817C">ORDEN DE COMPRA · ${esc(((SUPS.find(x=>x.id===o.supplier_id)||{}).name||'PROVEEDOR').toUpperCase())}</div></div>
  <div style="text-align:right;font-size:12px;color:#8A817C">${esc(o.nombre)||''}<br>Compra: <b style="color:#3A3330">${dfmt(new Date(o.fecha+'T00:00:00'))}</b><br>Envío: <b style="color:#3A3330">${dfmt(new Date((o.envio||o.fecha)+'T00:00:00'))}</b><br>Entrega estimada: <b style="color:#375E3A">${ent}</b> (+${o.lead} días háb.)</div></div>
  <h3 style="font-weight:400;font-size:13px;letter-spacing:1px;text-transform:uppercase;color:#8A817C;margin:18px 0 6px">Linesheet</h3>
  <div class="pline">${cards}</div>
@@ -403,13 +462,14 @@ function printOrd(id){const o=ORDS.find(x=>x.id==id),ent=dfmt(addBusinessDays(o.
  <table><thead><tr><th>Ref</th><th style="text-align:left">Nombre</th><th>Fit</th><th>Color</th><th>Tela / comp.</th><th>Lavado</th><th>Tallas</th><th>Cant</th><th>Costo u.</th><th>Total</th></tr></thead>
  <tbody>${rows}<tr class="tot"><td colspan="7">TOTAL ORDEN</td><td>${tu}</td><td></td><td>${fmt(tc)}${pend?' *':''}</td></tr></tbody></table>
  ${pend?'<div style="font-size:11px;color:#8A817C;margin-top:6px">* Costos pendientes por confirmar con el proveedor.</div>':''}
- <div style="display:flex;justify-content:space-between;margin-top:50px;font-size:12px;color:#8A817C"><div style="border-top:1px solid #3A3330;padding-top:6px;width:44%;text-align:center">Autoriza — LUXUR United S.A.S</div><div style="border-top:1px solid #3A3330;padding-top:6px;width:44%;text-align:center">Recibe — One Look</div></div>`;
+ <div style="display:flex;justify-content:space-between;margin-top:50px;font-size:12px;color:#8A817C"><div style="border-top:1px solid #3A3330;padding-top:6px;width:44%;text-align:center">Autoriza — LUXUR United S.A.S</div><div style="border-top:1px solid #3A3330;padding-top:6px;width:44%;text-align:center">Recibe — ${esc((SUPS.find(x=>x.id===o.supplier_id)||{}).name||'Proveedor')}</div></div>`;
  window.print();}
 
 function exportData(){const b=new Blob([JSON.stringify({REFS,ORDS},null,2)],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='LUXUR-atelier-respaldo.json';a.click();}
 
-Object.assign(window, { show, exportData, openRef, closeRef, saveRef, delRef, dupRef, calcM, calcFechas, openOrd, closeOrd, addItem, delItem, saveOrd, delOrd, printOrd, autoCod });
+Object.assign(window, { show, exportData, openRef, closeRef, saveRef, delRef, dupRef, calcM, calcFechas, openOrd, closeOrd, addItem, addAllItems, delItem, saveOrd, delOrd, printOrd, autoCod });
 
+loadSuppliers().then(()=>{ try{ renderOrds(); }catch(_){} });
 boot();
 </script>
 </body></html>
