@@ -224,6 +224,7 @@ header{border-bottom:1px solid var(--black);padding-bottom:24px;margin-bottom:64
 .wk-b{display:inline-block;font-size:10px;font-weight:700;border-radius:999px;padding:2px 8px;margin-top:4px;margin-right:4px}
 .wk-b.ok{background:#e2efe5;color:#3e7a4e}
 .wk-b.late{background:#f7dedc;color:#b23a35}
+.wk-it.late .n{color:#b23a35}
 .wk-b.part{background:#fdf3d7;color:#8a6d1a}
 .wk-b.go{background:var(--rosa);color:var(--black)}
 .wk-mv{margin-top:6px;background:rgba(0,0,0,.05);border:none;border-radius:999px;padding:5px 12px;font-size:11px;font-weight:600;font-family:inherit;color:var(--black);cursor:pointer}
@@ -2649,6 +2650,7 @@ function renderWeekRail(fBatches, fStandalone, variantsByBatch){
       items.push({
         kind: 'batch', id: b.id, entryId: null, name: b.name, qty: b.total_quantity || 0,
         date: b.tentative_date, delivered, partial: false, lote: '',
+        original: b.original_date || null,
         stageLbl: delivered ? '' : (PROD_NEXT_STAGE_LABEL[b.batch_stage] || ''),
         supplier: supName(b.supplier_id),
       });
@@ -2660,6 +2662,7 @@ function renderWeekRail(fBatches, fStandalone, variantsByBatch){
         kind: 'batch', id: b.id, entryId: v.id,
         name: v.design_name || v.product_name, qty: v.quantity || 0,
         date: v.tentative_date || b.tentative_date, delivered, partial: false,
+        original: v.original_date || b.original_date || null,
         lote: b.name,
         stageLbl: delivered ? '' : (PROD_NEXT_STAGE_LABEL[v.stage] || ''),
         supplier: supName(b.supplier_id),
@@ -2671,6 +2674,7 @@ function renderWeekRail(fBatches, fStandalone, variantsByBatch){
     items.push({
       kind: 'entry', id: e.id, entryId: null, name: e.product_name, qty: e.quantity || 0,
       date: e.tentative_date, delivered, partial: false, lote: '',
+      original: e.original_date || null,
       stageLbl: delivered ? '' : (PROD_NEXT_STAGE_LABEL[e.stage] || ''),
       supplier: supName(e.supplier_id),
     });
@@ -2690,16 +2694,28 @@ function renderWeekRail(fBatches, fStandalone, variantsByBatch){
   for (let m = addDays(curMon, -7); m <= maxMon; m = addDays(m, 7)) mons.push(m);
 
   const nextMon = addDays(curMon, 7);
-  // UN solo badge por referencia (el más importante) — el detalle vive en el sheet
+  // UN solo badge por referencia — el atraso se mide contra la fecha ORIGINAL,
+  // así aunque la reprogrames sigue en rojo diciendo cuántas semanas carga
+  const wksBetween = (a, b) => Math.max(0, Math.round((new Date(b + 'T12:00:00') - new Date(a + 'T12:00:00')) / 6048e5));
+  const isLateItem = i => {
+    if (i.delivered || !i.date) return false;
+    if (wkMonday(i.date) < curMon) return true;
+    return !!(i.original && wkMonday(i.original) < wkMonday(i.date));
+  };
   const badge = i => {
     if (i.delivered) return '<span class="wk-b ok">✓ Entregado</span>';
-    if (i.date && wkMonday(i.date) < curMon) return `<span class="wk-b late">Atrasado · era sem ${wkNum(i.date)}</span>`;
+    if (isLateItem(i)){
+      const orig = i.original || i.date;
+      const ref = wkMonday(i.date) < curMon ? curMon : wkMonday(i.date);
+      const w = wksBetween(wkMonday(orig), ref);
+      return `<span class="wk-b late">${w > 0 ? `${w} sem de atraso` : 'Atrasado'} · era sem ${wkNum(orig)}</span>`;
+    }
     if (i.partial) return '<span class="wk-b part">Entrega parcial</span>';
     if (i.stageLbl && i.stageLbl !== '✓ entregado') return `<span class="wk-b go">${i.stageLbl}</span>`;
     return '';
   };
   const itHtml = (i, showMove) => `
-    <div class="wk-it${selectedProdItem && selectedProdItem.kind === i.kind && selectedProdItem.id === i.id ? ' sel' : ''}" data-wk-open="${i.kind}:${i.id}">
+    <div class="wk-it${selectedProdItem && selectedProdItem.kind === i.kind && selectedProdItem.id === i.id ? ' sel' : ''}${isLateItem(i) ? ' late' : ''}" data-wk-open="${i.kind}:${i.id}">
       <div class="n">${escapeHtml(i.name || '')}</div>
       <div class="m">${i.qty ? i.qty.toLocaleString('es-CO') + 'u' : ''}${i.supplier && !currentSupplierId ? ' · ' + escapeHtml(i.supplier) : ''}</div>
       ${badge(i)}
@@ -2756,13 +2772,17 @@ function renderWeekRail(fBatches, fStandalone, variantsByBatch){
     b.disabled = true; b.textContent = 'Moviendo…';
     try {
       if (kind === 'batch'){
-        await supabase.from('production_batches').update({ tentative_date: nextMon }).eq('id', id);
+        const bt = batches.find(x => x.id === id);
+        const bOrig = bt && !bt.original_date ? bt.tentative_date : undefined;
+        await supabase.from('production_batches').update({ tentative_date: nextMon, ...(bOrig ? { original_date: bOrig } : {}) }).eq('id', id);
         await supabase.from('product_pipeline').update({ tentative_date: nextMon }).eq('batch_id', id);
-        const bt = batches.find(x => x.id === id); if (bt) bt.tentative_date = nextMon;
+        if (bt){ bt.tentative_date = nextMon; if (bOrig) bt.original_date = bOrig; }
         pipeline.forEach(e => { if (e.batch_id === id) e.tentative_date = nextMon; });
       } else {
-        await supabase.from('product_pipeline').update({ tentative_date: nextMon }).eq('id', id);
-        const e = pipeline.find(x => x.id === id); if (e) e.tentative_date = nextMon;
+        const e = pipeline.find(x => x.id === id);
+        const eOrig = e && !e.original_date ? e.tentative_date : undefined;
+        await supabase.from('product_pipeline').update({ tentative_date: nextMon, ...(eOrig ? { original_date: eOrig } : {}) }).eq('id', id);
+        if (e){ e.tentative_date = nextMon; if (eOrig) e.original_date = eOrig; }
       }
       renderPipeline();
     } catch(err){ b.disabled = false; b.textContent = 'Error, reintentá'; }
@@ -3149,13 +3169,17 @@ document.getElementById('entrySave').addEventListener('click', async () => {
   };
   let error;
   if (editingEntryId){
+    const prevE = pipeline.find(x => x.id === editingEntryId);
+    if (prevE && !prevE.original_date && prevE.tentative_date && payload.tentative_date !== prevE.tentative_date){
+      payload.original_date = prevE.tentative_date; // la promesa original no se pierde al reprogramar
+    }
     ({ error } = await supabase.from('product_pipeline').update(payload).eq('id', editingEntryId));
     if (!error){
       const prev = pipeline.find(x => x.id === editingEntryId);
       selectedProdItem = prev && prev.batch_id ? { kind: 'batch', id: prev.batch_id } : { kind: 'entry', id: editingEntryId };
     }
   } else {
-    const res = await supabase.from('product_pipeline').insert({ ...payload, status: 'pendiente' }).select('id').single();
+    const res = await supabase.from('product_pipeline').insert({ ...payload, status: 'pendiente', original_date: payload.tentative_date || null }).select('id').single();
     error = res.error;
     if (!error && res.data) selectedProdItem = { kind: 'entry', id: res.data.id }; // abrí el desglose del jean nuevo
   }
@@ -3201,10 +3225,14 @@ document.getElementById('batchSave').addEventListener('click', async () => {
   };
   let error;
   if (editingBatchId){
+    const prevB = batches.find(x => x.id === editingBatchId);
+    if (prevB && !prevB.original_date && prevB.tentative_date && payload.tentative_date !== prevB.tentative_date){
+      payload.original_date = prevB.tentative_date;
+    }
     ({ error } = await supabase.from('production_batches').update(payload).eq('id', editingBatchId));
     if (!error) selectedProdItem = { kind: 'batch', id: editingBatchId };
   } else {
-    const res = await supabase.from('production_batches').insert(payload).select('id').single();
+    const res = await supabase.from('production_batches').insert({ ...payload, original_date: payload.tentative_date || null }).select('id').single();
     error = res.error;
     if (!error && res.data) selectedProdItem = { kind: 'batch', id: res.data.id }; // abrí el desglose del lote nuevo
   }
