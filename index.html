@@ -220,7 +220,7 @@ header{border-bottom:1px solid var(--black);padding-bottom:24px;margin-bottom:64
 .wk-items{margin-top:10px;display:flex;flex-direction:column;gap:8px}
 .wk-it{border-top:1px solid rgba(0,0,0,.05);padding-top:8px}
 .wk-it .n{font-size:12.5px;font-weight:600;line-height:1.3}
-.wk-it .m{font-size:11px;color:var(--grey);margin-top:1px}
+.wk-it .m{font-size:11px;color:var(--grey);margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .wk-b{display:inline-block;font-size:10px;font-weight:700;border-radius:999px;padding:2px 8px;margin-top:4px;margin-right:4px}
 .wk-b.ok{background:#e2efe5;color:#3e7a4e}
 .wk-b.late{background:#f7dedc;color:#b23a35}
@@ -248,6 +248,7 @@ header{border-bottom:1px solid var(--black);padding-bottom:24px;margin-bottom:64
 .ps-close:active{opacity:.6}
 .ps-body{overflow-y:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;padding:4px 16px calc(env(safe-area-inset-bottom) + 28px)}
 .wk-late-h{font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#b23a35;margin-top:12px}
+.wk-lote{font-size:9.5px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--grey);margin-top:10px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .wk-empty{font-size:12px;color:var(--grey);margin-top:10px}
 .sup-chip{background:#fff;border:1px solid rgba(0,0,0,.08);border-radius:999px;padding:9px 16px;font-family:'Outfit',sans-serif;font-size:13px;font-weight:500;color:#555;cursor:pointer;letter-spacing:.01em;transition:all .15s ease;white-space:nowrap;box-shadow:0 1px 2px rgba(0,0,0,.04)}
 .sup-chip:hover{border-color:rgba(212,132,142,.4);color:var(--black)}
@@ -2546,26 +2547,39 @@ function renderWeekRail(fBatches, fStandalone, variantsByBatch){
   const curMon = wkMonday(today);
   const supName = id => { const s = suppliers.find(x => x.id === id); return s ? s.name : ''; };
 
-  // Aplaná lotes + jeans sueltos a items con fecha
+  // Aplaná POR REFERENCIA (no por lote): los lotes no siempre entregan juntos,
+  // así que cada diseño va a su propia semana con su propia fecha y estado.
+  // Tocar una referencia abre el desglose del lote completo.
   const items = [];
   fBatches.forEach(b => {
     const vars = variantsByBatch[b.id] || [];
-    const dCount = vars.filter(v => v.stage === 'entrega' || v.status === 'llego').length;
-    const delivered = vars.length ? dCount === vars.length : b.batch_stage === 'entrega';
-    items.push({
-      kind: 'batch', id: b.id, name: b.name, qty: b.total_quantity || 0,
-      date: b.tentative_date, delivered,
-      partial: dCount > 0 && !delivered,
-      sub: vars.length ? `${dCount} de ${vars.length} diseños entregados` : '',
-      stageLbl: delivered ? '' : (PROD_NEXT_STAGE_LABEL[b.batch_stage] || ''),
-      supplier: supName(b.supplier_id),
+    if (!vars.length){
+      const delivered = b.batch_stage === 'entrega';
+      items.push({
+        kind: 'batch', id: b.id, entryId: null, name: b.name, qty: b.total_quantity || 0,
+        date: b.tentative_date, delivered, partial: false, lote: '',
+        stageLbl: delivered ? '' : (PROD_NEXT_STAGE_LABEL[b.batch_stage] || ''),
+        supplier: supName(b.supplier_id),
+      });
+      return;
+    }
+    vars.forEach(v => {
+      const delivered = v.stage === 'entrega' || v.status === 'llego';
+      items.push({
+        kind: 'batch', id: b.id, entryId: v.id,
+        name: v.design_name || v.product_name, qty: v.quantity || 0,
+        date: v.tentative_date || b.tentative_date, delivered, partial: false,
+        lote: b.name,
+        stageLbl: delivered ? '' : (PROD_NEXT_STAGE_LABEL[v.stage] || ''),
+        supplier: supName(b.supplier_id),
+      });
     });
   });
   fStandalone.forEach(e => {
     const delivered = e.stage === 'entrega' || e.status === 'llego';
     items.push({
-      kind: 'entry', id: e.id, name: e.product_name, qty: e.quantity || 0,
-      date: e.tentative_date, delivered, partial: false, sub: '',
+      kind: 'entry', id: e.id, entryId: null, name: e.product_name, qty: e.quantity || 0,
+      date: e.tentative_date, delivered, partial: false, lote: '',
       stageLbl: delivered ? '' : (PROD_NEXT_STAGE_LABEL[e.stage] || ''),
       supplier: supName(e.supplier_id),
     });
@@ -2598,9 +2612,17 @@ function renderWeekRail(fBatches, fStandalone, variantsByBatch){
       <div class="n">${escapeHtml(i.name || '')}</div>
       <div class="m">${i.qty ? i.qty.toLocaleString('es-CO') + 'u' : ''}${i.supplier && !currentSupplierId ? ' · ' + escapeHtml(i.supplier) : ''}</div>
       ${badge(i)}
-      ${showMove ? `<div><button class="wk-mv" data-wk-move="${i.kind}:${i.id}">→ mover a sem ${wkNum(nextMon)}</button></div>` : ''}
+      ${showMove ? `<div><button class="wk-mv" data-wk-move="${i.entryId ? 'entry:' + i.entryId : i.kind + ':' + i.id}">→ mover a sem ${wkNum(nextMon)}</button></div>` : ''}
     </div>`;
 
+  // Agrupá las refs de un mismo lote bajo un encabezado chiquito (menos repetición)
+  const groupHtml = (arr, showMove) => {
+    const byLote = {};
+    arr.forEach(i => { const k = i.lote || ''; (byLote[k] = byLote[k] || []).push(i); });
+    return Object.entries(byLote).map(([lote, its]) =>
+      (lote && its.length > 1 ? `<div class="wk-lote">${escapeHtml(lote)}</div>` : '') + its.map(i => itHtml(i, showMove)).join('')
+    ).join('');
+  };
   const undated = items.filter(i => !i.date);
   rail.innerHTML = mons.map(mon => {
     const inWeek = dated.filter(i => wkMonday(i.date) === mon);
@@ -2616,13 +2638,13 @@ function renderWeekRail(fBatches, fStandalone, variantsByBatch){
         <span class="wk-rng">${wkRangeLabel(mon)}</span>
         ${totalU ? `<span class="wk-tot">${totalU.toLocaleString('es-CO')}u</span>` : ''}
       </div>
-      ${shown.length ? `<div class="wk-items">${shown.map(i => itHtml(i, false)).join('')}</div>` : ''}
-      ${lateHere.length ? `<div class="wk-late-h">Atrasadas</div><div class="wk-items">${lateHere.map(i => itHtml(i, true)).join('')}</div>` : ''}
+      ${shown.length ? `<div class="wk-items">${groupHtml(shown, false)}</div>` : ''}
+      ${lateHere.length ? `<div class="wk-late-h">Atrasadas</div><div class="wk-items">${groupHtml(lateHere, true)}</div>` : ''}
       ${isEmpty ? '<div class="wk-empty">Sin entregas</div>' : ''}
     </div>`;
   }).join('') + (undated.length ? `<div class="wk-card">
       <div class="wk-t"><span class="wk-sem">Sin fecha</span></div>
-      <div class="wk-items">${undated.map(i => itHtml(i, false)).join('')}</div>
+      <div class="wk-items">${groupHtml(undated, false)}</div>
     </div>` : '');
 
   // Click en una referencia → abrir su desglose abajo
@@ -2789,11 +2811,21 @@ function renderPipeline(){
   };
   filteredBatches.forEach(b => {
     const vars = variantsByBatch[b.id] || [];
-    const allDelivered = vars.length > 0 && vars.every(v => v.stage === 'entrega');
-    if (!allDelivered){
-      const q = b.total_quantity || 0;
-      addToWindow(b.tentative_date, q, costOf({ unit_cost: b.unit_cost, product_name: b.name, supplier_id: b.supplier_id }, q), pvpOf({ product_name: b.name }, q));
+    if (!vars.length){
+      if (b.batch_stage !== 'entrega'){
+        const q = b.total_quantity || 0;
+        addToWindow(b.tentative_date, q, costOf({ unit_cost: b.unit_cost, product_name: b.name, supplier_id: b.supplier_id }, q), pvpOf({ product_name: b.name }, q));
+      }
+      return;
     }
+    // Por referencia: cada diseño cuenta con SU fecha (los lotes no entregan juntos)
+    vars.forEach(v => {
+      const delivered = v.stage === 'entrega' || v.status === 'llego';
+      if (!delivered){
+        const q = v.quantity || 0;
+        addToWindow(v.tentative_date || b.tentative_date, q, costOf({ ...v, unit_cost: v.unit_cost || b.unit_cost }, q), pvpOf(v, q));
+      }
+    });
   });
   standalone.forEach(e => {
     const delivered = e.stage === 'entrega' || e.status === 'llego';
