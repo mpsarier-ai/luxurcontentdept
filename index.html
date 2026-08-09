@@ -229,6 +229,18 @@ header{border-bottom:1px solid var(--black);padding-bottom:24px;margin-bottom:64
 .tl-close-row{display:flex;justify-content:flex-end;margin-bottom:8px}
 .tl-close{background:rgba(0,0,0,.05);border:none;border-radius:999px;padding:6px 14px;font-size:12px;font-weight:600;font-family:inherit;color:var(--black);cursor:pointer}
 .tl-hint{font-size:12.5px;color:var(--grey);text-align:center;padding:22px 20px;background:#fff;border:1px dashed rgba(0,0,0,.12);border-radius:16px}
+/* ── Bottom sheet · desglose de referencia (sube desde abajo, estilo Apple) ── */
+.prod-sheet{position:fixed;inset:0;z-index:150;display:none}
+.prod-sheet.on{display:block}
+.prod-sheet .ps-bg{position:absolute;inset:0;background:rgba(26,26,26,.45);backdrop-filter:blur(3px);-webkit-backdrop-filter:blur(3px)}
+.prod-sheet .ps-panel{position:absolute;left:0;right:0;bottom:0;max-width:640px;margin:0 auto;max-height:88dvh;background:var(--cream);border-radius:24px 24px 0 0;box-shadow:0 -10px 40px rgba(0,0,0,.28);display:flex;flex-direction:column;animation:psUp .3s cubic-bezier(.32,.72,.35,1)}
+@keyframes psUp{from{transform:translateY(45%);opacity:.6}to{transform:translateY(0);opacity:1}}
+.ps-grab{width:40px;height:5px;border-radius:3px;background:rgba(0,0,0,.16);margin:9px auto 0;flex-shrink:0}
+.ps-head{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:10px 18px 8px;flex-shrink:0}
+.ps-title{font-size:16.5px;font-weight:700;letter-spacing:-.01em;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.ps-close{background:rgba(0,0,0,.07);border:none;border-radius:999px;width:32px;height:32px;font-size:14px;font-weight:600;color:var(--black);cursor:pointer;flex-shrink:0;font-family:inherit}
+.ps-close:active{opacity:.6}
+.ps-body{overflow-y:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;padding:4px 16px calc(env(safe-area-inset-bottom) + 28px)}
 .wk-late-h{font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#b23a35;margin-top:12px}
 .wk-empty{font-size:12px;color:var(--grey);margin-top:10px}
 .sup-chip{background:#fff;border:1px solid rgba(0,0,0,.08);border-radius:999px;padding:9px 16px;font-family:'Outfit',sans-serif;font-size:13px;font-weight:500;color:#555;cursor:pointer;letter-spacing:.01em;transition:all .15s ease;white-space:nowrap;box-shadow:0 1px 2px rgba(0,0,0,.04)}
@@ -360,7 +372,7 @@ header{border-bottom:1px solid var(--black);padding-bottom:24px;margin-bottom:64
 .login-status.success{color:var(--green-ok)}
 
 /* MODAL */
-.modal-backdrop{position:fixed;inset:0;background:rgba(26,26,26,.65);backdrop-filter:blur(4px);display:none;justify-content:center;align-items:safe center;z-index:100;padding:24px;overflow-y:auto;-webkit-overflow-scrolling:touch}
+.modal-backdrop{position:fixed;inset:0;background:rgba(26,26,26,.65);backdrop-filter:blur(4px);display:none;justify-content:center;align-items:safe center;z-index:200;padding:24px;overflow-y:auto;-webkit-overflow-scrolling:touch}
 .modal-backdrop.open{display:flex}
 .modal{background:var(--cream);max-width:520px;width:100%;border:1px solid var(--black);padding:32px;font-family:'Outfit',sans-serif;margin:auto 0;flex-shrink:0}
 .modal h3{font-family:'Cormorant Garamond',serif;font-weight:700;font-style:italic;font-size:28px;margin-bottom:8px}
@@ -501,9 +513,10 @@ body{padding-top:env(safe-area-inset-top);padding-bottom:env(safe-area-inset-bot
   /* Cards estilo IG: rounded, sombra sutil */
   .week-card,.product-card,.pipeline-card,.calendar-card{border-radius:14px!important;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.05),0 1px 2px rgba(0,0,0,.04);border:1px solid rgba(0,0,0,.04)}
 
-  /* Modales sliding-up desde abajo con handle */
+  /* Modales sliding-up desde abajo con handle · scroll INTERNO para que
+     los campos nunca se desborden por fuera del panel */
   .modal-backdrop{align-items:flex-end!important;padding:0!important}
-  .modal-content,.modal{border-radius:22px 22px 0 0!important;max-height:92dvh;min-height:auto!important;animation:llSlideUp .28s cubic-bezier(.16,1,.3,1)}
+  .modal-content,.modal{border-radius:22px 22px 0 0!important;max-height:88dvh;min-height:auto!important;overflow-y:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;padding-bottom:calc(28px + env(safe-area-inset-bottom))!important;animation:llSlideUp .28s cubic-bezier(.16,1,.3,1)}
   .modal-content::before,.modal::before{content:'';display:block;width:38px;height:4px;background:rgba(0,0,0,.18);border-radius:999px;margin:-10px auto 14px;flex-shrink:0}
   @keyframes llSlideUp{from{transform:translateY(100%);opacity:.7}to{transform:translateY(0);opacity:1}}
 
@@ -805,7 +818,7 @@ header,.hub-header{position:static !important;background:transparent !important;
       <button class="slb-copy" id="slbCopy">📋 Copiar link</button>
     </div>
     <h2 class="section-title">
-      <span>Desglose</span>
+      <span>Añadir</span>
       <span style="display:flex;gap:8px">
         <button class="new-week-btn" id="addBatchBtn">+ Nuevo lote</button>
         <button class="new-week-btn" id="addEntryBtn" style="background:transparent;color:var(--black);border:1px solid var(--cream-dark)">+ Jean suelto</button>
@@ -863,6 +876,19 @@ header,.hub-header{position:static !important;background:transparent !important;
 </div>
 
 <!-- ENTRY (pipeline) MODAL -->
+<!-- Bottom sheet · desglose de la referencia tocada en el rail de Producción -->
+<div class="prod-sheet" id="prodSheet">
+  <div class="ps-bg" id="prodSheetBg"></div>
+  <div class="ps-panel">
+    <div class="ps-grab"></div>
+    <div class="ps-head">
+      <span class="ps-title" id="prodSheetTitle">Desglose</span>
+      <button class="ps-close" id="prodSheetClose" title="Cerrar">✕</button>
+    </div>
+    <div class="ps-body" id="prodSheetBody"></div>
+  </div>
+</div>
+
 <div class="modal-backdrop" id="entryModal">
   <div class="modal">
     <div class="modal-meta">Próxima entrada</div>
@@ -2499,7 +2525,10 @@ function wkRangeLabel(mon){
   return `${a.getDate()} ${MES[a.getMonth()]} – ${b.getDate()} ${MES[b.getMonth()]}`;
 }
 let weekRailScrolled = false;
-let selectedProdItem = null; // {kind:'batch'|'entry', id} → desglose abierto abajo del rail
+let selectedProdItem = null; // {kind:'batch'|'entry', id} → desglose abierto en el bottom sheet
+// Cerrar el sheet con la ✕ o tocando el fondo oscuro
+document.getElementById('prodSheetClose')?.addEventListener('click', () => { selectedProdItem = null; renderPipeline(); });
+document.getElementById('prodSheetBg')?.addEventListener('click', () => { selectedProdItem = null; renderPipeline(); });
 function renderWeekRail(fBatches, fStandalone, variantsByBatch){
   const rail = document.getElementById('weekRail');
   const head = document.getElementById('weekRailHead');
@@ -2596,8 +2625,7 @@ function renderWeekRail(fBatches, fStandalone, variantsByBatch){
     } else {
       selectedProdItem = { kind, id };
     }
-    renderPipeline();
-    if (selectedProdItem) setTimeout(() => document.getElementById('timeline')?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 60);
+    renderPipeline(); // abre/cierra el bottom sheet con el desglose
   }));
 
   // Reprogramar atrasadas a la próxima semana (lote arrastra sus diseños)
@@ -2790,33 +2818,43 @@ function renderPipeline(){
 
   if (!filteredPipeline.length && !filteredBatches.length){
     el.innerHTML = `<div class="empty-state">${currentSupplierId ? 'Este proveedor no tiene nada en producción.' : 'Sin entradas. Click "+ Nuevo lote" o "+ Jean suelto".'}</div>`;
+    const emptySheet = document.getElementById('prodSheet');
+    if (emptySheet) emptySheet.classList.remove('on');
     return;
   }
-  // El timeline ahora es el DESGLOSE de la referencia seleccionada en el rail.
-  // Sin selección → hint. La selección puede desaparecer al cambiar el filtro
-  // de proveedor o al borrarse el item: en ese caso volvé al hint.
-  let html = '';
+  // El desglose vive en un BOTTOM SHEET que sube desde abajo (no en la página).
+  // La selección puede desaparecer al cambiar el filtro de proveedor o al
+  // borrarse el item: en ese caso el sheet se cierra solo.
+  const sheet = document.getElementById('prodSheet');
+  const sheetBody = document.getElementById('prodSheetBody');
+  const sheetTitle = document.getElementById('prodSheetTitle');
+  let html = '', sheetName = '';
   if (selectedProdItem){
     if (selectedProdItem.kind === 'batch'){
       const b = filteredBatches.find(x => x.id === selectedProdItem.id);
-      if (b) html = renderBatchCard(b, variantsByBatch[b.id] || []);
+      if (b){ html = renderBatchCard(b, variantsByBatch[b.id] || []); sheetName = b.name; }
     } else {
       const e = standalone.find(x => x.id === selectedProdItem.id);
-      if (e) html = renderPipelineEntry(e, false);
+      if (e){ html = renderPipelineEntry(e, false); sheetName = e.product_name; }
     }
-    if (html) html = `<div class="tl-close-row"><button class="tl-close" id="tlCloseBtn">✕ Cerrar desglose</button></div>` + html;
-    else selectedProdItem = null;
+    if (!html) selectedProdItem = null;
   }
-  if (!html) html = `<div class="tl-hint">Toca una referencia en las semanas de arriba para ver su desglose: diseños, etapas, curva y fechas.</div>`;
-  el.innerHTML = html;
-  const tlClose = document.getElementById('tlCloseBtn');
-  if (tlClose) tlClose.addEventListener('click', () => { selectedProdItem = null; renderPipeline(); });
-  el.querySelectorAll('[data-toggle]').forEach(b => b.addEventListener('click', () => togglePipelineStatus(b.getAttribute('data-toggle'))));
-  el.querySelectorAll('[data-del]').forEach(b => b.addEventListener('click', () => deletePipeline(b.getAttribute('data-del'))));
-  el.querySelectorAll('[data-edit]').forEach(b => b.addEventListener('click', () => openEntryModal(b.getAttribute('data-edit'))));
+  if (html){
+    if (sheetTitle) sheetTitle.textContent = sheetName || 'Desglose';
+    sheetBody.innerHTML = html;
+    sheet.classList.add('on');
+  } else if (sheet){
+    sheet.classList.remove('on');
+    if (sheetBody) sheetBody.innerHTML = '';
+  }
+  el.innerHTML = '';
+  const wireEl = sheetBody || el;
+  wireEl.querySelectorAll('[data-toggle]').forEach(b => b.addEventListener('click', () => togglePipelineStatus(b.getAttribute('data-toggle'))));
+  wireEl.querySelectorAll('[data-del]').forEach(b => b.addEventListener('click', () => deletePipeline(b.getAttribute('data-del'))));
+  wireEl.querySelectorAll('[data-edit]').forEach(b => b.addEventListener('click', () => openEntryModal(b.getAttribute('data-edit'))));
   // Click en dot del stepper variant/standalone.
   // Si tocás el ÚLTIMO dot hecho → lo desmarca (retrocede una etapa). Cualquier otro dot → salta ahí.
-  el.querySelectorAll('[data-set-stage]').forEach(b => b.addEventListener('click', async (ev) => {
+  wireEl.querySelectorAll('[data-set-stage]').forEach(b => b.addEventListener('click', async (ev) => {
     ev.stopPropagation();
     const entryId = b.getAttribute('data-entry');
     const clicked = b.getAttribute('data-set-stage');
@@ -2840,7 +2878,7 @@ function renderPipeline(){
     if (error) alert('Error al guardar: ' + error.message);
   }));
   // Click en dot del stepper LOTE — misma lógica de desmarcar
-  el.querySelectorAll('[data-batch-set-stage]').forEach(b => b.addEventListener('click', async (ev) => {
+  wireEl.querySelectorAll('[data-batch-set-stage]').forEach(b => b.addEventListener('click', async (ev) => {
     ev.stopPropagation();
     const batchId = b.getAttribute('data-batch');
     const clicked = b.getAttribute('data-batch-set-stage');
@@ -2864,9 +2902,9 @@ function renderPipeline(){
     if (error) alert('Error al guardar: ' + error.message);
   }));
   // Editar lote / agregar variante / eliminar lote
-  el.querySelectorAll('[data-edit-batch]').forEach(b => b.addEventListener('click', () => openBatchModal(b.getAttribute('data-edit-batch'))));
-  el.querySelectorAll('[data-add-variant]').forEach(b => b.addEventListener('click', () => openVariantModal(b.getAttribute('data-add-variant'))));
-  el.querySelectorAll('[data-del-batch]').forEach(b => b.addEventListener('click', () => deleteBatch(b.getAttribute('data-del-batch'))));
+  wireEl.querySelectorAll('[data-edit-batch]').forEach(b => b.addEventListener('click', () => openBatchModal(b.getAttribute('data-edit-batch'))));
+  wireEl.querySelectorAll('[data-add-variant]').forEach(b => b.addEventListener('click', () => openVariantModal(b.getAttribute('data-add-variant'))));
+  wireEl.querySelectorAll('[data-del-batch]').forEach(b => b.addEventListener('click', () => deleteBatch(b.getAttribute('data-del-batch'))));
 }
 
 async function togglePipelineStatus(id){
