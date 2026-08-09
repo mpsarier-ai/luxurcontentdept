@@ -225,6 +225,11 @@ header{border-bottom:1px solid var(--black);padding-bottom:24px;margin-bottom:64
 .wk-b.ok{background:#e2efe5;color:#3e7a4e}
 .wk-b.late{background:#f7dedc;color:#b23a35}
 .wk-it.late .n{color:#b23a35}
+.wk-it{display:flex;gap:10px;align-items:flex-start}
+.wk-it .wk-bd{flex:1;min-width:0}
+.wk-ph{width:42px;height:54px;border-radius:8px;background:#f2f2f0 center/cover no-repeat;flex:none;margin-top:2px}
+.ps-ph{width:44px;height:56px;border-radius:10px;background:#f2f2f0 center/cover no-repeat;flex:none;cursor:pointer}
+.ps-cam{width:44px;height:56px;border-radius:10px;background:#f2f2f0;border:1px dashed rgba(0,0,0,.15);flex:none;font-size:16px;cursor:pointer}
 .wk-b.part{background:#fdf3d7;color:#8a6d1a}
 .wk-b.go{background:var(--rosa);color:var(--black)}
 .wk-mv{margin-top:6px;background:rgba(0,0,0,.05);border:none;border-radius:999px;padding:5px 12px;font-size:11px;font-weight:600;font-family:inherit;color:var(--black);cursor:pointer}
@@ -919,6 +924,7 @@ header,.hub-header{position:static !important;background:transparent !important;
 </div>
 
 <!-- ENTRY (pipeline) MODAL -->
+<input type="file" id="prodPhotoInput" accept="image/*" hidden>
 <!-- Bottom sheet · desglose de la referencia tocada en el rail de Producción -->
 <div class="prod-sheet" id="prodSheet">
   <div class="ps-bg" id="prodSheetBg"></div>
@@ -2603,9 +2609,11 @@ function renderBatchSheet(batch, variants){
       : v.stage === 'terminacion' ? 'En Entrega'
       : (PROD_NEXT_STAGE_LABEL[batch.batch_stage] || 'en Corte');
     const chip = `<button class="tl-vstate ${done ? 'done' : ''}" data-vtoggle="${v.id}">${vLbl} ▾</button>`;
+    const vPhoto = prodPhoto(v);
     return `<div class="ps-v tl-variant" data-id="${v.id}">
       <div class="ps-v-h">
-        <div>
+        ${vPhoto ? `<div class="ps-ph" data-photo-pick="${v.id}" title="Cambiar foto" style="background-image:url('${vPhoto}')"></div>` : `<button class="ps-cam" data-photo-pick="${v.id}" title="Subir foto">📷</button>`}
+        <div style="flex:1;min-width:0">
           <div class="ps-v-n" data-edit="${v.id}" title="Editar">${escapeHtml(v.design_name || v.product_name || '—')} <span class="tl-edit-mark">✎</span></div>
           <div class="ps-v-m">${v.quantity ? v.quantity.toLocaleString('es-CO') + 'u' : ''}</div>
         </div>
@@ -2724,6 +2732,18 @@ function wkRangeLabel(mon){
   const a = new Date(mon + 'T12:00:00'), b = new Date(a); b.setDate(b.getDate() + 6);
   return `${a.getDate()} ${MES[a.getMonth()]} – ${b.getDate()} ${MES[b.getMonth()]}`;
 }
+// Foto de una referencia: manual (photo_url, incluye la de Atelier) → Shopify
+function findCatalogPhoto(name, gid){
+  if (gid){ const m = (catalog || []).find(p => p.gid === gid); if (m && m.image) return m.image; }
+  if (!name) return null;
+  const t = String(name).toLowerCase();
+  const m = (catalog || []).find(p => (p.title || '').toLowerCase() === t);
+  return (m && m.image) || null;
+}
+function prodPhoto(e){
+  return e.photo_url || findCatalogPhoto(e.product_name, e.product_gid) || null;
+}
+
 let weekRailScrolled = false;
 let selectedProdItem = null; // {kind:'batch'|'entry', id} → desglose abierto en el bottom sheet
 // Cerrar el sheet con la ✕ o tocando el fondo oscuro
@@ -2731,6 +2751,23 @@ document.getElementById('prodSheetClose')?.addEventListener('click', () => { sel
 document.getElementById('prodSheetBg')?.addEventListener('click', () => { selectedProdItem = null; renderPipeline(); });
 // KPIs minimalistas: toca una tarjeta para ver/ocultar el detalle de costo + PVP
 document.querySelectorAll('.prod-kpi').forEach(k => k.addEventListener('click', () => k.classList.toggle('open')));
+// Subida de foto por referencia (bucket calendar-photos/prod/)
+document.getElementById('prodPhotoInput')?.addEventListener('change', async () => {
+  const input = document.getElementById('prodPhotoInput');
+  const id = input.dataset.target;
+  const f = input.files && input.files[0];
+  input.value = '';
+  if (!id || !f) return;
+  try {
+    const path = `prod/${id}-${Date.now()}.jpg`;
+    const { error: upErr } = await supabase.storage.from('calendar-photos').upload(path, f, { upsert: true, contentType: f.type || 'image/jpeg' });
+    if (upErr) throw upErr;
+    const { data: pub } = supabase.storage.from('calendar-photos').getPublicUrl(path);
+    await supabase.from('product_pipeline').update({ photo_url: pub.publicUrl }).eq('id', id);
+    const e = pipeline.find(x => x.id === id); if (e) e.photo_url = pub.publicUrl;
+    renderPipeline();
+  } catch(err){ alert('No se pudo subir la foto: ' + (err.message || err)); }
+});
 function renderWeekRail(fBatches, fStandalone, variantsByBatch){
   const rail = document.getElementById('weekRail');
   const head = document.getElementById('weekRailHead');
@@ -2749,7 +2786,7 @@ function renderWeekRail(fBatches, fStandalone, variantsByBatch){
     if (!vars.length){
       const delivered = b.batch_stage === 'entrega';
       items.push({
-        kind: 'batch', id: b.id, entryId: null, name: b.name, qty: b.total_quantity || 0,
+        kind: 'batch', id: b.id, entryId: null, photo: findCatalogPhoto(b.name, null), name: b.name, qty: b.total_quantity || 0,
         date: b.tentative_date, delivered, partial: false, lote: '',
         original: b.original_date || null,
         stageLbl: delivered ? '' : (PROD_NEXT_STAGE_LABEL[b.batch_stage] || ''),
@@ -2760,7 +2797,7 @@ function renderWeekRail(fBatches, fStandalone, variantsByBatch){
     vars.forEach(v => {
       const delivered = v.stage === 'entrega' || v.status === 'llego';
       items.push({
-        kind: 'batch', id: b.id, entryId: v.id,
+        kind: 'batch', id: b.id, entryId: v.id, photo: prodPhoto(v),
         name: v.design_name || v.product_name, qty: v.quantity || 0,
         date: v.tentative_date || b.tentative_date, delivered, partial: false,
         original: v.original_date || b.original_date || null,
@@ -2773,7 +2810,7 @@ function renderWeekRail(fBatches, fStandalone, variantsByBatch){
   fStandalone.forEach(e => {
     const delivered = e.stage === 'entrega' || e.status === 'llego';
     items.push({
-      kind: 'entry', id: e.id, entryId: null, name: e.product_name, qty: e.quantity || 0,
+      kind: 'entry', id: e.id, entryId: null, photo: prodPhoto(e), name: e.product_name, qty: e.quantity || 0,
       date: e.tentative_date, delivered, partial: false, lote: '',
       original: e.original_date || null,
       stageLbl: delivered ? '' : (PROD_NEXT_STAGE_LABEL[e.stage] || ''),
@@ -2817,10 +2854,13 @@ function renderWeekRail(fBatches, fStandalone, variantsByBatch){
   };
   const itHtml = (i, showMove) => `
     <div class="wk-it${selectedProdItem && selectedProdItem.kind === i.kind && selectedProdItem.id === i.id ? ' sel' : ''}${isLateItem(i) ? ' late' : ''}" data-wk-open="${i.kind}:${i.id}">
-      <div class="n">${escapeHtml(i.name || '')}</div>
-      <div class="m">${i.qty ? i.qty.toLocaleString('es-CO') + 'u' : ''}${i.supplier && !currentSupplierId ? ' · ' + escapeHtml(i.supplier) : ''}</div>
-      ${badge(i)}
-      ${showMove ? `<div><button class="wk-mv" data-wk-move="${i.entryId ? 'entry:' + i.entryId : i.kind + ':' + i.id}">→ mover a sem ${wkNum(nextMon)}</button></div>` : ''}
+      ${i.photo ? `<div class="wk-ph" style="background-image:url('${i.photo}')"></div>` : ''}
+      <div class="wk-bd">
+        <div class="n">${escapeHtml(i.name || '')}</div>
+        <div class="m">${i.qty ? i.qty.toLocaleString('es-CO') + 'u' : ''}${i.supplier && !currentSupplierId ? ' · ' + escapeHtml(i.supplier) : ''}</div>
+        ${badge(i)}
+        ${showMove ? `<div><button class="wk-mv" data-wk-move="${i.entryId ? 'entry:' + i.entryId : i.kind + ':' + i.id}">→ mover a sem ${wkNum(nextMon)}</button></div>` : ''}
+      </div>
     </div>`;
 
   // Agrupá las refs de un mismo lote bajo un encabezado chiquito (menos repetición)
@@ -3103,6 +3143,12 @@ function renderPipeline(){
   el.innerHTML = '';
   const wireEl = sheetBody || el;
   wireEl.querySelectorAll('[data-vtoggle]').forEach(b => b.addEventListener('click', () => b.closest('.tl-variant')?.classList.toggle('open')));
+  wireEl.querySelectorAll('[data-photo-pick]').forEach(b => b.addEventListener('click', (ev) => {
+    ev.stopPropagation();
+    const input = document.getElementById('prodPhotoInput');
+    input.dataset.target = b.getAttribute('data-photo-pick');
+    input.click();
+  }));
   wireEl.querySelectorAll('[data-toggle]').forEach(b => b.addEventListener('click', () => togglePipelineStatus(b.getAttribute('data-toggle'))));
   wireEl.querySelectorAll('[data-del]').forEach(b => b.addEventListener('click', () => deletePipeline(b.getAttribute('data-del'))));
   wireEl.querySelectorAll('[data-edit]').forEach(b => b.addEventListener('click', () => openEntryModal(b.getAttribute('data-edit'))));

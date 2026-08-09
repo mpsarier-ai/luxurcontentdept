@@ -140,6 +140,7 @@ async function fetchCatalog(token: string) {
               title
               createdAt
               publishedAt
+              featuredImage { url(transform: { maxWidth: 400 }) }
               variants(first: 20) {
                 edges {
                   node {
@@ -182,6 +183,7 @@ async function fetchCatalog(token: string) {
       products.push({
         gid: n.id, title: n.title, total,
         createdAt: n.createdAt, publishedAt: n.publishedAt || n.createdAt,
+        image: n.featuredImage?.url || null,
         sizes,
       });
     }
