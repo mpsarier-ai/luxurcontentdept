@@ -90,6 +90,18 @@ tr.tot td{font-weight:700;border-top:2px solid var(--black);background:var(--cre
 .gate{max-width:420px;margin:80px auto;text-align:center;padding:30px;background:#fff;border-radius:20px;box-shadow:0 1px 3px rgba(0,0,0,.05)}
 .gate a{color:var(--rosa-deep)}
 
+/* ── Modales en celular: sheet desde abajo, 1 columna, scroll interno ── */
+@media (max-width: 640px){
+  .ov{padding:0;align-items:flex-end}
+  .ov .modal{max-width:100%;border-radius:22px 22px 0 0;max-height:90dvh;overflow-y:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;padding:20px 16px calc(24px + env(safe-area-inset-bottom))}
+  .form{grid-template-columns:1fr}
+  .f input,.f select{min-width:0;width:100%}
+  .photos{grid-template-columns:repeat(2,1fr)}
+  .szrow{gap:5px}
+  #o_tbl{display:block;overflow-x:auto;white-space:nowrap;font-size:11px}
+  .mact{position:sticky;bottom:0;background:#fff;padding-top:10px;margin:10px -16px 0;padding-left:16px;padding-right:16px}
+}
+
 /* ── PRINT (linesheet + OC · diseño formal intacto) ── */
 #printArea{display:none}
 @media print{body>*{display:none!important}#printArea{display:block!important;font-family:"Helvetica Neue",Helvetica,Arial,sans-serif}.top,.tabs,.bar{display:none!important}@page{size:A4;margin:12mm}}
