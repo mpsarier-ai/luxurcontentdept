@@ -207,6 +207,12 @@ header{border-bottom:1px solid var(--black);padding-bottom:24px;margin-bottom:64
 .wk-card{flex:0 0 82%;max-width:340px;scroll-snap-align:center;background:#fff;border-radius:18px;padding:14px 16px;box-shadow:0 1px 3px rgba(0,0,0,.05),0 6px 18px rgba(0,0,0,.05)}
 @media(min-width:700px){.wk-card{flex-basis:320px}}
 .wk-card.cur{box-shadow:0 0 0 2px var(--rosa-deep),0 6px 18px rgba(0,0,0,.06)}
+.wk-card.slim{flex:0 0 44%;max-width:180px;opacity:.75}
+.wk-card.slim .wk-t{flex-direction:column;align-items:flex-start;gap:1px}
+/* KPIs: solo el número; toca la tarjeta para ver costo + PVP */
+.prod-kpi{cursor:pointer}
+.prod-kpi .pk-cost{display:none}
+.prod-kpi.open .pk-cost{display:block}
 .wk-t{display:flex;justify-content:space-between;align-items:baseline;gap:8px}
 .wk-sem{font-weight:700;font-size:15px;white-space:nowrap}
 .wk-rng{font-size:11px;color:var(--grey);white-space:nowrap}
@@ -2529,6 +2535,8 @@ let selectedProdItem = null; // {kind:'batch'|'entry', id} → desglose abierto 
 // Cerrar el sheet con la ✕ o tocando el fondo oscuro
 document.getElementById('prodSheetClose')?.addEventListener('click', () => { selectedProdItem = null; renderPipeline(); });
 document.getElementById('prodSheetBg')?.addEventListener('click', () => { selectedProdItem = null; renderPipeline(); });
+// KPIs minimalistas: toca una tarjeta para ver/ocultar el detalle de costo + PVP
+document.querySelectorAll('.prod-kpi').forEach(k => k.addEventListener('click', () => k.classList.toggle('open')));
 function renderWeekRail(fBatches, fStandalone, variantsByBatch){
   const rail = document.getElementById('weekRail');
   const head = document.getElementById('weekRailHead');
@@ -2577,18 +2585,18 @@ function renderWeekRail(fBatches, fStandalone, variantsByBatch){
   for (let m = addDays(curMon, -7); m <= maxMon; m = addDays(m, 7)) mons.push(m);
 
   const nextMon = addDays(curMon, 7);
+  // UN solo badge por referencia (el más importante) — el detalle vive en el sheet
   const badge = i => {
     if (i.delivered) return '<span class="wk-b ok">✓ Entregado</span>';
-    let b = '';
-    if (i.partial) b += '<span class="wk-b part">Entrega parcial</span>';
-    if (i.date && wkMonday(i.date) < curMon) b += `<span class="wk-b late">Atrasado · era sem ${wkNum(i.date)}</span>`;
-    if (i.stageLbl && i.stageLbl !== '✓ entregado') b += `<span class="wk-b go">${i.stageLbl}</span>`;
-    return b;
+    if (i.date && wkMonday(i.date) < curMon) return `<span class="wk-b late">Atrasado · era sem ${wkNum(i.date)}</span>`;
+    if (i.partial) return '<span class="wk-b part">Entrega parcial</span>';
+    if (i.stageLbl && i.stageLbl !== '✓ entregado') return `<span class="wk-b go">${i.stageLbl}</span>`;
+    return '';
   };
   const itHtml = (i, showMove) => `
     <div class="wk-it${selectedProdItem && selectedProdItem.kind === i.kind && selectedProdItem.id === i.id ? ' sel' : ''}" data-wk-open="${i.kind}:${i.id}">
       <div class="n">${escapeHtml(i.name || '')}</div>
-      <div class="m">${i.qty ? i.qty.toLocaleString('es-CO') + 'u' : ''}${i.supplier && !currentSupplierId ? ' · ' + escapeHtml(i.supplier) : ''}${i.sub ? ' · ' + escapeHtml(i.sub) : ''}</div>
+      <div class="m">${i.qty ? i.qty.toLocaleString('es-CO') + 'u' : ''}${i.supplier && !currentSupplierId ? ' · ' + escapeHtml(i.supplier) : ''}</div>
       ${badge(i)}
       ${showMove ? `<div><button class="wk-mv" data-wk-move="${i.kind}:${i.id}">→ mover a sem ${wkNum(nextMon)}</button></div>` : ''}
     </div>`;
@@ -2601,15 +2609,16 @@ function renderWeekRail(fBatches, fStandalone, variantsByBatch){
     // Semanas pasadas: solo lo que sí se entregó (lo atrasado vive en la semana actual)
     const shown = isCur ? inWeek.filter(i => !late.includes(i)) : (mon < curMon ? inWeek.filter(i => i.delivered) : inWeek);
     const totalU = shown.concat(lateHere).filter(i => !i.delivered).reduce((a, i) => a + (i.qty || 0), 0);
-    return `<div class="wk-card${isCur ? ' cur' : ''}">
+    const isEmpty = !shown.length && !lateHere.length;
+    return `<div class="wk-card${isCur ? ' cur' : ''}${isEmpty ? ' slim' : ''}">
       <div class="wk-t">
         <span class="wk-sem">Semana ${wkNum(mon)}${isCur ? ' · hoy' : ''}</span>
         <span class="wk-rng">${wkRangeLabel(mon)}</span>
         ${totalU ? `<span class="wk-tot">${totalU.toLocaleString('es-CO')}u</span>` : ''}
       </div>
       ${shown.length ? `<div class="wk-items">${shown.map(i => itHtml(i, false)).join('')}</div>` : ''}
-      ${lateHere.length ? `<div class="wk-late-h">Atrasadas de semanas anteriores</div><div class="wk-items">${lateHere.map(i => itHtml(i, true)).join('')}</div>` : ''}
-      ${!shown.length && !lateHere.length ? '<div class="wk-empty">Sin entregas programadas</div>' : ''}
+      ${lateHere.length ? `<div class="wk-late-h">Atrasadas</div><div class="wk-items">${lateHere.map(i => itHtml(i, true)).join('')}</div>` : ''}
+      ${isEmpty ? '<div class="wk-empty">Sin entregas</div>' : ''}
     </div>`;
   }).join('') + (undated.length ? `<div class="wk-card">
       <div class="wk-t"><span class="wk-sem">Sin fecha</span></div>
