@@ -331,6 +331,10 @@ header{border-bottom:1px solid var(--black);padding-bottom:24px;margin-bottom:64
 .tl-stage-days{margin-left:auto;font-family:inherit;font-size:12.5px;color:#8e8e93;letter-spacing:0;text-transform:none;font-variant-numeric:tabular-nums}
 .tl-stage.done .tl-stage-days{color:var(--rosa-deep);font-weight:600}
 .tl-stage.current .tl-stage-days{color:var(--black);font-weight:600}
+.tl-stage-days.goal{color:#b6b6ba;font-weight:400}
+.tl-stage .tl-stage-days.over{color:#b23a35;font-weight:700}
+.tl-stage-summary.late{background:#f7dedc;color:#8a2f2b}
+.tl-stage-summary.late b{color:#b23a35}
 .tl-line{flex:none;width:2px;height:14px;background:rgba(0,0,0,.1);align-self:flex-start;margin:-7px 0 -7px 17px}
 .tl-line.done{background:var(--rosa-deep)}
 .tl-stage-summary{margin-top:8px;padding:9px 14px;background:rgba(212,132,142,.08);border-radius:12px;font-family:-apple-system,sans-serif;font-size:12.5px;color:#555;letter-spacing:.01em;text-align:center}
@@ -2198,7 +2202,7 @@ function fmtCOP(n){
 async function loadSuppliers(){
   try {
     const { data, error } = await supabase
-      .from('suppliers').select('id,name,token,default_unit_cost,phone,notes,flow_type')
+      .from('suppliers').select('id,name,token,default_unit_cost,phone,notes,flow_type,stage_days')
       .order('created_at');
     if (error) throw error;
     suppliers = data || [];
@@ -2328,6 +2332,25 @@ function getFlowStages(entry){
 
 // Calcula duración de cada etapa basándose en stage_history
 // Empieza desde created_at (cuando se creó la entrada) o el primer history entry si falta
+// Meta de días por etapa: suppliers.stage_days (editable en DB) con fallback
+const STAGE_DAYS_DEFAULT = { corte:4, proceso:3, confeccion:8, lavanderia:6, terminacion:4, entrega:2, planeado:1, pagado:1, entregado:3 };
+function stageGoalDays(supplierId, key){
+  const sup = suppliers.find(x => x.id === supplierId);
+  const v = sup && sup.stage_days && sup.stage_days[key];
+  const n = v != null ? Number(v) : STAGE_DAYS_DEFAULT[key];
+  return Number.isFinite(n) ? n : null;
+}
+
+// "5d de 4d" (rojo si se pasó de la meta) · pendientes muestran "meta 4d"
+function stageDaysLabel(it){
+  if (it.isDone || it.isCurrent){
+    if (it.days == null) return '';
+    const over = it.goal != null && it.days > it.goal;
+    return `<span class="tl-stage-days${over ? ' over' : ''}">${it.days}d${it.goal != null ? ` de ${it.goal}d` : ''}</span>`;
+  }
+  return it.goal != null ? `<span class="tl-stage-days goal">meta ${it.goal}d</span>` : '';
+}
+
 function computeStageTimings(entry, stages){
   const history = Array.isArray(entry.stage_history) ? entry.stage_history : [];
   // Toma la PRIMERA aparición de cada etapa (no la última — si el proveedor reclickea
@@ -2363,20 +2386,31 @@ function computeStageTimings(entry, stages){
         isOngoing = true;
       }
     }
-    result.push({ stage: s, isDone, isCurrent, days, isOngoing });
+    const goal = stageGoalDays(entry.supplier_id, s.key);
+    result.push({ stage: s, isDone, isCurrent, days, isOngoing, goal });
   }
   const totalDays = totalMs > 0 ? Math.round(totalMs / 86400000) : null;
-  return { items: result, totalDays, lastDoneIdx, isFullyDone };
+  // Días que FALTAN si el resto va al ritmo de las metas: lo que le queda a la
+  // etapa actual (0 si ya se pasó de su meta) + metas completas de las pendientes
+  let remainingDays = 0, haveGoals = false;
+  result.forEach(it => {
+    if (it.isDone) return;
+    if (it.goal == null) return;
+    haveGoals = true;
+    remainingDays += it.isCurrent ? Math.max(0, it.goal - (it.days || 0)) : it.goal;
+  });
+  if (!haveGoals) remainingDays = null;
+  return { items: result, totalDays, lastDoneIdx, isFullyDone, remainingDays };
 }
 
 function renderStepperInline(e){
   const stages = getFlowStages(e);
-  const { items, totalDays, lastDoneIdx, isFullyDone } = computeStageTimings(e, stages);
+  const { items, totalDays, lastDoneIdx, isFullyDone, remainingDays } = computeStageTimings(e, stages);
   const currentIdx = lastDoneIdx + 1;
   let html = '<div class="tl-stepper">';
   items.forEach((it, i) => {
     const cls = it.isDone ? 'done' : (it.isCurrent ? 'current' : '');
-    const daysLabel = it.days != null ? `<span class="tl-stage-days">${it.days}d</span>` : '';
+    const daysLabel = stageDaysLabel(it);
     // Cada dot es un botón: vos podés marcar cualquier etapa como completada
     html += `<div class="tl-stage ${cls}"><span class="tl-stage-dot"></span><span class="tl-stage-label">${it.stage.long || it.stage.short}</span>${daysLabel}</div>`;
     if (i < stages.length - 1){
@@ -2394,11 +2428,28 @@ function renderStepperInline(e){
     const totalStr = totalDays != null && totalDays > 0 ? ` · total ${totalDays + (current.days || 0)}d` : '';
     html += `<div class="tl-stage-summary">En <b>${currentLabel}</b> · ${dayStr}${totalStr}</div>`;
   }
+  html += projectionHtml(remainingDays, isFullyDone, e.tentative_date);
   html += `<div class="tl-cta-row">
     ${!isFullyDone && currentIdx < stages.length ? `<button class="tl-adv" data-adv-entry="${e.id}">✓ Marcar ${stages[currentIdx].long || stages[currentIdx].short}</button>` : ''}
     ${lastDoneIdx >= 0 ? `<button class="tl-undo" data-undo-entry="${e.id}">↩ Me equivoqué</button>` : ''}
   </div>`;
   return html;
+}
+
+// "Al ritmo de las metas terminaría ~21 ago · ~11d más tarde" (para saber
+// cuánto MÁS se va a atrasar, no solo cuánto lleva)
+function projectionHtml(remainingDays, isFullyDone, tentativeDate){
+  if (isFullyDone || remainingDays == null) return '';
+  const proj = new Date(Date.now() + remainingDays * 86400000);
+  const projStr = `${proj.getDate()} ${MONTH_ABBR[proj.getMonth()]}`;
+  let tail = '', late = false;
+  if (tentativeDate){
+    const tent = new Date(tentativeDate + 'T12:00:00');
+    const diff = Math.round((proj - tent) / 86400000);
+    if (diff > 0){ tail = ` · <b>~${diff}d más tarde</b> de lo prometido`; late = true; }
+    else tail = ' · va a tiempo';
+  }
+  return `<div class="tl-stage-summary ${late ? 'late' : ''}">Al ritmo meta terminaría ~<b>${projStr}</b>${tail}</div>`;
 }
 
 function renderPipelineEntry(e, isVariantNested){
@@ -2461,15 +2512,12 @@ function renderVariantStepperInline(v){
     { key: 'terminacion', short: 'Term', long: 'Terminación' },
     { key: 'entrega', short: 'Entr', long: 'Entrega' },
   ];
-  const lastDoneIdx = v.stage ? stages.findIndex(s => s.key === v.stage) : -1;
-  const isFullyDone = lastDoneIdx === stages.length - 1;
+  const { items, lastDoneIdx, isFullyDone } = computeStageTimings(v, stages);
   const currentIdx = lastDoneIdx + 1;
   let html = '<div class="tl-stepper">';
-  stages.forEach((s, i) => {
-    const isDone = i <= lastDoneIdx;
-    const isCur = !isFullyDone && i === currentIdx;
-    const cls = isDone ? 'done' : (isCur ? 'current' : '');
-    html += `<div class="tl-stage ${cls}"><span class="tl-stage-dot"></span><span class="tl-stage-label">${s.long || s.short}</span></div>`;
+  items.forEach((it, i) => {
+    const cls = it.isDone ? 'done' : (it.isCurrent ? 'current' : '');
+    html += `<div class="tl-stage ${cls}"><span class="tl-stage-dot"></span><span class="tl-stage-label">${it.stage.long || it.stage.short}</span>${stageDaysLabel(it)}</div>`;
     if (i < stages.length - 1) html += `<span class="tl-line ${i < lastDoneIdx ? 'done' : ''}"></span>`;
   });
   html += '</div>';
@@ -2496,16 +2544,25 @@ function renderBatchCard(batch, variants){
     const d = batch.tentative_date.split('-');
     dateBox = `<div class="tl-date">${parseInt(d[2])}<small>${MONTH_ABBR[parseInt(d[1])-1]}</small></div>`;
   }
-  // Mini stepper del lote
+  // Mini stepper del lote — con días reales vs meta por etapa
+  const bTimings = computeStageTimings({
+    stage: batch.batch_stage, stage_history: batch.batch_stage_history,
+    created_at: batch.created_at, supplier_id: batch.supplier_id,
+  }, stages);
   let stepperHtml = '<div class="tl-stepper">';
-  stages.forEach((s, i) => {
-    const isDone = i <= lastIdx;
-    const isCur = !isLavadero && i === currentIdx;
-    const cls = isDone ? 'done' : (isCur ? 'current' : '');
-    stepperHtml += `<div class="tl-stage ${cls}"><span class="tl-stage-dot"></span><span class="tl-stage-label">${s.long || s.label || s.short}</span></div>`;
+  bTimings.items.forEach((it, i) => {
+    const cls = it.isDone ? 'done' : (it.isCurrent ? 'current' : '');
+    stepperHtml += `<div class="tl-stage ${cls}"><span class="tl-stage-dot"></span><span class="tl-stage-label">${it.stage.long || it.stage.label || it.stage.short}</span>${stageDaysLabel(it)}</div>`;
     if (i < stages.length - 1) stepperHtml += `<span class="tl-line ${i < lastIdx ? 'done' : ''}"></span>`;
   });
   stepperHtml += '</div>';
+  // Proyección del lote: lo que falta de sus etapas + Terminación y Entrega
+  // de las variantes (en flujo completo el lote termina en Lavandería)
+  let bRemaining = bTimings.remainingDays;
+  if (!isSimpleFlow && bRemaining != null){
+    bRemaining += (stageGoalDays(batch.supplier_id, 'terminacion') || 0) + (stageGoalDays(batch.supplier_id, 'entrega') || 0);
+  }
+  const batchProjection = projectionHtml(bRemaining, isLavadero && isSimpleFlow, batch.tentative_date);
   const batchCta = `<div class="tl-cta-row">
     ${!isLavadero && currentIdx < stages.length ? `<button class="tl-adv" data-adv-batch="${batch.id}">✓ Marcar ${stages[currentIdx].long || stages[currentIdx].label || stages[currentIdx].short}</button>` : ''}
     ${lastIdx >= 0 ? `<button class="tl-undo" data-undo-batch="${batch.id}">↩ Me equivoqué</button>` : ''}
@@ -2534,6 +2591,7 @@ function renderBatchCard(batch, variants){
     </div>
     ${stepperHtml}
     ${summary}
+    ${batchProjection}
     ${batchCta}
   </div>`;
   // Variantes nested abajo
