@@ -2071,11 +2071,12 @@ document.addEventListener('click', e => {
 
 // === Helpers para detectar restock/lote ya activo ===
 const PROD_STAGE_LABEL = {
-  corte: 'en Corte', proceso: 'en Proceso', confeccion: 'en Confección',
+  pre: 'en Pre (muestra)', corte: 'en Corte', proceso: 'en Proceso', confeccion: 'en Confección',
   lavanderia: 'en Lavandería', terminacion: 'en Terminación', entrega: '✓ entregado',
 };
 const PROD_NEXT_STAGE_LABEL = {
-  null: 'en Corte', undefined: 'en Corte',
+  null: 'en Pre · muestra', undefined: 'en Pre · muestra',
+  pre: 'en Corte',
   corte: 'en Proceso/Confección', proceso: 'en Confección',
   confeccion: 'en Lavandería', lavanderia: 'en Terminación',
   terminacion: 'en Entrega', entrega: '✓ entregado',
@@ -2328,6 +2329,7 @@ async function loadSupplierLink(){ await loadSuppliers(); }
 
 // Etapas de producción · stage = última completada (null = primera en curso)
 const PROD_STAGES_FULL = [
+  { key: 'pre', short: 'Pre', long: 'Pre · muestra' },
   { key: 'corte', short: 'Corte', long: 'Corte' },
   { key: 'proceso', short: 'Proceso', long: 'Proceso' },
   { key: 'confeccion', short: 'Confec.', long: 'Confección' },
@@ -2399,12 +2401,12 @@ function computeStageTimings(entry, stages){
     let days = null, isOngoing = false;
     if (isDone){
       const at = completedAt[s.key];
-      if (at && prevAt) {
+      if (at && prevAt && s.key !== 'pre') {
         days = Math.max(0, Math.round((at - prevAt) / 86400000));
         totalMs += (at - prevAt);
       }
       prevAt = at || prevAt;
-    } else if (isCurrent){
+    } else if (isCurrent && s.key !== 'pre'){
       if (prevAt){
         days = Math.max(0, Math.round((now - prevAt) / 86400000));
         isOngoing = true;

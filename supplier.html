@@ -161,6 +161,7 @@ const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBh
 const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 const STAGES_FULL = [
+  { key: 'pre',         short: 'Pre',    label: 'Pre · muestra' },
   { key: 'corte',       short: 'Corte',  label: 'Corte' },
   { key: 'proceso',     short: 'Proc',   label: 'Proceso · bordado/estampado' },
   { key: 'confeccion',  short: 'Conf',   label: 'Confección' },
@@ -179,9 +180,9 @@ const STAGES_SIMPLE = [
 ];
 let supplierFlowType = 'full'; // se setea al render con payload.supplier.flow_type
 // Etapas a nivel LOTE (hasta lavandería)
-const BATCH_STAGES_FULL = STAGES_FULL.slice(0, 4); // corte, proceso, confeccion, lavanderia
+const BATCH_STAGES_FULL = STAGES_FULL.slice(1, 5); // corte, proceso, confeccion, lavanderia
 // Etapas a nivel VARIANTE (después de lavandería)
-const VARIANT_STAGES = STAGES_FULL.slice(4); // terminacion, entrega
+const VARIANT_STAGES = STAGES_FULL.slice(5); // terminacion, entrega
 
 function escapeHtml(s){
   return String(s == null ? '' : s)
@@ -238,14 +239,14 @@ function renderCard(entry, supplierToken){
     const h = firstHistory(entry.stage_history, s.key);
     let d = null;
     if (isDone){
-      d = daysBetween(prevAt, h && h.at);
+      if (s.key !== 'pre') d = daysBetween(prevAt, h && h.at);
       prevAt = (h && h.at) || prevAt;
-    } else if (isCurrent){
+    } else if (isCurrent && s.key !== 'pre'){
       d = daysBetween(prevAt, now);
     }
     return d;
   });
-  const totalDays = isFullyDone ? daysBetween(startedAt, firstHistory(entry.stage_history, 'entrega')?.at) : null;
+  const totalDays = isFullyDone ? daysBetween(firstHistory(entry.stage_history, 'pre')?.at || startedAt, firstHistory(entry.stage_history, 'entrega')?.at) : null;
   const curveStr = entry.size_curve && typeof entry.size_curve === 'object'
     ? Object.entries(entry.size_curve).filter(([_,v]) => v > 0).map(([k,v]) => `${k}·${v}`)
     : [];
