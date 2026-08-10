@@ -121,6 +121,20 @@ html,body{background:#edebe6}
 .card,.batch{box-shadow:0 1px 3px rgba(0,0,0,.05)}
 .delivered,.variant-delivered{font-weight:600}
 .footer{letter-spacing:.02em;text-transform:none;color:#aeaeb2}
+/* Rediseño simple: foto + barra de progreso + un botón grande */
+.prow{display:flex;gap:12px;align-items:flex-start}
+.prow .pbody{flex:1;min-width:0}
+.pph{width:64px;height:84px;border-radius:12px;background:#f2f2f0 center/cover no-repeat;flex:none}
+.pph.sm{width:52px;height:68px;border-radius:10px}
+.pbar{height:7px;border-radius:4px;background:rgba(0,0,0,.08);overflow:hidden;margin:12px 0 7px}
+.pbar i{display:block;height:100%;background:var(--rosa-deep);border-radius:4px;transition:width .3s ease}
+.pbar.full i{background:var(--green)}
+.pstate{font-size:13.5px;font-weight:600}
+.pstate small{color:#8e8e93;font-weight:500;font-size:12px}
+.step-btn{width:100%;padding:15px 20px;border-radius:14px;font-size:15px !important}
+.variant-btn{width:100%;padding:13px 18px;border-radius:12px;font-size:14px !important}
+.vstate-chip{display:inline-block;background:var(--cream);border-radius:999px;padding:4px 12px;font-size:11px;font-weight:600;margin-top:2px}
+.vstate-chip.ok{background:rgba(91,154,91,.12);color:var(--green)}
 .revert-row{text-align:center;margin-top:10px}
 .revert-btn{background:transparent;border:none;color:#8e8e93;font-size:12px;font-weight:500;text-decoration:underline;cursor:pointer;padding:6px 10px}
 .revert-btn:active{opacity:.6}
@@ -240,29 +254,26 @@ function renderCard(entry, supplierToken){
   const nextLabel = !isFullyDone && currentIdx < stages.length ? stages[currentIdx].label : '';
   const isLastStage = currentIdx === stages.length - 1;
   const nextKey = !isFullyDone ? stages[currentIdx].key : '';
+  const curDays = !isFullyDone ? stageDays[currentIdx] : null;
+  const pct = Math.round(((lastDoneIdx + 1) / stages.length) * 100);
   return `<div class="card ${cardCls}" data-id="${entry.id}">
-    <div class="product-name">${escapeHtml(entry.product_name || 'Sin nombre')}</div>
-    <div class="product-meta">
-      ${entry.quantity ? `<span><b>${entry.quantity}u</b></span>` : ''}
-      ${entrega ? `<span>📅 ${entrega}</span>` : ''}
-      ${entry.entry_type ? `<span style="text-transform:capitalize">${escapeHtml(entry.entry_type)}</span>` : ''}
+    <div class="prow">
+      ${entry.photo_url ? `<div class="pph" style="background-image:url('${escapeHtml(entry.photo_url)}')"></div>` : ''}
+      <div class="pbody">
+        <div class="product-name" style="font-size:18px">${escapeHtml(entry.product_name || 'Sin nombre')}</div>
+        <div class="product-meta">
+          ${entry.quantity ? `<span><b>${entry.quantity}u</b></span>` : ''}
+          ${entrega ? `<span>📅 ${entrega}</span>` : ''}
+        </div>
+        ${curveStr.length ? `<div class="curve">${curveStr.map(s => `<span class="curve-pill">${escapeHtml(s)}</span>`).join('')}</div>` : ''}
+      </div>
     </div>
-    ${curveStr.length ? `<div class="curve">${curveStr.map(s => `<span class="curve-pill">${escapeHtml(s)}</span>`).join('')}</div>` : ''}
     ${entry.notes ? `<div class="notes"><b>Nota:</b> ${escapeHtml(entry.notes)}</div>` : ''}
-    <div class="stepper">
-      ${stages.map((s, i) => {
-        const isDone = i <= lastDoneIdx;
-        const isCur = !isFullyDone && i === currentIdx;
-        const cls = isDone ? 'done' : (isCur ? 'current' : '');
-        const d = stageDays[i];
-        const daysLbl = d != null ? `<span class="step-days">${d === 0 ? 'hoy' : `${d}d`}</span>` : '';
-        let html = `<div class="step ${cls}"><span class="step-dot"></span><span class="step-label">${s.short}</span>${daysLbl}</div>`;
-        if (i < stages.length - 1) html += `<span class="step-line ${i < lastDoneIdx ? 'done' : ''}"></span>`;
-        return html;
-      }).join('')}
-    </div>
-    ${isFullyDone ? `<div class="delivered">✓ Entregado${totalDays != null ? ` · en ${totalDays}d` : ''}</div>` :
-      `<div class="step-action"><button class="step-btn ${isLastStage ? 'complete' : ''}" data-pid="${entry.id}" data-stage="${nextKey}" data-supplier="${supplierToken}">${isLastStage ? 'Confirmar entrega' : `${escapeHtml(nextLabel)} terminado`}</button></div>`}
+    <div class="pbar ${isFullyDone ? 'full' : ''}"><i style="width:${pct}%"></i></div>
+    ${isFullyDone
+      ? `<div class="delivered">✓ Entregado${totalDays != null ? ` · en ${totalDays}d` : ''}</div>`
+      : `<div class="pstate">Va en: <b>${escapeHtml(stages[currentIdx].label.split(' · ')[0])}</b> <small>· etapa ${currentIdx + 1} de ${stages.length}${curDays != null ? ` · lleva ${curDays === 0 ? 'hoy' : curDays + 'd'}` : ''}</small></div>
+         <div class="step-action"><button class="step-btn ${isLastStage ? 'complete' : ''}" data-pid="${entry.id}" data-stage="${nextKey}" data-supplier="${supplierToken}">✓ Ya terminamos ${escapeHtml(nextLabel.split(' · ')[0])}</button></div>`}
     ${lastDoneIdx >= 0 ? `<div class="revert-row"><button class="revert-btn" data-revert-pid="${entry.id}" data-revert-stage="${lastDoneIdx > 0 ? stages[lastDoneIdx-1].key : 'none'}" data-supplier="${supplierToken}">↩ Me equivoqué · desmarcar última etapa</button></div>` : ''}
   </div>`;
 }
@@ -305,22 +316,16 @@ function renderBatch(batch, variants, supplierToken){
     </div>
     ${batch.notes ? `<div class="notes"><b>Nota:</b> ${escapeHtml(batch.notes)}</div>` : ''}
 
-    <div class="stepper">
-      ${batchStages.map((s, i) => {
-        const isDone = i <= lastBatchIdx;
-        const isCur = !batchDoneFully && i === batchCurrentIdx;
-        const cls = isDone ? 'done' : (isCur ? 'current' : '');
-        const d = batchDays[i];
-        const daysLbl = d != null ? `<span class="step-days">${d === 0 ? 'hoy' : `${d}d`}</span>` : '';
-        let h = `<div class="step ${cls}"><span class="step-dot"></span><span class="step-label">${s.short}</span>${daysLbl}</div>`;
-        if (i < batchStages.length - 1) h += `<span class="step-line ${i < lastBatchIdx ? 'done' : ''}"></span>`;
-        return h;
-      }).join('')}
-    </div>
+    ${(() => {
+      const pct = Math.round(((lastBatchIdx + 1) / batchStages.length) * 100);
+      const curDays = !batchDoneFully ? batchDays[batchCurrentIdx] : null;
+      return `<div class="pbar ${batchDoneFully ? 'full' : ''}"><i style="width:${pct}%"></i></div>
+      ${!batchDoneFully ? `<div class="pstate">El lote va en: <b>${escapeHtml(nextBatchStage.label.split(' · ')[0])}</b> <small>· etapa ${batchCurrentIdx + 1} de ${batchStages.length}${curDays != null ? ` · lleva ${curDays === 0 ? 'hoy' : curDays + 'd'}` : ''}</small></div>` : ''}`;
+    })()}
 
     ${nextBatchStage ? `<div class="step-action">
-      <button class="step-btn" data-batch-advance="${batch.id}" data-stage="${nextBatchStage.key}" data-supplier="${supplierToken}">${escapeHtml(nextBatchStage.label.split(' · ')[0])} terminada</button>
-    </div>` : `<div class="batch-msg">${supplierFlowType === 'simple' ? '✓ Listo · producción completa' : '✓ Lote completo hasta Lavandería · ahora subdivide por diseño'}</div>`}
+      <button class="step-btn" data-batch-advance="${batch.id}" data-stage="${nextBatchStage.key}" data-supplier="${supplierToken}">✓ Ya terminamos ${escapeHtml(nextBatchStage.label.split(' · ')[0])}</button>
+    </div>` : `<div class="batch-msg">${supplierFlowType === 'simple' ? '✓ Listo · producción completa' : '✓ Lote completo hasta Lavandería · ahora marca cada diseño abajo'}</div>`}
     ${lastBatchIdx >= 0 ? `<div class="revert-row"><button class="revert-btn" data-revert-batch="${batch.id}" data-revert-stage="${lastBatchIdx > 0 ? batchStages[lastBatchIdx-1].key : 'none'}" data-supplier="${supplierToken}">↩ Me equivoqué · desmarcar última etapa</button></div>` : ''}
   `;
 
@@ -351,27 +356,28 @@ function renderVariant(v, batch, batchReadyForVariants, supplierToken){
   if (isFullyDone){
     actionHtml = `<div class="variant-delivered">✓ Entregado</div>`;
   } else if (!batchReadyForVariants){
-    actionHtml = `<div class="variant-action"><button class="variant-btn" disabled>Esperando lote en Lavandería</button></div>`;
+    actionHtml = '';
   } else {
     const nextStage = stages[currentIdx];
     const isLast = currentIdx === stages.length - 1;
-    actionHtml = `<div class="variant-action"><button class="variant-btn ${isLast ? 'complete' : ''}" data-pid="${v.id}" data-stage="${nextStage.key}" data-supplier="${supplierToken}">${isLast ? 'Confirmar entrega' : `${escapeHtml(nextStage.label)} terminada`}</button></div>`;
+    actionHtml = `<div class="variant-action"><button class="variant-btn ${isLast ? 'complete' : ''}" data-pid="${v.id}" data-stage="${nextStage.key}" data-supplier="${supplierToken}">${isLast ? '✓ Confirmar ENTREGA' : `✓ Ya terminamos ${escapeHtml(nextStage.label)}`}</button></div>`;
   }
+  const stateChip = isFullyDone
+    ? '<span class="vstate-chip ok">✓ Entregado</span>'
+    : !batchReadyForVariants
+      ? '<span class="vstate-chip">Esperando el lote</span>'
+      : `<span class="vstate-chip">Va en: ${escapeHtml(stages[currentIdx].label)}</span>`;
   return `<div class="variant ${cls}" data-id="${v.id}">
-    <div class="variant-name">${escapeHtml(designName)}</div>
-    <div class="variant-meta">
-      ${v.quantity ? `<span><b>${v.quantity}u</b></span>` : ''}
-      ${curveStr.length ? `<span>${curveStr.join(' · ')}</span>` : ''}
-    </div>
-    <div class="variant-stepper">
-      ${stages.map((s, i) => {
-        const isDone = i <= lastDoneIdx;
-        const isCur = !isFullyDone && batchReadyForVariants && i === currentIdx;
-        const sCls = isDone ? 'done' : (isCur ? 'current' : '');
-        let h = `<div class="variant-step ${sCls}"><span class="variant-step-dot"></span><span>${s.short}</span></div>`;
-        if (i < stages.length - 1) h += `<span class="variant-step-line ${i < lastDoneIdx ? 'done' : ''}"></span>`;
-        return h;
-      }).join('')}
+    <div class="prow">
+      ${v.photo_url ? `<div class="pph sm" style="background-image:url('${escapeHtml(v.photo_url)}')"></div>` : ''}
+      <div class="pbody">
+        <div class="variant-name">${escapeHtml(designName)}</div>
+        <div class="variant-meta">
+          ${v.quantity ? `<span><b>${v.quantity}u</b></span>` : ''}
+          ${curveStr.length ? `<span>${curveStr.join(' · ')}</span>` : ''}
+        </div>
+        ${stateChip}
+      </div>
     </div>
     ${actionHtml}
   </div>`;
