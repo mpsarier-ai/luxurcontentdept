@@ -260,7 +260,7 @@ function renderCard(entry, supplierToken){
     <div class="prow">
       ${entry.photo_url ? `<div class="pph" style="background-image:url('${escapeHtml(entry.photo_url)}')"></div>` : ''}
       <div class="pbody">
-        <div class="product-name" style="font-size:18px">${escapeHtml(entry.product_name || 'Sin nombre')}</div>
+        <div class="product-name" style="font-size:18px">${escapeHtml(entry.design_name || entry.product_name || 'Sin nombre')}</div>
         <div class="product-meta">
           ${entry.quantity ? `<span><b>${entry.quantity}u</b></span>` : ''}
           ${entrega ? `<span>📅 ${entrega}</span>` : ''}
@@ -279,6 +279,22 @@ function renderCard(entry, supplierToken){
 }
 
 function renderBatch(batch, variants, supplierToken){
+  // Flujo completo (One Look, Createxa): el lote es SOLO la agrupación de la
+  // orden — cada referencia (tela) avanza con su propio flujo de 6 etapas
+  if (supplierFlowType !== 'simple'){
+    const entrega = batch.tentative_date ? fmtDateShort(batch.tentative_date + 'T12:00:00') : null;
+    const allDone = variants.length > 0 && variants.every(v => v.stage === 'entrega');
+    return `<div class="batch ${allDone ? 'batch-done' : ''}" data-batch-id="${batch.id}">
+      <div class="batch-name">${escapeHtml(batch.name || 'Lote sin nombre')}</div>
+      <div class="product-meta">
+        ${batch.total_quantity ? `<span><b>${batch.total_quantity}u</b> totales</span>` : ''}
+        ${entrega ? `<span>📅 entrega ${entrega}</span>` : ''}
+        ${variants.length ? `<span><b>${variants.length}</b> referencias</span>` : ''}
+      </div>
+      ${batch.notes ? `<div class="notes"><b>Nota:</b> ${escapeHtml(batch.notes)}</div>` : ''}
+      <div style="margin-top:12px">${variants.map(v => renderCard(v, supplierToken)).join('')}</div>
+    </div>`;
+  }
   const batchStages = supplierFlowType === 'simple'
     ? STAGES_SIMPLE
     : (batch.has_proceso !== false ? BATCH_STAGES_FULL : BATCH_STAGES_FULL.filter(s => s.key !== 'proceso'));

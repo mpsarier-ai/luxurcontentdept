@@ -2529,29 +2529,9 @@ function renderPipelineEntry(e, isVariantNested){
   </div>`;
 }
 
-// Stepper para VARIANTES: solo 2 etapas (Terminación + Entrega).
-// Las etapas tempranas vienen del lote.
-function renderVariantStepperInline(v){
-  const stages = [
-    { key: 'terminacion', short: 'Term', long: 'Terminación' },
-    { key: 'entrega', short: 'Entr', long: 'Entrega' },
-  ];
-  const { items, lastDoneIdx, isFullyDone } = computeStageTimings(v, stages);
-  const currentIdx = lastDoneIdx + 1;
-  let html = '<div class="tl-stepper">';
-  items.forEach((it, i) => {
-    const cls = it.isDone ? 'done' : (it.isCurrent ? 'current' : '');
-    html += `<div class="tl-stage ${cls}"><span class="tl-stage-dot"></span><span class="tl-stage-label">${it.stage.long || it.stage.short}</span>${stageDaysLabel(it)}</div>`;
-    if (i < stages.length - 1) html += `<span class="tl-line ${i < lastDoneIdx ? 'done' : ''}"></span>`;
-  });
-  html += '</div>';
-  if (isFullyDone) html += `<div class="tl-stage-summary done">✓ Entregado</div>`;
-  html += `<div class="tl-cta-row">
-    ${!isFullyDone ? `<button class="tl-adv" data-adv-entry="${v.id}">✓ Marcar ${stages[currentIdx].long}</button>` : ''}
-    ${lastDoneIdx >= 0 ? `<button class="tl-undo" data-undo-entry="${v.id}">↩ Me equivoqué</button>` : ''}
-  </div>`;
-  return html;
-}
+// Cada referencia lleva su flujo COMPLETO (el lote es solo la agrupación
+// de la orden de compra — telas distintas avanzan a ritmos distintos)
+function renderVariantStepperInline(v){ return renderStepperInline(v); }
 
 // Desglose de lote para el bottom sheet: resumen arriba, diseños como
 // lista limpia (sin tarjetas anidadas ni cajones de fecha)
@@ -2605,9 +2585,7 @@ function renderBatchSheet(batch, variants){
   // Diseños: lista simple con chip de estado; tap en el chip abre su checklist
   const varRows = variants.map(v => {
     const done = v.stage === 'entrega' || v.status === 'llego';
-    const vLbl = done ? '✓ Entregado'
-      : v.stage === 'terminacion' ? 'En Entrega'
-      : (PROD_NEXT_STAGE_LABEL[batch.batch_stage] || 'en Corte');
+    const vLbl = done ? '✓ Entregado' : (PROD_NEXT_STAGE_LABEL[v.stage] || 'en Corte');
     const chip = `<button class="tl-vstate ${done ? 'done' : ''}" data-vtoggle="${v.id}">${vLbl} ▾</button>`;
     const vPhoto = prodPhoto(v);
     return `<div class="ps-v tl-variant" data-id="${v.id}">
@@ -2626,11 +2604,9 @@ function renderBatchSheet(batch, variants){
   return `
     <div class="ps-card">
       <div class="ps-meta">${chips.join('')}</div>
-      ${steps}
-      ${proj}
-      ${cta}
+      ${isSimpleFlow ? steps + proj + cta : ''}
     </div>
-    <div class="ps-sec">Diseños</div>
+    <div class="ps-sec">Referencias</div>
     <div class="ps-card">${varRows || '<div class="ps-v-m">Este lote no tiene diseños aún</div>'}</div>
     <div class="ps-actions">
       <button class="ps-act" data-edit-batch="${batch.id}">✎ Editar lote</button>
@@ -2802,7 +2778,7 @@ function renderWeekRail(fBatches, fStandalone, variantsByBatch){
         date: v.tentative_date || b.tentative_date, delivered, partial: false,
         original: v.original_date || b.original_date || null,
         lote: b.name,
-        stageLbl: delivered ? '' : (v.stage ? (PROD_NEXT_STAGE_LABEL[v.stage] || '') : (PROD_NEXT_STAGE_LABEL[b.batch_stage] || 'en Corte')),
+        stageLbl: delivered ? '' : (PROD_NEXT_STAGE_LABEL[v.stage] || 'en Corte'),
         supplier: supName(b.supplier_id),
       });
     });
@@ -3154,10 +3130,6 @@ function renderPipeline(){
   wireEl.querySelectorAll('[data-edit]').forEach(b => b.addEventListener('click', () => openEntryModal(b.getAttribute('data-edit'))));
   // CTA del pipeline: "✓ Marcar [etapa]" avanza una etapa al instante
   // (sin dialogs — equivocarse se arregla con "↩ Me equivoqué")
-  const VARIANT_FLOW = [
-    { key: 'terminacion', long: 'Terminación' },
-    { key: 'entrega', long: 'Entrega' },
-  ];
   const stampHist = (arr, stage) => {
     const h = Array.isArray(arr) ? arr.slice() : [];
     h.push({ stage: stage || 'none', at: new Date().toISOString(), by: (user && user.email) || 'team' });
@@ -3169,7 +3141,7 @@ function renderPipeline(){
     const id = b.getAttribute(isUndo ? 'data-undo-entry' : 'data-adv-entry');
     const entry = pipeline.find(x => x.id === id);
     if (!entry) return;
-    const stages = entry.batch_id ? VARIANT_FLOW : getFlowStages(entry);
+    const stages = getFlowStages(entry);
     const idx = entry.stage ? stages.findIndex(x => x.key === entry.stage) : -1;
     const nIdx = isUndo ? idx - 1 : idx + 1;
     if (!isUndo && nIdx >= stages.length) return;
