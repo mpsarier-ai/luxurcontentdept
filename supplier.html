@@ -135,6 +135,15 @@ html,body{background:#edebe6}
 .variant-btn{width:100%;padding:13px 18px;border-radius:12px;font-size:14px !important}
 .vstate-chip{display:inline-block;background:var(--cream);border-radius:999px;padding:4px 12px;font-size:11px;font-weight:600;margin-top:2px}
 .vstate-chip.ok{background:rgba(91,154,91,.12);color:var(--green)}
+/* Selector de etapa: saltar a cualquier etapa, no solo la siguiente */
+.stage-pick{text-align:center;margin-top:2px}
+.stage-pick-toggle{background:none;border:none;color:#8e8e93;font-size:12px;font-weight:500;text-decoration:underline;padding:6px 10px;cursor:pointer}
+.stage-pick-list{background:rgba(237,235,230,.65);border-radius:14px;padding:10px;margin-top:6px;text-align:left}
+.sp-hint{font-size:11.5px;color:#6e6e73;margin:2px 4px 8px;font-weight:600}
+.sp-item{display:block;width:100%;text-align:left;background:#fff;border:none;border-radius:10px;padding:11px 14px;font-size:13.5px;font-weight:500;margin-bottom:6px;cursor:pointer;font-family:inherit}
+.sp-item:last-child{margin-bottom:0}
+.sp-item.done{color:var(--rosa-deep);font-weight:600}
+.sp-item:active{opacity:.6}
 .revert-row{text-align:center;margin-top:10px}
 .revert-btn{background:transparent;border:none;color:#8e8e93;font-size:12px;font-weight:500;text-decoration:underline;cursor:pointer;padding:6px 10px}
 .revert-btn:active{opacity:.6}
@@ -276,6 +285,14 @@ function renderCard(entry, supplierToken){
       : `<div class="pstate">Va en: <b>${escapeHtml(stages[currentIdx].label.split(' · ')[0])}</b> <small>· etapa ${currentIdx + 1} de ${stages.length}${curDays != null ? ` · lleva ${curDays === 0 ? 'hoy' : curDays + 'd'}` : ''}</small></div>
          <div class="step-action"><button class="step-btn ${isLastStage ? 'complete' : ''}" data-pid="${entry.id}" data-stage="${nextKey}" data-supplier="${supplierToken}">✓ Ya terminamos ${escapeHtml(nextLabel.split(' · ')[0])}</button></div>`}
     ${lastDoneIdx >= 0 ? `<div class="revert-row"><button class="revert-btn" data-revert-pid="${entry.id}" data-revert-stage="${lastDoneIdx > 0 ? stages[lastDoneIdx-1].key : 'none'}" data-supplier="${supplierToken}">↩ Me equivoqué · desmarcar última etapa</button></div>` : ''}
+    <div class="stage-pick">
+      <button class="stage-pick-toggle" data-pick-toggle>Corregir etapa ▾</button>
+      <div class="stage-pick-list" hidden>
+        <div class="sp-hint">Toca la última etapa que YA está terminada:</div>
+        <button class="sp-item ${lastDoneIdx < 0 ? 'done' : ''}" data-pid="${entry.id}" data-stage="none" data-supplier="${supplierToken}">— Sin empezar</button>
+        ${stages.map((st, i) => `<button class="sp-item ${i <= lastDoneIdx ? 'done' : ''}" data-pid="${entry.id}" data-stage="${st.key}" data-supplier="${supplierToken}">${i <= lastDoneIdx ? '✓ ' : ''}${escapeHtml(st.label.split(' · ')[0])}</button>`).join('')}
+      </div>
+    </div>
   </div>`;
 }
 
@@ -344,6 +361,14 @@ function renderBatch(batch, variants, supplierToken){
       <button class="step-btn" data-batch-advance="${batch.id}" data-stage="${nextBatchStage.key}" data-supplier="${supplierToken}">✓ Ya terminamos ${escapeHtml(nextBatchStage.label.split(' · ')[0])}</button>
     </div>` : `<div class="batch-msg">${supplierFlowType === 'simple' ? '✓ Listo · producción completa' : '✓ Lote completo hasta Lavandería · ahora marca cada diseño abajo'}</div>`}
     ${lastBatchIdx >= 0 ? `<div class="revert-row"><button class="revert-btn" data-revert-batch="${batch.id}" data-revert-stage="${lastBatchIdx > 0 ? batchStages[lastBatchIdx-1].key : 'none'}" data-supplier="${supplierToken}">↩ Me equivoqué · desmarcar última etapa</button></div>` : ''}
+    <div class="stage-pick">
+      <button class="stage-pick-toggle" data-pick-toggle>Corregir etapa ▾</button>
+      <div class="stage-pick-list" hidden>
+        <div class="sp-hint">Toca la última etapa que YA está terminada:</div>
+        <button class="sp-item ${lastBatchIdx < 0 ? 'done' : ''}" data-batch-advance="${batch.id}" data-stage="none" data-supplier="${supplierToken}">— Sin empezar</button>
+        ${batchStages.map((st, i) => `<button class="sp-item ${i <= lastBatchIdx ? 'done' : ''}" data-batch-advance="${batch.id}" data-stage="${st.key}" data-supplier="${supplierToken}">${i <= lastBatchIdx ? '✓ ' : ''}${escapeHtml(st.label.split(' · ')[0])}</button>`).join('')}
+      </div>
+    </div>
   `;
 
   // Variants section
@@ -449,6 +474,11 @@ function render(payload, supplierToken){
     }
   }
   root.innerHTML = html;
+  // Toggle del selector de etapa
+  root.querySelectorAll('[data-pick-toggle]').forEach(b => b.addEventListener('click', () => {
+    const l = b.parentElement.querySelector('.stage-pick-list');
+    if (l) l.hidden = !l.hidden;
+  }));
   // Wire buttons de variantes / standalone
   root.querySelectorAll('[data-pid]').forEach(btn => {
     btn.addEventListener('click', async () => {
