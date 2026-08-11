@@ -207,6 +207,15 @@ header{border-bottom:1px solid var(--black);padding-bottom:24px;margin-bottom:64
 .wk-card{flex:0 0 82%;max-width:340px;scroll-snap-align:center;background:#fff;border-radius:18px;padding:14px 16px;box-shadow:0 1px 3px rgba(0,0,0,.05),0 6px 18px rgba(0,0,0,.05)}
 @media(min-width:700px){.wk-card{flex-basis:320px}}
 .wk-card.cur{box-shadow:0 0 0 2px var(--rosa-deep),0 6px 18px rgba(0,0,0,.06)}
+/* Cumplimiento por proveedor */
+.sc-card{background:#fff;border-radius:16px;padding:12px 16px;box-shadow:0 1px 3px rgba(0,0,0,.05);margin:14px 0 2px}
+.sc-title{font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#8e8e93;margin-bottom:8px}
+.sc-row{display:flex;justify-content:space-between;align-items:baseline;gap:10px;padding:6px 0;border-top:1px solid rgba(0,0,0,.05);font-size:13px}
+.sc-row:first-of-type{border-top:none}
+.sc-name{font-weight:600;white-space:nowrap}
+.sc-meta{font-size:12px;color:#8e8e93;text-align:right}
+.sc-meta b.ok{color:#3e7a4e}
+.sc-meta b.bad,.sc-meta .bad{color:#b23a35;font-weight:600}
 .wk-card.slim{flex:0 0 44%;max-width:180px;opacity:.75}
 .wk-card.slim .wk-t{flex-direction:column;align-items:flex-start;gap:1px}
 /* KPIs: solo el número; toca la tarjeta para ver costo + PVP */
@@ -856,6 +865,8 @@ header,.hub-header{position:static !important;background:transparent !important;
         <div class="pk-cost" id="kpiMonthCost">—</div>
       </div>
     </div>
+    <!-- Cumplimiento por proveedor -->
+    <div class="sc-card" id="supScore" hidden></div>
     <!-- Entregas semana a semana (swipe) -->
     <div class="wk-head" id="weekRailHead" hidden><span>Entregas por semana</span><span class="wk-hint">‹ desliza ›</span></div>
     <div class="week-rail" id="weekRail" hidden></div>
@@ -2759,6 +2770,48 @@ function nextBatchStageLabelFor(b){
   return next ? 'en ' + (next.long || next.label || next.short) : '✓ completo';
 }
 
+// Cumplimiento por proveedor: % de entregas a tiempo (vs promesa ORIGINAL),
+// atraso promedio de las tardías, y cuántas pendientes van en riesgo
+function renderSupplierScore(){
+  const el = document.getElementById('supScore');
+  if (!el) return;
+  if (!suppliers.length || !pipeline.length){ el.hidden = true; return; }
+  const rows = suppliers.map(sup => {
+    const refs = pipeline.filter(p => p.supplier_id === sup.id);
+    if (!refs.length) return null;
+    let timed = 0, onTime = 0, lateSum = 0, lateCount = 0, atRisk = 0;
+    refs.forEach(p => {
+      const done = p.stage === 'entrega' || p.status === 'llego';
+      const prom = p.original_date || p.tentative_date;
+      if (done){
+        const h = Array.isArray(p.stage_history) ? p.stage_history.find(x => x.stage === 'entrega' && x.at) : null;
+        if (h && prom){
+          timed++;
+          const d = Math.round((new Date(h.at) - new Date(prom + 'T23:59:00-05:00')) / 864e5);
+          if (d <= 0) onTime++;
+          else { lateSum += d; lateCount++; }
+        }
+      } else if (prom){
+        const est = estimatedDateOf(p);
+        if (est && wkMonday(est) > wkMonday(prom)) atRisk++;
+      }
+    });
+    if (!timed && !atRisk) return null;
+    return { name: sup.name, timed, onTime, avgLate: lateCount ? Math.round(lateSum / lateCount) : 0, lateCount, atRisk };
+  }).filter(Boolean);
+  if (!rows.length){ el.hidden = true; return; }
+  el.hidden = false;
+  el.innerHTML = '<div class="sc-title">Cumplimiento por proveedor</div>' + rows.map(r => {
+    const pct = r.timed ? Math.round((r.onTime / r.timed) * 100) : null;
+    const bits = [];
+    if (pct != null) bits.push(`<b class="${pct >= 70 ? 'ok' : 'bad'}">${pct}% a tiempo</b> (${r.onTime}/${r.timed})`);
+    if (r.lateCount) bits.push(`tarde prom. +${r.avgLate}d`);
+    if (r.atRisk) bits.push(`<span class="bad">${r.atRisk} en riesgo</span>`);
+    if (!bits.length) bits.push('sin historial aún');
+    return `<div class="sc-row"><span class="sc-name">${escapeHtml(r.name)}</span><span class="sc-meta">${bits.join(' · ')}</span></div>`;
+  }).join('');
+}
+
 let weekRailScrolled = false;
 let selectedProdItem = null; // {kind:'batch'|'entry', id} → desglose abierto en el bottom sheet
 // Cerrar el sheet con la ✕ o tocando el fondo oscuro
@@ -3116,6 +3169,7 @@ function renderPipeline(){
 
   // Rail de entregas semana a semana (swipe)
   try { renderWeekRail(filteredBatches, standalone, variantsByBatch); } catch(_) {}
+  try { renderSupplierScore(); } catch(_) {}
 
   if (!filteredPipeline.length && !filteredBatches.length){
     el.innerHTML = `<div class="empty-state">${currentSupplierId ? 'Este proveedor no tiene nada en producción.' : 'Sin entradas. Click "+ Nuevo lote" o "+ Jean suelto".'}</div>`;
