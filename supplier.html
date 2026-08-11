@@ -394,15 +394,11 @@ function renderVariant(v, batch, batchReadyForVariants, supplierToken){
     : [];
   const cls = isFullyDone ? 'done' : (batchReadyForVariants ? 'active' : '');
   const designName = v.design_name || v.product_name || 'Variante';
+  // Flujo simple: el pedido se marca COMPLETO a nivel de orden — las refs
+  // no tienen botones individuales
   let actionHtml = '';
   if (isFullyDone){
     actionHtml = `<div class="variant-delivered">✓ Entregado</div>`;
-  } else if (!batchReadyForVariants){
-    actionHtml = '';
-  } else {
-    const nextStage = stages[currentIdx];
-    const isLast = currentIdx === stages.length - 1;
-    actionHtml = `<div class="variant-action"><button class="variant-btn ${isLast ? 'complete' : ''}" data-pid="${v.id}" data-stage="${nextStage.key}" data-supplier="${supplierToken}">${isLast ? '✓ Confirmar ENTREGA' : `✓ Ya terminamos ${escapeHtml(nextStage.label)}`}</button></div>`;
   }
   const stateChip = isFullyDone
     ? '<span class="vstate-chip ok">✓ Entregado</span>'

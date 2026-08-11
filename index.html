@@ -2595,8 +2595,25 @@ function renderBatchSheet(batch, variants){
     ${lastIdx >= 0 ? `<button class="tl-undo" data-undo-batch="${batch.id}">↩ Me equivoqué</button>` : ''}
   </div>`;
 
-  // Diseños: lista simple con chip de estado; tap en el chip abre su checklist
-  const varRows = variants.map(v => {
+  // Diseños: lista simple con chip de estado; tap en el chip abre su checklist.
+  // Flujo SIMPLE (AXSPEN/Blessed): el pedido avanza COMPLETO — las refs son
+  // solo informativas (foto, nombre, unidades), sin marcado individual.
+  const varRows = isSimpleFlow
+    ? variants.map(v => {
+        const vPhoto = prodPhoto(v);
+        const done = v.stage === 'entrega' || v.status === 'llego';
+        return `<div class="ps-v" data-id="${v.id}">
+          <div class="ps-v-h">
+            ${vPhoto ? `<div class="ps-ph" data-photo-pick="${v.id}" title="Cambiar foto" style="background-image:url('${vPhoto}')"></div>` : `<button class="ps-cam" data-photo-pick="${v.id}" title="Subir foto">📷</button>`}
+            <div style="flex:1;min-width:0">
+              <div class="ps-v-n" data-edit="${v.id}" title="Editar">${escapeHtml(v.design_name || v.product_name || '—')} <span class="tl-edit-mark">✎</span></div>
+              <div class="ps-v-m">${v.quantity ? v.quantity.toLocaleString('es-CO') + 'u' : ''}</div>
+            </div>
+            ${done ? '<span class="tl-vstate done">✓ Entregado</span>' : ''}
+          </div>
+        </div>`;
+      }).join('')
+    : variants.map(v => {
     const done = v.stage === 'entrega' || v.status === 'llego';
     const vLbl = done ? '✓ Entregado' : nextStageLabelFor(v);
     const chip = `<button class="tl-vstate ${done ? 'done' : ''}" data-vtoggle="${v.id}">${vLbl} ▾</button>`;
@@ -2620,7 +2637,7 @@ function renderBatchSheet(batch, variants){
       </div>
       ${renderVariantStepperInline(v)}
     </div>`;
-  }).join('');
+    }).join('');
 
   return `
     <div class="ps-card">
@@ -3258,6 +3275,18 @@ function renderPipeline(){
     if (error){ alert('Error al guardar: ' + error.message); b.disabled = false; return; }
     batch.batch_stage = newStage;
     batch.batch_stage_history = hist;
+    // Flujo simple: el pedido avanza completo → al llegar a Listo, todas las
+    // refs quedan entregadas (y si se deshace, vuelven a pendiente)
+    if (bsup && bsup.flow_type === 'simple'){
+      const vHist = stampHist(null, newStage === 'entrega' ? 'entrega' : 'none');
+      if (newStage === 'entrega'){
+        await supabase.from('product_pipeline').update({ stage: 'entrega' }).eq('batch_id', id);
+        pipeline.forEach(p => { if (p.batch_id === id){ p.stage = 'entrega'; } });
+      } else {
+        await supabase.from('product_pipeline').update({ stage: null }).eq('batch_id', id).eq('stage', 'entrega');
+        pipeline.forEach(p => { if (p.batch_id === id && p.stage === 'entrega'){ p.stage = null; } });
+      }
+    }
     renderPipeline();
   }));
   // Editar lote / agregar variante / eliminar lote
