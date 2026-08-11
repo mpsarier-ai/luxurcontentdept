@@ -2589,6 +2589,13 @@ function renderBatchSheet(batch, variants){
     const done = v.stage === 'entrega' || v.status === 'llego';
     const vLbl = done ? '✓ Entregado' : (PROD_NEXT_STAGE_LABEL[v.stage] || 'en Corte');
     const chip = `<button class="tl-vstate ${done ? 'done' : ''}" data-vtoggle="${v.id}">${vLbl} ▾</button>`;
+    const vProm = v.original_date || v.tentative_date || batch.original_date || batch.tentative_date;
+    const vReal = done ? null : estimatedDateOf(v);
+    const fmtD = d => { if (!d) return ''; const p = d.split('-'); return parseInt(p[2]) + ' ' + MONTH_ABBR[parseInt(p[1]) - 1]; };
+    const vLate = vProm && vReal && wkMonday(vReal) > wkMonday(vProm);
+    const vDates = (vProm || vReal) && !done
+      ? `<div class="ps-v-m">${vProm ? 'prometida ' + fmtD(vProm) : ''}${vReal ? ` · <b style="color:${vLate ? '#b23a35' : '#3e7a4e'}">real ~${fmtD(vReal)}</b>` : ''}</div>`
+      : '';
     const vPhoto = prodPhoto(v);
     return `<div class="ps-v tl-variant" data-id="${v.id}">
       <div class="ps-v-h">
@@ -2596,6 +2603,7 @@ function renderBatchSheet(batch, variants){
         <div style="flex:1;min-width:0">
           <div class="ps-v-n" data-edit="${v.id}" title="Editar">${escapeHtml(v.design_name || v.product_name || '—')} <span class="tl-edit-mark">✎</span></div>
           <div class="ps-v-m">${v.quantity ? v.quantity.toLocaleString('es-CO') + 'u' : ''}</div>
+          ${vDates}
         </div>
         ${chip}
       </div>
@@ -2722,6 +2730,19 @@ function prodPhoto(e){
   return e.photo_url || findCatalogPhoto(e.product_name, e.product_gid) || null;
 }
 
+// Fecha REAL estimada de una referencia: hoy + lo que falta al ritmo de las
+// metas. Se recalcula sola cuando marcan etapas — nadie tiene que mover fechas.
+// En Pre no hay estimado (el reloj no ha arrancado): se usa la promesa.
+function estimatedDateOf(e){
+  if (e.stage === 'entrega' || e.status === 'llego') return null;
+  if (!e.stage) return null; // en Pre → sin estimado
+  try {
+    const { remainingDays } = computeStageTimings(e, getFlowStages(e));
+    if (remainingDays == null) return null;
+    return new Date(Date.now() - 5*3600e3 + remainingDays * 86400000).toISOString().slice(0, 10);
+  } catch(_){ return null; }
+}
+
 let weekRailScrolled = false;
 let selectedProdItem = null; // {kind:'batch'|'entry', id} → desglose abierto en el bottom sheet
 // Cerrar el sheet con la ✕ o tocando el fondo oscuro
@@ -2766,7 +2787,7 @@ function renderWeekRail(fBatches, fStandalone, variantsByBatch){
       items.push({
         kind: 'batch', id: b.id, entryId: null, photo: findCatalogPhoto(b.name, null), name: b.name, qty: b.total_quantity || 0,
         date: b.tentative_date, delivered, partial: false, lote: '',
-        original: b.original_date || null,
+        promised: b.original_date || b.tentative_date || null,
         stageLbl: delivered ? '' : (PROD_NEXT_STAGE_LABEL[b.batch_stage] || ''),
         supplier: supName(b.supplier_id),
       });
@@ -2774,11 +2795,13 @@ function renderWeekRail(fBatches, fStandalone, variantsByBatch){
     }
     vars.forEach(v => {
       const delivered = v.stage === 'entrega' || v.status === 'llego';
+      const promise = v.tentative_date || b.tentative_date;
       items.push({
         kind: 'batch', id: b.id, entryId: v.id, photo: prodPhoto(v),
         name: v.design_name || v.product_name, qty: v.quantity || 0,
-        date: v.tentative_date || b.tentative_date, delivered, partial: false,
-        original: v.original_date || b.original_date || null,
+        date: delivered ? promise : (estimatedDateOf(v) || promise),
+        promised: v.original_date || b.original_date || promise,
+        delivered, partial: false,
         lote: b.name,
         stageLbl: delivered ? '' : (PROD_NEXT_STAGE_LABEL[v.stage] || 'en Corte'),
         supplier: supName(b.supplier_id),
@@ -2789,8 +2812,9 @@ function renderWeekRail(fBatches, fStandalone, variantsByBatch){
     const delivered = e.stage === 'entrega' || e.status === 'llego';
     items.push({
       kind: 'entry', id: e.id, entryId: null, photo: prodPhoto(e), name: e.product_name, qty: e.quantity || 0,
-      date: e.tentative_date, delivered, partial: false, lote: '',
-      original: e.original_date || null,
+      date: delivered ? e.tentative_date : (estimatedDateOf(e) || e.tentative_date),
+      promised: e.original_date || e.tentative_date || null,
+      delivered, partial: false, lote: '',
       stageLbl: delivered ? '' : (PROD_NEXT_STAGE_LABEL[e.stage] || ''),
       supplier: supName(e.supplier_id),
     });
@@ -2799,8 +2823,6 @@ function renderWeekRail(fBatches, fStandalone, variantsByBatch){
   if (!dated.length){ rail.hidden = true; if (head) head.hidden = true; return; }
   rail.hidden = false; if (head) head.hidden = false;
 
-  // Atrasadas: fecha en semana pasada y sin entregar → se muestran en la semana ACTUAL
-  const late = dated.filter(i => wkMonday(i.date) < curMon && !i.delivered);
   // Rango del rail: semana pasada → última semana futura con entregas (mín. actual+1)
   const addDays = (mon, n) => { const d = new Date(mon + 'T12:00:00'); d.setDate(d.getDate() + n); return d.toISOString().slice(0, 10); };
   const futureMons = dated.map(i => wkMonday(i.date)).filter(m => m >= curMon);
@@ -2809,26 +2831,22 @@ function renderWeekRail(fBatches, fStandalone, variantsByBatch){
   const mons = [];
   for (let m = addDays(curMon, -7); m <= maxMon; m = addDays(m, 7)) mons.push(m);
 
-  const nextMon = addDays(curMon, 7);
-  // UN solo badge por referencia — el atraso se mide contra la fecha ORIGINAL,
-  // así aunque la reprogrames sigue en rojo diciendo cuántas semanas carga
+  // La referencia se ubica en su semana REAL (estimada por etapa) y el badge
+  // compara contra la PROMETIDA original — la promesa nunca se pierde
   const wksBetween = (a, b) => Math.max(0, Math.round((new Date(b + 'T12:00:00') - new Date(a + 'T12:00:00')) / 6048e5));
   const isLateItem = i => {
-    if (i.delivered || !i.date) return false;
-    if (wkMonday(i.date) < curMon) return true;
-    return !!(i.original && wkMonday(i.original) < wkMonday(i.date));
+    if (i.delivered || !i.date || !i.promised) return false;
+    return wkMonday(i.promised) < wkMonday(i.date);
   };
   const badge = i => {
     if (i.delivered) return '<span class="wk-b ok">✓ Entregado</span>';
+    let b = '';
     if (isLateItem(i)){
-      const orig = i.original || i.date;
-      const ref = wkMonday(i.date) < curMon ? curMon : wkMonday(i.date);
-      const w = wksBetween(wkMonday(orig), ref);
-      return `<span class="wk-b late">${w > 0 ? `${w} sem de atraso` : 'Atrasado'} · era sem ${wkNum(orig)}</span>`;
+      const w = wksBetween(wkMonday(i.promised), wkMonday(i.date));
+      b = `<span class="wk-b late">${w} sem tarde · prometida sem ${wkNum(i.promised)}</span>`;
     }
-    if (i.partial) return '<span class="wk-b part">Entrega parcial</span>';
-    if (i.stageLbl && i.stageLbl !== '✓ entregado') return `<span class="wk-b go">${i.stageLbl}</span>`;
-    return '';
+    if (i.stageLbl && i.stageLbl !== '✓ entregado') b += `<span class="wk-b go">${i.stageLbl}</span>`;
+    return b;
   };
   const itHtml = (i, showMove) => `
     <div class="wk-it${selectedProdItem && selectedProdItem.kind === i.kind && selectedProdItem.id === i.id ? ' sel' : ''}${isLateItem(i) ? ' late' : ''}" data-wk-open="${i.kind}:${i.id}">
@@ -2837,7 +2855,6 @@ function renderWeekRail(fBatches, fStandalone, variantsByBatch){
         <div class="n">${escapeHtml(i.name || '')}</div>
         <div class="m">${i.qty ? i.qty.toLocaleString('es-CO') + 'u' : ''}${i.supplier && !currentSupplierId ? ' · ' + escapeHtml(i.supplier) : ''}</div>
         ${badge(i)}
-        ${showMove ? `<div><button class="wk-mv" data-wk-move="${i.entryId ? 'entry:' + i.entryId : i.kind + ':' + i.id}">→ mover a sem ${wkNum(nextMon)}</button></div>` : ''}
       </div>
     </div>`;
 
@@ -2853,11 +2870,9 @@ function renderWeekRail(fBatches, fStandalone, variantsByBatch){
   rail.innerHTML = mons.map(mon => {
     const inWeek = dated.filter(i => wkMonday(i.date) === mon);
     const isCur = mon === curMon;
-    const lateHere = isCur ? late : [];
-    // Semanas pasadas: solo lo que sí se entregó (lo atrasado vive en la semana actual)
-    const shown = isCur ? inWeek.filter(i => !late.includes(i)) : (mon < curMon ? inWeek.filter(i => i.delivered) : inWeek);
-    const totalU = shown.concat(lateHere).filter(i => !i.delivered).reduce((a, i) => a + (i.qty || 0), 0);
-    const isEmpty = !shown.length && !lateHere.length;
+    const shown = inWeek;
+    const totalU = shown.filter(i => !i.delivered).reduce((a, i) => a + (i.qty || 0), 0);
+    const isEmpty = !shown.length;
     return `<div class="wk-card${isCur ? ' cur' : ''}${isEmpty ? ' slim' : ''}">
       <div class="wk-t">
         <span class="wk-sem">Semana ${wkNum(mon)}${isCur ? ' · hoy' : ''}</span>
@@ -2865,7 +2880,6 @@ function renderWeekRail(fBatches, fStandalone, variantsByBatch){
         ${totalU ? `<span class="wk-tot">${totalU.toLocaleString('es-CO')}u</span>` : ''}
       </div>
       ${shown.length ? `<div class="wk-items">${groupHtml(shown, false)}</div>` : ''}
-      ${lateHere.length ? `<div class="wk-late-h">Atrasadas</div><div class="wk-items">${groupHtml(lateHere, true)}</div>` : ''}
       ${isEmpty ? '<div class="wk-empty">Sin entregas</div>' : ''}
     </div>`;
   }).join('') + (undated.length ? `<div class="wk-card">
@@ -3048,12 +3062,12 @@ function renderPipeline(){
       }
       return;
     }
-    // Por referencia: cada diseño cuenta con SU fecha (los lotes no entregan juntos)
+    // Por referencia, con su fecha REAL estimada (fallback: la prometida)
     vars.forEach(v => {
       const delivered = v.stage === 'entrega' || v.status === 'llego';
       if (!delivered){
         const q = v.quantity || 0;
-        addToWindow(v.tentative_date || b.tentative_date, q, costOf({ ...v, unit_cost: v.unit_cost || b.unit_cost }, q), pvpOf(v, q));
+        addToWindow(estimatedDateOf(v) || v.tentative_date || b.tentative_date, q, costOf({ ...v, unit_cost: v.unit_cost || b.unit_cost }, q), pvpOf(v, q));
       }
     });
   });
@@ -3061,7 +3075,7 @@ function renderPipeline(){
     const delivered = e.stage === 'entrega' || e.status === 'llego';
     if (!delivered){
       const q = e.quantity || 0;
-      addToWindow(e.tentative_date, q, costOf(e, q), pvpOf(e, q));
+      addToWindow(estimatedDateOf(e) || e.tentative_date, q, costOf(e, q), pvpOf(e, q));
     }
   });
 
