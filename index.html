@@ -2587,7 +2587,7 @@ function renderBatchSheet(batch, variants){
   // Diseños: lista simple con chip de estado; tap en el chip abre su checklist
   const varRows = variants.map(v => {
     const done = v.stage === 'entrega' || v.status === 'llego';
-    const vLbl = done ? '✓ Entregado' : (PROD_NEXT_STAGE_LABEL[v.stage] || 'en Corte');
+    const vLbl = done ? '✓ Entregado' : nextStageLabelFor(v);
     const chip = `<button class="tl-vstate ${done ? 'done' : ''}" data-vtoggle="${v.id}">${vLbl} ▾</button>`;
     const vProm = v.original_date || v.tentative_date || batch.original_date || batch.tentative_date;
     const vReal = done ? null : estimatedDateOf(v);
@@ -2743,6 +2743,22 @@ function estimatedDateOf(e){
   } catch(_){ return null; }
 }
 
+// Etiqueta "en X" respetando el flujo del proveedor (AXSPEN/Blessed: simple)
+function nextStageLabelFor(e){
+  if (e.stage === 'entrega' || e.status === 'llego') return '✓ entregado';
+  const stages = getFlowStages(e);
+  const idx = e.stage ? stages.findIndex(x => x.key === e.stage) : -1;
+  const next = stages[idx + 1];
+  return next ? 'en ' + (next.long || next.label || next.short) : '✓ entregado';
+}
+function nextBatchStageLabelFor(b){
+  const sup = suppliers.find(x => x.id === b.supplier_id);
+  const stages = (sup && sup.flow_type === 'simple') ? PROD_STAGES_SIMPLE : getBatchStages(b.has_proceso);
+  const idx = b.batch_stage ? stages.findIndex(x => x.key === b.batch_stage) : -1;
+  const next = stages[idx + 1];
+  return next ? 'en ' + (next.long || next.label || next.short) : '✓ completo';
+}
+
 let weekRailScrolled = false;
 let selectedProdItem = null; // {kind:'batch'|'entry', id} → desglose abierto en el bottom sheet
 // Cerrar el sheet con la ✕ o tocando el fondo oscuro
@@ -2788,7 +2804,7 @@ function renderWeekRail(fBatches, fStandalone, variantsByBatch){
         kind: 'batch', id: b.id, entryId: null, photo: findCatalogPhoto(b.name, null), name: b.name, qty: b.total_quantity || 0,
         date: b.tentative_date, delivered, partial: false, lote: '',
         promised: b.original_date || b.tentative_date || null,
-        stageLbl: delivered ? '' : (PROD_NEXT_STAGE_LABEL[b.batch_stage] || ''),
+        stageLbl: delivered ? '' : nextBatchStageLabelFor(b),
         supplier: supName(b.supplier_id),
       });
       return;
@@ -2803,7 +2819,7 @@ function renderWeekRail(fBatches, fStandalone, variantsByBatch){
         promised: v.original_date || b.original_date || promise,
         delivered, partial: false,
         lote: b.name,
-        stageLbl: delivered ? '' : (PROD_NEXT_STAGE_LABEL[v.stage] || 'en Corte'),
+        stageLbl: delivered ? '' : nextStageLabelFor(v),
         supplier: supName(b.supplier_id),
       });
     });
@@ -2815,7 +2831,7 @@ function renderWeekRail(fBatches, fStandalone, variantsByBatch){
       date: delivered ? e.tentative_date : (estimatedDateOf(e) || e.tentative_date),
       promised: e.original_date || e.tentative_date || null,
       delivered, partial: false, lote: '',
-      stageLbl: delivered ? '' : (PROD_NEXT_STAGE_LABEL[e.stage] || ''),
+      stageLbl: delivered ? '' : nextStageLabelFor(e),
       supplier: supName(e.supplier_id),
     });
   });
