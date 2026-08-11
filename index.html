@@ -2077,8 +2077,8 @@ const PROD_STAGE_LABEL = {
 const PROD_NEXT_STAGE_LABEL = {
   null: 'en Pre · muestra', undefined: 'en Pre · muestra',
   pre: 'en Corte',
-  corte: 'en Proceso/Confección', proceso: 'en Confección',
-  confeccion: 'en Lavandería', lavanderia: 'en Terminación',
+  corte: 'en Confección', confeccion: 'en Proceso/Lavandería',
+  proceso: 'en Lavandería', lavanderia: 'en Terminación',
   terminacion: 'en Entrega', entrega: '✓ entregado',
 };
 function faFindActive(p){
@@ -2203,8 +2203,8 @@ async function loadPipeline(){
 // Etapas a nivel LOTE (Corte → Lavandería)
 const BATCH_STAGES = [
   { key: 'corte',      short: 'Corte',   label: 'Corte' },
-  { key: 'proceso',    short: 'Proc',    label: 'Proceso' },
   { key: 'confeccion', short: 'Confec',  label: 'Confección' },
+  { key: 'proceso',    short: 'Proc',    label: 'Proceso' },
   { key: 'lavanderia', short: 'Lavand',  label: 'Lavandería' },
 ];
 function getBatchStages(hasProceso){
@@ -2331,8 +2331,8 @@ async function loadSupplierLink(){ await loadSuppliers(); }
 const PROD_STAGES_FULL = [
   { key: 'pre', short: 'Pre', long: 'Pre · muestra' },
   { key: 'corte', short: 'Corte', long: 'Corte' },
-  { key: 'proceso', short: 'Proceso', long: 'Proceso' },
   { key: 'confeccion', short: 'Confec.', long: 'Confección' },
+  { key: 'proceso', short: 'Proceso', long: 'Proceso' },
   { key: 'lavanderia', short: 'Lavand.', long: 'Lavandería' },
   { key: 'terminacion', short: 'Termin.', long: 'Terminación' },
   { key: 'entrega', short: 'Entrega', long: 'Entrega' },
@@ -2359,7 +2359,7 @@ function getFlowStages(entry){
 // Calcula duración de cada etapa basándose en stage_history
 // Empieza desde created_at (cuando se creó la entrada) o el primer history entry si falta
 // Meta de días por etapa: suppliers.stage_days (editable en DB) con fallback
-const STAGE_DAYS_DEFAULT = { corte:4, proceso:3, confeccion:8, lavanderia:6, terminacion:4, entrega:2, planeado:1, pagado:1, entregado:3 };
+const STAGE_DAYS_DEFAULT = { corte:4, confeccion:8, proceso:17, lavanderia:21, terminacion:4, entrega:2, planeado:1, pagado:1, entregado:3 };
 function stageGoalDays(supplierId, key){
   const sup = suppliers.find(x => x.id === supplierId);
   const v = sup && sup.stage_days && sup.stage_days[key];
