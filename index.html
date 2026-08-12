@@ -376,6 +376,11 @@ header{border-bottom:1px solid var(--black);padding-bottom:24px;margin-bottom:64
 .ps-act{background:rgba(0,0,0,.05);border:none;border-radius:999px;padding:9px 16px;font-size:12.5px;font-weight:600;font-family:-apple-system,sans-serif;color:var(--black);cursor:pointer}
 .ps-act:active{opacity:.6}
 .ps-act.danger{color:#b23a35}
+.ps-bulk{margin-top:10px}
+.ps-bulk-list{background:var(--cream);border-radius:12px;padding:8px;margin-top:8px}
+.ps-bulk-item{display:block;width:100%;text-align:left;background:#fff;border:none;border-radius:10px;padding:11px 14px;font-size:13.5px;font-weight:500;margin-bottom:6px;font-family:-apple-system,sans-serif;cursor:pointer}
+.ps-bulk-item:last-child{margin-bottom:0}
+.ps-bulk-item:active{opacity:.6}
 .tl-vstate{background:var(--cream);border:none;border-radius:999px;padding:6px 12px;font-size:11px;font-weight:600;font-family:-apple-system,sans-serif;color:var(--black);cursor:pointer;white-space:nowrap}
 .tl-vstate.done{background:#e2efe5;color:#3e7a4e}
 .tl-vstate:active{opacity:.6}
@@ -2625,7 +2630,7 @@ function renderBatchSheet(batch, variants){
       ? `<div class="ps-v-m">${vProm ? 'prometida ' + fmtD(vProm) : ''}${vReal ? ` · <b style="color:${vLate ? '#b23a35' : '#3e7a4e'}">real ~${fmtD(vReal)}</b>` : ''}</div>`
       : '';
     const vPhoto = prodPhoto(v);
-    return `<div class="ps-v tl-variant" data-id="${v.id}">
+    return `<div class="ps-v tl-variant${openVariants.has(v.id) ? ' open' : ''}" data-id="${v.id}">
       <div class="ps-v-h">
         ${vPhoto ? `<div class="ps-ph" data-photo-pick="${v.id}" title="Cambiar foto" style="background-image:url('${vPhoto}')"></div>` : `<button class="ps-cam" data-photo-pick="${v.id}" title="Subir foto">📷</button>`}
         <div style="flex:1;min-width:0">
@@ -2639,10 +2644,19 @@ function renderBatchSheet(batch, variants){
     </div>`;
     }).join('');
 
+  const bulkStages = isSimpleFlow ? [] : getProdStages(batch.has_proceso);
+  const bulk = isSimpleFlow ? '' : `
+    <div class="ps-bulk">
+      <button class="ps-act" data-bulk-toggle>⇶ Mover TODAS las refs a… ▾</button>
+      <div class="ps-bulk-list" hidden>
+        <div class="sp-hint" style="font-size:11px;color:#8e8e93;font-weight:600;margin:2px 4px 6px">Toca la última etapa TERMINADA — aplica a todas las refs no entregadas:</div>
+        ${bulkStages.map(st => `<button class="ps-bulk-item" data-bulk-batch="${batch.id}" data-bulk-stage="${st.key}">${st.long || st.short}</button>`).join('')}
+      </div>
+    </div>`;
   return `
     <div class="ps-card">
       <div class="ps-meta">${chips.join('')}</div>
-      ${isSimpleFlow ? steps + proj + cta : ''}
+      ${isSimpleFlow ? steps + proj + cta : bulk}
     </div>
     <div class="ps-sec">Referencias</div>
     <div class="ps-card">${varRows || '<div class="ps-v-m">Este lote no tiene diseños aún</div>'}</div>
@@ -2828,6 +2842,9 @@ function renderSupplierScore(){
     return `<div class="sc-row"><span class="sc-name">${escapeHtml(r.name)}</span><span class="sc-meta">${bits.join(' · ')}</span></div>`;
   }).join('');
 }
+
+// Refs con el checklist abierto en el sheet — sobreviven a los re-renders
+const openVariants = new Set();
 
 let weekRailScrolled = false;
 let selectedProdItem = null; // {kind:'batch'|'entry', id} → desglose abierto en el bottom sheet
@@ -3221,7 +3238,30 @@ function renderPipeline(){
   }
   el.innerHTML = '';
   const wireEl = sheetBody || el;
-  wireEl.querySelectorAll('[data-vtoggle]').forEach(b => b.addEventListener('click', () => b.closest('.tl-variant')?.classList.toggle('open')));
+  wireEl.querySelectorAll('[data-vtoggle]').forEach(b => b.addEventListener('click', () => {
+    const id = b.getAttribute('data-vtoggle');
+    if (openVariants.has(id)) openVariants.delete(id); else openVariants.add(id);
+    b.closest('.tl-variant')?.classList.toggle('open');
+  }));
+  wireEl.querySelectorAll('[data-bulk-toggle]').forEach(b => b.addEventListener('click', () => {
+    const l = b.parentElement.querySelector('.ps-bulk-list');
+    if (l) l.hidden = !l.hidden;
+  }));
+  wireEl.querySelectorAll('[data-bulk-stage]').forEach(b => b.addEventListener('click', async () => {
+    const bid = b.getAttribute('data-bulk-batch');
+    const key = b.getAttribute('data-bulk-stage');
+    b.disabled = true; b.textContent = 'Guardando…';
+    try {
+      const refs = pipeline.filter(p => p.batch_id === bid && !(p.stage === 'entrega' || p.status === 'llego'));
+      for (const p of refs){
+        const hist = stampHist(p.stage_history, key);
+        const { error } = await supabase.from('product_pipeline').update({ stage: key, stage_history: hist }).eq('id', p.id);
+        if (error) throw error;
+        p.stage = key; p.stage_history = hist;
+      }
+      renderPipeline();
+    } catch(err){ alert('Error al guardar: ' + (err.message || err)); renderPipeline(); }
+  }));
   wireEl.querySelectorAll('[data-photo-pick]').forEach(b => b.addEventListener('click', (ev) => {
     ev.stopPropagation();
     const input = document.getElementById('prodPhotoInput');
