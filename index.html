@@ -3131,14 +3131,24 @@ function renderPipeline(){
   };
   let prodUnits = 0, prodCost = 0, prodPVP = 0;
   filteredBatches.forEach(b => {
+    // Flujo simple (AXSPEN/Blessed): el lote avanza completo → si ya está entregado, sale entero
+    if (b.batch_stage === 'entrega') return;
     const vars = variantsByBatch[b.id] || [];
-    const allDelivered = vars.length > 0 && vars.every(v => v.stage === 'entrega');
-    if (!allDelivered){
+    if (!vars.length){
       const q = b.total_quantity || 0;
       prodUnits += q;
       prodCost  += costOf({ unit_cost: b.unit_cost, product_name: b.name, supplier_id: b.supplier_id }, q);
       prodPVP   += pvpOf({ product_name: b.name }, q);
+      return;
     }
+    // Con referencias: solo cuenta lo que TODAVÍA no se ha entregado (entregas parciales)
+    vars.forEach(v => {
+      if (v.stage === 'entrega' || v.status === 'llego') return;
+      const q = v.quantity || 0;
+      prodUnits += q;
+      prodCost  += costOf({ ...v, unit_cost: v.unit_cost || b.unit_cost, supplier_id: v.supplier_id || b.supplier_id }, q);
+      prodPVP   += pvpOf(v, q);
+    });
   });
   standalone.forEach(e => {
     const delivered = e.stage === 'entrega' || e.status === 'llego';
