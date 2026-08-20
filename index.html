@@ -718,6 +718,106 @@ html,body{background:#edebe6}
 /* Header 100% transparente — sin blur ni fondo que difiera del body */
 header,.hub-header{position:static !important;background:transparent !important;backdrop-filter:none !important;-webkit-backdrop-filter:none !important;border-bottom:none !important;box-shadow:none !important}
 
+/* ═══ RITMO DE NOVEDAD · PAUTA ═══ */
+.mk-tabs{display:flex;gap:8px;margin:0 0 20px;overflow-x:auto;-webkit-overflow-scrolling:touch;padding-bottom:2px}
+.mk-tab{flex:none;border:1px solid rgba(0,0,0,.08);background:#fff;border-radius:999px;padding:9px 18px;
+  font-family:'Outfit',sans-serif;font-size:13.5px;font-weight:500;color:#555;cursor:pointer;
+  box-shadow:0 1px 2px rgba(0,0,0,.04);white-space:nowrap}
+.mk-tab.active{background:var(--rosa);border-color:transparent;color:var(--black);font-weight:600}
+
+.rt-goal{display:flex;align-items:center;justify-content:space-between;gap:12px;background:#fff;
+  border-radius:16px;padding:13px 16px;box-shadow:0 1px 3px rgba(0,0,0,.05);margin-bottom:14px}
+.rt-goal-lbl{font-family:'JetBrains Mono',monospace;font-size:9.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--grey)}
+.rt-goal-opts{display:flex;gap:6px}
+.rt-goal-opts button{border:1px solid rgba(0,0,0,.08);background:#fff;border-radius:999px;width:38px;height:34px;
+  font-family:'Outfit',sans-serif;font-size:14px;font-weight:600;color:#555;cursor:pointer}
+.rt-goal-opts button.on{background:var(--black);color:var(--cream);border-color:transparent}
+
+.rt-summary{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:16px}
+.rt-st{min-width:0;background:#fff;border-radius:16px;padding:14px 12px;box-shadow:0 1px 2px rgba(0,0,0,.04),0 6px 18px rgba(0,0,0,.05);
+  border-top:3px solid transparent}
+.rt-st .l{font-family:'JetBrains Mono',monospace;font-size:8.5px;letter-spacing:.12em;text-transform:uppercase;
+  color:var(--grey);margin-bottom:8px;line-height:1.3;min-height:22px;overflow-wrap:anywhere;hyphens:auto}
+.rt-st .n{font-family:'Cormorant Garamond',serif;font-weight:700;font-size:34px;line-height:.95;font-variant-numeric:tabular-nums}
+.rt-st.bad{border-top-color:var(--red-out)} .rt-st.warn{border-top-color:var(--yellow-low)}
+.rt-st.ok{border-top-color:var(--green-ok)}
+
+.rt-weeks{display:flex;flex-direction:column;gap:10px}
+.rt-wk{background:#fff;border-radius:16px;padding:14px 16px;box-shadow:0 1px 3px rgba(0,0,0,.05);
+  border-left:3px solid var(--cream-dark)}
+.rt-wk.bad{border-left-color:var(--red-out)}
+.rt-wk.warn{border-left-color:var(--yellow-low)}
+.rt-wk.ok{border-left-color:var(--green-ok)}
+.rt-wk.now{box-shadow:0 1px 2px rgba(0,0,0,.04),0 6px 18px rgba(0,0,0,.06)}
+.rt-wk-hd{display:flex;align-items:baseline;justify-content:space-between;gap:10px;flex-wrap:wrap}
+.rt-wk-t{font-size:14.5px;font-weight:600;min-width:0;flex:1 1 auto}
+.rt-wk-d{font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--grey);letter-spacing:.04em}
+.rt-flag{border-radius:999px;padding:4px 11px;font-size:11px;font-weight:600;white-space:nowrap;margin-left:auto;flex:none}
+.rt-flag.bad{background:var(--red-out);color:#fff}
+.rt-flag.warn{background:var(--yellow-low);color:#fff}
+.rt-flag.ok{background:var(--cream);color:var(--grey)}
+.rt-items{display:flex;flex-wrap:wrap;gap:7px;margin-top:11px}
+.rt-item{display:flex;align-items:center;gap:7px;background:var(--cream);border-radius:999px;
+  padding:5px 12px 5px 5px;font-size:12.5px;font-weight:500;border:none;cursor:pointer;
+  font-family:'Outfit',sans-serif;color:var(--black);max-width:100%}
+.rt-item img{width:24px;height:24px;border-radius:999px;object-fit:cover;flex:none;background:#e6e3de}
+.rt-item span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.rt-item .ads{font-family:'JetBrains Mono',monospace;font-size:9.5px;color:var(--grey)}
+.rt-empty{margin-top:9px;font-size:12.5px;color:var(--grey)}
+.rt-fix{margin-top:10px;border:none;background:var(--black);color:var(--cream);border-radius:999px;
+  padding:9px 16px;font-family:'Outfit',sans-serif;font-size:12.5px;font-weight:600;cursor:pointer}
+
+.rt-un{margin-top:22px}
+.rt-un h3{font-size:15px;font-weight:600;margin-bottom:4px}
+.rt-un p{font-size:13px;color:var(--grey);margin-bottom:11px}
+
+/* ── Pauta ── */
+.pa-people{display:flex;gap:8px;overflow-x:auto;-webkit-overflow-scrolling:touch;margin-bottom:16px;padding-bottom:2px}
+.pa-p{flex:none;display:flex;align-items:center;gap:8px;background:#fff;border:1px solid rgba(0,0,0,.08);
+  border-radius:999px;padding:7px 14px 7px 8px;cursor:pointer;font-family:'Outfit',sans-serif;
+  font-size:13px;font-weight:500;color:#555;box-shadow:0 1px 2px rgba(0,0,0,.04);white-space:nowrap}
+.pa-p.on{background:var(--rosa);border-color:transparent;color:var(--black);font-weight:600}
+.pa-dot{width:22px;height:22px;border-radius:999px;color:#fff;font-size:10px;font-weight:700;
+  display:flex;align-items:center;justify-content:center;flex:none}
+.pa-n{font-family:'JetBrains Mono',monospace;font-size:10.5px;color:var(--grey)}
+.pa-p.on .pa-n{color:var(--black)}
+
+.pa-list{display:flex;flex-direction:column;gap:14px}
+.pa-launch{background:#fff;border-radius:18px;padding:16px;box-shadow:0 1px 2px rgba(0,0,0,.04),0 6px 18px rgba(0,0,0,.05);
+  border-top:3px solid var(--cream-dark)}
+.pa-launch.soon{border-top-color:var(--rosa-deep)}
+.pa-lhd{display:flex;gap:12px;align-items:flex-start}
+.pa-lhd img{width:46px;height:60px;border-radius:12px;object-fit:cover;background:#f2f2f0;flex:none}
+.pa-lt{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}
+.pa-lt b{font-size:15px;font-weight:600;line-height:1.25}
+.pa-lt span{font-size:12px;color:var(--grey)}
+.pa-ads{display:flex;flex-direction:column;gap:9px;margin-top:13px}
+.pa-ad{background:var(--cream);border-radius:14px;padding:12px 13px}
+.pa-ad-hd{display:flex;align-items:flex-start;justify-content:space-between;gap:9px}
+.pa-ad-c{font-size:13.5px;font-weight:600;line-height:1.3;min-width:0;flex:1 1 auto;overflow-wrap:anywhere}
+.pa-ad-f{font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:.12em;text-transform:uppercase;color:var(--grey);white-space:nowrap;padding-top:2px}
+.pa-steps{display:flex;flex-direction:column;gap:6px;margin-top:10px}
+.pa-step{display:flex;align-items:center;gap:9px;background:#fff;border-radius:10px;padding:9px 11px}
+.pa-step .who{flex:1 1 auto;min-width:0;display:flex;flex-direction:column;gap:1px;overflow:hidden}
+.pa-step .who b{font-size:12.5px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.pa-step .who span{font-size:11px;color:var(--grey);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.pa-chk{border:none;border-radius:999px;padding:8px 14px;font-family:'Outfit',sans-serif;font-size:12px;
+  font-weight:600;cursor:pointer;background:var(--black);color:var(--cream);white-space:nowrap;flex:none}
+.pa-chk.done{background:var(--green-ok);color:#fff}
+.pa-chk:disabled{background:var(--cream-dark);color:#9a948e;cursor:not-allowed}
+.pa-add{margin-top:11px;width:100%;border:1px dashed rgba(0,0,0,.15);background:transparent;border-radius:12px;
+  padding:11px;font-family:'Outfit',sans-serif;font-size:13px;font-weight:500;color:var(--grey);cursor:pointer}
+.pa-del{border:none;background:transparent;color:#c4c0bb;font-size:15px;cursor:pointer;padding:0 2px;flex:none}
+
+@media (max-width:768px){
+  .rt-summary{gap:8px}
+  .rt-st{padding:12px 9px}
+  .rt-st .l{font-size:8px;letter-spacing:.08em}
+  .pa-chk{padding:8px 11px;font-size:11.5px}
+  .rt-st .n{font-size:28px}
+  .pa-launch{padding:14px}
+}
+
 /* ═══ HUB BRIEF · tus tareas del día ═══ */
 .hub-brief{display:flex;flex-direction:column;gap:2px;animation:llFadeUp .4s cubic-bezier(.16,1,.3,1) both}
 .brief-date{font-size:13px;color:#8e8e93;font-weight:500;margin-bottom:2px;text-transform:capitalize}
@@ -828,15 +928,48 @@ header,.hub-header{position:static !important;background:transparent !important;
     <a class="brief-wa" href="https://chat.whatsapp.com/GCmEivfGHfxL9NwWcES7IF?mode=gi_t" target="_blank" rel="noopener">💬 Grupo del equipo <span>↗</span></a>
   </section>
 
-  <!-- MARKETING DEPT · calendarios -->
+  <!-- MARKETING DEPT · ritmo de novedad · pauta · calendarios -->
   <section id="hubMarketing" class="hub-section" hidden>
     <button class="hub-back" data-hub-back>Inicio</button>
-    <h2 class="section-title">
-      <span>Calendarios Semanales</span>
-      <button class="new-week-btn" id="newWeekBtn">+ Nueva Semana</button>
-    </h2>
-    <div class="cal-list" id="calList">
-      <div class="empty-state">Cargando…</div>
+
+    <div class="mk-tabs" id="mkTabs">
+      <button class="mk-tab active" data-mk="ritmo">Ritmo</button>
+      <button class="mk-tab" data-mk="pauta">Pauta</button>
+      <button class="mk-tab" data-mk="cal">Calendarios</button>
+    </div>
+
+    <!-- ── RITMO DE NOVEDAD ── -->
+    <div id="mkRitmo">
+      <h2 class="section-title"><span>Ritmo de novedad</span></h2>
+      <div class="rt-goal">
+        <span class="rt-goal-lbl">Novedades por semana</span>
+        <div class="rt-goal-opts" id="rtGoal">
+          <button data-goal="1">1</button>
+          <button data-goal="2" class="on">2</button>
+          <button data-goal="3">3</button>
+        </div>
+      </div>
+      <div class="rt-summary" id="rtSummary"></div>
+      <div class="rt-weeks" id="rtWeeks"><div class="empty-state">Cargando…</div></div>
+      <div id="rtUnscheduled"></div>
+    </div>
+
+    <!-- ── PAUTA ── -->
+    <div id="mkPauta" hidden>
+      <h2 class="section-title"><span>Pauta</span></h2>
+      <div class="pa-people" id="paPeople"></div>
+      <div class="pa-list" id="paList"><div class="empty-state">Cargando…</div></div>
+    </div>
+
+    <!-- ── CALENDARIOS ── -->
+    <div id="mkCal" hidden>
+      <h2 class="section-title">
+        <span>Calendarios Semanales</span>
+        <button class="new-week-btn" id="newWeekBtn">+ Nueva Semana</button>
+      </h2>
+      <div class="cal-list" id="calList">
+        <div class="empty-state">Cargando…</div>
+      </div>
     </div>
   </section>
 
@@ -951,6 +1084,48 @@ header,.hub-header{position:static !important;background:transparent !important;
       <button class="ps-close" id="prodSheetClose" title="Cerrar">✕</button>
     </div>
     <div class="ps-body" id="prodSheetBody"></div>
+  </div>
+</div>
+
+<div class="modal-backdrop" id="launchModal">
+  <div class="modal">
+    <div class="modal-meta">Ritmo de novedad</div>
+    <h3 id="lmTitle">Programar lanzamiento</h3>
+    <p id="lmSub">¿Qué semana se vuelve novedad esta referencia?</p>
+    <label>Día de lanzamiento</label>
+    <input type="date" id="lmDate">
+    <div class="modal-actions">
+      <button class="modal-btn" id="lmClear">Quitar fecha</button>
+      <button class="modal-btn" data-close-modal="launchModal">Cancelar</button>
+      <button class="modal-btn primary" id="lmSave">Guardar</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-backdrop" id="adModal">
+  <div class="modal">
+    <div class="modal-meta">Pauta</div>
+    <h3>Nuevo anuncio</h3>
+    <p id="amSub">Para el lanzamiento</p>
+    <label>Concepto del anuncio</label>
+    <input type="text" id="amConcept" placeholder="ej: Reel probándoselo en el espejo" autocomplete="off">
+    <label>Formato</label>
+    <select id="amFormat">
+      <option value="reel">Reel</option>
+      <option value="carrusel">Carrusel</option>
+      <option value="imagen">Imagen</option>
+      <option value="story">Story</option>
+    </select>
+    <label>Quién lo hace</label>
+    <select id="amCreative"></select>
+    <label>Quién lo sube a Meta</label>
+    <select id="amUpload"></select>
+    <label>Presupuesto (opcional, COP)</label>
+    <input type="number" id="amBudget" placeholder="ej: 300000" min="0" step="1000">
+    <div class="modal-actions">
+      <button class="modal-btn" data-close-modal="adModal">Cancelar</button>
+      <button class="modal-btn primary" id="amSave">Crear anuncio</button>
+    </div>
   </div>
 </div>
 
@@ -1345,15 +1520,39 @@ async function loadDailyBrief(){
     .select('id,day,type,title,assignee,status,approved')
     .eq('calendar_id', cal.id).eq('day', dayKey).order('position');
   const mine = (pieces||[]).filter(p => canonicalEmail(p.assignee) === canonicalEmail(user.email));
-  if (!mine.length){
-    elT.innerHTML = '<div class="brief-empty done">✓ Sin tareas asignadas hoy</div>';
-  } else {
-    elT.innerHTML = mine.map(p => `<a class="brief-row" href="${link(p)}">
+  let rowsHtml = mine.map(p => `<a class="brief-row" href="${link(p)}">
       <span class="brief-ico">${typeIco(p.type)}</span>
       <span class="brief-body"><span class="brief-row-title">${escapeHtml(p.title||p.type)}</span><span class="brief-row-sub">${escapeHtml(p.type||'')}</span></span>
       <span class="brief-chip ${p.approved?'aprobado':(p.status==='listo'?'listo':'pendiente')}">${p.approved?'Aprobado':(p.status==='listo'?'Listo':'Pendiente')}</span>
     </a>`).join('');
-  }
+
+  // Pauta: anuncios míos pendientes — hacer el creativo o subirlo a Meta
+  try {
+    const me = canonicalEmail(user.email);
+    const { data: myAds } = await supabase.from('launch_ads')
+      .select('id,concept,format,creative_by,creative_done,upload_by,upload_done,launch_id');
+    const pend = (myAds||[]).filter(a =>
+      (canonicalEmail(a.creative_by) === me && !a.creative_done) ||
+      (canonicalEmail(a.upload_by)   === me && !a.upload_done && a.creative_done));
+    if (pend.length){
+      const { data: ls } = await supabase.from('launches').select('id,name,launch_date');
+      const lOf = id => (ls||[]).find(x => x.id === id);
+      rowsHtml += pend.slice(0, 6).map(a => {
+        const l = lOf(a.launch_id);
+        const mio = canonicalEmail(a.creative_by) === me && !a.creative_done;
+        return `<a class="brief-row" href="#marketing">
+          <span class="brief-ico">${mio ? '🎬' : '📣'}</span>
+          <span class="brief-body">
+            <span class="brief-row-title">${mio ? 'Hacer' : 'Subir'}: ${escapeHtml(a.concept)}</span>
+            <span class="brief-row-sub">${escapeHtml(l ? l.name : 'Pauta')}${l && l.launch_date ? ' · lanza ' + l.launch_date.slice(8) + '/' + l.launch_date.slice(5,7) : ''}</span>
+          </span>
+          <span class="brief-chip pendiente">Pauta</span>
+        </a>`;
+      }).join('');
+    }
+  } catch(e){ console.warn('brief pauta:', e); }
+
+  elT.innerHTML = rowsHtml || '<div class="brief-empty done">✓ Sin tareas asignadas hoy</div>';
   // "Para aprobar" — solo leads, toda la semana
   try {
     const { data: tm } = await supabase.from('team_members').select('role').eq('email', canonicalEmail(user.email)).maybeSingle();
@@ -1579,6 +1778,7 @@ async function enterApp(){
       if (el) el.innerHTML = `<div class="fa-empty">Error cargando dashboard. ${(e && e.message) || ''}<br>Marketing Dept y Producción siguen funcionando.</div>`;
     }),
     loadPipeline().catch(e => { console.error('loadPipeline failed:', e); }),
+    loadLaunches().catch(e => { console.error('loadLaunches failed:', e); }),
   ]);
   // Con catálogo + pipeline cargados, refrescá las alertas del brief
   try { renderBriefAlerts(); } catch(_) {}
@@ -3639,6 +3839,403 @@ document.getElementById('supDelete').addEventListener('click', async () => {
   editingSupplierId = null;
   await loadSuppliers();
   renderPipeline();
+});
+
+
+// ═══════════════════════════════════════════════════════════════════
+// RITMO DE NOVEDAD · PAUTA
+// La pauta de LUXUR vive de la novedad: si una semana no tiene nada
+// nuevo que anunciar, la pauta se queda sin combustible. Esta vista
+// reparte los lanzamientos y reparte el trabajo de los anuncios.
+// ═══════════════════════════════════════════════════════════════════
+let launches = [], launchAds = [], teamAll = [];
+let rtGoalPerWeek = Number(localStorage.getItem('luxur_rt_goal') || 2);
+let paFilter = 'all';
+const RT_WEEKS_AHEAD = 10;
+
+const AD_FORMATS = ['reel','carrusel','imagen','story'];
+
+function mondayOf(d){
+  const x = new Date(d.getFullYear(), d.getMonth(), d.getDate());
+  const wd = (x.getDay() + 6) % 7;      // 0 = lunes
+  x.setDate(x.getDate() - wd);
+  return x;
+}
+function ymd(d){
+  return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+}
+function isoWeekNum(d){
+  const t = new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()));
+  t.setUTCDate(t.getUTCDate() + 4 - (t.getUTCDay() || 7));
+  const y0 = new Date(Date.UTC(t.getUTCFullYear(), 0, 1));
+  return Math.ceil(((t - y0) / 86400000 + 1) / 7);
+}
+function shortRange(mon){
+  const sun = new Date(mon); sun.setDate(sun.getDate() + 6);
+  const M = ['ene','feb','mar','abr','may','jun','jul','ago','sep','oct','nov','dic'];
+  return mon.getMonth() === sun.getMonth()
+    ? `${mon.getDate()}–${sun.getDate()} ${M[sun.getMonth()]}`
+    : `${mon.getDate()} ${M[mon.getMonth()]} – ${sun.getDate()} ${M[sun.getMonth()]}`;
+}
+function rtFmtD(iso){
+  if (!iso) return '';
+  const p = iso.split('-');
+  return `${parseInt(p[2])} ${MONTH_ABBR[parseInt(p[1]) - 1]}`;
+}
+function memberOf(email){
+  return teamAll.find(t => t.email === email) || null;
+}
+function memberName(email){
+  if (!email) return 'sin asignar';
+  const m = memberOf(email);
+  return m ? m.name : email.split('@')[0];
+}
+function memberColor(email){
+  const m = memberOf(email);
+  return m ? m.color : '#9a948e';
+}
+
+async function loadLaunches(){
+  const [lRes, aRes, tRes] = await Promise.all([
+    supabase.from('launches').select('*').order('launch_date', { ascending: true, nullsFirst: false }),
+    supabase.from('launch_ads').select('*').order('position', { ascending: true }),
+    supabase.from('team_members').select('name,email,role,color,focus'),
+  ]);
+  launches  = lRes.data  || [];
+  launchAds = aRes.data  || [];
+  teamAll   = tRes.data  || [];
+  renderRitmo();
+  renderPauta();
+}
+
+// ─── Ritmo: reparte los lanzamientos por semana ──────────────────────
+function renderRitmo(){
+  const box = document.getElementById('rtWeeks');
+  if (!box) return;
+  const today = new Date();
+  const start = mondayOf(today);
+
+  const weeks = [];
+  for (let i = 0; i < RT_WEEKS_AHEAD; i++){
+    const mon = new Date(start); mon.setDate(mon.getDate() + i * 7);
+    const sun = new Date(mon);   sun.setDate(sun.getDate() + 6);
+    const from = ymd(mon), to = ymd(sun);
+    const items = launches.filter(l => l.launch_date && l.launch_date >= from && l.launch_date <= to
+                                       && l.status !== 'pausado');
+    weeks.push({ mon, from, to, items, n: items.length });
+  }
+
+  const desiertos = weeks.filter(w => w.n === 0).length;
+  const atracones = weeks.filter(w => w.n > rtGoalPerWeek).length;
+  const total = weeks.reduce((a, w) => a + w.n, 0);
+
+  const sum = document.getElementById('rtSummary');
+  if (sum) sum.innerHTML = `
+    <div class="rt-st ${atracones ? 'bad' : 'ok'}"><div class="l">Semanas con atracón</div><div class="n">${atracones}</div></div>
+    <div class="rt-st ${desiertos ? 'warn' : 'ok'}"><div class="l">Semanas sin novedad</div><div class="n">${desiertos}</div></div>
+    <div class="rt-st ok"><div class="l">Lanzamientos en ${RT_WEEKS_AHEAD} sem</div><div class="n">${total}</div></div>`;
+
+  const nowFrom = ymd(start);
+  box.innerHTML = weeks.map(w => {
+    const state = w.n === 0 ? 'warn' : (w.n > rtGoalPerWeek ? 'bad' : 'ok');
+    const flag  = w.n === 0
+      ? '<span class="rt-flag warn">sin novedad</span>'
+      : (w.n > rtGoalPerWeek
+          ? `<span class="rt-flag bad">${w.n} novedades · atracón</span>`
+          : `<span class="rt-flag ok">${w.n} novedad${w.n === 1 ? '' : 'es'}</span>`);
+
+    const items = w.items.map(l => {
+      const ads = launchAds.filter(a => a.launch_id === l.id);
+      const pend = ads.filter(a => !a.upload_done).length;
+      const img = l.photo_url ? `<img src="${escapeHtml(l.photo_url)}" alt="" loading="lazy">` : '<img alt="">';
+      const badge = ads.length ? `<span class="ads">${pend ? pend + ' pend.' : '✓'}</span>` : '<span class="ads">sin pauta</span>';
+      return `<button class="rt-item" data-launch="${l.id}">${img}<span>${escapeHtml(l.name)}</span>${badge}</button>`;
+    }).join('');
+
+    const gap = w.n === 0
+      ? `<div class="rt-empty">Nada nuevo que anunciar esta semana. Mueve un lanzamiento de una semana cargada, o programa un restock.</div>`
+      : '';
+    const fix = w.n > rtGoalPerWeek
+      ? `<button class="rt-fix" data-spread="${w.from}">⇢ Escalonar estas ${w.n}</button>`
+      : '';
+
+    return `<div class="rt-wk ${state} ${w.from === nowFrom ? 'now' : ''}">
+      <div class="rt-wk-hd">
+        <span class="rt-wk-t">Semana ${isoWeekNum(w.mon)}${w.from === nowFrom ? ' · esta semana' : ''}</span>
+        <span class="rt-wk-d">${shortRange(w.mon)}</span>
+        ${flag}
+      </div>
+      ${items ? `<div class="rt-items">${items}</div>` : ''}
+      ${gap}${fix}
+    </div>`;
+  }).join('');
+
+  // Sin fecha de lanzamiento todavía
+  const un = launches.filter(l => !l.launch_date);
+  const ubox = document.getElementById('rtUnscheduled');
+  if (ubox){
+    ubox.innerHTML = un.length ? `<div class="rt-un">
+      <h3>Por programar · ${un.length}</h3>
+      <p>Estas referencias existen pero todavía no tienen semana de lanzamiento.</p>
+      <div class="rt-items">${un.map(l => `<button class="rt-item" data-launch="${l.id}">
+        ${l.photo_url ? `<img src="${escapeHtml(l.photo_url)}" alt="" loading="lazy">` : '<img alt="">'}
+        <span>${escapeHtml(l.name)}</span></button>`).join('')}</div>
+    </div>` : '';
+  }
+}
+
+// ─── Pauta: quién hace el anuncio y quién lo sube ────────────────────
+function renderPauta(){
+  const box = document.getElementById('paList');
+  if (!box) return;
+
+  // Carga por persona: creativos pendientes + subidas pendientes
+  const load = {};
+  launchAds.forEach(a => {
+    if (a.creative_by && !a.creative_done) load[a.creative_by] = (load[a.creative_by] || 0) + 1;
+    if (a.upload_by  && !a.upload_done)   load[a.upload_by]   = (load[a.upload_by]   || 0) + 1;
+  });
+  const people = teamAll.filter(t => t.role !== 'viewer');
+  const pbox = document.getElementById('paPeople');
+  if (pbox) pbox.innerHTML = `
+    <button class="pa-p ${paFilter === 'all' ? 'on' : ''}" data-pa="all">Todos <span class="pa-n">${launchAds.filter(a => !a.upload_done).length}</span></button>
+    ` + people.map(p => `<button class="pa-p ${paFilter === p.email ? 'on' : ''}" data-pa="${escapeHtml(p.email)}">
+        <span class="pa-dot" style="background:${escapeHtml(p.color)}">${escapeHtml((p.name||'?')[0])}</span>
+        ${escapeHtml(p.name)} <span class="pa-n">${load[p.email] || 0}</span></button>`).join('');
+
+  // Lanzamientos con fecha, del más cercano al más lejano
+  const today = ymd(new Date());
+  const rows = launches
+    .filter(l => l.status !== 'pausado')
+    .sort((a, b) => (a.launch_date || '9999') < (b.launch_date || '9999') ? -1 : 1);
+
+  const visible = rows.filter(l => {
+    if (paFilter === 'all') return true;
+    return launchAds.some(a => a.launch_id === l.id &&
+      ((a.creative_by === paFilter && !a.creative_done) || (a.upload_by === paFilter && !a.upload_done)));
+  });
+
+  if (!visible.length){
+    box.innerHTML = `<div class="empty-state">${paFilter === 'all'
+      ? 'Todavía no hay lanzamientos. Programa uno desde Ritmo.'
+      : 'Esta persona no tiene anuncios pendientes.'}</div>`;
+    return;
+  }
+
+  box.innerHTML = visible.map(l => {
+    const ads = launchAds.filter(a => a.launch_id === l.id)
+      .filter(a => paFilter === 'all' ||
+        (a.creative_by === paFilter && !a.creative_done) || (a.upload_by === paFilter && !a.upload_done));
+    const soon = l.launch_date && l.launch_date >= today;
+
+    const adsHtml = ads.map(a => {
+      const cDone = !!a.creative_done, uDone = !!a.upload_done;
+      return `<div class="pa-ad">
+        <div class="pa-ad-hd">
+          <span class="pa-ad-c">${escapeHtml(a.concept)}</span>
+          <span class="pa-ad-f">${escapeHtml(a.format || '')}</span>
+          <button class="pa-del" data-ad-del="${a.id}" title="Borrar anuncio">×</button>
+        </div>
+        <div class="pa-steps">
+          <div class="pa-step">
+            <span class="pa-dot" style="background:${escapeHtml(memberColor(a.creative_by))}">${escapeHtml((memberName(a.creative_by)||'?')[0].toUpperCase())}</span>
+            <span class="who"><b>Hacer el anuncio</b><span>${escapeHtml(memberName(a.creative_by))}</span></span>
+            <button class="pa-chk ${cDone ? 'done' : ''}" data-ad-creative="${a.id}">${cDone ? '✓ Listo' : 'Marcar listo'}</button>
+          </div>
+          <div class="pa-step">
+            <span class="pa-dot" style="background:${escapeHtml(memberColor(a.upload_by))}">${escapeHtml((memberName(a.upload_by)||'?')[0].toUpperCase())}</span>
+            <span class="who"><b>Subir a Meta</b><span>${escapeHtml(memberName(a.upload_by))}${a.budget_cop ? ' · ' + fmtCOP(a.budget_cop) : ''}</span></span>
+            <button class="pa-chk ${uDone ? 'done' : ''}" data-ad-upload="${a.id}" ${cDone ? '' : 'disabled title="Primero hay que hacer el anuncio"'}>${uDone ? '✓ Subido' : 'Marcar subido'}</button>
+          </div>
+        </div>
+      </div>`;
+    }).join('');
+
+    return `<div class="pa-launch ${soon ? 'soon' : ''}">
+      <div class="pa-lhd">
+        ${l.photo_url ? `<img src="${escapeHtml(l.photo_url)}" alt="" loading="lazy">` : '<img alt="">'}
+        <span class="pa-lt">
+          <b>${escapeHtml(l.name)}</b>
+          <span>${l.launch_date ? 'Lanza ' + rtFmtD(l.launch_date) : 'Sin fecha de lanzamiento'}${l.qty ? ' · ' + l.qty + 'u' : ''}</span>
+        </span>
+      </div>
+      ${adsHtml ? `<div class="pa-ads">${adsHtml}</div>` : ''}
+      <button class="pa-add" data-ad-new="${l.id}">+ Anuncio para este lanzamiento</button>
+    </div>`;
+  }).join('');
+}
+
+// ─── Acciones ────────────────────────────────────────────────────────
+let lmEditing = null, amEditing = null;
+
+function openLaunchModal(id){
+  const l = launches.find(x => x.id === id);
+  if (!l) return;
+  lmEditing = id;
+  document.getElementById('lmTitle').textContent = l.name;
+  document.getElementById('lmSub').textContent = l.arrival_date
+    ? `Llega el ${rtFmtD(l.arrival_date)}. ¿Qué día se vuelve novedad?`
+    : '¿Qué día se vuelve novedad esta referencia?';
+  document.getElementById('lmDate').value = l.launch_date || '';
+  document.getElementById('launchModal').classList.add('open');
+}
+
+async function saveLaunchDate(date){
+  if (!lmEditing) return;
+  const { error } = await supabase.from('launches')
+    .update({ launch_date: date, updated_at: new Date().toISOString() }).eq('id', lmEditing);
+  if (error){ alert('No se guardó: ' + error.message); return; }
+  const l = launches.find(x => x.id === lmEditing);
+  if (l) l.launch_date = date;
+  document.getElementById('launchModal').classList.remove('open');
+  lmEditing = null;
+  renderRitmo(); renderPauta();
+}
+
+// Reparte los lanzamientos de una semana cargada hacia las semanas siguientes
+async function spreadWeek(fromMonday){
+  const mon = new Date(fromMonday + 'T00:00:00');
+  const sun = new Date(mon); sun.setDate(sun.getDate() + 6);
+  const items = launches.filter(l => l.launch_date >= ymd(mon) && l.launch_date <= ymd(sun) && l.status !== 'pausado');
+  if (items.length <= rtGoalPerWeek) return;
+  if (!confirm(`Se quedan ${rtGoalPerWeek} en esta semana y el resto se reparte a razón de ${rtGoalPerWeek} por semana en las siguientes. ¿Lo hago?`)) return;
+
+  for (let i = 0; i < items.length; i++){
+    const weekOffset = Math.floor(i / rtGoalPerWeek);
+    if (!weekOffset) continue;
+    const d = new Date(mon);
+    d.setDate(d.getDate() + weekOffset * 7 + (i % rtGoalPerWeek) * 2);
+    const date = ymd(d);
+    const { error } = await supabase.from('launches').update({ launch_date: date }).eq('id', items[i].id);
+    if (error){ alert('No se guardó: ' + error.message); return; }
+    items[i].launch_date = date;
+  }
+  renderRitmo(); renderPauta();
+}
+
+function openAdModal(launchId){
+  const l = launches.find(x => x.id === launchId);
+  if (!l) return;
+  amEditing = launchId;
+  document.getElementById('amSub').textContent = `Para ${l.name}${l.launch_date ? ' · lanza ' + rtFmtD(l.launch_date) : ''}`;
+  document.getElementById('amConcept').value = '';
+  document.getElementById('amBudget').value = '';
+  document.getElementById('amFormat').value = 'reel';
+
+  const makers = teamAll.filter(t => ['designer','producer','lead'].includes(t.role));
+  const buyers = teamAll.filter(t => ['media_buyer','lead','designer'].includes(t.role));
+  const opts = arr => arr.map(t => `<option value="${escapeHtml(t.email)}">${escapeHtml(t.name)}${t.focus ? ' · ' + escapeHtml(t.focus) : ''}</option>`).join('');
+  document.getElementById('amCreative').innerHTML = opts(makers);
+  document.getElementById('amUpload').innerHTML   = opts(buyers);
+  const felipe = buyers.find(b => b.role === 'media_buyer');
+  if (felipe) document.getElementById('amUpload').value = felipe.email;
+  const nati = makers.find(m => /natasha/i.test(m.name));
+  if (nati) document.getElementById('amCreative').value = nati.email;
+
+  document.getElementById('adModal').classList.add('open');
+}
+
+async function saveAd(){
+  if (!amEditing) return;
+  const concept = document.getElementById('amConcept').value.trim();
+  if (!concept){ document.getElementById('amConcept').focus(); return; }
+  const budget = Number(document.getElementById('amBudget').value) || null;
+  const row = {
+    launch_id: amEditing,
+    concept,
+    format: document.getElementById('amFormat').value,
+    creative_by: document.getElementById('amCreative').value || null,
+    upload_by: document.getElementById('amUpload').value || null,
+    budget_cop: budget,
+    position: launchAds.filter(a => a.launch_id === amEditing).length,
+  };
+  const { data, error } = await supabase.from('launch_ads').insert(row).select().single();
+  if (error){ alert('No se guardó: ' + error.message); return; }
+  launchAds.push(data);
+  document.getElementById('adModal').classList.remove('open');
+  amEditing = null;
+  renderPauta(); renderRitmo();
+}
+
+async function toggleAdStep(id, step){
+  const a = launchAds.find(x => x.id === id);
+  if (!a) return;
+  const patch = step === 'creative'
+    ? { creative_done: !a.creative_done, creative_done_at: !a.creative_done ? new Date().toISOString() : null }
+    : { upload_done:   !a.upload_done,   upload_done_at:   !a.upload_done   ? new Date().toISOString() : null };
+  // Si se deshace el creativo, la subida no puede quedar marcada
+  if (step === 'creative' && a.creative_done) { patch.upload_done = false; patch.upload_done_at = null; }
+  const { error } = await supabase.from('launch_ads').update(patch).eq('id', id);
+  if (error){ alert('No se guardó: ' + error.message); return; }
+  Object.assign(a, patch);
+  renderPauta(); renderRitmo();
+}
+
+async function deleteAd(id){
+  const a = launchAds.find(x => x.id === id);
+  if (!a || !confirm(`¿Borrar el anuncio "${a.concept}"?`)) return;
+  const { error } = await supabase.from('launch_ads').delete().eq('id', id);
+  if (error){ alert('No se borró: ' + error.message); return; }
+  launchAds = launchAds.filter(x => x.id !== id);
+  renderPauta(); renderRitmo();
+}
+
+// ─── Eventos ─────────────────────────────────────────────────────────
+document.addEventListener('click', e => {
+  const tab = e.target.closest('.mk-tab');
+  if (tab){
+    const which = tab.getAttribute('data-mk');
+    document.querySelectorAll('.mk-tab').forEach(t => t.classList.toggle('active', t === tab));
+    ['ritmo','pauta','cal'].forEach(k => {
+      const el = document.getElementById('mk' + k[0].toUpperCase() + k.slice(1));
+      if (el) el.hidden = (k !== which);
+    });
+    return;
+  }
+  const goal = e.target.closest('#rtGoal button');
+  if (goal){
+    rtGoalPerWeek = Number(goal.getAttribute('data-goal')) || 2;
+    localStorage.setItem('luxur_rt_goal', String(rtGoalPerWeek));
+    document.querySelectorAll('#rtGoal button').forEach(b => b.classList.toggle('on', b === goal));
+    renderRitmo();
+    return;
+  }
+  const spread = e.target.closest('[data-spread]');
+  if (spread){ spreadWeek(spread.getAttribute('data-spread')); return; }
+
+  const item = e.target.closest('[data-launch]');
+  if (item){ openLaunchModal(item.getAttribute('data-launch')); return; }
+
+  const pa = e.target.closest('[data-pa]');
+  if (pa){ paFilter = pa.getAttribute('data-pa'); renderPauta(); return; }
+
+  const adNew = e.target.closest('[data-ad-new]');
+  if (adNew){ openAdModal(adNew.getAttribute('data-ad-new')); return; }
+
+  const adC = e.target.closest('[data-ad-creative]');
+  if (adC){ toggleAdStep(adC.getAttribute('data-ad-creative'), 'creative'); return; }
+
+  const adU = e.target.closest('[data-ad-upload]');
+  if (adU){ toggleAdStep(adU.getAttribute('data-ad-upload'), 'upload'); return; }
+
+  const adD = e.target.closest('[data-ad-del]');
+  if (adD){ deleteAd(adD.getAttribute('data-ad-del')); return; }
+
+  // Modales
+  const close = e.target.closest('[data-close-modal]');
+  if (close){
+    const m = document.getElementById(close.getAttribute('data-close-modal'));
+    if (m) m.classList.remove('open');
+    lmEditing = null; amEditing = null;
+    return;
+  }
+  if (e.target.id === 'lmSave'){ saveLaunchDate(document.getElementById('lmDate').value || null); return; }
+  if (e.target.id === 'lmClear'){ saveLaunchDate(null); return; }
+  if (e.target.id === 'amSave'){ saveAd(); return; }
+  // Click en el fondo del modal lo cierra
+  if (e.target.id === 'launchModal' || e.target.id === 'adModal'){
+    e.target.classList.remove('open'); lmEditing = null; amEditing = null;
+  }
 });
 
 async function loadCalendars(){
