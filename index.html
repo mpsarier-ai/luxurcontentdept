@@ -725,47 +725,61 @@ header,.hub-header{position:static !important;background:transparent !important;
   box-shadow:0 1px 2px rgba(0,0,0,.04);white-space:nowrap}
 .mk-tab.active{background:var(--rosa);border-color:transparent;color:var(--black);font-weight:600}
 
-.rt-goal{display:flex;align-items:center;justify-content:space-between;gap:12px;background:#fff;
-  border-radius:16px;padding:13px 16px;box-shadow:0 1px 3px rgba(0,0,0,.05);margin-bottom:14px}
-.rt-goal-lbl{font-family:'JetBrains Mono',monospace;font-size:9.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--grey)}
-.rt-goal-opts{display:flex;gap:6px}
-.rt-goal-opts button{border:1px solid rgba(0,0,0,.08);background:#fff;border-radius:999px;width:38px;height:34px;
-  font-family:'Outfit',sans-serif;font-size:14px;font-weight:600;color:#555;cursor:pointer}
-.rt-goal-opts button.on{background:var(--black);color:var(--cream);border-color:transparent}
+/* Calendario de lanzamientos */
+.lc-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:12px}
+.lc-month{font-family:'Cormorant Garamond',serif;font-weight:700;font-size:26px;text-transform:capitalize;letter-spacing:-.01em}
+.lc-nav{border:1px solid rgba(0,0,0,.08);background:#fff;border-radius:999px;width:40px;height:40px;
+  font-size:19px;line-height:1;color:var(--black);cursor:pointer;box-shadow:0 1px 2px rgba(0,0,0,.04)}
+.lc-new{width:100%;border:1px dashed rgba(0,0,0,.15);background:transparent;border-radius:12px;padding:11px;
+  font-family:'Outfit',sans-serif;font-size:13px;font-weight:600;color:var(--grey);cursor:pointer;margin-bottom:14px}
+.lc-grid{background:#fff;border-radius:16px;padding:10px;box-shadow:0 1px 3px rgba(0,0,0,.05);
+  display:grid;grid-template-columns:repeat(7,1fr);gap:3px;margin-bottom:18px}
+.lc-dow{font-family:'JetBrains Mono',monospace;font-size:8.5px;letter-spacing:.1em;text-transform:uppercase;
+  color:var(--grey);text-align:center;padding:3px 0 6px}
+.lc-day{aspect-ratio:1;border:none;background:transparent;border-radius:10px;padding:3px 0 0;cursor:default;
+  display:flex;flex-direction:column;align-items:center;gap:3px;font-family:'Outfit',sans-serif}
+.lc-day .d{font-size:12px;font-weight:500;color:var(--grey);font-variant-numeric:tabular-nums;line-height:1}
+.lc-day.out .d{opacity:.32}
+.lc-day.today{background:var(--cream)}
+.lc-day.today .d{color:var(--black);font-weight:700}
+.lc-day.has{cursor:pointer}
+.lc-day.has .d{color:var(--black);font-weight:600}
+.lc-dots{display:flex;flex-wrap:wrap;justify-content:center;gap:2px}
+.lc-dot{width:6px;height:6px;border-radius:999px;background:var(--rosa-deep)}
+.lc-dot.done{background:var(--green-ok)}
 
-.rt-summary{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:16px}
-.rt-st{min-width:0;background:#fff;border-radius:16px;padding:14px 12px;box-shadow:0 1px 2px rgba(0,0,0,.04),0 6px 18px rgba(0,0,0,.05);
-  border-top:3px solid transparent}
-.rt-st .l{font-family:'JetBrains Mono',monospace;font-size:8.5px;letter-spacing:.12em;text-transform:uppercase;
-  color:var(--grey);margin-bottom:8px;line-height:1.3;min-height:22px;overflow-wrap:anywhere;hyphens:auto}
-.rt-st .n{font-family:'Cormorant Garamond',serif;font-weight:700;font-size:34px;line-height:.95;font-variant-numeric:tabular-nums}
-.rt-st.bad{border-top-color:var(--red-out)} .rt-st.warn{border-top-color:var(--yellow-low)}
-.rt-st.ok{border-top-color:var(--green-ok)}
+.lc-list{display:flex;flex-direction:column;gap:10px}
+.lc-item{display:flex;align-items:center;gap:12px;background:#fff;border:none;width:100%;text-align:left;
+  border-radius:16px;padding:12px 14px;box-shadow:0 1px 3px rgba(0,0,0,.05);cursor:pointer;
+  font-family:'Outfit',sans-serif;color:var(--black);border-left:3px solid var(--rosa-deep)}
+.lc-item.ready{border-left-color:var(--green-ok)}
+.lc-item img{width:42px;height:54px;border-radius:10px;object-fit:cover;background:#f2f2f0;flex:none}
+.lc-item .in{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}
+.lc-item .in b{font-size:14.5px;font-weight:600;line-height:1.25;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.lc-item .in span{font-size:12px;color:var(--grey)}
+.lc-item .pr{font-family:'JetBrains Mono',monospace;font-size:10.5px;color:var(--grey);flex:none;text-align:right}
+.lc-item .pr b{display:block;font-size:15px;color:var(--black);font-family:'Cormorant Garamond',serif;font-weight:700}
+.lc-none{background:rgba(255,255,255,.5);border-radius:16px;padding:20px 16px;text-align:center;
+  font-size:13.5px;color:var(--grey)}
 
-.rt-weeks{display:flex;flex-direction:column;gap:10px}
-.rt-wk{background:#fff;border-radius:16px;padding:14px 16px;box-shadow:0 1px 3px rgba(0,0,0,.05);
-  border-left:3px solid var(--cream-dark)}
-.rt-wk.bad{border-left-color:var(--red-out)}
-.rt-wk.warn{border-left-color:var(--yellow-low)}
-.rt-wk.ok{border-left-color:var(--green-ok)}
-.rt-wk.now{box-shadow:0 1px 2px rgba(0,0,0,.04),0 6px 18px rgba(0,0,0,.06)}
-.rt-wk-hd{display:flex;align-items:baseline;justify-content:space-between;gap:10px;flex-wrap:wrap}
-.rt-wk-t{font-size:14.5px;font-weight:600;min-width:0;flex:1 1 auto}
-.rt-wk-d{font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--grey);letter-spacing:.04em}
-.rt-flag{border-radius:999px;padding:4px 11px;font-size:11px;font-weight:600;white-space:nowrap;margin-left:auto;flex:none}
-.rt-flag.bad{background:var(--red-out);color:#fff}
-.rt-flag.warn{background:var(--yellow-low);color:#fff}
-.rt-flag.ok{background:var(--cream);color:var(--grey)}
-.rt-items{display:flex;flex-wrap:wrap;gap:7px;margin-top:11px}
-.rt-item{display:flex;align-items:center;gap:7px;background:var(--cream);border-radius:999px;
-  padding:5px 12px 5px 5px;font-size:12.5px;font-weight:500;border:none;cursor:pointer;
-  font-family:'Outfit',sans-serif;color:var(--black);max-width:100%}
-.rt-item img{width:24px;height:24px;border-radius:999px;object-fit:cover;flex:none;background:#e6e3de}
-.rt-item span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.rt-item .ads{font-family:'JetBrains Mono',monospace;font-size:9.5px;color:var(--grey)}
-.rt-empty{margin-top:9px;font-size:12.5px;color:var(--grey)}
-.rt-fix{margin-top:10px;border:none;background:var(--black);color:var(--cream);border-radius:999px;
-  padding:9px 16px;font-family:'Outfit',sans-serif;font-size:12.5px;font-weight:600;cursor:pointer}
+/* Ficha del lanzamiento */
+.lf-hd{display:flex;gap:13px;align-items:flex-start;margin-bottom:4px}
+.lf-hd img{width:56px;height:72px;border-radius:12px;object-fit:cover;background:#f2f2f0;flex:none}
+.lf-sec{margin-top:16px}
+.lf-sec-h{display:flex;align-items:baseline;justify-content:space-between;gap:10px;margin-bottom:8px}
+.lf-sec-t{font-family:'JetBrains Mono',monospace;font-size:9.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--grey)}
+.lf-add{border:none;background:transparent;color:var(--rosa-deep);font-family:'Outfit',sans-serif;
+  font-size:12.5px;font-weight:600;cursor:pointer;padding:0}
+.lf-tasks{display:flex;flex-direction:column;gap:6px}
+.lf-task{display:flex;align-items:center;gap:10px;background:#fff;border-radius:12px;padding:11px 12px}
+.lf-task .tk{flex:1;min-width:0;display:flex;flex-direction:column;gap:1px}
+.lf-task .tk b{font-size:13.5px;font-weight:500;line-height:1.3}
+.lf-task .tk span{font-size:11.5px;color:var(--grey)}
+.lf-task.ok .tk b{text-decoration:line-through;color:var(--grey)}
+.lf-box{border:none;background:var(--cream);border-radius:999px;width:30px;height:30px;flex:none;
+  font-size:14px;color:var(--grey);cursor:pointer;line-height:1}
+.lf-box.on{background:var(--green-ok);color:#fff}
+.lf-empty{font-size:12.5px;color:var(--grey);padding:2px 2px 4px}
 
 .rt-un{margin-top:22px}
 .rt-un h3{font-size:15px;font-weight:600;margin-bottom:4px}
@@ -810,12 +824,10 @@ header,.hub-header{position:static !important;background:transparent !important;
 .pa-del{border:none;background:transparent;color:#c4c0bb;font-size:15px;cursor:pointer;padding:0 2px;flex:none}
 
 @media (max-width:768px){
-  .rt-summary{gap:8px}
-  .rt-st{padding:12px 9px}
-  .rt-st .l{font-size:8px;letter-spacing:.08em}
+  .lc-grid{padding:8px;gap:2px}
   .pa-chk{padding:8px 11px;font-size:11.5px}
-  .rt-st .n{font-size:28px}
   .pa-launch{padding:14px}
+  .lc-month{font-size:23px}
 }
 
 /* ═══ HUB BRIEF · tus tareas del día ═══ */
@@ -933,24 +945,21 @@ header,.hub-header{position:static !important;background:transparent !important;
     <button class="hub-back" data-hub-back>Inicio</button>
 
     <div class="mk-tabs" id="mkTabs">
-      <button class="mk-tab active" data-mk="ritmo">Ritmo</button>
+      <button class="mk-tab active" data-mk="ritmo">Lanzamientos</button>
       <button class="mk-tab" data-mk="pauta">Pauta</button>
-      <button class="mk-tab" data-mk="cal">Calendarios</button>
+      <button class="mk-tab" data-mk="cal">Semanas</button>
     </div>
 
-    <!-- ── RITMO DE NOVEDAD ── -->
+    <!-- ── CALENDARIO DE LANZAMIENTOS ── -->
     <div id="mkRitmo">
-      <h2 class="section-title"><span>Ritmo de novedad</span></h2>
-      <div class="rt-goal">
-        <span class="rt-goal-lbl">Novedades por semana</span>
-        <div class="rt-goal-opts" id="rtGoal">
-          <button data-goal="1">1</button>
-          <button data-goal="2" class="on">2</button>
-          <button data-goal="3">3</button>
-        </div>
+      <div class="lc-head">
+        <button class="lc-nav" id="lcPrev" aria-label="Mes anterior">‹</button>
+        <span class="lc-month" id="lcMonth">—</span>
+        <button class="lc-nav" id="lcNext" aria-label="Mes siguiente">›</button>
       </div>
-      <div class="rt-summary" id="rtSummary"></div>
-      <div class="rt-weeks" id="rtWeeks"><div class="empty-state">Cargando…</div></div>
+      <button class="lc-new" id="lcNew">+ Lanzamiento</button>
+      <div class="lc-grid" id="lcGrid"></div>
+      <div class="lc-list" id="lcList"></div>
       <div id="rtUnscheduled"></div>
     </div>
 
@@ -1084,6 +1093,59 @@ header,.hub-header{position:static !important;background:transparent !important;
       <button class="ps-close" id="prodSheetClose" title="Cerrar">✕</button>
     </div>
     <div class="ps-body" id="prodSheetBody"></div>
+  </div>
+</div>
+
+<div class="modal-backdrop" id="newLaunchModal">
+  <div class="modal">
+    <div class="modal-meta">Nuevo lanzamiento</div>
+    <h3>¿Qué vas a lanzar?</h3>
+    <p>Para un restock, un relanzamiento o algo que no viene de producción.</p>
+    <label>Nombre</label>
+    <input list="catalogList" id="nlName" placeholder="ej: Estrellas Rosadas · restock" autocomplete="off">
+    <label>Día de lanzamiento</label>
+    <input type="date" id="nlDate">
+    <label>Unidades (opcional)</label>
+    <input type="number" id="nlQty" placeholder="ej: 100" min="0" step="1">
+    <div class="modal-actions">
+      <button class="modal-btn" data-close-modal="newLaunchModal">Cancelar</button>
+      <button class="modal-btn primary" id="nlSave">Crear</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-backdrop" id="launchSheet">
+  <div class="modal">
+    <div class="modal-meta">Lanzamiento</div>
+    <div class="lf-hd">
+      <img id="lfPhoto" alt="">
+      <span style="flex:1;min-width:0">
+        <h3 id="lfName" style="margin:0">—</h3>
+        <span id="lfDate" style="font-size:13px;color:var(--grey)">—</span>
+      </span>
+    </div>
+    <button class="lf-add" id="lfChangeDate" style="font-size:13px">Cambiar fecha</button>
+    <div id="lfBody"></div>
+    <div class="modal-actions">
+      <button class="modal-btn" data-close-modal="launchSheet">Cerrar</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-backdrop" id="taskModal">
+  <div class="modal">
+    <div class="modal-meta" id="tmCat">Tarea</div>
+    <h3>Nueva tarea</h3>
+    <label>¿Qué hay que hacer?</label>
+    <input type="text" id="tmTitle" placeholder="ej: Sesión de fotos del jean" autocomplete="off">
+    <label>Quién</label>
+    <select id="tmWho"></select>
+    <label>Para cuándo (opcional)</label>
+    <input type="date" id="tmDue">
+    <div class="modal-actions">
+      <button class="modal-btn" data-close-modal="taskModal">Cancelar</button>
+      <button class="modal-btn primary" id="tmSave">Crear tarea</button>
+    </div>
   </div>
 </div>
 
@@ -3848,10 +3910,10 @@ document.getElementById('supDelete').addEventListener('click', async () => {
 // nuevo que anunciar, la pauta se queda sin combustible. Esta vista
 // reparte los lanzamientos y reparte el trabajo de los anuncios.
 // ═══════════════════════════════════════════════════════════════════
-let launches = [], launchAds = [], teamAll = [];
-let rtGoalPerWeek = Number(localStorage.getItem('luxur_rt_goal') || 2);
+let launches = [], launchAds = [], launchTasks = [], teamAll = [];
+let lcCursor = new Date();
+let lfOpen = null;
 let paFilter = 'all';
-const RT_WEEKS_AHEAD = 10;
 
 const AD_FORMATS = ['reel','carrusel','imagen','story'];
 
@@ -3863,19 +3925,6 @@ function mondayOf(d){
 }
 function ymd(d){
   return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
-}
-function isoWeekNum(d){
-  const t = new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()));
-  t.setUTCDate(t.getUTCDate() + 4 - (t.getUTCDay() || 7));
-  const y0 = new Date(Date.UTC(t.getUTCFullYear(), 0, 1));
-  return Math.ceil(((t - y0) / 86400000 + 1) / 7);
-}
-function shortRange(mon){
-  const sun = new Date(mon); sun.setDate(sun.getDate() + 6);
-  const M = ['ene','feb','mar','abr','may','jun','jul','ago','sep','oct','nov','dic'];
-  return mon.getMonth() === sun.getMonth()
-    ? `${mon.getDate()}–${sun.getDate()} ${M[sun.getMonth()]}`
-    : `${mon.getDate()} ${M[mon.getMonth()]} – ${sun.getDate()} ${M[sun.getMonth()]}`;
 }
 function rtFmtD(iso){
   if (!iso) return '';
@@ -3896,92 +3945,165 @@ function memberColor(email){
 }
 
 async function loadLaunches(){
-  const [lRes, aRes, tRes] = await Promise.all([
+  const [lRes, aRes, kRes, tRes] = await Promise.all([
     supabase.from('launches').select('*').order('launch_date', { ascending: true, nullsFirst: false }),
     supabase.from('launch_ads').select('*').order('position', { ascending: true }),
+    supabase.from('launch_tasks').select('*').order('position', { ascending: true }),
     supabase.from('team_members').select('name,email,role,color,focus'),
   ]);
-  launches  = lRes.data  || [];
-  launchAds = aRes.data  || [];
-  teamAll   = tRes.data  || [];
+  launches    = lRes.data || [];
+  launchAds   = aRes.data || [];
+  launchTasks = kRes.data || [];
+  teamAll     = tRes.data || [];
   renderRitmo();
   renderPauta();
 }
 
-// ─── Ritmo: reparte los lanzamientos por semana ──────────────────────
+// ─── Calendario de lanzamientos ──────────────────────────────────────
+const LF_CATS = [
+  { key: 'fotos',     label: 'Fotos y video' },
+  { key: 'contenido', label: 'Contenido orgánico' },
+  { key: 'pauta',     label: 'Anuncios de pauta' },
+  { key: 'shopify',   label: 'Producto en Shopify' },
+];
+
+function launchProgress(id){
+  const t = launchTasks.filter(x => x.launch_id === id);
+  const a = launchAds.filter(x => x.launch_id === id);
+  const total = t.length + a.length * 2;
+  const done  = t.filter(x => x.done).length
+              + a.filter(x => x.creative_done).length
+              + a.filter(x => x.upload_done).length;
+  return { done, total };
+}
+
 function renderRitmo(){
-  const box = document.getElementById('rtWeeks');
-  if (!box) return;
-  const today = new Date();
-  const start = mondayOf(today);
+  const grid = document.getElementById('lcGrid');
+  const list = document.getElementById('lcList');
+  if (!grid || !list) return;
 
-  const weeks = [];
-  for (let i = 0; i < RT_WEEKS_AHEAD; i++){
-    const mon = new Date(start); mon.setDate(mon.getDate() + i * 7);
-    const sun = new Date(mon);   sun.setDate(sun.getDate() + 6);
-    const from = ymd(mon), to = ymd(sun);
-    const items = launches.filter(l => l.launch_date && l.launch_date >= from && l.launch_date <= to
-                                       && l.status !== 'pausado');
-    weeks.push({ mon, from, to, items, n: items.length });
+  const MES = ['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'];
+  const y = lcCursor.getFullYear(), m = lcCursor.getMonth();
+  const mEl = document.getElementById('lcMonth');
+  if (mEl) mEl.textContent = `${MES[m]} ${y}`;
+
+  const first = new Date(y, m, 1);
+  const startPad = (first.getDay() + 6) % 7;          // lunes primero
+  const daysInMonth = new Date(y, m + 1, 0).getDate();
+  const todayISO = ymd(new Date());
+
+  const byDay = {};
+  launches.forEach(l => {
+    if (!l.launch_date || l.status === 'pausado') return;
+    (byDay[l.launch_date] = byDay[l.launch_date] || []).push(l);
+  });
+
+  let cells = ['L','M','X','J','V','S','D'].map(d => `<div class="lc-dow">${d}</div>`).join('');
+  for (let i = 0; i < startPad; i++){
+    const d = new Date(y, m, 0 - (startPad - 1 - i));
+    cells += `<div class="lc-day out"><span class="d">${d.getDate()}</span></div>`;
   }
-
-  const desiertos = weeks.filter(w => w.n === 0).length;
-  const atracones = weeks.filter(w => w.n > rtGoalPerWeek).length;
-  const total = weeks.reduce((a, w) => a + w.n, 0);
-
-  const sum = document.getElementById('rtSummary');
-  if (sum) sum.innerHTML = `
-    <div class="rt-st ${atracones ? 'bad' : 'ok'}"><div class="l">Semanas con atracón</div><div class="n">${atracones}</div></div>
-    <div class="rt-st ${desiertos ? 'warn' : 'ok'}"><div class="l">Semanas sin novedad</div><div class="n">${desiertos}</div></div>
-    <div class="rt-st ok"><div class="l">Lanzamientos en ${RT_WEEKS_AHEAD} sem</div><div class="n">${total}</div></div>`;
-
-  const nowFrom = ymd(start);
-  box.innerHTML = weeks.map(w => {
-    const state = w.n === 0 ? 'warn' : (w.n > rtGoalPerWeek ? 'bad' : 'ok');
-    const flag  = w.n === 0
-      ? '<span class="rt-flag warn">sin novedad</span>'
-      : (w.n > rtGoalPerWeek
-          ? `<span class="rt-flag bad">${w.n} novedades · atracón</span>`
-          : `<span class="rt-flag ok">${w.n} novedad${w.n === 1 ? '' : 'es'}</span>`);
-
-    const items = w.items.map(l => {
-      const ads = launchAds.filter(a => a.launch_id === l.id);
-      const pend = ads.filter(a => !a.upload_done).length;
-      const img = l.photo_url ? `<img src="${escapeHtml(l.photo_url)}" alt="" loading="lazy">` : '<img alt="">';
-      const badge = ads.length ? `<span class="ads">${pend ? pend + ' pend.' : '✓'}</span>` : '<span class="ads">sin pauta</span>';
-      return `<button class="rt-item" data-launch="${l.id}">${img}<span>${escapeHtml(l.name)}</span>${badge}</button>`;
+  for (let day = 1; day <= daysInMonth; day++){
+    const iso = ymd(new Date(y, m, day));
+    const items = byDay[iso] || [];
+    const dots = items.slice(0, 4).map(l => {
+      const p = launchProgress(l.id);
+      return `<span class="lc-dot ${p.total && p.done === p.total ? 'done' : ''}"></span>`;
     }).join('');
+    cells += `<div class="lc-day ${items.length ? 'has' : ''} ${iso === todayISO ? 'today' : ''}" ${items.length ? `data-lc-day="${iso}"` : ''}>
+      <span class="d">${day}</span>${dots ? `<span class="lc-dots">${dots}</span>` : ''}</div>`;
+  }
+  const tail = (7 - ((startPad + daysInMonth) % 7)) % 7;
+  for (let i = 1; i <= tail; i++){
+    cells += `<div class="lc-day out"><span class="d">${i}</span></div>`;
+  }
+  grid.innerHTML = cells;
 
-    const gap = w.n === 0
-      ? `<div class="rt-empty">Nada nuevo que anunciar esta semana. Mueve un lanzamiento de una semana cargada, o programa un restock.</div>`
-      : '';
-    const fix = w.n > rtGoalPerWeek
-      ? `<button class="rt-fix" data-spread="${w.from}">⇢ Escalonar estas ${w.n}</button>`
-      : '';
+  // Lista del mes
+  const from = ymd(new Date(y, m, 1)), to = ymd(new Date(y, m, daysInMonth));
+  const mine = launches
+    .filter(l => l.launch_date && l.launch_date >= from && l.launch_date <= to && l.status !== 'pausado')
+    .sort((a, b) => a.launch_date < b.launch_date ? -1 : 1);
 
-    return `<div class="rt-wk ${state} ${w.from === nowFrom ? 'now' : ''}">
-      <div class="rt-wk-hd">
-        <span class="rt-wk-t">Semana ${isoWeekNum(w.mon)}${w.from === nowFrom ? ' · esta semana' : ''}</span>
-        <span class="rt-wk-d">${shortRange(w.mon)}</span>
-        ${flag}
-      </div>
-      ${items ? `<div class="rt-items">${items}</div>` : ''}
-      ${gap}${fix}
-    </div>`;
-  }).join('');
+  list.innerHTML = mine.length ? mine.map(l => {
+    const p = launchProgress(l.id);
+    const ready = p.total > 0 && p.done === p.total;
+    return `<button class="lc-item ${ready ? 'ready' : ''}" data-launch="${l.id}">
+      ${l.photo_url ? `<img src="${escapeHtml(l.photo_url)}" alt="" loading="lazy">` : '<img alt="">'}
+      <span class="in">
+        <b>${escapeHtml(l.name)}</b>
+        <span>${rtFmtD(l.launch_date)}${l.qty ? ' · ' + l.qty + 'u' : ''}</span>
+      </span>
+      <span class="pr"><b>${p.total ? p.done + '/' + p.total : '—'}</b>${p.total ? 'tareas' : 'sin tareas'}</span>
+    </button>`;
+  }).join('') : `<div class="lc-none">No hay lanzamientos en ${MES[m]}.</div>`;
 
-  // Sin fecha de lanzamiento todavía
+  // Sin fecha todavía
   const un = launches.filter(l => !l.launch_date);
   const ubox = document.getElementById('rtUnscheduled');
   if (ubox){
     ubox.innerHTML = un.length ? `<div class="rt-un">
-      <h3>Por programar · ${un.length}</h3>
-      <p>Estas referencias existen pero todavía no tienen semana de lanzamiento.</p>
-      <div class="rt-items">${un.map(l => `<button class="rt-item" data-launch="${l.id}">
+      <h3>Sin fecha · ${un.length}</h3>
+      <p>Tócalas para ponerles día de lanzamiento y que entren al calendario.</p>
+      <div class="lc-list">${un.slice(0, 30).map(l => `<button class="lc-item" data-launch="${l.id}">
         ${l.photo_url ? `<img src="${escapeHtml(l.photo_url)}" alt="" loading="lazy">` : '<img alt="">'}
-        <span>${escapeHtml(l.name)}</span></button>`).join('')}</div>
+        <span class="in"><b>${escapeHtml(l.name)}</b><span>${l.qty ? l.qty + 'u' : 'sin fecha'}</span></span>
+        <span class="pr"><b>+</b>fecha</span></button>`).join('')}</div>
     </div>` : '';
   }
+}
+
+// ─── Ficha del lanzamiento ───────────────────────────────────────────
+function renderLaunchSheet(){
+  if (!lfOpen) return;
+  const l = launches.find(x => x.id === lfOpen);
+  const body = document.getElementById('lfBody');
+  if (!l || !body) return;
+
+  document.getElementById('lfName').textContent = l.name;
+  document.getElementById('lfDate').textContent = l.launch_date
+    ? 'Lanza el ' + rtFmtD(l.launch_date) + (l.qty ? ' · ' + l.qty + 'u' : '')
+    : 'Sin fecha de lanzamiento';
+  const ph = document.getElementById('lfPhoto');
+  if (ph) ph.src = l.photo_url || '';
+
+  body.innerHTML = LF_CATS.map(cat => {
+    let rows = '';
+    if (cat.key === 'pauta'){
+      const ads = launchAds.filter(a => a.launch_id === l.id);
+      rows = ads.map(a => `
+        <div class="lf-task ${a.creative_done ? 'ok' : ''}">
+          <button class="lf-box ${a.creative_done ? 'on' : ''}" data-ad-creative="${a.id}">${a.creative_done ? '✓' : ''}</button>
+          <span class="tk"><b>Hacer: ${escapeHtml(a.concept)}</b><span>${escapeHtml(memberName(a.creative_by))} · ${escapeHtml(a.format || '')}</span></span>
+          <button class="pa-del" data-ad-del="${a.id}">×</button>
+        </div>
+        <div class="lf-task ${a.upload_done ? 'ok' : ''}">
+          <button class="lf-box ${a.upload_done ? 'on' : ''}" data-ad-upload="${a.id}" ${a.creative_done ? '' : 'disabled'}>${a.upload_done ? '✓' : ''}</button>
+          <span class="tk"><b>Subir a Meta: ${escapeHtml(a.concept)}</b><span>${escapeHtml(memberName(a.upload_by))}${a.budget_cop ? ' · ' + fmtCOP(a.budget_cop) : ''}</span></span>
+        </div>`).join('');
+    } else {
+      const ts = launchTasks.filter(t => t.launch_id === l.id && t.category === cat.key);
+      rows = ts.map(t => `
+        <div class="lf-task ${t.done ? 'ok' : ''}">
+          <button class="lf-box ${t.done ? 'on' : ''}" data-task="${t.id}">${t.done ? '✓' : ''}</button>
+          <span class="tk"><b>${escapeHtml(t.title)}</b><span>${escapeHtml(memberName(t.assignee))}${t.due_date ? ' · ' + rtFmtD(t.due_date) : ''}</span></span>
+          <button class="pa-del" data-task-del="${t.id}">×</button>
+        </div>`).join('');
+    }
+    return `<div class="lf-sec">
+      <div class="lf-sec-h">
+        <span class="lf-sec-t">${cat.label}</span>
+        <button class="lf-add" data-newtask="${cat.key}">+ tarea</button>
+      </div>
+      <div class="lf-tasks">${rows || '<div class="lf-empty">Nada todavía.</div>'}</div>
+    </div>`;
+  }).join('');
+}
+
+function openLaunchSheet(id){
+  lfOpen = id;
+  renderLaunchSheet();
+  document.getElementById('launchSheet').classList.add('open');
 }
 
 // ─── Pauta: quién hace el anuncio y quién lo sube ────────────────────
@@ -4089,28 +4211,7 @@ async function saveLaunchDate(date){
   if (l) l.launch_date = date;
   document.getElementById('launchModal').classList.remove('open');
   lmEditing = null;
-  renderRitmo(); renderPauta();
-}
-
-// Reparte los lanzamientos de una semana cargada hacia las semanas siguientes
-async function spreadWeek(fromMonday){
-  const mon = new Date(fromMonday + 'T00:00:00');
-  const sun = new Date(mon); sun.setDate(sun.getDate() + 6);
-  const items = launches.filter(l => l.launch_date >= ymd(mon) && l.launch_date <= ymd(sun) && l.status !== 'pausado');
-  if (items.length <= rtGoalPerWeek) return;
-  if (!confirm(`Se quedan ${rtGoalPerWeek} en esta semana y el resto se reparte a razón de ${rtGoalPerWeek} por semana en las siguientes. ¿Lo hago?`)) return;
-
-  for (let i = 0; i < items.length; i++){
-    const weekOffset = Math.floor(i / rtGoalPerWeek);
-    if (!weekOffset) continue;
-    const d = new Date(mon);
-    d.setDate(d.getDate() + weekOffset * 7 + (i % rtGoalPerWeek) * 2);
-    const date = ymd(d);
-    const { error } = await supabase.from('launches').update({ launch_date: date }).eq('id', items[i].id);
-    if (error){ alert('No se guardó: ' + error.message); return; }
-    items[i].launch_date = date;
-  }
-  renderRitmo(); renderPauta();
+  renderRitmo(); renderPauta(); renderLaunchSheet();
 }
 
 function openAdModal(launchId){
@@ -4154,7 +4255,78 @@ async function saveAd(){
   launchAds.push(data);
   document.getElementById('adModal').classList.remove('open');
   amEditing = null;
-  renderPauta(); renderRitmo();
+  renderPauta(); renderRitmo(); renderLaunchSheet();
+}
+
+async function saveNewLaunch(){
+  const name = document.getElementById('nlName').value.trim();
+  if (!name){ document.getElementById('nlName').focus(); return; }
+  const row = {
+    name,
+    launch_date: document.getElementById('nlDate').value || null,
+    qty: Number(document.getElementById('nlQty').value) || null,
+    photo_url: findCatalogPhoto(name, null) || null,
+    status: 'planeado',
+  };
+  const { data, error } = await supabase.from('launches').insert(row).select().single();
+  if (error){ alert('No se guardó: ' + error.message); return; }
+  launches.push(data);
+  document.getElementById('newLaunchModal').classList.remove('open');
+  if (data.launch_date) lcCursor = new Date(data.launch_date + 'T00:00:00');
+  renderRitmo(); renderPauta();
+  openLaunchSheet(data.id);
+}
+
+let tmCatKey = null;
+
+function openTaskModal(cat){
+  if (!lfOpen) return;
+  tmCatKey = cat;
+  const label = (LF_CATS.find(c => c.key === cat) || {}).label || 'Tarea';
+  document.getElementById('tmCat').textContent = label;
+  document.getElementById('tmTitle').value = '';
+  document.getElementById('tmDue').value = '';
+  const who = document.getElementById('tmWho');
+  who.innerHTML = teamAll.filter(t => t.role !== 'viewer')
+    .map(t => `<option value="${escapeHtml(t.email)}">${escapeHtml(t.name)}${t.focus ? ' · ' + escapeHtml(t.focus) : ''}</option>`).join('');
+  document.getElementById('taskModal').classList.add('open');
+}
+
+async function saveTask(){
+  const title = document.getElementById('tmTitle').value.trim();
+  if (!title){ document.getElementById('tmTitle').focus(); return; }
+  const row = {
+    launch_id: lfOpen,
+    category: tmCatKey || 'contenido',
+    title,
+    assignee: document.getElementById('tmWho').value || null,
+    due_date: document.getElementById('tmDue').value || null,
+    position: launchTasks.filter(t => t.launch_id === lfOpen && t.category === tmCatKey).length,
+  };
+  const { data, error } = await supabase.from('launch_tasks').insert(row).select().single();
+  if (error){ alert('No se guardó: ' + error.message); return; }
+  launchTasks.push(data);
+  document.getElementById('taskModal').classList.remove('open');
+  renderLaunchSheet(); renderRitmo();
+}
+
+async function toggleTask(id){
+  const t = launchTasks.find(x => x.id === id);
+  if (!t) return;
+  const patch = { done: !t.done, done_at: !t.done ? new Date().toISOString() : null };
+  const { error } = await supabase.from('launch_tasks').update(patch).eq('id', id);
+  if (error){ alert('No se guardó: ' + error.message); return; }
+  Object.assign(t, patch);
+  renderLaunchSheet(); renderRitmo();
+}
+
+async function deleteTask(id){
+  const t = launchTasks.find(x => x.id === id);
+  if (!t || !confirm(`¿Borrar "${t.title}"?`)) return;
+  const { error } = await supabase.from('launch_tasks').delete().eq('id', id);
+  if (error){ alert('No se borró: ' + error.message); return; }
+  launchTasks = launchTasks.filter(x => x.id !== id);
+  renderLaunchSheet(); renderRitmo();
 }
 
 async function toggleAdStep(id, step){
@@ -4168,7 +4340,7 @@ async function toggleAdStep(id, step){
   const { error } = await supabase.from('launch_ads').update(patch).eq('id', id);
   if (error){ alert('No se guardó: ' + error.message); return; }
   Object.assign(a, patch);
-  renderPauta(); renderRitmo();
+  renderPauta(); renderRitmo(); renderLaunchSheet();
 }
 
 async function deleteAd(id){
@@ -4177,7 +4349,7 @@ async function deleteAd(id){
   const { error } = await supabase.from('launch_ads').delete().eq('id', id);
   if (error){ alert('No se borró: ' + error.message); return; }
   launchAds = launchAds.filter(x => x.id !== id);
-  renderPauta(); renderRitmo();
+  renderPauta(); renderRitmo(); renderLaunchSheet();
 }
 
 // ─── Eventos ─────────────────────────────────────────────────────────
@@ -4192,19 +4364,42 @@ document.addEventListener('click', e => {
     });
     return;
   }
-  const goal = e.target.closest('#rtGoal button');
-  if (goal){
-    rtGoalPerWeek = Number(goal.getAttribute('data-goal')) || 2;
-    localStorage.setItem('luxur_rt_goal', String(rtGoalPerWeek));
-    document.querySelectorAll('#rtGoal button').forEach(b => b.classList.toggle('on', b === goal));
-    renderRitmo();
+  const item = e.target.closest('[data-launch]');
+  if (item){
+    const id = item.getAttribute('data-launch');
+    const l = launches.find(x => x.id === id);
+    // Sin fecha: primero se le pone día; con fecha: se abre su ficha
+    if (l && !l.launch_date) openLaunchModal(id); else openLaunchSheet(id);
     return;
   }
-  const spread = e.target.closest('[data-spread]');
-  if (spread){ spreadWeek(spread.getAttribute('data-spread')); return; }
+  const dayCell = e.target.closest('[data-lc-day]');
+  if (dayCell){
+    const iso = dayCell.getAttribute('data-lc-day');
+    const first = launches.find(l => l.launch_date === iso && l.status !== 'pausado');
+    if (first) openLaunchSheet(first.id);
+    return;
+  }
+  if (e.target.id === 'lcPrev'){ lcCursor = new Date(lcCursor.getFullYear(), lcCursor.getMonth() - 1, 1); renderRitmo(); return; }
+  if (e.target.id === 'lcNext'){ lcCursor = new Date(lcCursor.getFullYear(), lcCursor.getMonth() + 1, 1); renderRitmo(); return; }
+  if (e.target.id === 'lfChangeDate'){ if (lfOpen) openLaunchModal(lfOpen); return; }
+  if (e.target.id === 'lcNew'){
+    document.getElementById('nlName').value = '';
+    document.getElementById('nlQty').value = '';
+    document.getElementById('nlDate').value = '';
+    document.getElementById('newLaunchModal').classList.add('open');
+    return;
+  }
 
-  const item = e.target.closest('[data-launch]');
-  if (item){ openLaunchModal(item.getAttribute('data-launch')); return; }
+  const nt = e.target.closest('[data-newtask]');
+  if (nt){
+    if (nt.getAttribute('data-newtask') === 'pauta') openAdModal(lfOpen);
+    else openTaskModal(nt.getAttribute('data-newtask'));
+    return;
+  }
+  const tk = e.target.closest('[data-task]');
+  if (tk){ toggleTask(tk.getAttribute('data-task')); return; }
+  const tkd = e.target.closest('[data-task-del]');
+  if (tkd){ deleteTask(tkd.getAttribute('data-task-del')); return; }
 
   const pa = e.target.closest('[data-pa]');
   if (pa){ paFilter = pa.getAttribute('data-pa'); renderPauta(); return; }
@@ -4227,14 +4422,19 @@ document.addEventListener('click', e => {
     const m = document.getElementById(close.getAttribute('data-close-modal'));
     if (m) m.classList.remove('open');
     lmEditing = null; amEditing = null;
+    if (close.getAttribute('data-close-modal') === 'launchSheet') lfOpen = null;
     return;
   }
   if (e.target.id === 'lmSave'){ saveLaunchDate(document.getElementById('lmDate').value || null); return; }
   if (e.target.id === 'lmClear'){ saveLaunchDate(null); return; }
   if (e.target.id === 'amSave'){ saveAd(); return; }
+  if (e.target.id === 'tmSave'){ saveTask(); return; }
+  if (e.target.id === 'nlSave'){ saveNewLaunch(); return; }
   // Click en el fondo del modal lo cierra
-  if (e.target.id === 'launchModal' || e.target.id === 'adModal'){
-    e.target.classList.remove('open'); lmEditing = null; amEditing = null;
+  if (['launchModal','adModal','taskModal','launchSheet','newLaunchModal'].includes(e.target.id)){
+    e.target.classList.remove('open');
+    lmEditing = null; amEditing = null;
+    if (e.target.id === 'launchSheet') lfOpen = null;
   }
 });
 
