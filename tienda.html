@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no">
+<meta name="theme-color" content="#edebe6">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Tienda">
+<title>LUXUR · Tienda</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;700&family=Montserrat:wght@600&family=Outfit:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --cream:#edebe6; --cream-dark:#dedad3; --rosa:#f2d4d7; --rosa-deep:#d4848e;
+  --black:#1a1a1a; --grey:#7a7570; --green:#5b9a5b; --red:#bd6b6b;
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{background:var(--cream);color:var(--black);font-family:'Outfit',sans-serif;font-weight:300;
+  min-height:100dvh;-webkit-font-smoothing:antialiased;overscroll-behavior:none;
+  padding:env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left)}
+body{display:flex;flex-direction:column}
+.wrap{max-width:430px;margin:0 auto;padding:26px 20px 30px;flex:1;width:100%;
+  display:flex;flex-direction:column;min-height:100dvh}
+
+.brand{font-family:'Montserrat',sans-serif;font-weight:600;font-size:24px;text-align:center;color:var(--rosa-deep)}
+.tagline{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.2em;text-transform:uppercase;
+  color:var(--grey);text-align:center;margin-top:2px}
+
+.openrow{display:flex;align-items:center;justify-content:center;gap:10px;margin:18px 0 6px}
+.opendot{width:9px;height:9px;border-radius:999px;background:var(--cream-dark);flex:none}
+.opendot.on{background:var(--green)}
+.openlbl{font-size:13px;font-weight:500;color:var(--grey)}
+.openbtn{border:1px solid rgba(0,0,0,.1);background:#fff;border-radius:999px;padding:8px 16px;
+  font-family:'Outfit',sans-serif;font-size:12.5px;font-weight:600;color:var(--black);cursor:pointer}
+
+.stage{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;min-height:0}
+.n{font-family:'Cormorant Garamond',serif;font-weight:700;font-size:clamp(96px,34vw,150px);line-height:.9;
+  font-variant-numeric:tabular-nums;letter-spacing:-.02em}
+.nlbl{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:var(--grey)}
+.sync{font-family:'JetBrains Mono',monospace;font-size:9.5px;letter-spacing:.08em;color:var(--grey);
+  min-height:16px;margin-top:8px;text-align:center}
+.sync.err{color:var(--red)}
+
+.tap{border:none;width:100%;border-radius:28px;background:var(--black);color:var(--cream);
+  font-family:'Outfit',sans-serif;font-size:21px;font-weight:600;padding:30px 20px;cursor:pointer;
+  box-shadow:0 8px 26px rgba(0,0,0,.16);transition:transform .08s ease;touch-action:manipulation;
+  user-select:none;-webkit-user-select:none}
+.tap:active{transform:scale(.97)}
+.tap:disabled{background:var(--cream-dark);color:#9a948e;box-shadow:none}
+.undo{border:none;background:transparent;color:var(--grey);font-family:'Outfit',sans-serif;
+  font-size:14px;font-weight:500;padding:16px;cursor:pointer;width:100%;margin-top:2px}
+
+.badpage{text-align:center;padding:80px 24px;font-size:15px;color:var(--grey)}
+</style>
+</head>
+<body>
+<div class="wrap" id="app" hidden>
+  <div>
+    <div class="brand">LUXUR</div>
+    <div class="tagline" id="storeName">Tienda Medellín</div>
+    <div class="openrow">
+      <span class="opendot" id="openDot"></span>
+      <span class="openlbl" id="openLbl">Cerrada</span>
+      <button class="openbtn" id="openBtn">Abrir tienda</button>
+    </div>
+  </div>
+
+  <div class="stage">
+    <div class="n" id="count">0</div>
+    <div class="nlbl">personas hoy</div>
+    <div class="sync" id="sync"></div>
+  </div>
+
+  <div>
+    <button class="tap" id="tapBtn">+1 · Entró alguien</button>
+    <button class="undo" id="undoBtn">↩ Me equivoqué, quitar una</button>
+  </div>
+</div>
+<div class="badpage" id="badToken" hidden>
+  Este link no es válido.<br>Pídele a Paulina el link del contador.
+</div>
+
+<script type="module">
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+const SUPABASE_URL = "https://nrpgtlcdvtesjbxpkxha.supabase.co";
+const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5ycGd0bGNkdnRlc2pieHBreGhhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg3ODkzNTAsImV4cCI6MjA5NDM2NTM1MH0.ntRHkFobaVK6RW9EYRwoww1ATr8N0zHMzXHM__5x8E0";
+const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+const token = new URLSearchParams(location.search).get('t') || '';
+const $ = id => document.getElementById(id);
+
+if (!/^[0-9a-f-]{36}$/.test(token)){
+  $('badToken').hidden = false;
+} else {
+  $('app').hidden = false;
+  boot();
+}
+
+let today = 0;        // lo que muestra la pantalla
+let open = false;
+let pending = 0;      // taps que aún no llegan al servidor
+let flushing = false;
+
+function paint(){
+  $('count').textContent = today;
+  $('openDot').classList.toggle('on', open);
+  $('openLbl').textContent = open ? 'Abierta' : 'Cerrada';
+  $('openBtn').textContent = open ? 'Cerrar tienda' : 'Abrir tienda';
+  const s = $('sync');
+  if (pending > 0){ s.textContent = `guardando ${pending}…`; s.classList.remove('err'); }
+  else { s.textContent = ''; s.classList.remove('err'); }
+}
+
+async function boot(){
+  try {
+    const { data, error } = await supabase.rpc('store_state', { p_token: token });
+    if (error) throw error;
+    today = data.today || 0;
+    open = !!data.open;
+  } catch (e) {
+    $('sync').textContent = 'sin conexión — el conteo se guarda al volver';
+    $('sync').classList.add('err');
+  }
+  paint();
+  // recuperar taps que quedaron en cola de una sesión anterior
+  try { pending += Number(localStorage.getItem('luxur_tap_queue') || 0); } catch(_){}
+  if (pending) flush();
+}
+
+// El tap es optimista: suma en pantalla al instante y sincroniza detrás.
+// Si no hay señal, queda en cola y se reintenta solo.
+$('tapBtn').addEventListener('click', () => {
+  today++; pending++;
+  try { localStorage.setItem('luxur_tap_queue', String(pending)); } catch(_){}
+  if (navigator.vibrate) navigator.vibrate(12);
+  paint();
+  flush();
+});
+
+async function flush(){
+  if (flushing) return;
+  flushing = true;
+  while (pending > 0){
+    try {
+      const { data, error } = await supabase.rpc('store_tap', { p_token: token, p_device: 'web' });
+      if (error) throw error;
+      pending--;
+      try { localStorage.setItem('luxur_tap_queue', String(pending)); } catch(_){}
+      if (pending === 0 && data && typeof data.today === 'number') today = data.today;
+      paint();
+    } catch (e) {
+      $('sync').textContent = `sin señal — ${pending} por guardar, reintento solo`;
+      $('sync').classList.add('err');
+      setTimeout(() => { flushing = false; flush(); }, 5000);
+      return;
+    }
+  }
+  flushing = false;
+  paint();
+}
+
+$('undoBtn').addEventListener('click', async () => {
+  if (today <= 0) return;
+  if (pending > 0){
+    // aún no había llegado al servidor: basta con no mandarlo
+    pending--; today--;
+    try { localStorage.setItem('luxur_tap_queue', String(pending)); } catch(_){}
+    paint();
+    return;
+  }
+  today--; paint();
+  try {
+    const { data, error } = await supabase.rpc('store_undo', { p_token: token });
+    if (error) throw error;
+    if (data && typeof data.today === 'number'){ today = data.today; paint(); }
+  } catch (e) {
+    today++; paint();
+    $('sync').textContent = 'no se pudo quitar — revisa la señal';
+    $('sync').classList.add('err');
+  }
+});
+
+$('openBtn').addEventListener('click', async () => {
+  const next = !open;
+  open = next; paint();
+  try {
+    const { error } = await supabase.rpc('store_toggle', { p_token: token, p_open: next });
+    if (error) throw error;
+  } catch (e) {
+    open = !next; paint();
+    $('sync').textContent = 'no se guardó — revisa la señal';
+    $('sync').classList.add('err');
+  }
+});
+
+// al volver la señal, vaciar la cola
+window.addEventListener('online', flush);
+</script>
+</body>
+</html>

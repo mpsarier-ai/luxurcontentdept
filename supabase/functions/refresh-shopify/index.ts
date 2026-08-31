@@ -45,6 +45,7 @@ async function fetchOrders(token: string, sinceISO: string) {
     id: string;
     createdAt: string;
     total: number;
+    sourceName: string;
     lineItems: Array<{ title: string; amount: number; quantity: number }>;
   }> = [];
   let cursor: string | null = null;
@@ -60,6 +61,7 @@ async function fetchOrders(token: string, sinceISO: string) {
             node {
               id
               createdAt
+              sourceName
               currentTotalPriceSet { shopMoney { amount } }
               lineItems(first: 50) {
                 edges { node { title quantity originalTotalSet { shopMoney { amount } } } }
@@ -80,7 +82,7 @@ async function fetchOrders(token: string, sinceISO: string) {
       // "gross sales" = suma de lineItems a precio original (antes de descuentos/
       // impuestos/envio), para que coincida con el gross_sales de Shopify Analytics
       const gross = lineItems.reduce((s: number, li: any) => s + li.amount, 0);
-      orders.push({ id: n.id, createdAt: n.createdAt, total: gross, lineItems });
+      orders.push({ id: n.id, createdAt: n.createdAt, total: gross, sourceName: n.sourceName || "", lineItems });
     }
     hasNext = conn.pageInfo.hasNextPage;
     cursor = conn.pageInfo.endCursor;
@@ -317,6 +319,25 @@ async function handler(_req: Request): Promise<Response> {
       if (ps < earliest) earliest = ps;
     }
     const orders = await fetchOrders(shopifyToken, earliest);
+
+    // ── Tienda física: ventas del POS por día (hora Bogotá) → pos_daily ──
+    try {
+      const posMap: Record<string, { orders: number; gross: number; units: number }> = {};
+      for (const o of orders) {
+        if ((o.sourceName || "").toLowerCase() !== "pos") continue;
+        const day = new Date(new Date(o.createdAt).getTime() - 5 * 3600_000).toISOString().slice(0, 10);
+        if (!posMap[day]) posMap[day] = { orders: 0, gross: 0, units: 0 };
+        posMap[day].orders += 1;
+        posMap[day].gross += o.total;
+        posMap[day].units += o.lineItems.reduce((a, li) => a + li.quantity, 0);
+      }
+      const posDays = Object.entries(posMap).map(([day, v]) => ({ day, ...v }));
+      if (posDays.length) await rpcCall("rpc_update_pos_daily", { p_days: posDays });
+      console.log(`POS: ${posDays.length} días actualizados`);
+    } catch (err) {
+      // Si la tabla aún no existe, el resto del refresh sigue normal
+      console.error("pos_daily:", (err as Error).message);
+    }
 
     // Aggregate any [startISO .. endISO] window from the fetched orders
     function buildWindow(startISO: string, days: number = 7){
