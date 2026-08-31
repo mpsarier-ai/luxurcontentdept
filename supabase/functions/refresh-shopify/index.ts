@@ -320,23 +320,29 @@ async function handler(_req: Request): Promise<Response> {
     }
     const orders = await fetchOrders(shopifyToken, earliest);
 
-    // ── Tienda física: ventas del POS por día (hora Bogotá) → pos_daily ──
+    // ── Ventas por canal y por día (hora Bogotá): POS → pos_daily · Online Store → online_daily ──
     try {
-      const posMap: Record<string, { orders: number; gross: number; units: number }> = {};
+      type DayAgg = Record<string, { orders: number; gross: number; units: number }>;
+      const posMap: DayAgg = {};
+      const webMap: DayAgg = {};
       for (const o of orders) {
-        if ((o.sourceName || "").toLowerCase() !== "pos") continue;
+        const src = (o.sourceName || "").toLowerCase();
+        const map = src === "pos" ? posMap : (src === "web" ? webMap : null);
+        if (!map) continue;
         const day = new Date(new Date(o.createdAt).getTime() - 5 * 3600_000).toISOString().slice(0, 10);
-        if (!posMap[day]) posMap[day] = { orders: 0, gross: 0, units: 0 };
-        posMap[day].orders += 1;
-        posMap[day].gross += o.total;
-        posMap[day].units += o.lineItems.reduce((a, li) => a + li.quantity, 0);
+        if (!map[day]) map[day] = { orders: 0, gross: 0, units: 0 };
+        map[day].orders += 1;
+        map[day].gross += o.total;
+        map[day].units += o.lineItems.reduce((a, li) => a + li.quantity, 0);
       }
       const posDays = Object.entries(posMap).map(([day, v]) => ({ day, ...v }));
+      const webDays = Object.entries(webMap).map(([day, v]) => ({ day, ...v }));
       if (posDays.length) await rpcCall("rpc_update_pos_daily", { p_days: posDays });
-      console.log(`POS: ${posDays.length} días actualizados`);
+      if (webDays.length) await rpcCall("rpc_update_online_daily", { p_days: webDays });
+      console.log(`POS: ${posDays.length} días · Online: ${webDays.length} días`);
     } catch (err) {
-      // Si la tabla aún no existe, el resto del refresh sigue normal
-      console.error("pos_daily:", (err as Error).message);
+      // Si las tablas aún no existen, el resto del refresh sigue normal
+      console.error("canal_daily:", (err as Error).message);
     }
 
     // Aggregate any [startISO .. endISO] window from the fetched orders

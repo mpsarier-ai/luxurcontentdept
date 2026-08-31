@@ -125,3 +125,32 @@ grant execute on function public.store_undo(uuid) to anon, authenticated;
 grant execute on function public.store_toggle(uuid, boolean) to anon, authenticated;
 grant execute on function public.store_state(uuid) to anon, authenticated;
 grant execute on function public.rpc_update_pos_daily(jsonb) to anon, authenticated;
+
+-- ═══ TIENDA ONLINE · ventas del canal Online Store por día ═══
+create table if not exists public.online_daily (
+  day date primary key,
+  orders int not null default 0,
+  gross numeric not null default 0,
+  units int not null default 0,
+  updated_at timestamptz default now()
+);
+alter table public.online_daily enable row level security;
+drop policy if exists online_daily_team on public.online_daily;
+create policy online_daily_team on public.online_daily
+  for select to authenticated using (public.is_team_member());
+
+create or replace function public.rpc_update_online_daily(p_days jsonb)
+returns void language plpgsql security definer set search_path = public as $$
+declare d jsonb;
+begin
+  for d in select * from jsonb_array_elements(p_days) loop
+    insert into online_daily (day, orders, gross, units, updated_at)
+    values ((d->>'day')::date, (d->>'orders')::int, (d->>'gross')::numeric, (d->>'units')::int, now())
+    on conflict (day) do update
+      set orders = excluded.orders, gross = excluded.gross,
+          units = excluded.units, updated_at = now();
+  end loop;
+end $$;
+
+revoke all on function public.rpc_update_online_daily(jsonb) from public;
+grant execute on function public.rpc_update_online_daily(jsonb) to anon, authenticated;

@@ -1063,6 +1063,19 @@ header,.hub-header{position:static !important;background:transparent !important;
     </div>
     <div class="empty-state" id="stEmpty" hidden></div>
 
+    <h2 class="section-title" style="margin-top:26px"><span>Tienda online</span><span class="meta">canal Online Store · mismas vistas</span></h2>
+    <div class="prod-kpis st-kpis" id="onKpis">
+      <div class="prod-kpi"><div class="pk-label">Ventas online</div>
+        <div class="pk-num"><span id="onOrdenes">—</span></div>
+        <div class="pk-cost"><span class="pk-cost-line" id="onOrdenesSub"></span></div></div>
+      <div class="prod-kpi"><div class="pk-label">Ingresos</div>
+        <div class="pk-num"><span id="onGross">—</span></div>
+        <div class="pk-cost"><span class="pk-cost-line" id="onGrossSub"></span></div></div>
+      <div class="prod-kpi"><div class="pk-label">Ticket promedio</div>
+        <div class="pk-num"><span id="onTicket">—</span></div>
+        <div class="pk-cost"><span class="pk-cost-line" id="onTicketSub"></span></div></div>
+    </div>
+
     <h2 class="section-title" style="margin-top:34px"><span>Dashboard · Jeans activos</span><span class="meta" id="prodStatusMeta">—</span></h2>
     <a class="fa-inv-link" href="calendars/calendar.html?view=inventory">📦 Ver inventario completo por tallas <span>›</span></a>
     <div class="prod-status" id="prodStatus"><div class="empty-state">Cargando catálogo…</div></div>
@@ -4469,7 +4482,8 @@ document.addEventListener('click', e => {
 
 // ═══ TIENDA FÍSICA · visitas + ventas POS + conversión ═══
 let stEntries = [];   // fechas (local_day) de cada entrada
-let stPos = [];       // { day, orders, gross, units }
+let stPos = [];       // { day, orders, gross, units } · POS
+let stOnline = [];    // igual, canal Online Store
 let stMode = 'hoy';
 
 function bogotaISO(shift){
@@ -4482,9 +4496,10 @@ async function loadStoreStats(){
   const kpis = document.getElementById('stKpis');
   if (!kpis) return;
   const from = bogotaISO(-59);
-  const [evRes, posRes, setRes] = await Promise.all([
+  const [evRes, posRes, onRes, setRes] = await Promise.all([
     supabase.from('store_events').select('local_day').eq('kind','entry').gte('local_day', from).limit(20000),
     supabase.from('pos_daily').select('day,orders,gross,units').gte('day', from),
+    supabase.from('online_daily').select('day,orders,gross,units').gte('day', from),
     supabase.from('store_settings').select('counter_token,store_name').eq('id',1).maybeSingle(),
   ]);
   const empty = document.getElementById('stEmpty');
@@ -4496,6 +4511,7 @@ async function loadStoreStats(){
   }
   stEntries = (evRes.data || []).map(r => r.local_day);
   stPos = posRes.data || [];
+  stOnline = onRes.data || [];
   if (setRes.data && setRes.data.counter_token){
     const box = document.getElementById('storeLinkBox');
     if (box){
@@ -4531,6 +4547,19 @@ function renderStoreStats(){
   el('stConvSub').textContent = conv === null
     ? 'aún sin visitas registradas'
     : `${ordenes} de ${visitas} personas compraron`;
+
+  // Tienda online — se cuenta sola desde Shopify
+  const on = stOnline.filter(p => p.day >= r.from && p.day <= today);
+  const onOrd = on.reduce((a,p) => a + (p.orders||0), 0);
+  const onGross = on.reduce((a,p) => a + Number(p.gross||0), 0);
+  const onUnits = on.reduce((a,p) => a + (p.units||0), 0);
+  const hayOnline = stOnline.length > 0;
+  el('onOrdenes').textContent = hayOnline ? onOrd.toLocaleString('es-CO') : '—';
+  el('onOrdenesSub').textContent = hayOnline ? `${r.label} · ${onUnits} unidad${onUnits===1?'':'es'}` : 'esperando datos de Shopify';
+  el('onGross').textContent = hayOnline ? (onGross > 0 ? fmtCOP(onGross) : '$0') : '—';
+  el('onGrossSub').textContent = hayOnline ? r.label : '';
+  el('onTicket').textContent = onOrd > 0 ? fmtCOP(onGross / onOrd) : '—';
+  el('onTicketSub').textContent = onOrd > 0 ? 'por venta' : '';
 }
 
 document.addEventListener('click', e => {
