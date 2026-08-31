@@ -1044,6 +1044,10 @@ header,.hub-header{position:static !important;background:transparent !important;
       <button class="mk-tab active" data-st="hoy">Hoy</button>
       <button class="mk-tab" data-st="semana">Semana</button>
       <button class="mk-tab" data-st="mes">Mes</button>
+      <button class="mk-tab" data-st="d7">7 días</button>
+      <button class="mk-tab" data-st="d14">14 días</button>
+      <button class="mk-tab" data-st="d30">30 días</button>
+      <button class="mk-tab" data-st="d60">60 días</button>
     </div>
     <div class="prod-kpis st-kpis" id="stKpis">
       <div class="prod-kpi"><div class="pk-label">Personas que entraron</div>
@@ -4526,10 +4530,18 @@ function renderStoreStats(){
   const el = id => document.getElementById(id);
   if (!el('stVisitas')) return;
   const today = bogotaISO(0);
+  // Semana = la calendario (lunes a hoy) · Mes = lo que va del mes
+  const bogNow = new Date(Date.now() - 5*60*60*1000);
+  const lunes = bogotaISO(-((bogNow.getUTCDay() + 6) % 7));
+  const dia1 = today.slice(0, 8) + '01';
   const ranges = {
-    hoy:    { from: today,        label: 'hoy' },
-    semana: { from: bogotaISO(-6),  label: 'últimos 7 días' },
-    mes:    { from: bogotaISO(-29), label: 'últimos 30 días' },
+    hoy:    { from: today, label: 'hoy' },
+    semana: { from: lunes, label: 'esta semana · desde el lunes' },
+    mes:    { from: dia1,  label: 'lo que va del mes' },
+    d7:     { from: bogotaISO(-6),  label: 'últimos 7 días' },
+    d14:    { from: bogotaISO(-13), label: 'últimos 14 días' },
+    d30:    { from: bogotaISO(-29), label: 'últimos 30 días' },
+    d60:    { from: bogotaISO(-59), label: 'últimos 60 días' },
   };
   const r = ranges[stMode] || ranges.hoy;
 
