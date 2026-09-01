@@ -4485,7 +4485,7 @@ document.addEventListener('click', e => {
 
 
 // ═══ TIENDA FÍSICA · visitas + ventas POS + conversión ═══
-let stEntries = [];   // fechas (local_day) de cada entrada
+let stDaily = {};     // day → personas que entraron (total del día)
 let stPos = [];       // { day, orders, gross, units } · POS
 let stOnline = [];    // igual, canal Online Store
 let stMode = 'hoy';
@@ -4500,7 +4500,8 @@ async function loadStoreStats(){
   const kpis = document.getElementById('stKpis');
   if (!kpis) return;
   const from = bogotaISO(-59);
-  const [evRes, posRes, onRes, setRes] = await Promise.all([
+  const [dyRes, evRes, posRes, onRes, setRes] = await Promise.all([
+    supabase.from('store_daily').select('day,visitors').gte('day', from),
     supabase.from('store_events').select('local_day').eq('kind','entry').gte('local_day', from).limit(20000),
     supabase.from('pos_daily').select('day,orders,gross,units').gte('day', from),
     supabase.from('online_daily').select('day,orders,gross,units').gte('day', from),
@@ -4513,7 +4514,11 @@ async function loadStoreStats(){
     if (kpis) kpis.hidden = true;
     return;
   }
-  stEntries = (evRes.data || []).map(r => r.local_day);
+  // Total del día escrito por las chicas; si un día no lo tiene,
+  // vale lo que se haya contado con taps (modelo viejo)
+  stDaily = {};
+  (evRes.data || []).forEach(r => { stDaily[r.local_day] = (stDaily[r.local_day] || 0) + 1; });
+  (dyRes.data || []).forEach(r => { stDaily[r.day] = r.visitors; });
   stPos = posRes.data || [];
   stOnline = onRes.data || [];
   if (setRes.data && setRes.data.counter_token){
@@ -4545,7 +4550,8 @@ function renderStoreStats(){
   };
   const r = ranges[stMode] || ranges.hoy;
 
-  const visitas = stEntries.filter(d => d >= r.from && d <= today).length;
+  const diasVisita = Object.keys(stDaily).filter(d => d >= r.from && d <= today);
+  const visitas = diasVisita.reduce((a,d) => a + stDaily[d], 0);
   const pos = stPos.filter(p => p.day >= r.from && p.day <= today);
   const ordenes = pos.reduce((a,p) => a + (p.orders||0), 0);
   const gross   = pos.reduce((a,p) => a + Number(p.gross||0), 0);
@@ -4554,6 +4560,7 @@ function renderStoreStats(){
   el('stVisitasSub').textContent = r.label;
   el('stVentas').textContent = gross > 0 ? fmtCOP(gross) : (stPos.length ? '$0' : '—');
   el('stVentasSub').textContent = stPos.length ? `${ordenes} venta${ordenes===1?'':'s'} en el POS` : 'esperando datos de Shopify';
+  const hayVisitas = diasVisita.length > 0;
   const conv = visitas > 0 ? (ordenes / visitas) * 100 : null;
   el('stConv').textContent = conv === null ? '—' : (conv >= 10 ? Math.round(conv) : conv.toFixed(1));
   el('stConvSub').textContent = conv === null
