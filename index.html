@@ -4525,7 +4525,7 @@ async function loadStoreStats(){
     const box = document.getElementById('storeLinkBox');
     if (box){
       box.hidden = false;
-      box.dataset.link = `${location.origin}/tienda.html?t=${setRes.data.counter_token}`;
+      box.dataset.link = `https://ops.luxurjeans.com/tienda.html?t=${setRes.data.counter_token}`;
     }
   }
   renderStoreStats();
@@ -4593,11 +4593,22 @@ document.addEventListener('click', e => {
     const box = document.getElementById('storeLinkBox');
     const link = box && box.dataset.link;
     if (!link) return;
-    navigator.clipboard.writeText(link).then(() => {
-      e.target.textContent = '✓ Copiado';
-      e.target.classList.add('copied');
-      setTimeout(() => { e.target.textContent = '📋 Copiar link'; e.target.classList.remove('copied'); }, 2000);
-    });
+    const btn = e.target;
+    const ok = () => {
+      btn.textContent = '✓ Copiado';
+      btn.classList.add('copied');
+      setTimeout(() => { btn.textContent = '📋 Copiar link'; btn.classList.remove('copied'); }, 2000);
+    };
+    // En celular: hoja de compartir directo (WhatsApp). Si no, copiar. Si tampoco, mostrarlo.
+    if (navigator.share){
+      navigator.share({ url: link }).catch(() => {});
+      return;
+    }
+    if (navigator.clipboard && navigator.clipboard.writeText){
+      navigator.clipboard.writeText(link).then(ok).catch(() => prompt('Copia este link para el celular de la tienda:', link));
+    } else {
+      prompt('Copia este link para el celular de la tienda:', link);
+    }
   }
 });
 
