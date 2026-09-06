@@ -4505,7 +4505,7 @@ async function loadStoreStats(){
     supabase.from('store_events').select('local_day').eq('kind','entry').gte('local_day', from).limit(20000),
     supabase.from('pos_daily').select('day,orders,gross,units').gte('day', from),
     supabase.from('online_daily').select('day,orders,gross,units').gte('day', from),
-    supabase.from('store_settings').select('counter_token,store_name').eq('id',1).maybeSingle(),
+    supabase.from('store_settings').select('counter_token,store_name,aforo_code').eq('id',1).maybeSingle(),
   ]);
   const empty = document.getElementById('stEmpty');
   if (evRes.error){
@@ -4519,6 +4519,19 @@ async function loadStoreStats(){
   stDaily = {};
   (evRes.data || []).forEach(r => { stDaily[r.local_day] = (stDaily[r.local_day] || 0) + 1; });
   (dyRes.data || []).forEach(r => { stDaily[r.day] = r.visitors; });
+  // Contador nuevo (extensión Aforo): sus clics mandan en los días que los tienen
+  try {
+    const code = setRes.data && setRes.data.aforo_code;
+    if (code){
+      const { data: hist } = await supabase.rpc('pc_history', { p_code: code, p_days: 90 });
+      const porDia = {};
+      (hist || []).forEach(h => {
+        const dia = new Date(new Date(h.hour).getTime() - 5*3600*1000).toISOString().slice(0,10);
+        porDia[dia] = (porDia[dia] || 0) + Number(h.people || 0);
+      });
+      Object.entries(porDia).forEach(([dia, n]) => { if (n > 0) stDaily[dia] = n; });
+    }
+  } catch(e){ console.warn('aforo:', e); }
   stPos = posRes.data || [];
   stOnline = onRes.data || [];
   if (setRes.data && setRes.data.counter_token){
