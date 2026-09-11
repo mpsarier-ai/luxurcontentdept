@@ -1061,8 +1061,8 @@ header,.hub-header{position:static !important;background:transparent !important;
         <div class="pk-cost"><span class="pk-cost-line" id="stConvSub"></span></div></div>
     </div>
     <div class="supplier-link-box" id="storeLinkBox" hidden>
-      <div class="slb-label">Contador de la tienda</div>
-      <div class="slb-name" id="storeLinkName">Para el celular del punto físico</div>
+      <div class="slb-label">¿Se olvidó un día?</div>
+      <div class="slb-name" id="storeLinkName">Escribir el total a mano — Hoy, Ayer u Otro día</div>
       <button class="slb-copy" id="storeLinkCopy">📋 Copiar link</button>
     </div>
     <div class="empty-state" id="stEmpty" hidden></div>
@@ -4518,8 +4518,7 @@ async function loadStoreStats(){
   // vale lo que se haya contado con taps (modelo viejo)
   stDaily = {};
   (evRes.data || []).forEach(r => { stDaily[r.local_day] = (stDaily[r.local_day] || 0) + 1; });
-  (dyRes.data || []).forEach(r => { stDaily[r.day] = r.visitors; });
-  // Contador nuevo (extensión Aforo): sus clics mandan en los días que los tienen
+  // Clics de la extensión (contador en vivo)
   try {
     const code = setRes.data && setRes.data.aforo_code;
     if (code){
@@ -4532,6 +4531,9 @@ async function loadStoreStats(){
       Object.entries(porDia).forEach(([dia, n]) => { if (n > 0) stDaily[dia] = n; });
     }
   } catch(e){ console.warn('aforo:', e); }
+  // El total escrito a mano MANDA: es la corrección deliberada de un humano
+  // (día olvidado, o clics incompletos)
+  (dyRes.data || []).forEach(r => { stDaily[r.day] = r.visitors; });
   stPos = posRes.data || [];
   stOnline = onRes.data || [];
   if (setRes.data && setRes.data.counter_token){
