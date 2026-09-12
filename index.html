@@ -734,6 +734,7 @@ header,.hub-header{position:static !important;background:transparent !important;
 .st-kpis.on4{grid-template-columns:repeat(4,1fr)}
 @media (max-width:768px){ .st-kpis.on4{grid-template-columns:repeat(2,1fr)} }
 .st-range{display:flex;gap:10px;margin:-6px 0 14px;flex-wrap:wrap}
+.st-range[hidden]{display:none}
 .st-range label{display:flex;flex-direction:column;gap:4px;flex:1;min-width:130px;
   font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:.14em;text-transform:uppercase;color:var(--grey)}
 .st-range input{border:1px solid rgba(0,0,0,.08);background:#fff;border-radius:12px;padding:11px 12px;
@@ -4530,7 +4531,11 @@ document.addEventListener('change', e => {
       from: (document.getElementById('stFrom') || {}).value || '',
       to:   (document.getElementById('stTo')   || {}).value || '',
     };
-    if (stMode === 'custom') renderStoreStats();
+    // Tocar una fecha activa el rango solo, sin depender del chip
+    stMode = 'custom';
+    document.querySelectorAll('.mk-tab[data-st]').forEach(t =>
+      t.classList.toggle('active', t.getAttribute('data-st') === 'custom'));
+    renderStoreStats();
   }
 });
 
