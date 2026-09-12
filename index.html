@@ -743,6 +743,7 @@ header,.hub-header{position:static !important;background:transparent !important;
 .st-chart-hd{display:flex;align-items:baseline;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-bottom:10px}
 .st-chart-t{font-size:14.5px;font-weight:600}
 .st-legend{display:flex;align-items:center;gap:6px;font-size:11.5px;color:var(--grey);font-weight:500}
+.st-legend[hidden]{display:none}
 .st-legend .sw{width:10px;height:10px;border-radius:3px;display:inline-block;margin-left:8px}
 .st-chart-scroll{overflow-x:auto;-webkit-overflow-scrolling:touch}
 #stChart{display:block}
@@ -4525,6 +4526,7 @@ let stPos = [];       // { day, orders, gross, units } · POS
 let stOnline = [];    // igual, canal Online Store
 let stMode = 'hoy';
 let stCustom = { from: '', to: '' };
+let stHourly = {};   // day → hora Bogotá → personas (clics del contador)
 document.addEventListener('change', e => {
   if (e.target && (e.target.id === 'stFrom' || e.target.id === 'stTo')){
     stCustom = {
@@ -4573,9 +4575,14 @@ async function loadStoreStats(){
     if (code){
       const { data: hist } = await supabase.rpc('pc_history', { p_code: code, p_days: 90 });
       const porDia = {};
+      stHourly = {};
       (hist || []).forEach(h => {
-        const dia = new Date(new Date(h.hour).getTime() - 5*3600*1000).toISOString().slice(0,10);
+        const bog = new Date(new Date(h.hour).getTime() - 5*3600*1000);
+        const dia = bog.toISOString().slice(0,10);
+        const hora = bog.getUTCHours();
         porDia[dia] = (porDia[dia] || 0) + Number(h.people || 0);
+        if (!stHourly[dia]) stHourly[dia] = {};
+        stHourly[dia][hora] = (stHourly[dia][hora] || 0) + Number(h.people || 0);
       });
       Object.entries(porDia).forEach(([dia, n]) => { if (n > 0) stDaily[dia] = n; });
     }
@@ -4657,10 +4664,122 @@ function renderStoreStats(){
   renderStoreChart(r.from, hasta);
 }
 
+// ─── Un solo día: personas por hora (clics del contador) ───
+function renderStoreHourChart(day){
+  const svg = document.getElementById('stChart');
+  const ns = 'http://www.w3.org/2000/svg';
+  const scroll = document.getElementById('stChartScroll');
+  const visW = (scroll && scroll.clientWidth) ? scroll.clientWidth : 320;
+  const H = 190, padT = 12, padB = 24, plotH = H - padT - padB;
+  svg.setAttribute('width', visW); svg.setAttribute('height', H);
+  svg.innerHTML = '';
+  const tb = document.getElementById('stTable');
+
+  const horas = stHourly[day];
+  if (!horas || !Object.keys(horas).length){
+    const total = stDaily[day] || 0;
+    const t = document.createElementNS(ns, 'text');
+    t.setAttribute('x', visW/2); t.setAttribute('y', H/2 - 8);
+    t.setAttribute('text-anchor','middle');
+    t.setAttribute('style','font:300 13px Outfit,sans-serif;fill:#7a7570');
+    t.textContent = total > 0 ? `${total} personas ese día (total escrito a mano)` : 'Sin registros ese día.';
+    svg.appendChild(t);
+    const t2 = document.createElementNS(ns, 'text');
+    t2.setAttribute('x', visW/2); t2.setAttribute('y', H/2 + 12);
+    t2.setAttribute('text-anchor','middle');
+    t2.setAttribute('style','font:300 11px Outfit,sans-serif;fill:#9a948e');
+    t2.textContent = 'El desglose por hora sale de los clics del contador.';
+    svg.appendChild(t2);
+    if (tb) tb.innerHTML = '';
+    return;
+  }
+
+  const hs = Object.keys(horas).map(Number);
+  const h0 = Math.min(9, ...hs), h1 = Math.max(20, ...hs);
+  const serie = [];
+  for (let h = h0; h <= h1; h++) serie.push({ h, n: horas[h] || 0 });
+  const maxV = Math.max(1, ...serie.map(x => x.n));
+  const step = visW / serie.length;
+  const yOf = v => padT + plotH - (v / maxV) * plotH;
+  const hLbl = h => h === 12 ? '12 pm' : (h < 12 ? `${h} am` : `${h-12} pm`);
+
+  [0, maxV].forEach(v => {
+    const l = document.createElementNS(ns, 'line');
+    l.setAttribute('x1', 0); l.setAttribute('x2', visW);
+    l.setAttribute('y1', yOf(v)); l.setAttribute('y2', yOf(v));
+    l.setAttribute('stroke', 'rgba(0,0,0,.06)');
+    svg.appendChild(l);
+  });
+
+  const barW = Math.max(6, Math.round(step * 0.55));
+  serie.forEach((x, i) => {
+    if (!x.n) return;
+    const h = Math.max(2, (x.n / maxV) * plotH);
+    const bx = i*step + (step - barW)/2, by = padT + plotH, rr = Math.min(3, barW/2);
+    const rect = document.createElementNS(ns, 'path');
+    rect.setAttribute('d', `M${bx},${by} L${bx},${by-h+rr} Q${bx},${by-h} ${bx+rr},${by-h} L${bx+barW-rr},${by-h} Q${bx+barW},${by-h} ${bx+barW},${by-h+rr} L${bx+barW},${by} Z`);
+    rect.setAttribute('fill', '#c25a72');
+    svg.appendChild(rect);
+    // etiqueta directa solo en la hora pico
+    if (x.n === maxV){
+      const t = document.createElementNS(ns, 'text');
+      t.setAttribute('x', i*step + step/2); t.setAttribute('y', yOf(x.n) - 4);
+      t.setAttribute('text-anchor', 'middle');
+      t.setAttribute('style', "font:600 10px 'JetBrains Mono',monospace;fill:#7a7570;paint-order:stroke;stroke:#fff;stroke-width:3px");
+      t.textContent = x.n;
+      svg.appendChild(t);
+    }
+  });
+
+  serie.forEach((x, i) => {
+    if (i % 2 !== 0) return;
+    const t = document.createElementNS(ns, 'text');
+    t.setAttribute('x', i*step + step/2); t.setAttribute('y', H - 8);
+    t.setAttribute('text-anchor', 'middle');
+    t.setAttribute('style', "font:500 9px 'JetBrains Mono',monospace;fill:#9a948e");
+    t.textContent = hLbl(x.h);
+    svg.appendChild(t);
+  });
+
+  const tip = document.getElementById('stTip');
+  serie.forEach((x, i) => {
+    const hit = document.createElementNS(ns, 'rect');
+    hit.setAttribute('x', i*step); hit.setAttribute('y', 0);
+    hit.setAttribute('width', step); hit.setAttribute('height', H);
+    hit.setAttribute('fill', 'transparent');
+    hit.addEventListener('mouseenter', () => {
+      if (!tip) return;
+      tip.innerHTML = `<b>${hLbl(x.h)}</b><br>${x.n} persona${x.n===1?'':'s'}`;
+      tip.hidden = false;
+      const card = tip.parentElement.getBoundingClientRect();
+      tip.style.left = Math.max(8, Math.min(i*step + step/2 + 16, card.width - 120)) + 'px';
+      tip.style.top = '44px';
+    });
+    hit.addEventListener('mouseleave', () => { if (tip) tip.hidden = true; });
+    svg.appendChild(hit);
+  });
+
+  if (tb){
+    tb.innerHTML = '<table><thead><tr><th>Hora</th><th>Personas</th></tr></thead><tbody>' +
+      serie.filter(x => x.n).map(x => `<tr><td>${hLbl(x.h)}</td><td>${x.n}</td></tr>`).join('') +
+      '</tbody></table>';
+  }
+}
+
 // ─── Gráfico: tráfico (barras) vs ventas POS (línea) · misma escala de conteo ───
 function renderStoreChart(from, to){
   const svg = document.getElementById('stChart');
   if (!svg) return;
+  const title = document.querySelector('.st-chart-t');
+  const legend = document.querySelector('.st-legend');
+  if (from === to){
+    if (title) title.textContent = `Tráfico por hora · ${rtFmtD(from)}`;
+    if (legend) legend.hidden = true;
+    renderStoreHourChart(from);
+    return;
+  }
+  if (title) title.textContent = 'Tráfico vs ventas por día';
+  if (legend) legend.hidden = false;
   // días del rango (máx 92 para que siga legible)
   const days = [];
   {
