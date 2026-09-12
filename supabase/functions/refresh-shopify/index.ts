@@ -90,6 +90,21 @@ async function fetchOrders(token: string, sinceISO: string) {
   return orders;
 }
 
+// Sesiones de la tienda online por día (ShopifyQL). Si la API no lo permite
+// con este token, devuelve vacío y la conversión web queda en "—".
+async function fetchSessions(token: string): Promise<Record<string, number>> {
+  const { rows, err } = await runShopifyQL(token,
+    `FROM sessions SHOW sessions TIMESERIES day SINCE -60d UNTIL today`);
+  if (err) { console.error("sessions:", err); return {}; }
+  const out: Record<string, number> = {};
+  for (const r of rows) {
+    const day = String(r.day ?? "").slice(0, 10);
+    const n = parseInt(String(r.sessions ?? ""), 10);
+    if (/^\d{4}-\d{2}-\d{2}$/.test(day) && !isNaN(n)) out[day] = n;
+  }
+  return out;
+}
+
 async function getInventory(token: string, productGid: string) {
   const data: any = await shopifyGQL(token, `
     query($id: ID!) {
@@ -203,18 +218,18 @@ async function runShopifyQL(token: string, q: string): Promise<{ rows: any[]; er
     const data: any = await shopifyGQL(token, `
       query RunQL($q: String!) {
         shopifyqlQuery(query: $q) {
-          parseErrors { message code }
-          tableData { columns { name dataType } rowData }
+          parseErrors
+          tableData { columns { name dataType } rows }
         }
       }
     `, { q });
     const res = data?.shopifyqlQuery;
     if (!res) return { rows: [], err: "no_response" };
     if (res.parseErrors && res.parseErrors.length) {
-      return { rows: [], err: res.parseErrors.map((p: any) => p.message || p.code).join('; ') };
+      return { rows: [], err: res.parseErrors.join('; ') };
     }
     const cols: { name: string }[] = res.tableData?.columns || [];
-    const rowData: any[] = res.tableData?.rowData || [];
+    const rowData: any[] = res.tableData?.rows || [];
     const rows = rowData.map((row: any) => {
       // rowData puede venir como array (posicional) u objeto (keyed)
       if (Array.isArray(row)) {
@@ -336,10 +351,16 @@ async function handler(_req: Request): Promise<Response> {
         map[day].units += o.lineItems.reduce((a, li) => a + li.quantity, 0);
       }
       const posDays = Object.entries(posMap).map(([day, v]) => ({ day, ...v }));
-      const webDays = Object.entries(webMap).map(([day, v]) => ({ day, ...v }));
+      const sessions = await fetchSessions(shopifyToken);
+      const webAll = new Set([...Object.keys(webMap), ...Object.keys(sessions)]);
+      const webDays = [...webAll].map((day) => ({
+        day,
+        ...(webMap[day] || { orders: 0, gross: 0, units: 0 }),
+        sessions: sessions[day] ?? null,
+      }));
       if (posDays.length) await rpcCall("rpc_update_pos_daily", { p_days: posDays });
       if (webDays.length) await rpcCall("rpc_update_online_daily", { p_days: webDays });
-      console.log(`POS: ${posDays.length} días · Online: ${webDays.length} días`);
+      console.log(`POS: ${posDays.length} días · Online: ${webDays.length} días · Sesiones: ${Object.keys(sessions).length} días`);
     } catch (err) {
       // Si las tablas aún no existen, el resto del refresh sigue normal
       console.error("canal_daily:", (err as Error).message);
