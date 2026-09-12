@@ -4630,12 +4630,17 @@ function renderStoreStats(){
   el('stVisitasSub').textContent = r.label;
   el('stVentas').textContent = gross > 0 ? fmtCOP(gross) : (stPos.length ? '$0' : '—');
   el('stVentasSub').textContent = stPos.length ? `${ordenes} venta${ordenes===1?'':'s'} en el POS` : 'esperando datos de Shopify';
-  const hayVisitas = diasVisita.length > 0;
-  const conv = visitas > 0 ? (ordenes / visitas) * 100 : null;
+  // Conversión honesta: solo cuentan los días que tienen AMBOS datos
+  // (si faltan conteos, dividir todas las ventas entre pocas visitas infla el %)
+  const setConteo = new Set(diasVisita);
+  const ordenesPareadas = pos.filter(p => setConteo.has(p.day)).reduce((a,p) => a + (p.orders||0), 0);
+  const conv = visitas > 0 ? (ordenesPareadas / visitas) * 100 : null;
   el('stConv').textContent = conv === null ? '—' : (conv >= 10 ? Math.round(conv) : conv.toFixed(1));
+  const totalDias = Math.max(1, Math.round((new Date(hasta) - new Date(r.from)) / 86400000) + 1);
   el('stConvSub').textContent = conv === null
     ? 'aún sin visitas registradas'
-    : `${ordenes} de ${visitas} personas compraron`;
+    : `${ordenesPareadas} de ${visitas} personas` +
+      (diasVisita.length < totalDias ? ` · solo ${diasVisita.length} de ${totalDias} días con conteo` : ' compraron');
 
   // Tienda online — se cuenta sola desde Shopify
   const on = stOnline.filter(p => p.day >= r.from && p.day <= hasta);
@@ -4650,12 +4655,14 @@ function renderStoreStats(){
   el('onTicket').textContent = onOrd > 0 ? fmtCOP(onGross / onOrd) : '—';
   el('onTicketSub').textContent = onOrd > 0 ? 'por venta' : '';
 
-  // Conversión web = ventas online / sesiones de la tienda online
-  const sesiones = on.reduce((a,p) => a + (p.sessions || 0), 0);
+  // Conversión web = ventas online / sesiones — solo días que tienen sesiones
+  const conSes = on.filter(p => p.sessions != null);
+  const sesiones = conSes.reduce((a,p) => a + p.sessions, 0);
+  const onOrdPareadas = conSes.reduce((a,p) => a + (p.orders||0), 0);
   if (sesiones > 0){
-    const wconv = (onOrd / sesiones) * 100;
+    const wconv = (onOrdPareadas / sesiones) * 100;
     el('onConv').textContent = wconv >= 10 ? Math.round(wconv) : wconv.toFixed(1);
-    el('onConvSub').textContent = `${onOrd} de ${sesiones.toLocaleString('es-CO')} sesiones`;
+    el('onConvSub').textContent = `${onOrdPareadas} de ${sesiones.toLocaleString('es-CO')} sesiones`;
   } else {
     el('onConv').textContent = '—';
     el('onConvSub').textContent = 'esperando sesiones de Shopify';
