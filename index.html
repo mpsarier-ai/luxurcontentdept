@@ -873,6 +873,8 @@ header,.hub-header{position:static !important;background:transparent !important;
 .brief-chip.pendiente{background:rgba(255,159,10,.15);color:#c07000}
 .brief-chip.listo{background:rgba(52,199,89,.15);color:#1e7b34}
 .brief-chip.aprobado{background:rgba(212,132,142,.18);color:#a8515c}
+.brief-chip.urgente{background:rgba(184,80,74,.14);color:#8f2f2a}
+.brief-chip.frio{background:rgba(74,111,138,.14);color:#35566e}
 .brief-arrow{color:#c7c7cc;font-size:16px;flex-shrink:0}
 .brief-thumb{width:36px;height:46px;border-radius:8px;object-fit:cover;flex-shrink:0;background:#f2f2f0}
 .brief-empty{padding:18px 16px;color:#8e8e93;font-size:14px;text-align:center}
@@ -1776,34 +1778,71 @@ function renderBriefAlerts(){
   renderBriefLaunches();
   const el = document.getElementById('briefAlerts');
   if (!el) return;
-  const rows = [];
   const nowStr = new Date(Date.now()-5*60*60*1000).toISOString().slice(0,10);
   const in7 = new Date(Date.now()-5*60*60*1000+7*86400000).toISOString().slice(0,10);
-  // Inventario crítico (mismo criterio que Fashionalytics)
-  const jeans = (catalog||[]).filter(p => (p.title||'').toUpperCase().startsWith('JEAN'));
-  const u30of = p => p.units30d_native ?? p.units30d_manual ?? p.units30d ?? 0;
-  const meds = jeans.map(u30of).filter(v => v > 0).sort((a,b) => a-b);
-  const med = meds.length ? meds[Math.floor(meds.length/2)] : 5;
-  const MIN = Math.max(5, Math.round(med*0.4));
-  jeans.filter(p => (p.total??0) <= 0 && u30of(p) >= MIN).slice(0,2)
-    .forEach(p => rows.push({ ico:'🚨', t:`${shortNameFa(p.title)} agotado`, s:`vendía ${u30of(p)}u/mes · restock ya`, go:'fashionalytics' }));
-  jeans.filter(p => (p.total??0) > 0 && (p.total??0) <= 5 && u30of(p) >= MIN).slice(0,2)
-    .forEach(p => rows.push({ ico:'🔥', t:`${shortNameFa(p.title)} casi agotado`, s:`quedan ${p.total}u`, go:'fashionalytics' }));
-  // Producción: llegadas de la semana + atrasados
-  const pending = e => !(e.stage === 'entrega' || e.status === 'llego');
   const fmtD = iso => { const p = iso.split('-'); return `${parseInt(p[2])} ${MONTH_ABBR[parseInt(p[1])-1]}`; };
-  (pipeline||[]).filter(e => !e.batch_id && pending(e) && e.tentative_date && e.tentative_date >= nowStr && e.tentative_date <= in7).slice(0,2)
-    .forEach(e => rows.push({ ico:'🚚', t:`Llega ${e.product_name}`, s:`${fmtD(e.tentative_date)}${e.quantity ? ' · '+e.quantity+'u' : ''}`, go:'produccion' }));
-  (batches||[]).filter(b => b.tentative_date && b.tentative_date >= nowStr && b.tentative_date <= in7).slice(0,2)
-    .forEach(b => rows.push({ ico:'🚚', t:`Llega lote ${b.name}`, s:`${fmtD(b.tentative_date)}${b.total_quantity ? ' · '+b.total_quantity+'u' : ''}`, go:'produccion' }));
-  (pipeline||[]).filter(e => !e.batch_id && pending(e) && e.tentative_date && e.tentative_date < nowStr).slice(0,2)
-    .forEach(e => rows.push({ ico:'⚠️', t:`${e.product_name} atrasado`, s:`era para ${fmtD(e.tentative_date)}`, go:'produccion' }));
-  if (!rows.length){ el.innerHTML = '<div class="brief-empty done">✓ Todo en orden</div>'; }
+
+  // Mismo análisis que el dashboard de referencias (faAnalyze + guards), para
+  // que Inicio y Analytics nunca se contradigan. Solo jeans, como el dashboard.
+  const isJean = t => /^JEAN[\s·\-]/i.test((t || '').trim());
+  const analyzed = (catalog || [])
+    .filter(p => isJean(p.title) && ((p.total ?? 0) !== 0 || (p.units30d_native ?? p.units30d ?? p.units7d ?? p.orders7d ?? 0) > 0))
+    .map(p => ({ p, a: faAnalyze(p) }));
+  const u30s = analyzed.map(x => x.a.u30).filter(v => v > 0).sort((a,b) => a-b);
+  const medianU30 = u30s.length ? u30s[Math.floor(u30s.length/2)] : 5;
+  analyzed.forEach(x => faRefineUrgency(x.a, medianU30));
+
+  // Cada regla produce filas con prioridad; se muestran las 8 más urgentes.
+  // prio: 0 roto · 1 restock sin pedir · 2 atrasado · 3 llega · 4 restock ya pedido
+  //       5 quiebre de talla · 6 cayendo · 7 push · 8 congelado · 9 liquidar
+  const rows = [];
+  const row = (prio, chip, chipCls, p, t, s, go) => rows.push({ prio, chip, chipCls, img: p ? (p.image || null) : null, t, s, go });
+  const weeksOf = a => a.u30 > 0 ? a.stock / (a.u30 / 4.3) : null;
+  const wkTxt = a => { const w = weeksOf(a); return w == null ? '' : w < 1 ? ' · menos de una semana de stock' : ` · ${Math.round(w)} sem de stock`; };
+
+  for (const { p, a } of analyzed){
+    const name = shortNameFa(p.title);
+    const incoming = faFindActive(p);   // ¿ya viene restock o lote?
+    const inTxt = incoming ? (incoming.entry?.tentative_date ? `ya viene · llega ${fmtD(incoming.entry.tentative_date)}` : 'ya viene un lote') : null;
+    if (a.brokenInv){
+      row(0, 'Corregir', 'urgente', p, `${name} con inventario roto`, 'stock negativo doble contado · corregir en Shopify', 'fashionalytics');
+    } else if (a.cat === 'r1'){
+      if (incoming) row(4, 'Restock', 'listo', p, `${name}${a.stockReal <= 0 ? ' agotado' : ' casi agotado'}`, `vendía ${a.u30}u/mes · ${inTxt}`, 'produccion');
+      else row(1, 'Restock', 'urgente', p, `${name}${a.stockReal <= 0 ? ' agotado' : ' se agota'}`, `vendía ${a.u30}u/mes${a.stockReal > 0 ? ' · quedan ' + a.stock + 'u' : ''}${wkTxt(a)} · restock ya`, 'fashionalytics');
+    } else if (a.cat === 'r2' || a.cat === 'r3'){
+      const sizes = a.brokenSizes.map(v => v.size).join('/');
+      row(5, 'Tallas', 'pendiente', p, sizes ? `${name} sin ${sizes}` : `${name} planear restock`, `ST ${a.st}% · ${a.u30}u/mes${incoming ? ' · ' + inTxt : wkTxt(a)}`, incoming ? 'produccion' : 'fashionalytics');
+    } else if (a.cat === 'push'){
+      row(7, 'Push', 'aprobado', p, `${name} arranca lento`, `nuevo (${a.age}d) · ${a.u30}u en 30d · pauta y contenido`, 'marketing');
+    } else if (a.cat === 'sobre'){
+      row(8, 'Congelado', 'frio', p, `${name} congelado`, `${a.stock}u sin moverse · ${a.u30}u/mes${a.cob > 99 ? '' : ' · cobertura ' + a.cob.toFixed(1) + ' meses'}`, 'fashionalytics');
+    } else if (a.cat === 'liquidar'){
+      row(9, 'Liquidar', 'frio', p, `${name} no se mueve`, `${a.age}d en tienda · ${a.u30}u en 30d · ${a.stock}u en stock`, 'fashionalytics');
+    } else if (a.trend7 <= -50 && a.u30 >= Math.max(5, medianU30 * 0.6) && (a.u7 || 0) <= 2){
+      row(6, 'Cayendo', 'pendiente', p, `${name} se enfrió`, `vendía ${a.u30}u/mes · ${a.u7 || 0}u esta semana · revisar contenido`, 'marketing');
+    }
+  }
+
+  // Producción: atrasados y llegadas de la semana, con la foto del catálogo
+  const pending = e => !(e.stage === 'entrega' || e.status === 'llego');
+  const photoOf = e => ({ image: findCatalogPhoto(e.product_name || e.name, e.product_gid) });
+  (pipeline||[]).filter(e => !e.batch_id && pending(e) && e.tentative_date && e.tentative_date < nowStr)
+    .forEach(e => row(2, 'Atrasado', 'urgente', photoOf(e), `${e.product_name} atrasado`, `era para ${fmtD(e.tentative_date)}${e.quantity ? ' · '+e.quantity+'u' : ''}`, 'produccion'));
+  (pipeline||[]).filter(e => !e.batch_id && pending(e) && e.tentative_date && e.tentative_date >= nowStr && e.tentative_date <= in7)
+    .forEach(e => row(3, 'Llega', 'listo', photoOf(e), `Llega ${e.product_name}`, `${fmtD(e.tentative_date)}${e.quantity ? ' · '+e.quantity+'u' : ''}`, 'produccion'));
+  (batches||[]).filter(b => b.tentative_date && b.tentative_date >= nowStr && b.tentative_date <= in7)
+    .forEach(b => row(3, 'Llega', 'listo', photoOf(b), `Llega lote ${b.name}`, `${fmtD(b.tentative_date)}${b.total_quantity ? ' · '+b.total_quantity+'u' : ''}`, 'produccion'));
+
+  rows.sort((x, y) => x.prio - y.prio);
+  // Máximo 2 por regla para que una sola categoría no tape las demás
+  const perPrio = {}; const shown = rows.filter(r => (perPrio[r.prio] = (perPrio[r.prio] || 0) + 1) <= 2).slice(0, 8);
+
+  if (!shown.length){ el.innerHTML = '<div class="brief-empty done">✓ Todo en orden</div>'; }
   else {
-    el.innerHTML = rows.slice(0,6).map(r => `<button class="brief-row" data-brief-go="${r.go}">
-      <span class="brief-ico">${r.ico}</span>
+    el.innerHTML = shown.map(r => `<button class="brief-row" data-brief-go="${r.go}">
+      ${r.img ? `<img class="brief-thumb" src="${escapeHtml(r.img)}" alt="" loading="lazy">` : `<span class="brief-ico">${r.chipCls === 'urgente' ? '🚨' : r.chipCls === 'frio' ? '🧊' : r.chip === 'Llega' ? '🚚' : '•'}</span>`}
       <span class="brief-body"><span class="brief-row-title">${escapeHtml(r.t)}</span><span class="brief-row-sub">${escapeHtml(r.s)}</span></span>
-      <span class="brief-arrow">›</span></button>`).join('');
+      <span class="brief-chip ${r.chipCls}">${r.chip}</span></button>`).join('');
     el.querySelectorAll('[data-brief-go]').forEach(b => b.addEventListener('click', () => showHubSection(b.getAttribute('data-brief-go'))));
   }
   renderBriefPayments();
