@@ -875,6 +875,26 @@ header,.hub-header{position:static !important;background:transparent !important;
 .brief-chip.aprobado{background:rgba(212,132,142,.18);color:#a8515c}
 .brief-chip.urgente{background:rgba(184,80,74,.14);color:#8f2f2a}
 .brief-chip.frio{background:rgba(74,111,138,.14);color:#35566e}
+.env-kpis{grid-template-columns:repeat(4,1fr)}
+@media (max-width:520px){.env-kpis{grid-template-columns:repeat(2,1fr)}}
+.env-list{display:flex;flex-direction:column;gap:10px;margin-bottom:40px}
+.env-row{background:#fff;border-radius:16px;padding:14px 16px;box-shadow:0 1px 3px rgba(0,0,0,.05);border-left:4px solid var(--cream-dark);display:grid;grid-template-columns:auto 1fr auto;gap:12px;align-items:center;cursor:pointer}
+.env-row.bad{border-left-color:var(--red-out)}.env-row.warn{border-left-color:var(--yellow-low)}.env-row.ok{border-left-color:var(--green-ok)}
+.env-ph{width:44px;height:56px;border-radius:10px;object-fit:cover;background:#f2f2f0;flex:none}
+.env-t{font-size:15px;font-weight:600;line-height:1.25;display:flex;gap:8px;align-items:baseline;flex-wrap:wrap}
+.env-t small{font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--grey);font-weight:500;letter-spacing:.04em}
+.env-s{font-size:12.5px;color:#555;margin-top:2px;line-height:1.35}
+.env-why{font-size:12.5px;margin-top:4px;font-weight:500}
+.env-row.bad .env-why{color:#8f2f2a}.env-row.warn .env-why{color:#7a5e00}.env-row.ok .env-why{color:#1e7b34}
+.env-days{font-family:'Cormorant Garamond',serif;font-weight:700;font-size:26px;line-height:1;text-align:right}
+.env-days small{display:block;font-family:'JetBrains Mono',monospace;font-size:8.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--grey);font-weight:500;margin-top:3px}
+.env-detail{grid-column:1/-1;display:none;padding-top:10px;margin-top:6px;border-top:1px dashed rgba(0,0,0,.06)}
+.env-row.open .env-detail{display:block}
+.env-ev{display:grid;grid-template-columns:96px 1fr;gap:8px;font-size:12px;padding:3px 0;color:#444}
+.env-ev .d{font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--grey)}
+.env-ev.inc{color:#8f2f2a;font-weight:500}
+.env-acts{display:flex;gap:6px;margin-top:10px;flex-wrap:wrap}
+.env-acts .av-btn{flex:none}
 .av-intro{font-size:13px;color:var(--grey);margin:-14px 0 14px;line-height:1.45}
 .av-intro b{color:var(--black);font-weight:500}
 .dm-funnel{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:16px}
@@ -1157,11 +1177,26 @@ header,.hub-header{position:static !important;background:transparent !important;
   </section>
 </div>
 
+  <!-- ENVÍOS · logística: novedades, demorados, sin despachar -->
+  <section id="hubEnvios" class="hub-section" hidden>
+    <button class="hub-back" data-hub-back>Inicio</button>
+    <h2 class="section-title"><span>Envíos</span><span class="meta" id="envMeta">—</span></h2>
+    <div class="prod-kpis env-kpis" id="envKpis"></div>
+    <div class="mk-tabs" id="envTabs">
+      <button class="mk-tab active" data-env="atencion">Necesitan atención</button>
+      <button class="mk-tab" data-env="camino">En camino</button>
+      <button class="mk-tab" data-env="despachar">Sin despachar</button>
+      <button class="mk-tab" data-env="entregados">Entregados</button>
+    </div>
+    <div class="env-list" id="envList"><div class="empty-state">Cargando…</div></div>
+  </section>
+
 <!-- TAB BAR estilo WhatsApp · navegación principal del hub -->
 <nav class="hub-tabbar" id="hubTabbar">
   <button class="ht-tab active" data-ht="home"><span class="vt-ico">🏠</span><span class="vt-lbl">Inicio</span></button>
   <button class="ht-tab" data-ht="marketing"><span class="vt-ico">📅</span><span class="vt-lbl">Marketing</span></button>
   <button class="ht-tab" data-ht="produccion"><span class="vt-ico">🚚</span><span class="vt-lbl">Producción</span></button>
+  <button class="ht-tab" data-ht="envios"><span class="vt-ico">📦</span><span class="vt-lbl">Envíos</span></button>
   <button class="ht-tab" data-ht="fashionalytics"><span class="vt-ico">📊</span><span class="vt-lbl">Analytics</span></button>
 </nav>
 
@@ -1613,6 +1648,8 @@ let avisame = [];   // avisame_requests: demanda sin stock, desde los tags de Sh
 let intent = [];    // product_intent: sesiones, carrito, checkout y compra por producto (30d)
 let funnel = [];    // store_funnel_daily: embudo diario de la tienda
 let searches = [];  // store_searches: qué buscan en la tienda y si encontraron
+let shipments = []; // shipments: logística, un renglón por pedido con envío
+let envTab = 'atencion';
 let dmTab = 'sin-stock';
 
 // Alias de emails: alguien puede loguearse con un correo distinto al que
@@ -1940,6 +1977,100 @@ async function markAvisameNotified(handle){
   renderAvisame(); try { renderBriefAlerts(); } catch(_) {}
 }
 
+// === Envíos · logística ===
+// refresh-logistics fusiona Shopify + Envíoclick en `shipments`. Aquí solo se
+// clasifica: qué necesita a alguien hoy, qué va bien, qué falta despachar.
+const ENV_STEP = { '-2': 'Cancelado', '-1': 'Novedad', 0: 'Sin despachar', 1: 'Preparando', 2: 'En camino', 3: 'En reparto', 4: 'Entregado', 5: 'Devuelto' };
+async function loadShipments(){
+  const { data, error } = await supabase.from('shipments').select('*').order('last_event_at', { ascending: false });
+  if (error){ console.warn('shipments:', error.message); return; }
+  shipments = data || [];
+  renderShipments();
+  try { renderBriefAlerts(); } catch(_) {}
+}
+function daysSince(iso){ return iso ? Math.max(0, Math.floor((Date.now() - new Date(iso).getTime()) / 86400000)) : null; }
+// Clasificación: tone (bad/warn/ok/'') + motivo en palabras + días que importan
+function shipmentIssue(sh){
+  const now = Date.now();
+  const sinceOrder = daysSince(sh.order_created_at), sinceShip = daysSince(sh.fulfilled_at), sinceEvent = daysSince(sh.last_event_at);
+  const open = sh.step >= 0 && sh.step < 4;
+  if (sh.resolved_at && sh.incidence) return { tone: 'warn', why: `Novedad en gestión${sh.resolved_note ? ': ' + sh.resolved_note : ''}`, days: sinceEvent, dl: 'días' };
+  if (sh.step === -1 || sh.incidence) return { tone: 'bad', why: `Novedad: ${sh.incidence_type || sh.status_label || 'transportadora reporta problema'}`, days: sinceEvent, dl: 'días' };
+  if (sh.step === 5) return { tone: 'bad', why: 'Devuelto a origen', days: sinceEvent, dl: 'días' };
+  if (sh.step === 0 && sinceOrder >= 2) return { tone: sinceOrder >= 4 ? 'bad' : 'warn', why: `Pagado hace ${sinceOrder} días y sin despachar`, days: sinceOrder, dl: 'sin despachar' };
+  if (sh.step === 0) return { tone: '', why: 'Pagado, pendiente de despacho', days: sinceOrder, dl: 'días' };
+  if (open && sh.eta && new Date(sh.eta).getTime() < now - 86400000) return { tone: 'bad', why: `Pasó la fecha estimada (${rtFmtD(sh.eta.slice(0,10))}) y no ha llegado`, days: sinceShip, dl: 'en camino' };
+  if (open && sinceEvent >= 3) return { tone: 'bad', why: `Sin movimiento hace ${sinceEvent} días`, days: sinceShip, dl: 'en camino' };
+  if (open && sinceShip >= 6) return { tone: 'warn', why: `${sinceShip} días en camino: más de lo normal`, days: sinceShip, dl: 'en camino' };
+  if (open && sh.is_local && sinceShip >= 1) return { tone: 'warn', why: `Mensajero local: salió hace ${sinceShip} día${sinceShip === 1 ? '' : 's'} y no está marcado entregado`, days: sinceShip, dl: 'en camino' };
+  if (sh.step === 4) return { tone: 'ok', why: `Entregado${sh.delivered_at ? ' el ' + rtFmtD(sh.delivered_at.slice(0,10)) : ''}`, days: sinceShip, dl: 'días de viaje' };
+  return { tone: '', why: sh.status_label || ENV_STEP[sh.step], days: sinceShip, dl: 'en camino' };
+}
+function renderShipments(){
+  const el = document.getElementById('envList'), meta = document.getElementById('envMeta'), kp = document.getElementById('envKpis');
+  if (!el) return;
+  const rows = (shipments || []).map(sh => ({ sh, i: shipmentIssue(sh) }));
+  const open = rows.filter(r => r.sh.step >= 0 && r.sh.step < 4);
+  const attention = rows.filter(r => r.i.tone === 'bad' || r.i.tone === 'warn');
+  const delivered7 = rows.filter(r => r.sh.step === 4);
+  const avgDays = delivered7.filter(r => r.sh.fulfilled_at && r.sh.delivered_at).map(r => (new Date(r.sh.delivered_at) - new Date(r.sh.fulfilled_at)) / 86400000);
+  const avg = avgDays.length ? (avgDays.reduce((a,b) => a+b, 0) / avgDays.length) : null;
+  if (meta) meta.textContent = shipments.length ? `actualizado ${rtFmtD(new Date(Math.max(...shipments.map(s => new Date(s.updated_at)))).toISOString().slice(0,10))}` : '—';
+  if (kp) kp.innerHTML = [
+    ['Necesitan atención', attention.length, attention.filter(r => r.i.tone === 'bad').length + ' urgentes', attention.length ? 'bad' : ''],
+    ['En camino', open.filter(r => r.sh.step >= 1).length, open.filter(r => r.sh.step === 3).length + ' en reparto', ''],
+    ['Sin despachar', open.filter(r => r.sh.step === 0).length, 'pagados sin guía', open.filter(r => r.sh.step === 0 && daysSince(r.sh.order_created_at) >= 2).length ? 'warn' : ''],
+    ['Entregados · 7d', delivered7.length, avg != null ? avg.toFixed(1).replace('.', ',') + ' días promedio' : 'sin datos de viaje', 'ok'],
+  ].map(([l, v, sub, tone]) => `<div class="prod-kpi" style="border-top-color:${tone === 'bad' ? 'var(--red-out)' : tone === 'warn' ? 'var(--yellow-low)' : tone === 'ok' ? 'var(--green-ok)' : 'transparent'}"><div class="pk-label">${l}</div><div class="pk-num">${v}</div><div class="pk-cost"><span class="pk-cost-line">${sub}</span></div></div>`).join('');
+
+  let list;
+  if (envTab === 'camino') list = open.filter(r => r.sh.step >= 1 && r.i.tone !== 'bad');
+  else if (envTab === 'despachar') list = open.filter(r => r.sh.step === 0);
+  else if (envTab === 'entregados') list = delivered7;
+  else list = attention;
+  list.sort((a, b) => (a.i.tone === 'bad' ? 0 : a.i.tone === 'warn' ? 1 : 2) - (b.i.tone === 'bad' ? 0 : b.i.tone === 'warn' ? 1 : 2) || (b.i.days || 0) - (a.i.days || 0));
+  if (!list.length){ el.innerHTML = `<div class="fa-empty">${envTab === 'atencion' ? '✓ Ningún envío necesita atención' : 'Nada aquí por ahora'}</div>`; return; }
+  const num = n => (n || '').replace('#', '');
+  el.innerHTML = list.map(({ sh, i }) => {
+    const item = (sh.items || [])[0];
+    const evs = [...(sh.events || [])].reverse().slice(0, 8);
+    return `<div class="env-row ${i.tone}" data-env-row="${escapeHtml(sh.order_name)}">
+      ${item?.image ? `<img class="env-ph" src="${escapeHtml(item.image)}" alt="" loading="lazy">` : '<span class="env-ph"></span>'}
+      <div style="min-width:0">
+        <div class="env-t">${escapeHtml(sh.customer_name || 'Sin nombre')} <small>${escapeHtml(sh.order_name)}${sh.city ? ' · ' + escapeHtml(sh.city) : ''}</small></div>
+        <div class="env-s">${(sh.items || []).map(x => escapeHtml(shortNameFa(x.title)) + (x.size ? ' ' + escapeHtml(x.size) : '')).join(' · ')}${sh.carrier ? ' · ' + escapeHtml(sh.carrier) : sh.is_local ? ' · mensajero local' : ''}</div>
+        <div class="env-why">${escapeHtml(i.why)}</div>
+      </div>
+      <div class="env-days">${i.days ?? '—'}<small>${i.dl}</small></div>
+      <div class="env-detail">
+        ${evs.length ? evs.map(e => `<div class="env-ev ${e.incidence ? 'inc' : ''}"><span class="d">${rtFmtD(String(e.at).slice(0,10))} ${String(e.at).slice(11,16)}</span><span>${escapeHtml(e.label || '')}${e.city ? ' · ' + escapeHtml(e.city) : ''}</span></div>`).join('') : '<div class="env-ev"><span class="d">—</span><span>Sin eventos de transportadora todavía</span></div>'}
+        <div class="env-acts">
+          <a class="av-btn" href="https://admin.shopify.com/store/luxurunited/orders?query=${encodeURIComponent(sh.order_name)}" target="_blank" rel="noopener">Pedido en Shopify</a>
+          ${sh.tracking_number ? `<a class="av-btn" href="https://luxurunited.com/pages/rastrea-tu-pedido?order=${encodeURIComponent(num(sh.order_name))}" target="_blank" rel="noopener">Guía ${escapeHtml(sh.tracking_number)}</a>` : ''}
+          ${(i.tone === 'bad' || i.tone === 'warn') && !sh.resolved_at ? `<button class="av-btn primary" data-env-resolve="${escapeHtml(sh.order_name)}">Ya lo estoy gestionando</button>` : ''}
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+  el.querySelectorAll('[data-env-row]').forEach(r => r.addEventListener('click', e => { if (e.target.closest('a,button')) return; r.classList.toggle('open'); }));
+  el.querySelectorAll('[data-env-resolve]').forEach(b => b.addEventListener('click', () => resolveShipment(b.getAttribute('data-env-resolve'))));
+}
+async function resolveShipment(orderName){
+  const note = prompt('¿Qué se hizo? (ej: llamé a la clienta, reprogramé con Coordinadora)');
+  if (note === null) return;
+  const { error } = await supabase.from('shipments').update({ resolved_at: new Date().toISOString(), resolved_note: note || null }).eq('order_name', orderName);
+  if (error){ alert('No se guardó: ' + error.message); return; }
+  const sh = shipments.find(x => x.order_name === orderName); if (sh){ sh.resolved_at = new Date().toISOString(); sh.resolved_note = note || null; }
+  renderShipments(); try { renderBriefAlerts(); } catch(_) {}
+}
+document.addEventListener('click', e => {
+  const t = e.target.closest('.mk-tab[data-env]');
+  if (!t) return;
+  envTab = t.getAttribute('data-env');
+  document.querySelectorAll('.mk-tab[data-env]').forEach(x => x.classList.toggle('active', x === t));
+  renderShipments();
+});
+
 // === Lanzamientos nuevos · derivados del catálogo de Shopify ===
 // Un producto CREADO hace ≤14 días es un lanzamiento (createdAt, no publishedAt:
 // re-publicar un producto viejo no lo vuelve nuevo). Sin foto → tarea de tomar
@@ -2065,6 +2196,14 @@ function renderBriefAlerts(){
   for (const g of avisameGroups()){
     if (g.ready) row(1, 'Avisar', 'urgente', g.p, `${g.title}: ${g.ready} esperan y ya hay stock`, `${g.sizes.filter(x => (x.stock ?? 0) > 0).map(x => x.sz + ' ' + x.stock + 'u').join(' · ')} · avisar hoy`, 'fashionalytics');
     else if (g.outSizes.length) row(g.rows.length >= 3 ? 1 : 5, 'Esperan', 'pendiente', g.p, `${g.rows.length} esperan ${g.title}`, `sin ${g.outSizes.map(x => x.sz + ' (' + x.n + ')').join(', ')} · producir esas tallas`, 'fashionalytics');
+  }
+
+  // Envíos: novedades y pedidos sin despachar van arriba del todo — hay una clienta esperando.
+  for (const sh of (shipments || [])){
+    const i = shipmentIssue(sh);
+    if (i.tone !== 'bad' || sh.resolved_at) continue;
+    const img = { image: (sh.items || [])[0]?.image || null };
+    row(sh.incidence || sh.step === -1 ? 0 : 1, sh.step === 0 ? 'Despachar' : 'Envío', 'urgente', img, `${sh.order_name} · ${sh.customer_name || ''}`.trim(), i.why, 'envios');
   }
 
   // Producción: atrasados y llegadas de la semana, con la foto del catálogo
@@ -2259,17 +2398,18 @@ async function enterApp(){
     loadLaunches().catch(e => { console.error('loadLaunches failed:', e); }),
     loadStoreStats().catch(e => { console.error('loadStoreStats failed:', e); }),
     loadAvisame().catch(e => { console.error('loadAvisame failed:', e); }),
+    loadShipments().catch(e => { console.error('loadShipments failed:', e); }),
   ]);
   // Con catálogo + pipeline cargados, refrescá las alertas del brief
   try { renderBriefAlerts(); } catch(_) {}
   // Si la URL pide una sección específica (#marketing | #produccion | #fashionalytics) la abrimos
-  if (['marketing','produccion','fashionalytics'].includes(location.hash.slice(1))){
+  if (['marketing','produccion','fashionalytics','envios'].includes(location.hash.slice(1))){
     showHubSection(location.hash.slice(1));
   }
 }
 
 // === HUB NAVEGACIÓN tipo iOS · slide-in desde la derecha ===
-const HUB_SECTIONS = { marketing: 'hubMarketing', produccion: 'hubProduccion', fashionalytics: 'hubFashionalytics' };
+const HUB_SECTIONS = { envios: 'hubEnvios', marketing: 'hubMarketing', produccion: 'hubProduccion', fashionalytics: 'hubFashionalytics' };
 function showHubSection(name){
   // Sync del tab bar
   const activeTab = (name && HUB_SECTIONS[name]) ? name : 'home';
