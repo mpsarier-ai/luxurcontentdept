@@ -155,6 +155,7 @@ async function fetchCatalog(token: string) {
             node {
               id
               title
+              handle
               createdAt
               publishedAt
               featuredImage { url(transform: { maxWidth: 400 }) }
@@ -198,7 +199,7 @@ async function fetchCatalog(token: string) {
       const sizes = Object.entries(sizeMap).map(([size, v]) => ({ size, available: v.available, price: v.price, cost: v.cost }));
       const total = sizes.reduce((s, x) => s + x.available, 0);
       products.push({
-        gid: n.id, title: n.title, total,
+        gid: n.id, title: n.title, handle: n.handle, total,
         createdAt: n.createdAt, publishedAt: n.publishedAt || n.createdAt,
         image: n.featuredImage?.url || null,
         sizes,
@@ -243,6 +244,37 @@ async function runShopifyQL(token: string, q: string): Promise<{ rows: any[]; er
   } catch (err) {
     return { rows: [], err: (err as Error).message };
   }
+}
+
+// === Avísame: clientas con tag avisame:<handle> + talla:<s> ===
+// Se sube el set completo; el RPC marca resueltas las que ya no tienen el tag.
+async function fetchAvisame(token: string) {
+  const rows: Array<{ customer_gid: string; product_handle: string; sizes: string[]; ambiguous: boolean; tagged_at: string }> = [];
+  let cursor: string | null = null;
+  let hasNext = true;
+  let pages = 0;
+  while (hasNext && pages < 10) {
+    pages++;
+    const data: any = await shopifyGQL(token, `
+      query($cursor: String) {
+        customers(first: 250, after: $cursor, query: "tag:avisame") {
+          pageInfo { hasNextPage endCursor }
+          nodes { id tags updatedAt }
+        }
+      }
+    `, { cursor });
+    for (const c of data.customers.nodes) {
+      const tags: string[] = c.tags || [];
+      const handles = tags.filter(t => t.startsWith('avisame:')).map(t => t.slice(8).trim()).filter(Boolean);
+      const sizes = tags.filter(t => /^talla:/i.test(t)).map(t => t.slice(6).trim().toUpperCase()).filter(Boolean);
+      // Varias tallas y varios productos: no se sabe qué talla es de qué producto
+      const ambiguous = handles.length > 1 && sizes.length > 1;
+      for (const h of handles) rows.push({ customer_gid: c.id, product_handle: h, sizes, ambiguous, tagged_at: c.updatedAt });
+    }
+    hasNext = data.customers.pageInfo.hasNextPage;
+    cursor = data.customers.pageInfo.endCursor;
+  }
+  return rows;
 }
 
 // === SUPABASE ===
@@ -514,6 +546,14 @@ async function handler(_req: Request): Promise<Response> {
       console.error('Catalog refresh failed:', (err as Error).message);
     }
 
+    // Avísame → avisame_requests (independiente del resto: si falla, sigue)
+    let avisameCount = 0;
+    try {
+      const rows = await fetchAvisame(shopifyToken);
+      await rpcCall('rpc_upsert_avisame', { rows });
+      avisameCount = rows.length;
+    } catch (err) { console.error('avisame:', (err as Error).message); }
+
     const ts = bogotaTimestamp();
     const results: Array<{ id: string; status: string }> = [];
 
@@ -578,6 +618,7 @@ async function handler(_req: Request): Promise<Response> {
       active_calendars: calendars.length,
       orders_analyzed: orders.length,
       catalog_products: catalogCount,
+      avisame_requests: avisameCount,
       results,
       duration_s: ((Date.now() - startTime) / 1000).toFixed(1),
     }, null, 2), { headers: { 'Content-Type': 'application/json' } });

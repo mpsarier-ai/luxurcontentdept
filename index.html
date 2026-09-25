@@ -875,6 +875,28 @@ header,.hub-header{position:static !important;background:transparent !important;
 .brief-chip.aprobado{background:rgba(212,132,142,.18);color:#a8515c}
 .brief-chip.urgente{background:rgba(184,80,74,.14);color:#8f2f2a}
 .brief-chip.frio{background:rgba(74,111,138,.14);color:#35566e}
+.av-intro{font-size:13px;color:var(--grey);margin:-14px 0 14px;line-height:1.45}
+.av-list{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:14px;margin-bottom:24px}
+.av-card{background:#fff;border-radius:18px;padding:16px;box-shadow:0 1px 3px rgba(0,0,0,.05);border-top:3px solid var(--cream-dark)}
+.av-card.ready{border-top-color:var(--green-ok)}
+.av-card.out{border-top-color:var(--red-out)}
+.av-head{display:flex;gap:12px;align-items:center}
+.av-ph{width:52px;height:66px;border-radius:10px;object-fit:cover;background:#f2f2f0;flex:none}
+.av-t{font-size:15px;font-weight:600;line-height:1.25}
+.av-n{font-family:'Cormorant Garamond',serif;font-weight:700;font-size:30px;line-height:1;color:var(--black)}
+.av-n small{font-family:'JetBrains Mono',monospace;font-size:9.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--grey);margin-left:6px}
+.av-sizes{display:flex;flex-direction:column;gap:5px;margin-top:12px;padding-top:10px;border-top:1px dashed rgba(0,0,0,.06)}
+.av-sz{display:grid;grid-template-columns:34px 1fr auto;gap:10px;align-items:center;font-family:'JetBrains Mono',monospace;font-size:11px}
+.av-sz b{font-weight:500;letter-spacing:.05em}
+.av-sz .w{color:var(--black)}
+.av-sz .st{text-align:right}
+.av-sz .st.ok{color:var(--green-ok)}.av-sz .st.out{color:var(--red-out)}
+.av-amb{font-family:'Outfit',sans-serif;font-size:11.5px;color:#7a5e00;margin-top:8px}
+.av-actions{display:flex;gap:6px;margin-top:12px}
+.av-btn{flex:1;font-family:'JetBrains Mono',monospace;font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;padding:9px 8px;border:1px solid var(--cream-dark);border-radius:999px;background:transparent;color:#555;cursor:pointer;text-decoration:none;text-align:center;font-weight:500}
+.av-btn.primary{background:var(--black);color:var(--cream);border-color:var(--black)}
+.av-btn[disabled]{opacity:.45;cursor:default}
+.av-done{font-family:'Outfit',sans-serif;font-size:11.5px;color:#1e7b34;margin-top:8px}
 .brief-arrow{color:#c7c7cc;font-size:16px;flex-shrink:0}
 .brief-thumb{width:36px;height:46px;border-radius:8px;object-fit:cover;flex-shrink:0;background:#f2f2f0}
 .brief-empty{padding:18px 16px;color:#8e8e93;font-size:14px;text-align:center}
@@ -1097,6 +1119,10 @@ header,.hub-header{position:static !important;background:transparent !important;
         <div class="pk-num"><span id="onTicket">—</span></div>
         <div class="pk-cost"><span class="pk-cost-line" id="onTicketSub"></span></div></div>
     </div>
+
+    <h2 class="section-title" style="margin-top:34px"><span>Avísame</span><span class="meta" id="avisameMeta">—</span></h2>
+    <p class="av-intro">Clientas que pidieron aviso desde la tienda. Es demanda real sin stock: lo que se pierde por no tener la talla.</p>
+    <div class="av-list" id="avisameList"><div class="empty-state">Cargando…</div></div>
 
     <h2 class="section-title" style="margin-top:34px"><span>Dashboard · Jeans activos</span><span class="meta" id="prodStatusMeta">—</span></h2>
     <a class="fa-inv-link" href="calendars/calendar.html?view=inventory">📦 Ver inventario completo por tallas <span>›</span></a>
@@ -1556,6 +1582,7 @@ async function boot(){
 }
 
 let catalog = [];
+let avisame = [];   // avisame_requests: demanda sin stock, desde los tags de Shopify
 
 // Alias de emails: alguien puede loguearse con un correo distinto al que
 // está en team_members (ej: Isa entra con hotmail pero el equipo la tiene
@@ -1678,7 +1705,20 @@ async function loadDailyBrief(){
     }
   } catch(e){ console.warn('brief pauta:', e); }
 
+  // CRM (Sofía): avisar a las clientas cuya talla ya volvió
+  try {
+    const { data: me } = await supabase.from('team_members').select('role').eq('email', canonicalEmail(user.email)).maybeSingle();
+    if (me && me.role === 'crm_ecommerce'){
+      avisameGroups().filter(g => g.ready).forEach(g => {
+        rowsHtml += `<a class="brief-row" href="#fashionalytics" data-brief-go="fashionalytics">
+          <span class="brief-ico">✉️</span>
+          <span class="brief-body"><span class="brief-row-title">Avisar: ${escapeHtml(g.title)} ya tiene talla</span><span class="brief-row-sub">${g.ready} clienta${g.ready === 1 ? '' : 's'} esperando · correo o WhatsApp</span></span>
+          <span class="brief-chip pendiente">CRM</span></a>`;
+      });
+    }
+  } catch(_) {}
   elT.innerHTML = rowsHtml || '<div class="brief-empty done">✓ Sin tareas asignadas hoy</div>';
+  elT.querySelectorAll('[data-brief-go]').forEach(b => b.addEventListener('click', ev => { ev.preventDefault(); showHubSection(b.getAttribute('data-brief-go')); }));
   // "Para aprobar" — solo leads, toda la semana
   try {
     const { data: tm } = await supabase.from('team_members').select('role').eq('email', canonicalEmail(user.email)).maybeSingle();
@@ -1701,6 +1741,91 @@ async function loadDailyBrief(){
     }
   } catch(_) {}
   renderBriefAlerts();
+}
+
+// === Avísame · demanda real sin stock ===
+// Cada clienta que pide aviso en la tienda queda etiquetada en Shopify como
+// avisame:<handle> + talla:<s>. refresh-shopify lo baja a avisame_requests;
+// aquí se cruza con el stock por talla del catálogo para saber a quién se le
+// puede avisar ya y qué talla hace falta producir.
+function slugTitle(t){
+  return String(t || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
+}
+function catalogByHandle(handle){
+  return (catalog || []).find(p => (p.handle || slugTitle(p.title)) === handle) || null;
+}
+async function loadAvisame(){
+  const { data, error } = await supabase.from('avisame_requests').select('*').is('resolved_at', null);
+  if (error){ console.warn('avisame:', error.message); return; }
+  avisame = data || [];
+  renderAvisame();
+  try { renderBriefAlerts(); } catch(_) {}
+}
+// Agrupa por producto: cuántas esperan, por talla, y cuántas ya pueden comprar.
+function avisameGroups(){
+  const groups = new Map();
+  for (const r of avisame){
+    const g = groups.get(r.product_handle) || { handle: r.product_handle, rows: [], bySize: {}, ambiguous: 0 };
+    g.rows.push(r);
+    if (r.ambiguous || !r.sizes.length) g.ambiguous++;
+    else r.sizes.forEach(sz => { g.bySize[sz] = (g.bySize[sz] || 0) + 1; });
+    groups.set(r.product_handle, g);
+  }
+  return [...groups.values()].map(g => {
+    const p = catalogByHandle(g.handle);
+    const stockOf = sz => { const s = (p?.sizes || []).find(x => (x.size || '').toUpperCase() === sz); return s ? (s.available ?? 0) : null; };
+    const sizes = Object.entries(g.bySize).sort((a,b) => sizeOrderIndex(a[0]) - sizeOrderIndex(b[0]))
+      .map(([sz, n]) => ({ sz, n, stock: stockOf(sz) }));
+    const readyRows = g.rows.filter(r => !r.ambiguous && !r.notified_at && r.sizes.some(sz => (stockOf(sz) ?? 0) > 0));
+    const waiting = g.rows.filter(r => !r.notified_at).length;
+    return { ...g, p, title: p ? shortNameFa(p.title) : g.handle.replace(/-/g, ' '), sizes, ready: readyRows.length, waiting,
+             outSizes: sizes.filter(x => (x.stock ?? 0) <= 0), notified: g.rows.filter(r => r.notified_at).length };
+  }).sort((a, b) => (b.ready - a.ready) || (b.rows.length - a.rows.length));
+}
+function renderAvisame(){
+  const el = document.getElementById('avisameList');
+  const meta = document.getElementById('avisameMeta');
+  if (!el) return;
+  const groups = avisameGroups();
+  const people = new Set(avisame.map(r => r.customer_gid)).size;
+  if (meta) meta.textContent = avisame.length ? `${people} clientas · ${groups.length} productos` : 'sin pedidos';
+  if (!groups.length){ el.innerHTML = '<div class="fa-empty">Nadie ha pedido aviso todavía. Cuando una clienta lo pida en la tienda, aparece aquí con su talla.</div>'; return; }
+  const adminUrl = h => `https://admin.shopify.com/store/luxurunited/customers?tag=${encodeURIComponent('avisame:' + h)}`;
+  el.innerHTML = groups.map(g => `<div class="av-card ${g.ready ? 'ready' : g.outSizes.length ? 'out' : ''}">
+    <div class="av-head">
+      ${g.p?.image ? `<img class="av-ph" src="${escapeHtml(g.p.image)}" alt="" loading="lazy">` : '<span class="av-ph"></span>'}
+      <div style="min-width:0;flex:1">
+        <div class="av-t">${escapeHtml(g.title)}</div>
+        <div class="av-n">${g.rows.length}<small>esperan</small></div>
+      </div>
+    </div>
+    <div class="av-sizes">
+      ${g.sizes.map(x => `<div class="av-sz"><b>${escapeHtml(x.sz)}</b><span class="w">${x.n} esperan</span>
+        <span class="st ${x.stock == null ? '' : x.stock > 0 ? 'ok' : 'out'}">${x.stock == null ? 'sin datos' : x.stock > 0 ? x.stock + ' en stock · avisar' : 'agotada'}</span></div>`).join('')}
+      ${g.ambiguous ? `<div class="av-amb">${g.ambiguous} con talla por confirmar (pidió varios productos y varias tallas)</div>` : ''}
+    </div>
+    ${g.notified ? `<div class="av-done">✓ ${g.notified} avisada${g.notified === 1 ? '' : 's'}</div>` : ''}
+    <div class="av-actions">
+      <a class="av-btn" href="${adminUrl(g.handle)}" target="_blank" rel="noopener">Ver clientas</a>
+      <button class="av-btn primary" data-av-notify="${escapeHtml(g.handle)}" ${g.ready ? '' : 'disabled'}>${g.ready ? `Marcar ${g.ready} avisada${g.ready === 1 ? '' : 's'}` : 'Sin stock para avisar'}</button>
+    </div>
+  </div>`).join('');
+  el.querySelectorAll('[data-av-notify]').forEach(b => b.addEventListener('click', () => markAvisameNotified(b.getAttribute('data-av-notify'))));
+}
+// Marca avisadas las que ya tienen su talla en stock. El aviso real sale por
+// Shopify Email o WhatsApp al segmento del tag; aquí solo se registra.
+async function markAvisameNotified(handle){
+  const g = avisameGroups().find(x => x.handle === handle);
+  if (!g) return;
+  const stockOf = sz => { const s = (g.p?.sizes || []).find(x => (x.size || '').toUpperCase() === sz); return s ? (s.available ?? 0) : 0; };
+  const ids = g.rows.filter(r => !r.ambiguous && !r.notified_at && r.sizes.some(sz => stockOf(sz) > 0)).map(r => r.customer_gid);
+  if (!ids.length) return;
+  const { error } = await supabase.from('avisame_requests').update({ notified_at: new Date().toISOString() })
+    .eq('product_handle', handle).in('customer_gid', ids);
+  if (error){ alert('No se guardó: ' + error.message); return; }
+  avisame.forEach(r => { if (r.product_handle === handle && ids.includes(r.customer_gid)) r.notified_at = new Date().toISOString(); });
+  renderAvisame(); try { renderBriefAlerts(); } catch(_) {}
 }
 
 // === Lanzamientos nuevos · derivados del catálogo de Shopify ===
@@ -1821,6 +1946,13 @@ function renderBriefAlerts(){
     } else if (a.trend7 <= -50 && a.u30 >= Math.max(5, medianU30 * 0.6) && (a.u7 || 0) <= 2){
       row(6, 'Cayendo', 'pendiente', p, `${name} se enfrió`, `vendía ${a.u30}u/mes · ${a.u7 || 0}u esta semana · revisar contenido`, 'marketing');
     }
+  }
+
+  // Avísame: demanda real sin stock. Si la talla volvió y nadie ha avisado, es
+  // lo más urgente de todo: la venta ya está pedida.
+  for (const g of avisameGroups()){
+    if (g.ready) row(1, 'Avisar', 'urgente', g.p, `${g.title}: ${g.ready} esperan y ya hay stock`, `${g.sizes.filter(x => (x.stock ?? 0) > 0).map(x => x.sz + ' ' + x.stock + 'u').join(' · ')} · avisar hoy`, 'fashionalytics');
+    else if (g.outSizes.length) row(g.rows.length >= 3 ? 1 : 5, 'Esperan', 'pendiente', g.p, `${g.rows.length} esperan ${g.title}`, `sin ${g.outSizes.map(x => x.sz + ' (' + x.n + ')').join(', ')} · producir esas tallas`, 'fashionalytics');
   }
 
   // Producción: atrasados y llegadas de la semana, con la foto del catálogo
@@ -2014,6 +2146,7 @@ async function enterApp(){
     loadPipeline().catch(e => { console.error('loadPipeline failed:', e); }),
     loadLaunches().catch(e => { console.error('loadLaunches failed:', e); }),
     loadStoreStats().catch(e => { console.error('loadStoreStats failed:', e); }),
+    loadAvisame().catch(e => { console.error('loadAvisame failed:', e); }),
   ]);
   // Con catálogo + pipeline cargados, refrescá las alertas del brief
   try { renderBriefAlerts(); } catch(_) {}
