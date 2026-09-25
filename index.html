@@ -1187,6 +1187,7 @@ header,.hub-header{position:static !important;background:transparent !important;
       <button class="mk-tab" data-env="camino">En camino</button>
       <button class="mk-tab" data-env="despachar">Sin despachar</button>
       <button class="mk-tab" data-env="entregados">Entregados</button>
+      <button class="mk-tab" data-env="confirmar">Sin confirmar</button>
     </div>
     <div class="env-list" id="envList"><div class="empty-state">Cargando…</div></div>
   </section>
@@ -1999,10 +2000,13 @@ function shipmentIssue(sh){
   if (sh.step === 5) return { tone: 'bad', why: 'Devuelto a origen', days: sinceEvent, dl: 'días' };
   if (sh.step === 0 && sinceOrder >= 2) return { tone: sinceOrder >= 4 ? 'bad' : 'warn', why: `Pagado hace ${sinceOrder} días y sin despachar`, days: sinceOrder, dl: 'sin despachar' };
   if (sh.step === 0) return { tone: '', why: 'Pagado, pendiente de despacho', days: sinceOrder, dl: 'días' };
-  if (open && sh.eta && new Date(sh.eta).getTime() < now - 86400000) return { tone: 'bad', why: `Pasó la fecha estimada (${rtFmtD(sh.eta.slice(0,10))}) y no ha llegado`, days: sinceShip, dl: 'en camino' };
-  if (open && sinceEvent >= 3) return { tone: 'bad', why: `Sin movimiento hace ${sinceEvent} días`, days: sinceShip, dl: 'en camino' };
-  if (open && sinceShip >= 6) return { tone: 'warn', why: `${sinceShip} días en camino: más de lo normal`, days: sinceShip, dl: 'en camino' };
-  if (open && sh.is_local && sinceShip >= 1) return { tone: 'warn', why: `Mensajero local: salió hace ${sinceShip} día${sinceShip === 1 ? '' : 's'} y no está marcado entregado`, days: sinceShip, dl: 'en camino' };
+  const tracked = sh.source === 'envioclick_live' || sh.source === 'envioclick_webhook';
+  if (open && tracked && sh.eta && new Date(sh.eta).getTime() < now - 86400000) return { tone: 'bad', why: `Pasó la fecha estimada (${rtFmtD(sh.eta.slice(0,10))}) y no ha llegado`, days: sinceShip, dl: 'en camino' };
+  if (open && tracked && sinceEvent >= 3) return { tone: 'bad', why: `Sin movimiento hace ${sinceEvent} días`, days: sinceShip, dl: 'en camino' };
+  if (open && tracked && sinceShip >= 6) return { tone: 'warn', why: `${sinceShip} días en camino: más de lo normal`, days: sinceShip, dl: 'en camino' };
+  if (open && sh.is_local && sinceShip >= 1 && sinceShip <= 3) return { tone: 'warn', why: `Mensajero local: salió hace ${sinceShip} día${sinceShip === 1 ? '' : 's'} y no está marcado entregado`, days: sinceShip, dl: 'en camino' };
+  if (open && !tracked && sh.tracking_number) return { tone: '', why: `Guía ${sh.tracking_number}: esperando datos de la transportadora`, days: sinceShip, dl: 'en camino', unverified: true };
+  if (open && !tracked && sinceShip > 3) return { tone: '', why: sh.is_local ? 'Mensajero local: sin confirmación de entrega' : 'Sin guía: no hay rastreo', days: sinceShip, dl: 'sin confirmar', unverified: true };
   if (sh.step === 4) return { tone: 'ok', why: `Entregado${sh.delivered_at ? ' el ' + rtFmtD(sh.delivered_at.slice(0,10)) : ''}`, days: sinceShip, dl: 'días de viaje' };
   return { tone: '', why: sh.status_label || ENV_STEP[sh.step], days: sinceShip, dl: 'en camino' };
 }
@@ -2018,13 +2022,14 @@ function renderShipments(){
   if (meta) meta.textContent = shipments.length ? `actualizado ${rtFmtD(new Date(Math.max(...shipments.map(s => new Date(s.updated_at)))).toISOString().slice(0,10))}` : '—';
   if (kp) kp.innerHTML = [
     ['Necesitan atención', attention.length, attention.filter(r => r.i.tone === 'bad').length + ' urgentes', attention.length ? 'bad' : ''],
-    ['En camino', open.filter(r => r.sh.step >= 1).length, open.filter(r => r.sh.step === 3).length + ' en reparto', ''],
+    ['En camino', open.filter(r => r.sh.step >= 1 && !r.i.unverified).length, open.filter(r => r.i.unverified).length + ' sin confirmar', ''],
     ['Sin despachar', open.filter(r => r.sh.step === 0).length, 'pagados sin guía', open.filter(r => r.sh.step === 0 && daysSince(r.sh.order_created_at) >= 2).length ? 'warn' : ''],
     ['Entregados · 7d', delivered7.length, avg != null ? avg.toFixed(1).replace('.', ',') + ' días promedio' : 'sin datos de viaje', 'ok'],
   ].map(([l, v, sub, tone]) => `<div class="prod-kpi" style="border-top-color:${tone === 'bad' ? 'var(--red-out)' : tone === 'warn' ? 'var(--yellow-low)' : tone === 'ok' ? 'var(--green-ok)' : 'transparent'}"><div class="pk-label">${l}</div><div class="pk-num">${v}</div><div class="pk-cost"><span class="pk-cost-line">${sub}</span></div></div>`).join('');
 
   let list;
-  if (envTab === 'camino') list = open.filter(r => r.sh.step >= 1 && r.i.tone !== 'bad');
+  if (envTab === 'camino') list = open.filter(r => r.sh.step >= 1 && r.i.tone !== 'bad' && !r.i.unverified);
+  else if (envTab === 'confirmar') list = open.filter(r => r.i.unverified);
   else if (envTab === 'despachar') list = open.filter(r => r.sh.step === 0);
   else if (envTab === 'entregados') list = delivered7;
   else list = attention;
