@@ -1702,16 +1702,22 @@ async function loadDailyBrief(){
 }
 
 // === Lanzamientos nuevos · derivados del catálogo de Shopify ===
-// Un producto publicado hace ≤14 días es un lanzamiento. Sin foto → tarea de tomar
+// Un producto CREADO hace ≤14 días es un lanzamiento (createdAt, no publishedAt:
+// re-publicar un producto viejo no lo vuelve nuevo). Sin foto → tarea de tomar
 // fotos; sin stock → tarea de cargar stock (las dos para Isa y Paulina). Con foto →
 // sale como lanzamiento nuevo a todo el equipo, listo para moverse. Nada se guarda:
 // cuando Shopify ya tiene la foto o el stock, la tarea desaparece sola.
 const LAUNCH_OWNERS = ['mpsarier@gmail.com', 'isabellasalazara13@gmail.com', 'isasazar@hotmail.com'];
 const LAUNCH_NEW_DAYS = 14;
 
+function daysSinceCreated(p){
+  const t = Date.parse(p.createdAt || '');
+  if (isNaN(t)) return 999;
+  return Math.max(0, Math.floor((Date.now() - 5 * 3600_000 - t) / 86400_000));
+}
 function newCatalogProducts(){
-  return (catalog || []).filter(p => (p.daysSincePublished ?? 999) <= LAUNCH_NEW_DAYS)
-    .sort((a, b) => (a.daysSincePublished ?? 999) - (b.daysSincePublished ?? 999));
+  return (catalog || []).filter(p => daysSinceCreated(p) <= LAUNCH_NEW_DAYS)
+    .sort((a, b) => daysSinceCreated(a) - daysSinceCreated(b));
 }
 
 function renderBriefLaunches(){
@@ -1744,7 +1750,7 @@ function renderBriefLaunches(){
   wrap.hidden = ready.length === 0;
   el.innerHTML = ready.map(p => `<button class="brief-row" data-brief-launch="${escapeHtml(p.gid)}">
       <img class="brief-thumb" src="${escapeHtml(p.image)}" alt="" loading="lazy">
-      <span class="brief-body"><span class="brief-row-title">${escapeHtml(shortNameFa(p.title))}</span><span class="brief-row-sub">${p.daysSincePublished === 0 ? 'Publicado hoy' : 'Hace ' + p.daysSincePublished + ' días'} · ${(p.total ?? 0) > 0 ? p.total + ' u en stock' : 'sin stock todavía'}</span></span>
+      <span class="brief-body"><span class="brief-row-title">${escapeHtml(shortNameFa(p.title))}</span><span class="brief-row-sub">${daysSinceCreated(p) === 0 ? 'Creado hoy' : 'Creado hace ' + daysSinceCreated(p) + ' días'} · ${(p.total ?? 0) > 0 ? p.total + ' u en stock' : 'sin stock todavía'}</span></span>
       <span class="brief-chip aprobado">Nuevo</span></button>`).join('');
   el.querySelectorAll('[data-brief-launch]').forEach(b => b.addEventListener('click', () => openLaunchForProduct(b.getAttribute('data-brief-launch'))));
 }
@@ -1757,7 +1763,7 @@ async function openLaunchForProduct(gid){
   if (!l){
     const { data, error } = await supabase.from('launches').insert({
       product_gid: gid, name: shortNameFa(p.title), photo_url: p.image || null,
-      launch_date: (p.publishedAt || '').slice(0, 10) || null, qty: p.total || null, status: 'planeado',
+      launch_date: (p.publishedAt || p.createdAt || '').slice(0, 10) || null, qty: p.total || null, status: 'planeado',
     }).select('*').single();
     if (error){ alert('No se creó el lanzamiento: ' + error.message); return; }
     l = data; launches.push(l);
