@@ -2080,7 +2080,7 @@ function renderBodega(){
       return `<div class="bd-row ${inn ? 'in' : 'out'}">
         ${img ? `<img class="env-ph" src="${escapeHtml(img)}" alt="" loading="lazy" style="height:56px">` : '<span class="env-ph"></span>'}
         <div><div class="t">${escapeHtml(shortNameFa(r.product_title))} · ${escapeHtml(r.size)}</div>
-          <div class="s">${r.kind === 'recepcion' ? 'Recibido' : r.kind === 'traslado' ? 'Casa → tienda' : 'Ajuste'}${r.batch_name ? ' · ' + escapeHtml(r.batch_name) : ''} · ${rtFmtD(r.created_at.slice(0,10))}${r.created_by ? ' · ' + escapeHtml((r.created_by.split('@')[0]))} : ''}${r.kind === 'recepcion' ? (r.shopify_synced ? ' · ✓ Shopify' : r.shopify_error ? ' · ⚠ Shopify no sumó' : '') : ''}</div></div>
+          <div class="s">${r.kind === 'recepcion' ? 'Recibido' : r.kind === 'traslado' ? 'Casa → tienda' : 'Ajuste'}${r.batch_name ? ' · ' + escapeHtml(r.batch_name) : ''} · ${rtFmtD(r.created_at.slice(0,10))}${r.created_by ? ' · ' + escapeHtml(r.created_by.split('@')[0]) : ''}${r.kind === 'recepcion' ? (r.shopify_synced ? ' · ✓ Shopify' : r.shopify_error ? ' · ⚠ Shopify no sumó' : '') : ''}</div></div>
         <div class="n">${inn ? '+' : '−'}${r.qty}<small>${inn ? 'a casa' : 'a tienda'}</small></div></div>`;
     }).join('');
     return;
