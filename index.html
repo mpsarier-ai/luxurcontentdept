@@ -875,6 +875,21 @@ header,.hub-header{position:static !important;background:transparent !important;
 .brief-chip.aprobado{background:rgba(212,132,142,.18);color:#a8515c}
 .brief-chip.urgente{background:rgba(184,80,74,.14);color:#8f2f2a}
 .brief-chip.frio{background:rgba(74,111,138,.14);color:#35566e}
+.bd-actions{display:flex;gap:8px;margin:0 0 16px}
+.bd-actions .new-week-btn{flex:1;padding:13px 10px;border-radius:999px}
+.bd-sizes{display:grid;grid-template-columns:repeat(auto-fill,minmax(88px,1fr));gap:8px;margin:6px 0 10px}
+.bd-sz{background:#fff;border:1px solid rgba(0,0,0,.08);border-radius:12px;padding:8px 8px 6px;text-align:center}
+.bd-sz b{display:block;font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.08em}
+.bd-sz small{display:block;font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--grey);margin-top:2px}
+.bd-sz input{width:100%;margin-top:6px;text-align:center;font-size:18px;font-weight:600;border:1px solid rgba(0,0,0,.1);border-radius:8px;padding:6px 4px;font-family:inherit}
+.bd-stock{font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--grey);margin:4px 0 8px;letter-spacing:.03em;min-height:14px}
+.bd-check{display:flex;align-items:center;gap:8px;font-size:13px;text-transform:none;letter-spacing:0;font-family:'Outfit',sans-serif;margin-top:12px}
+.bd-row{display:grid;grid-template-columns:44px 1fr auto;gap:12px;align-items:center;background:#fff;border-radius:14px;padding:12px 14px;box-shadow:0 1px 3px rgba(0,0,0,.05)}
+.bd-row .t{font-size:14.5px;font-weight:600;line-height:1.25}
+.bd-row .s{font-family:'JetBrains Mono',monospace;font-size:10.5px;color:var(--grey);margin-top:3px;letter-spacing:.03em}
+.bd-row .n{font-family:'Cormorant Garamond',serif;font-weight:700;font-size:26px;line-height:1;text-align:right}
+.bd-row .n small{display:block;font-family:'JetBrains Mono',monospace;font-size:8.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--grey);font-weight:500;margin-top:3px}
+.bd-row.in .n{color:var(--green-ok)}.bd-row.out .n{color:var(--rosa-deep)}
 .env-kpis{grid-template-columns:repeat(4,1fr)}
 @media (max-width:520px){.env-kpis{grid-template-columns:repeat(2,1fr)}}
 .env-list{display:flex;flex-direction:column;gap:10px;margin-bottom:40px}
@@ -1057,6 +1072,7 @@ header,.hub-header{position:static !important;background:transparent !important;
     <button class="hub-back" data-hub-back>Inicio</button>
     <!-- Colección (solo Paulina + Isabella) -->
     <a class="fa-inv-link" id="colLink" href="coleccion.html" hidden>🧵 Atelier · colección y órdenes de compra <span>›</span></a>
+    <a class="fa-inv-link" href="#bodega" onclick="event.preventDefault();showHubSection('bodega')">🏠 Bodega Casa · recepción y traslados a Medellín <span>›</span></a>
     <!-- Selector de proveedor (chips) -->
     <div class="supplier-chips" id="supplierChips"></div>
     <!-- Dashboard 4 stat tiles -->
@@ -1177,6 +1193,23 @@ header,.hub-header{position:static !important;background:transparent !important;
   </section>
 </div>
 
+  <!-- BODEGA CASA · sub-ubicación de LUXUR Medellín. Solo recepción y traslado. -->
+  <section id="hubBodega" class="hub-section" hidden>
+    <button class="hub-back" data-hub-back>Inicio</button>
+    <h2 class="section-title"><span>Bodega Casa</span><span class="meta">sale de LUXUR Medellín</span></h2>
+    <p class="av-intro">Lo que hay en la casa y lo que ya está en la tienda. Shopify solo conoce <b>LUXUR Medellín</b> = casa + tienda. <b>Recibir</b> suma en Shopify; <b>trasladar</b> solo mueve entre casa y tienda.</p>
+    <div class="prod-kpis env-kpis" id="bdKpis"></div>
+    <div class="bd-actions">
+      <button class="new-week-btn" id="bdReceiveBtn">＋ Recibir lote</button>
+      <button class="new-week-btn" id="bdMoveBtn" style="background:var(--black)">→ Trasladar a tienda</button>
+    </div>
+    <div class="mk-tabs" id="bdTabs">
+      <button class="mk-tab active" data-bd="casa">En casa</button>
+      <button class="mk-tab" data-bd="historial">Movimientos</button>
+    </div>
+    <div class="av-list" id="bdList"><div class="empty-state">Cargando…</div></div>
+  </section>
+
   <!-- ENVÍOS · logística: novedades, demorados, sin despachar -->
   <section id="hubEnvios" class="hub-section" hidden>
     <button class="hub-back" data-hub-back>Inicio</button>
@@ -1204,6 +1237,28 @@ header,.hub-header{position:static !important;background:transparent !important;
 <footer class="footer">
   LUXUR Content Operations
 </footer>
+
+<!-- BODEGA · recibir o trasladar -->
+<div class="modal-backdrop" id="bdModal">
+  <div class="modal">
+    <div class="modal-meta" id="bdModalMeta">Bodega Casa</div>
+    <h3 id="bdModalTitle">Recibir lote</h3>
+    <p id="bdModalHelp">Llega producción a la casa. Se suma en la casa y, si quieres, también en Shopify Medellín.</p>
+    <label>Producto</label>
+    <input list="catalogList" id="bdProduct" placeholder="Busca en el catálogo…" autocomplete="off">
+    <div class="bd-stock" id="bdStockHint"></div>
+    <label>Unidades por talla</label>
+    <div class="bd-sizes" id="bdSizes"><span class="brief-empty">Elige un producto</span></div>
+    <label id="bdBatchLabel">Lote (opcional)</label>
+    <input type="text" id="bdBatch" placeholder="ej: Createxa OC 12">
+    <label id="bdSyncLabel" class="bd-check"><input type="checkbox" id="bdSync" checked> Sumar también en Shopify Medellín</label>
+    <div class="modal-error" id="bdError"></div>
+    <div class="modal-actions">
+      <button class="modal-btn" data-close-modal="bdModal">Cancelar</button>
+      <button class="modal-btn primary" id="bdSave">Guardar</button>
+    </div>
+  </div>
+</div>
 
 <!-- NEW WEEK MODAL -->
 <div class="modal-backdrop" id="newWeekModal">
@@ -1650,6 +1705,8 @@ let intent = [];    // product_intent: sesiones, carrito, checkout y compra por 
 let funnel = [];    // store_funnel_daily: embudo diario de la tienda
 let searches = [];  // store_searches: qué buscan en la tienda y si encontraron
 let shipments = []; // shipments: logística, un renglón por pedido con envío
+let bodega = [];    // bodega_moves: libro mayor de la casa
+let bdTab = 'casa', bdKind = 'recepcion', bdSelected = null, bdMedellin = null;
 let envTab = 'atencion';
 let dmTab = 'sin-stock';
 
@@ -1977,6 +2034,148 @@ async function markAvisameNotified(handle){
   avisame.forEach(r => { if (r.product_handle === handle && ids.includes(r.customer_gid)) r.notified_at = new Date().toISOString(); });
   renderAvisame(); try { renderBriefAlerts(); } catch(_) {}
 }
+
+// === Bodega Casa · recepción y traslados ===
+// La casa es una sub-ubicación de LUXUR Medellín. Shopify no la conoce: lo que
+// hay en Shopify Medellín es casa + tienda. Aquí se lleva el libro de la casa.
+const BODEGA_FN = SUPABASE_URL + '/functions/v1/bodega-shopify';
+async function loadBodega(){
+  const { data, error } = await supabase.from('bodega_moves').select('*').order('created_at', { ascending: false }).limit(500);
+  if (error){ console.warn('bodega:', error.message); return; }
+  bodega = data || [];
+  renderBodega();
+}
+function bodegaStock(){
+  const m = new Map();
+  for (const r of bodega){
+    const k = (r.product_gid || r.product_title) + '|' + r.size;
+    const e = m.get(k) || { gid: r.product_gid, title: r.product_title, size: r.size, casa: 0, last: r.created_at };
+    if (r.to_loc === 'casa') e.casa += r.qty; else if (r.from_loc === 'casa') e.casa -= r.qty;
+    if (r.created_at > e.last) e.last = r.created_at;
+    m.set(k, e);
+  }
+  return [...m.values()];
+}
+function renderBodega(){
+  const el = document.getElementById('bdList'), kp = document.getElementById('bdKpis');
+  if (!el) return;
+  const stock = bodegaStock();
+  const enCasa = stock.reduce((n, x) => n + Math.max(0, x.casa), 0);
+  const weekAgo = Date.now() - 7 * 86400000;
+  const recib7 = bodega.filter(r => r.kind === 'recepcion' && new Date(r.created_at) > weekAgo).reduce((n, r) => n + r.qty, 0);
+  const tras7 = bodega.filter(r => r.kind === 'traslado' && new Date(r.created_at) > weekAgo).reduce((n, r) => n + r.qty, 0);
+  const lastRec = bodega.find(r => r.kind === 'recepcion');
+  if (kp) kp.innerHTML = [
+    ['Unidades en casa', enCasa, stock.filter(x => x.casa > 0).length + ' referencias'],
+    ['Recibidas · 7d', recib7, 'llegaron a la casa'],
+    ['Trasladadas · 7d', tras7, 'pasaron a la tienda'],
+    ['Última recepción', lastRec ? rtFmtD(lastRec.created_at.slice(0,10)) : '—', lastRec ? shortNameFa(lastRec.product_title) : 'ninguna todavía'],
+  ].map(([l, v, sub]) => `<div class="prod-kpi"><div class="pk-label">${l}</div><div class="pk-num">${v}</div><div class="pk-cost"><span class="pk-cost-line">${escapeHtml(String(sub))}</span></div></div>`).join('');
+
+  if (bdTab === 'historial'){
+    if (!bodega.length){ el.innerHTML = '<div class="fa-empty">Sin movimientos todavía.</div>'; return; }
+    el.innerHTML = bodega.slice(0, 80).map(r => {
+      const img = findCatalogPhoto(r.product_title, r.product_gid);
+      const inn = r.to_loc === 'casa';
+      return `<div class="bd-row ${inn ? 'in' : 'out'}">
+        ${img ? `<img class="env-ph" src="${escapeHtml(img)}" alt="" loading="lazy" style="height:56px">` : '<span class="env-ph"></span>'}
+        <div><div class="t">${escapeHtml(shortNameFa(r.product_title))} · ${escapeHtml(r.size)}</div>
+          <div class="s">${r.kind === 'recepcion' ? 'Recibido' : r.kind === 'traslado' ? 'Casa → tienda' : 'Ajuste'}${r.batch_name ? ' · ' + escapeHtml(r.batch_name) : ''} · ${rtFmtD(r.created_at.slice(0,10))}${r.created_by ? ' · ' + escapeHtml((r.created_by.split('@')[0]))} : ''}${r.kind === 'recepcion' ? (r.shopify_synced ? ' · ✓ Shopify' : r.shopify_error ? ' · ⚠ Shopify no sumó' : '') : ''}</div></div>
+        <div class="n">${inn ? '+' : '−'}${r.qty}<small>${inn ? 'a casa' : 'a tienda'}</small></div></div>`;
+    }).join('');
+    return;
+  }
+  // En casa: agrupado por producto, con tallas
+  const byProd = new Map();
+  for (const x of stock){ if (x.casa <= 0) continue; const k = x.gid || x.title; const e = byProd.get(k) || { gid: x.gid, title: x.title, sizes: [], total: 0 }; e.sizes.push(x); e.total += x.casa; byProd.set(k, e); }
+  const list = [...byProd.values()].sort((a, b) => b.total - a.total);
+  if (!list.length){ el.innerHTML = '<div class="fa-empty">La casa está vacía. Cuando llegue un lote, tócalo en "Recibir lote".</div>'; return; }
+  el.innerHTML = list.map(p => {
+    const img = findCatalogPhoto(p.title, p.gid);
+    p.sizes.sort((a, b) => sizeOrderIndex(a.size) - sizeOrderIndex(b.size));
+    return `<div class="av-card">
+      <div class="av-head">${img ? `<img class="av-ph" src="${escapeHtml(img)}" alt="" loading="lazy">` : '<span class="av-ph"></span>'}
+        <div style="min-width:0;flex:1"><div class="av-t">${escapeHtml(shortNameFa(p.title))}</div><div class="av-n">${p.total}<small>en casa</small></div></div></div>
+      <div class="av-sizes">${p.sizes.map(x => `<div class="av-sz"><b>${escapeHtml(x.size)}</b><span class="w">${x.casa} en casa</span><span class="st"></span></div>`).join('')}</div>
+      <div class="av-actions"><button class="av-btn primary" data-bd-move="${escapeHtml(p.gid || '')}" data-bd-title="${escapeHtml(p.title)}">→ Trasladar a tienda</button></div>
+    </div>`;
+  }).join('');
+  el.querySelectorAll('[data-bd-move]').forEach(b => b.addEventListener('click', () => openBodegaModal('traslado', b.getAttribute('data-bd-title'))));
+}
+async function openBodegaModal(kind, presetTitle){
+  bdKind = kind; bdSelected = null; bdMedellin = null;
+  document.getElementById('bdModalTitle').textContent = kind === 'recepcion' ? 'Recibir lote' : 'Trasladar a tienda';
+  document.getElementById('bdModalHelp').textContent = kind === 'recepcion'
+    ? 'Llega producción a la casa. Se suma en la casa y, si quieres, también en Shopify Medellín.'
+    : 'Sale de la casa hacia la tienda. Shopify no cambia: Medellín ya lo tenía.';
+  document.getElementById('bdBatchLabel').hidden = kind !== 'recepcion';
+  document.getElementById('bdBatch').hidden = kind !== 'recepcion';
+  document.getElementById('bdSyncLabel').hidden = kind !== 'recepcion';
+  document.getElementById('bdError').textContent = '';
+  document.getElementById('bdBatch').value = '';
+  const inp = document.getElementById('bdProduct'); inp.value = presetTitle || '';
+  document.getElementById('bdModal').classList.add('open');
+  if (presetTitle) await bodegaPickProduct(presetTitle); else { document.getElementById('bdSizes').innerHTML = '<span class="brief-empty">Elige un producto</span>'; document.getElementById('bdStockHint').textContent = ''; }
+  setTimeout(() => inp.focus(), 50);
+}
+async function bodegaPickProduct(title){
+  const p = (catalog || []).find(x => (x.title || '').toLowerCase() === (title || '').toLowerCase());
+  const box = document.getElementById('bdSizes'), hint = document.getElementById('bdStockHint');
+  if (!p){ bdSelected = null; box.innerHTML = '<span class="brief-empty">No está en el catálogo</span>'; hint.textContent = ''; return; }
+  bdSelected = p;
+  const casa = bodegaStock().filter(x => (x.gid || x.title) === (p.gid || p.title));
+  const casaOf = sz => (casa.find(x => x.size === sz) || {}).casa || 0;
+  const sizes = [...(p.sizes || [])].sort((a, b) => sizeOrderIndex(a.size) - sizeOrderIndex(b.size));
+  box.innerHTML = sizes.map(x => `<label class="bd-sz"><b>${escapeHtml(x.size)}</b><small>${bdKind === 'traslado' ? casaOf(x.size) + ' en casa' : 'casa ' + casaOf(x.size)}</small><input type="number" inputmode="numeric" min="0" ${bdKind === 'traslado' ? 'max="' + casaOf(x.size) + '"' : ''} placeholder="0" data-bd-size="${escapeHtml(x.size)}"></label>`).join('');
+  hint.textContent = 'consultando Shopify Medellín…';
+  try {
+    const r = await fetch(BODEGA_FN, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ action: 'stock', product_gid: p.gid }) });
+    const j = await r.json();
+    if (j.sizes){ bdMedellin = j.sizes; hint.textContent = 'Shopify Medellín: ' + j.sizes.map(x => `${x.size} ${x.available}`).join(' · '); }
+    else hint.textContent = 'Shopify Medellín: sin datos';
+  } catch(_) { hint.textContent = 'Shopify Medellín: sin conexión'; }
+}
+async function saveBodegaMove(){
+  const err = document.getElementById('bdError'); err.textContent = '';
+  if (!bdSelected){ err.textContent = 'Elige un producto del catálogo.'; return; }
+  const lines = [...document.querySelectorAll('[data-bd-size]')].map(i => ({ size: i.getAttribute('data-bd-size'), qty: parseInt(i.value, 10) || 0 })).filter(l => l.qty > 0);
+  if (!lines.length){ err.textContent = 'Pon al menos una unidad en alguna talla.'; return; }
+  if (bdKind === 'traslado'){
+    const casa = bodegaStock().filter(x => (x.gid || x.title) === (bdSelected.gid || bdSelected.title));
+    const bad = lines.find(l => l.qty > ((casa.find(x => x.size === l.size) || {}).casa || 0));
+    if (bad){ err.textContent = `En la casa no hay ${bad.qty} de la talla ${bad.size}.`; return; }
+  }
+  const btn = document.getElementById('bdSave'); btn.disabled = true; btn.textContent = 'Guardando…';
+  const sync = bdKind === 'recepcion' && document.getElementById('bdSync').checked;
+  const batch = document.getElementById('bdBatch').value.trim() || null;
+  const rows = [];
+  for (const l of lines){
+    let synced = false, serr = null;
+    if (sync){
+      try {
+        const r = await fetch(BODEGA_FN, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ action: 'adjust', product_gid: bdSelected.gid, size: l.size, delta: l.qty, reason: 'received' }) });
+        const j = await r.json(); if (j.ok) synced = true; else serr = j.error || 'error';
+        if (j.needs_scope){ err.textContent = 'Shopify no dejó sumar: la app necesita el permiso write_inventory. Se guardó en la casa igual.'; }
+      } catch(e){ serr = String(e); }
+    }
+    rows.push({ kind: bdKind, product_gid: bdSelected.gid, product_title: bdSelected.title, size: l.size, qty: l.qty,
+      from_loc: bdKind === 'recepcion' ? 'proveedor' : 'casa', to_loc: bdKind === 'recepcion' ? 'casa' : 'tienda',
+      batch_name: batch, shopify_synced: synced, shopify_error: serr, created_by: canonicalEmail(user.email) });
+  }
+  const { error } = await supabase.from('bodega_moves').insert(rows);
+  btn.disabled = false; btn.textContent = 'Guardar';
+  if (error){ err.textContent = 'No se guardó: ' + error.message; return; }
+  if (!err.textContent) document.getElementById('bdModal').classList.remove('open');
+  await loadBodega();
+}
+document.addEventListener('click', e => {
+  if (e.target.id === 'bdReceiveBtn') return openBodegaModal('recepcion');
+  if (e.target.id === 'bdMoveBtn') return openBodegaModal('traslado');
+  if (e.target.id === 'bdSave') return saveBodegaMove();
+  const t = e.target.closest('.mk-tab[data-bd]');
+  if (t){ bdTab = t.getAttribute('data-bd'); document.querySelectorAll('.mk-tab[data-bd]').forEach(x => x.classList.toggle('active', x === t)); renderBodega(); }
+});
+document.addEventListener('change', e => { if (e.target.id === 'bdProduct') bodegaPickProduct(e.target.value); });
 
 // === Envíos · logística ===
 // refresh-logistics fusiona Shopify + Envíoclick en `shipments`. Aquí solo se
@@ -2404,17 +2603,18 @@ async function enterApp(){
     loadStoreStats().catch(e => { console.error('loadStoreStats failed:', e); }),
     loadAvisame().catch(e => { console.error('loadAvisame failed:', e); }),
     loadShipments().catch(e => { console.error('loadShipments failed:', e); }),
+    loadBodega().catch(e => { console.error('loadBodega failed:', e); }),
   ]);
   // Con catálogo + pipeline cargados, refrescá las alertas del brief
   try { renderBriefAlerts(); } catch(_) {}
   // Si la URL pide una sección específica (#marketing | #produccion | #fashionalytics) la abrimos
-  if (['marketing','produccion','fashionalytics','envios'].includes(location.hash.slice(1))){
+  if (['marketing','produccion','fashionalytics','envios','bodega'].includes(location.hash.slice(1))){
     showHubSection(location.hash.slice(1));
   }
 }
 
 // === HUB NAVEGACIÓN tipo iOS · slide-in desde la derecha ===
-const HUB_SECTIONS = { envios: 'hubEnvios', marketing: 'hubMarketing', produccion: 'hubProduccion', fashionalytics: 'hubFashionalytics' };
+const HUB_SECTIONS = { bodega: 'hubBodega', envios: 'hubEnvios', marketing: 'hubMarketing', produccion: 'hubProduccion', fashionalytics: 'hubFashionalytics' };
 function showHubSection(name){
   // Sync del tab bar
   const activeTab = (name && HUB_SECTIONS[name]) ? name : 'home';
