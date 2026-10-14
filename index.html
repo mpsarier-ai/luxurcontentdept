@@ -1132,16 +1132,6 @@ header,.hub-header{position:static !important;background:transparent !important;
     </div>
     <!-- Cobertura: stock de jeans + producción contra el mínimo -->
     <div class="cov-card" id="covCard"></div>
-    <!-- Rotación de jeans: rotan vs slow movers -->
-    <div class="rot-wrap" id="rotWrap">
-      <div class="wk-head"><span>Rotación de jeans</span><span class="wk-hint" id="rotHint">—</span></div>
-      <div class="mk-tabs" id="rotTabs">
-        <button class="mk-tab active" data-rot="slow">Slow movers</button>
-        <button class="mk-tab" data-rot="rota">Rotan</button>
-        <button class="mk-tab" data-rot="nuevo">En observación</button>
-      </div>
-      <div class="rot-list" id="rotList"></div>
-    </div>
     <!-- Cumplimiento por proveedor -->
     <div class="sc-card" id="supScore" hidden></div>
     <!-- Entregas semana a semana (swipe) -->
@@ -1334,6 +1324,24 @@ header,.hub-header{position:static !important;background:transparent !important;
 <!-- ENTRY (pipeline) MODAL -->
 <input type="file" id="prodPhotoInput" accept="image/*" hidden>
 <!-- Bottom sheet · desglose de la referencia tocada en el rail de Producción -->
+<div class="prod-sheet" id="rotSheet">
+  <div class="ps-bg" data-rot-close></div>
+  <div class="ps-panel">
+    <div class="ps-grab"></div>
+    <div class="ps-head">
+      <span class="ps-title" id="rotHint">Rotación de jeans</span>
+      <button class="ps-close" data-rot-close title="Cerrar">✕</button>
+    </div>
+    <div class="ps-body">
+      <div class="mk-tabs" id="rotTabs" style="margin-top:4px">
+        <button class="mk-tab active" data-rot="slow">Slow movers</button>
+        <button class="mk-tab" data-rot="rota">Rotan</button>
+        <button class="mk-tab" data-rot="nuevo">En observación</button>
+      </div>
+      <div class="rot-list" id="rotList"></div>
+    </div>
+  </div>
+</div>
 <div class="prod-sheet" id="prodSheet">
   <div class="ps-bg" id="prodSheetBg"></div>
   <div class="ps-panel">
@@ -2151,7 +2159,7 @@ function renderRotation(){
     const lbl = { slow: 'Slow movers', rota: 'Rotan', nuevo: 'En observación' }[k];
     b.textContent = `${lbl} · ${by[k].length}`;
   });
-  if (hint) hint.textContent = `${units('slow').toLocaleString('es-CO')} unds en slow movers`;
+  if (hint) hint.textContent = `${{ slow: 'Slow movers', rota: 'Rotan', nuevo: 'En observación' }[rotTab]} · ${units(rotTab).toLocaleString('es-CO')} unds`;
   // En la tarjeta principal "Stock actual": cuánto de ese stock rota y cuánto está parado
   const sp = document.getElementById('kpiStockSplit');
   if (sp){
@@ -2179,9 +2187,10 @@ document.addEventListener('click', e => {
     rotTab = go.getAttribute('data-rot-go');
     document.querySelectorAll('.mk-tab[data-rot]').forEach(x => x.classList.toggle('active', x.getAttribute('data-rot') === rotTab));
     renderRotation();
-    document.getElementById('rotWrap')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    document.getElementById('rotSheet')?.classList.add('on');
     return;
   }
+  if (e.target.closest('[data-rot-close]')){ document.getElementById('rotSheet')?.classList.remove('on'); return; }
   const t = e.target.closest('.mk-tab[data-rot]');
   if (!t) return;
   rotTab = t.getAttribute('data-rot');
