@@ -890,6 +890,31 @@ header,.hub-header{position:static !important;background:transparent !important;
 .bd-row .n{font-family:'Cormorant Garamond',serif;font-weight:700;font-size:26px;line-height:1;text-align:right}
 .bd-row .n small{display:block;font-family:'JetBrains Mono',monospace;font-size:8.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--grey);font-weight:500;margin-top:3px}
 .bd-row.in .n{color:var(--green-ok)}.bd-row.out .n{color:var(--rosa-deep)}
+.cov-card{background:#fff;border-radius:16px;padding:14px 16px;box-shadow:0 1px 3px rgba(0,0,0,.05);margin:-4px 0 18px;border-left:4px solid var(--green-ok)}
+.cov-card.bad{border-left-color:var(--red-out);background:rgba(184,80,74,.06)}
+.cov-top{display:flex;justify-content:space-between;align-items:baseline;gap:10px;flex-wrap:wrap}
+.cov-t{font-family:'JetBrains Mono',monospace;font-size:9.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--grey)}
+.cov-n{font-family:'Cormorant Garamond',serif;font-weight:700;font-size:30px;line-height:1}
+.cov-card.bad .cov-n{color:var(--red-out)}
+.cov-n small{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--grey);font-weight:500}
+.cov-bar{height:8px;background:rgba(0,0,0,.06);border-radius:999px;overflow:hidden;margin:10px 0 8px;position:relative}
+.cov-bar i{display:block;height:100%;background:var(--green-ok)}
+.cov-bar i.p{background:#7ba87b;opacity:.55}
+.cov-card.bad .cov-bar i{background:var(--red-out)}.cov-card.bad .cov-bar i.p{background:var(--red-out);opacity:.45}
+.cov-s{font-size:12.5px;color:#555;line-height:1.4}
+.cov-card.bad .cov-s{color:#8f2f2a;font-weight:500}
+.rot-wrap{margin-bottom:20px}
+.rot-list{display:flex;flex-direction:column;gap:8px}
+.rot-row{display:grid;grid-template-columns:44px 1fr auto;gap:12px;align-items:center;background:#fff;border-radius:14px;padding:10px 14px;box-shadow:0 1px 3px rgba(0,0,0,.05);border-left:4px solid var(--cream-dark)}
+.rot-row.slow{border-left-color:var(--red-out)}.rot-row.rota{border-left-color:var(--green-ok)}.rot-row.nuevo{border-left-color:var(--yellow-low)}
+.rot-row .t{font-size:14px;font-weight:600;line-height:1.25}
+.rot-row .s{font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--grey);margin-top:3px;letter-spacing:.03em}
+.rot-meter{height:5px;background:rgba(0,0,0,.06);border-radius:999px;margin-top:6px;position:relative;overflow:visible}
+.rot-meter i{display:block;height:100%;border-radius:999px;background:var(--rosa-deep)}
+.rot-row.slow .rot-meter i{background:var(--red-out)}.rot-row.rota .rot-meter i{background:var(--green-ok)}
+.rot-meter b{position:absolute;top:-3px;width:2px;height:11px;background:var(--black)}
+.rot-row .n{font-family:'Cormorant Garamond',serif;font-weight:700;font-size:24px;line-height:1;text-align:right}
+.rot-row .n small{display:block;font-family:'JetBrains Mono',monospace;font-size:8.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--grey);font-weight:500;margin-top:3px}
 .env-kpis{grid-template-columns:repeat(4,1fr)}
 @media (max-width:520px){.env-kpis{grid-template-columns:repeat(2,1fr)}}
 .env-list{display:flex;flex-direction:column;gap:10px;margin-bottom:40px}
@@ -1097,6 +1122,18 @@ header,.hub-header{position:static !important;background:transparent !important;
         <div class="pk-num"><span id="kpiMonthNum">—</span><span class="pk-unit">unds</span></div>
         <div class="pk-cost" id="kpiMonthCost">—</div>
       </div>
+    </div>
+    <!-- Cobertura: stock de jeans + producción contra el mínimo -->
+    <div class="cov-card" id="covCard"></div>
+    <!-- Rotación de jeans: rotan vs slow movers -->
+    <div class="rot-wrap" id="rotWrap">
+      <div class="wk-head"><span>Rotación de jeans</span><span class="wk-hint" id="rotHint">—</span></div>
+      <div class="mk-tabs" id="rotTabs">
+        <button class="mk-tab active" data-rot="slow">Slow movers</button>
+        <button class="mk-tab" data-rot="rota">Rotan</button>
+        <button class="mk-tab" data-rot="nuevo">En observación</button>
+      </div>
+      <div class="rot-list" id="rotList"></div>
     </div>
     <!-- Cumplimiento por proveedor -->
     <div class="sc-card" id="supScore" hidden></div>
@@ -2034,6 +2071,102 @@ async function markAvisameNotified(handle){
   avisame.forEach(r => { if (r.product_handle === handle && ids.includes(r.customer_gid)) r.notified_at = new Date().toISOString(); });
   renderAvisame(); try { renderBriefAlerts(); } catch(_) {}
 }
+
+// === Producción · cobertura y rotación de jeans ===
+const COVERAGE_MIN = 2560;   // stock de jeans + producción no puede bajar de esto
+let rotTab = 'slow';
+// Producción total sin filtro de proveedor: la cobertura es de toda la marca.
+function totalInProduction(){
+  const vb = {}, sa = [];
+  (pipeline || []).forEach(e => { if (e.batch_id) (vb[e.batch_id] = vb[e.batch_id] || []).push(e); else sa.push(e); });
+  let n = 0;
+  (batches || []).forEach(b => {
+    if (b.batch_stage === 'entrega') return;
+    const vars = vb[b.id] || [];
+    if (!vars.length){ n += b.total_quantity || 0; return; }
+    vars.forEach(v => { if (!(v.stage === 'entrega' || v.status === 'llego')) n += v.quantity || 0; });
+  });
+  sa.forEach(e => { if (!(e.stage === 'entrega' || e.status === 'llego')) n += e.quantity || 0; });
+  return n;
+}
+function jeanStockUnits(){
+  let n = 0;
+  (catalog || []).forEach(p => { if ((p.title || '').toUpperCase().startsWith('JEAN')) (p.sizes || []).forEach(sz => { n += Math.max(0, sz.available ?? 0); }); });
+  return n;
+}
+function renderCoverage(){
+  const el = document.getElementById('covCard');
+  if (!el) return;
+  const stock = jeanStockUnits(), prod = totalInProduction(), total = stock + prod;
+  const bad = total < COVERAGE_MIN;
+  const max = Math.max(COVERAGE_MIN, total);
+  el.classList.toggle('bad', bad);
+  el.innerHTML = `<div class="cov-top"><span class="cov-t">Stock + producción · mínimo ${COVERAGE_MIN.toLocaleString('es-CO')}</span>
+      <span class="cov-n">${total.toLocaleString('es-CO')} <small>/ ${COVERAGE_MIN.toLocaleString('es-CO')} unds</small></span></div>
+    <div class="cov-bar"><i style="width:${100 * stock / max}%;float:left"></i><i class="p" style="width:${100 * prod / max}%;float:left"></i>
+      <b style="position:absolute;left:${100 * COVERAGE_MIN / max}%;top:-3px;width:2px;height:14px;background:var(--black)"></b></div>
+    <div class="cov-s">${bad
+      ? `Faltan ${(COVERAGE_MIN - total).toLocaleString('es-CO')} unidades para el mínimo: hay que meter producción. Stock ${stock.toLocaleString('es-CO')} · en producción ${prod.toLocaleString('es-CO')}.`
+      : `Cubierto: ${(total - COVERAGE_MIN).toLocaleString('es-CO')} unidades por encima del mínimo. Stock ${stock.toLocaleString('es-CO')} · en producción ${prod.toLocaleString('es-CO')}.`}</div>`;
+}
+// Curva de rotación: 30 % a los 30 días, 60 % a los 90. Desde la semana 2 ya se
+// compara contra la curva (lineal hasta el día 30, luego hasta el 90).
+function rotationTarget(age){
+  if (age <= 30) return 0.30 * age / 30;
+  if (age <= 90) return 0.30 + 0.30 * (age - 30) / 60;
+  return 0.60;
+}
+function rotationOf(p){
+  const age = daysSinceCreated(p);
+  const stock = Math.max(0, p.total ?? 0);
+  const u30 = p.units30d_native ?? p.units30d ?? 0;
+  const u90 = p.units90d_native ?? p.units90d ?? null;
+  // Ventana = vida del producto, hasta 90 días. Más de 30 días sin dato de 90 → estimado.
+  let sold, approx = false;
+  if (age <= 30) sold = u30;
+  else if (u90 != null) sold = u90;
+  else { sold = Math.round(u30 * Math.min(age, 90) / 30); approx = true; }
+  if (sold + stock <= 0) return null;
+  const st = sold / (sold + stock);
+  const target = rotationTarget(Math.min(age, 90));
+  const cls = age < 14 ? 'nuevo' : st >= target ? 'rota' : 'slow';
+  return { p, age, stock, sold, st, target, cls, approx };
+}
+function renderRotation(){
+  const el = document.getElementById('rotList'), hint = document.getElementById('rotHint');
+  if (!el) return;
+  const all = (catalog || []).filter(p => /^JEAN[\s·\-]/i.test((p.title || '').trim())).map(rotationOf).filter(Boolean);
+  const by = { slow: [], rota: [], nuevo: [] };
+  all.forEach(r => by[r.cls].push(r));
+  const units = k => by[k].reduce((n, r) => n + r.stock, 0);
+  document.querySelectorAll('.mk-tab[data-rot]').forEach(b => {
+    const k = b.getAttribute('data-rot');
+    const lbl = { slow: 'Slow movers', rota: 'Rotan', nuevo: 'En observación' }[k];
+    b.textContent = `${lbl} · ${by[k].length}`;
+  });
+  if (hint) hint.textContent = `${units('slow').toLocaleString('es-CO')} unds en slow movers`;
+  const list = by[rotTab].sort((a, b) => rotTab === 'slow' ? (b.stock - a.stock) : rotTab === 'rota' ? (b.st - a.st) : (a.age - b.age));
+  if (!list.length){ el.innerHTML = `<div class="tl-hint">${rotTab === 'slow' ? '✓ Ningún jean por debajo de la curva' : 'Nada en esta vista'}</div>`; return; }
+  const pct = v => Math.round(v * 100) + '%';
+  el.innerHTML = list.map(r => {
+    const why = r.cls === 'nuevo' ? `${r.age} días · se clasifica desde la semana 2`
+      : r.cls === 'slow' ? `rota ${pct(r.st)} · a los ${Math.min(r.age, 90)} días debía ir en ${pct(r.target)}`
+      : `rota ${pct(r.st)} · meta ${pct(r.target)} a los ${Math.min(r.age, 90)} días`;
+    return `<div class="rot-row ${r.cls}">
+      ${r.p.image ? `<img class="env-ph" src="${escapeHtml(r.p.image)}" alt="" loading="lazy" style="height:56px">` : '<span class="env-ph"></span>'}
+      <div style="min-width:0"><div class="t">${escapeHtml(shortNameFa(r.p.title))}</div>
+        <div class="s">${why} · ${r.age > 90 ? 'últimos 90 días' : r.age + ' días en tienda'}${r.approx ? ' · aprox' : ''}</div>
+        <div class="rot-meter"><i style="width:${Math.min(100, r.st * 100)}%"></i><b style="left:${Math.min(100, r.target * 100)}%"></b></div></div>
+      <div class="n">${r.stock}<small>en stock</small></div></div>`;
+  }).join('');
+}
+document.addEventListener('click', e => {
+  const t = e.target.closest('.mk-tab[data-rot]');
+  if (!t) return;
+  rotTab = t.getAttribute('data-rot');
+  document.querySelectorAll('.mk-tab[data-rot]').forEach(x => x.classList.toggle('active', x === t));
+  renderRotation();
+});
 
 // === Bodega Casa · recepción y traslados ===
 // La casa es una sub-ubicación de LUXUR Medellín. Shopify no la conoce: lo que
@@ -4236,6 +4369,8 @@ function renderPipeline(){
   setKPI(weekUnits,  weekCost,  weekPVP,  'kpiWeekNum',  'kpiWeekCost');
   setKPI(monthUnits, monthCost, monthPVP, 'kpiMonthNum', 'kpiMonthCost');
 
+  try { renderCoverage(); } catch(e) { console.warn('coverage', e); }
+  try { renderRotation(); } catch(e) { console.warn('rotation', e); }
   // Rail de entregas semana a semana (swipe)
   try { renderWeekRail(filteredBatches, standalone, variantsByBatch); } catch(_) {}
   try { renderSupplierScore(); } catch(_) {}
