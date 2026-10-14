@@ -890,6 +890,12 @@ header,.hub-header{position:static !important;background:transparent !important;
 .bd-row .n{font-family:'Cormorant Garamond',serif;font-weight:700;font-size:26px;line-height:1;text-align:right}
 .bd-row .n small{display:block;font-family:'JetBrains Mono',monospace;font-size:8.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--grey);font-weight:500;margin-top:3px}
 .bd-row.in .n{color:var(--green-ok)}.bd-row.out .n{color:var(--rosa-deep)}
+.pk-split{display:flex;flex-direction:column;gap:4px;margin-top:10px;padding-top:9px;border-top:1px dashed rgba(0,0,0,.08)}
+.pk-split:empty{display:none}
+.pk-sp{display:flex;justify-content:space-between;align-items:baseline;gap:6px;border:none;background:none;padding:0;cursor:pointer;text-align:left;font-family:inherit}
+.pk-sp span{font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:var(--grey)}
+.pk-sp b{font-family:'Cormorant Garamond',serif;font-weight:700;font-size:20px;line-height:1}
+.pk-sp.slow b{color:var(--red-out)}.pk-sp.rota b{color:var(--green-ok)}.pk-sp.nuevo b{color:var(--yellow-low)}
 .cov-card{background:#fff;border-radius:16px;padding:14px 16px;box-shadow:0 1px 3px rgba(0,0,0,.05);margin:-4px 0 18px;border-left:4px solid var(--green-ok)}
 .cov-card.bad{border-left-color:var(--red-out);background:rgba(184,80,74,.06)}
 .cov-top{display:flex;justify-content:space-between;align-items:baseline;gap:10px;flex-wrap:wrap}
@@ -1106,6 +1112,7 @@ header,.hub-header{position:static !important;background:transparent !important;
         <div class="pk-label">Stock actual</div>
         <div class="pk-num"><span id="kpiStockNum">—</span><span class="pk-unit">unds</span></div>
         <div class="pk-cost" id="kpiStockCost">—</div>
+        <div class="pk-split" id="kpiStockSplit"></div>
       </div>
       <div class="prod-kpi" data-kpi="prod">
         <div class="pk-label">En producción</div>
@@ -2145,6 +2152,12 @@ function renderRotation(){
     b.textContent = `${lbl} · ${by[k].length}`;
   });
   if (hint) hint.textContent = `${units('slow').toLocaleString('es-CO')} unds en slow movers`;
+  // En la tarjeta principal "Stock actual": cuánto de ese stock rota y cuánto está parado
+  const sp = document.getElementById('kpiStockSplit');
+  if (sp){
+    const row = (k, lbl) => by[k].length ? `<button class="pk-sp ${k}" data-rot-go="${k}"><span>${lbl} · ${by[k].length} ref</span><b>${units(k).toLocaleString('es-CO')}</b></button>` : '';
+    sp.innerHTML = row('rota', 'Rotan') + row('slow', 'Slow movers') + row('nuevo', 'Observación');
+  }
   const list = by[rotTab].sort((a, b) => rotTab === 'slow' ? (b.stock - a.stock) : rotTab === 'rota' ? (b.st - a.st) : (a.age - b.age));
   if (!list.length){ el.innerHTML = `<div class="tl-hint">${rotTab === 'slow' ? '✓ Ningún jean por debajo de la curva' : 'Nada en esta vista'}</div>`; return; }
   const pct = v => Math.round(v * 100) + '%';
@@ -2161,6 +2174,14 @@ function renderRotation(){
   }).join('');
 }
 document.addEventListener('click', e => {
+  const go = e.target.closest('[data-rot-go]');
+  if (go){
+    rotTab = go.getAttribute('data-rot-go');
+    document.querySelectorAll('.mk-tab[data-rot]').forEach(x => x.classList.toggle('active', x.getAttribute('data-rot') === rotTab));
+    renderRotation();
+    document.getElementById('rotWrap')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    return;
+  }
   const t = e.target.closest('.mk-tab[data-rot]');
   if (!t) return;
   rotTab = t.getAttribute('data-rot');
