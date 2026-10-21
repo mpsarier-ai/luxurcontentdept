@@ -21,12 +21,12 @@
 body{background:var(--cream);color:var(--black);font-family:'Poppins',sans-serif;font-weight:300;min-height:100vh;display:flex;flex-direction:column}
 .wrap{max-width:1100px;margin:0 auto;padding:80px 32px;flex:1;width:100%}
 
-header{border-bottom:1px solid var(--black);padding-bottom:24px;margin-bottom:64px;display:flex;justify-content:space-between;align-items:flex-end;flex-wrap:wrap;gap:16px}
-.logo{font-family:'Montserrat',sans-serif;font-weight:600;font-size:38px;letter-spacing:normal;line-height:1}
+header{display:flex;justify-content:space-between;align-items:center;gap:16px;margin-bottom:14px}
+.logo{font-family:'Montserrat',sans-serif;font-weight:600;font-size:22px;letter-spacing:normal;line-height:1}
 .tagline{font-family:'Poppins',sans-serif;font-weight:600;font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:var(--grey);margin-top:8px}
 .year{font-family:'Poppins',sans-serif;font-weight:300;letter-spacing:-.02em;font-style:italic;font-size:42px;color:var(--rosa-deep)}
 
-.session-bar{display:flex;justify-content:space-between;align-items:center;background:var(--cream-dark);padding:12px 20px;margin-bottom:32px;border-radius:2px;font-family:'Poppins',sans-serif;font-weight:600;font-size:11px;letter-spacing:.1em;text-transform:uppercase;flex-wrap:wrap;gap:12px}
+.session-bar{display:flex;justify-content:space-between;align-items:center;background:transparent;padding:6px 4px;margin:0 0 10px;border-radius:2px;font-family:'Poppins',sans-serif;font-weight:600;font-size:11px;letter-spacing:.1em;text-transform:uppercase;flex-wrap:wrap;gap:12px}
 .session-status{display:flex;align-items:center;gap:10px}
 .sync-dot{width:8px;height:8px;border-radius:50%;background:var(--grey)}
 .sync-dot.connected{background:var(--green-ok)}
@@ -40,18 +40,24 @@ header{border-bottom:1px solid var(--black);padding-bottom:24px;margin-bottom:64
 .new-week-btn{padding:10px 18px;background:var(--rosa-deep);color:#fff;border:none;font-family:'Poppins',sans-serif;font-weight:600;font-size:11px;letter-spacing:.15em;text-transform:uppercase;cursor:pointer;transition:background .15s;font-weight:500}
 .new-week-btn:hover{background:var(--black)}
 
-.cal-list{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:1px;background:var(--black);border:1px solid var(--black);margin-bottom:64px;min-height:200px}
-.cal-card{background:var(--paper);padding:24px;text-decoration:none;color:var(--black);transition:background .15s;display:flex;flex-direction:column;gap:8px;cursor:pointer;position:relative}
-.cal-card:hover{background:var(--rosa)}
+.cal-list{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:10px;margin-bottom:40px;min-height:120px}
+.cal-card{background:var(--paper);padding:18px 18px 16px;border-radius:22px;text-decoration:none;color:var(--black);transition:transform .15s;display:flex;flex-direction:column;gap:6px;cursor:pointer;position:relative;box-shadow:0 1px 2px rgba(0,0,0,.04),0 8px 22px rgba(0,0,0,.06)}
+.cal-card:hover{transform:translateY(-1px)}
+.cal-card .mix{display:flex;gap:3px;height:8px;border-radius:999px;overflow:hidden;margin-top:10px;background:var(--cream)}
+.cal-card .mix i{display:block;height:100%}
+.cal-card .mix .adq{background:var(--black)}.cal-card .mix .aut{background:var(--line)}.cal-card .mix .ven{background:var(--rosa-deep)}
+.cal-card .mixt{font-size:11px;color:var(--grey);margin-top:2px}
+.cal-card .mixt b{font-weight:600;color:var(--black)}
+.cal-card .mixt .off{color:var(--red-out);font-weight:600}
 .cal-card.archived{opacity:.55}
-.cal-card .num{font-family:'Poppins',sans-serif;font-weight:400;letter-spacing:-.02em;font-size:64px;line-height:.85;font-style:italic;color:var(--rosa-deep)}
+.cal-card .num{font-family:'Poppins',sans-serif;font-weight:300;letter-spacing:-.03em;font-size:48px;line-height:.9;color:var(--black)}
 .cal-card .label{font-family:'Poppins',sans-serif;font-weight:600;font-size:11px;letter-spacing:.15em;text-transform:uppercase;color:var(--grey)}
 .cal-card .range{font-family:'Poppins',sans-serif;font-weight:500;font-size:16px;margin-top:4px}
 .cal-card .status-chip{position:absolute;top:12px;right:12px;font-family:'Poppins',sans-serif;font-weight:600;font-size:9px;letter-spacing:.1em;text-transform:uppercase;padding:3px 8px;border-radius:10px}
 .status-active{background:var(--green-ok);color:#fff}
 .status-draft{background:var(--yellow-low);color:#fff}
 .status-archived{background:var(--cream-dark);color:var(--grey)}
-.cal-card .stats-mini{font-family:'Poppins',sans-serif;font-weight:600;font-size:10px;color:var(--grey);margin-top:auto;padding-top:12px;border-top:1px dotted var(--cream-dark)}
+.cal-card .stats-mini{font-size:12px;color:var(--grey);margin-top:auto;padding-top:8px}
 
 .empty-state{padding:64px 24px;text-align:center;color:var(--grey);background:var(--paper);font-family:'Poppins',sans-serif;font-weight:600;font-size:11px;letter-spacing:.1em;grid-column:1/-1}
 
@@ -1107,7 +1113,25 @@ header,.hub-header{position:static !important;background:transparent !important;
 .brief-wa:active{opacity:.7}
 
 /* Saludo por hora en el header · hero grande */
-.greeting{font-size:30px;color:var(--black);font-weight:700;margin-top:10px;letter-spacing:-.03em;line-height:1.15;min-height:36px}
+.greeting{display:none}
+/* ── Inicio · hero del día ── */
+.home-hero{position:relative;overflow:hidden;border-radius:26px;padding:22px 20px 18px;color:var(--cream);margin:0 0 12px;
+  background:radial-gradient(120% 140% at 100% 0%,rgba(238,205,204,.6) 0%,rgba(201,134,142,.2) 38%,rgba(28,28,28,0) 70%),linear-gradient(160deg,#2a2224 0%,#1C1C1C 60%)}
+.home-hero .k{font-family:'Poppins',sans-serif;font-weight:600;font-size:9.5px;letter-spacing:.16em;text-transform:uppercase;color:rgba(237,235,230,.6);margin-bottom:12px;text-transform:uppercase}
+.home-hero .say{font-family:'Poppins',sans-serif;font-weight:300;font-size:25px;line-height:1.25;letter-spacing:-.015em;color:rgba(237,235,230,.72);text-wrap:balance}
+.home-hero .say b{font-weight:600;color:var(--cream)}
+.home-hero .say em{font-style:normal;font-weight:600;color:var(--rosa)}
+.home-stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin-top:18px}
+.home-stats button{border:none;text-align:left;cursor:pointer;font-family:inherit;color:var(--cream);background:rgba(237,235,230,.1);border-radius:16px;padding:10px 12px;display:flex;flex-direction:column;gap:2px;min-width:0}
+.home-stats button:focus-visible{outline:2px solid var(--rosa);outline-offset:2px}
+.home-stats .v{font-family:'Poppins',sans-serif;font-weight:300;font-size:24px;line-height:1.05;letter-spacing:-.02em;font-variant-numeric:tabular-nums;white-space:nowrap}
+.home-stats .l{font-size:10.5px;color:rgba(237,235,230,.65);line-height:1.25}
+.home-ph{display:flex;gap:6px;margin-top:14px;overflow-x:auto;scrollbar-width:none}
+.home-ph::-webkit-scrollbar{display:none}
+.home-ph img{width:44px;height:56px;border-radius:12px;object-fit:cover;flex:none;background:rgba(237,235,230,.1)}
+.home-ph span{flex:none;display:flex;align-items:center;justify-content:center;width:44px;height:56px;border-radius:12px;background:rgba(237,235,230,.12);font-size:11px;font-weight:600}
+.brief-date{display:none}
+.brief-title{font-size:15px;font-weight:600;letter-spacing:-.01em;color:var(--black);margin:18px 2px 8px}
 .greeting b{color:var(--rosa-deep);font-weight:700}
 
 /* Secciones sin barra flotante: solo un back '‹ Inicio' simple que
@@ -1155,22 +1179,20 @@ header,.hub-header{position:static !important;background:transparent !important;
   <header>
     <div>
       <div class="logo">LUXUR</div>
-      <div class="greeting" id="hubGreeting"></div>
+      <div class="greeting" id="hubGreeting" hidden></div>
     </div>
   </header>
 
-  <div class="session-bar">
-    <div class="session-status">
-      <span class="sync-dot connected"></span>
-      <span>Sesión:</span>
-      <span class="editor-chip" id="editorList">—</span>
-    </div>
-    <button class="signout-btn" id="signOutBtn">Salir</button>
-  </div>
-
   <!-- HUB HOME · brief del día: tus tareas + a tener en cuenta -->
   <section id="hubHome" class="hub-brief">
-    <div class="brief-date" id="briefDate">—</div>
+    <div class="home-hero" id="homeHero"><div class="k" id="briefDate">—</div><p class="say">Cargando tu día…</p></div>
+    <div class="session-bar">
+      <div class="session-status">
+        <span class="sync-dot connected"></span>
+        <span class="editor-chip" id="editorList">—</span>
+      </div>
+      <button class="signout-btn" id="signOutBtn">Salir</button>
+    </div>
 
     <h2 class="brief-title">Tus tareas de hoy</h2>
     <div id="briefTasks" class="brief-list"><div class="brief-empty">Cargando…</div></div>
@@ -1969,6 +1991,7 @@ async function loadDailyBrief(){
     .select('id,day,type,title,assignee,status,approved')
     .eq('calendar_id', cal.id).eq('day', dayKey).order('position');
   const mine = (pieces||[]).filter(p => canonicalEmail(p.assignee) === canonicalEmail(user.email));
+  homeMine = mine; renderHomeHero().catch(e => console.warn('hero', e));
   let rowsHtml = mine.map(p => `<a class="brief-row" href="${link(p)}">
       <span class="brief-ico">${typeIco(p.type)}</span>
       <span class="brief-body"><span class="brief-row-title">${escapeHtml(p.title||p.type)}</span><span class="brief-row-sub">${escapeHtml(p.type||'')}</span></span>
@@ -3504,6 +3527,48 @@ document.addEventListener('click', e => {
     }
   }, 350); // dejá que termine la transición de slide-in de la sección
 });
+
+
+// ═══ Inicio · hero del día ═══
+// Una frase con lo que importa hoy: tus piezas, la meta de la tienda y lo que llega esta semana.
+let homeMine = null, homeName = '';
+async function renderHomeHero(){
+  const el = document.getElementById('homeHero'); if (!el || !user) return;
+  const now = new Date(Date.now() - 5 * 3600_000), today = now.toISOString().slice(0, 10);
+  const in7 = new Date(now.getTime() + 7 * 86400_000).toISOString().slice(0, 10);
+  const DOWF = ['domingo','lunes','martes','miércoles','jueves','viernes','sábado'], MESF = ['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'];
+  const [bd, sd, pp] = await Promise.all([
+    supabase.from('budget_daily').select('amount,event').eq('day', today).eq('channel', 'tienda').maybeSingle(),
+    supabase.from('sales_channel_daily').select('net,orders').eq('day', today).eq('channel', 'tienda').maybeSingle(),
+    supabase.from('product_pipeline').select('id,design_name,product_name,quantity,tentative_date,photo_url,product_gid,category').eq('status', 'pendiente').gte('tentative_date', today).lte('tentative_date', in7).order('tentative_date'),
+  ]);
+  if (!homeName){
+    try { const { data } = await supabase.from('team_members').select('name').eq('email', canonicalEmail(user.email)).maybeSingle(); homeName = (data?.name || user.email.split('@')[0]).split(' ')[0]; } catch(_) { homeName = user.email.split('@')[0]; }
+    homeName = homeName.charAt(0).toUpperCase() + homeName.slice(1);
+  }
+  const h = now.getUTCHours();
+  const hello = h < 12 ? 'Buenos días' : h < 19 ? 'Buenas tardes' : 'Buenas noches';
+  const n = homeMine ? homeMine.length : 0, done = homeMine ? homeMine.filter(p => p.approved || p.status === 'listo').length : 0;
+  const goal = bd.data?.amount ? +bd.data.amount : null, sold = sd.data ? +sd.data.net : 0;
+  const pct = goal ? Math.round(sold / goal * 100) : null;
+  const arr = (pp.data || []), units = arr.reduce((a, e) => a + (e.quantity || 0), 0);
+  const parts = [];
+  parts.push(n ? `tienes <b>${n} pieza${n === 1 ? '' : 's'}</b> por entregar${done ? ` (${done} lista${done === 1 ? '' : 's'})` : ''}` : 'no tienes piezas asignadas');
+  if (goal) parts.push(pct >= 100 ? `la tienda <em>ya cumplió</em> la meta del día` : `la tienda va en <b>${pct} %</b> de su meta`);
+  if (units) parts.push(`esta semana llegan <b>${units.toLocaleString('es-CO')} jeans</b>`);
+  const say = `${hello}, <b>${escapeHtml(homeName)}</b>. Hoy ${parts.join(', ')}.`;
+  const mill = v => '$' + (v / 1e6).toFixed(1).replace('.', ',') + ' M';
+  const photos = arr.map(e => e.photo_url || findCatalogPhoto(e.product_name, e.product_gid)).filter(Boolean).slice(0, 6);
+  el.innerHTML = `<div class="k">${DOWF[now.getUTCDay()]} ${now.getUTCDate()} de ${MESF[now.getUTCMonth()]}${bd.data?.event ? ` — ${escapeHtml(bd.data.event)}` : ''}</div>
+    <p class="say">${say}</p>
+    <div class="home-stats">
+      <button data-go="marketing"><span class="v">${n}</span><span class="l">piezas hoy</span></button>
+      <button data-go="fashionalytics"><span class="v">${goal ? mill(sold) : '—'}</span><span class="l">${goal ? 'de ' + mill(goal) + ' en tienda' : 'tienda hoy'}</span></button>
+      <button data-go="produccion"><span class="v">${units.toLocaleString('es-CO')}</span><span class="l">jeans llegan esta semana</span></button>
+    </div>
+    ${photos.length ? `<div class="home-ph">${photos.map(u => `<img src="${escapeHtml(u)}" alt="" loading="lazy">`).join('')}${arr.length > photos.length ? `<span>+${arr.length - photos.length}</span>` : ''}</div>` : ''}`;
+  el.querySelectorAll('[data-go]').forEach(b => b.addEventListener('click', () => showHubSection(b.getAttribute('data-go'))));
+}
 
 // ═══ Marketing · Trimestre dorado ═══
 // La estrategia del Q4 (mezcla adquisición / autoridad / venta por mes) y el plan de acción comercial (PAC) por canal.
@@ -6106,12 +6171,19 @@ async function loadCalendars(){
     return;
   }
 
-  // Get piece counts per calendar (single query)
+  // Piezas por calendario y su palanca (estimada por el tipo de pieza:
+  // lanzamiento → adquisición · recap → autoridad · push y cross → venta)
   const { data: counts } = await supabase
     .from('calendar_pieces')
-    .select('calendar_id', { count: 'exact', head: false });
-  const countMap = {};
-  if (counts) counts.forEach(r => { countMap[r.calendar_id] = (countMap[r.calendar_id] || 0) + 1; });
+    .select('calendar_id,color');
+  const countMap = {}, mixMap = {};
+  const lever = c => c === 'launch' ? 0 : c === 'recap' ? 1 : (c === 'push' || c === 'cross') ? 2 : -1;
+  if (counts) counts.forEach(r => {
+    countMap[r.calendar_id] = (countMap[r.calendar_id] || 0) + 1;
+    const k = lever(r.color); if (k < 0) return;
+    (mixMap[r.calendar_id] = mixMap[r.calendar_id] || [0, 0, 0])[k]++;
+  });
+  const targetFor = start => { const m = start.slice(5, 7); return m === '10' ? TD.oct.mix : m === '11' ? TD.nov.mix : m === '12' ? TD.dic.mix : null; };
 
   calList.innerHTML = data.map(c => {
     const range = formatRange(c.start_date, c.end_date);
@@ -6124,6 +6196,11 @@ async function loadCalendars(){
         <div class="num">${c.week_number}</div>
         <div class="label">Semana</div>
         <div class="range">${escapeHtml(range)}</div>
+        ${(() => { const mx = mixMap[c.id], tg = targetFor(c.start_date); if (!mx || !tg) return ''; const tot = mx[0] + mx[1] + mx[2] || 1; const pc = mx.map(v => Math.round(v / tot * 100));
+          const worst = [0, 1, 2].map(i => [Math.abs(pc[i] - tg[i]), i]).sort((a, b) => b[0] - a[0])[0];
+          const nm = ['adquisición', 'autoridad', 'venta'];
+          return `<div class="mix"><i class="adq" style="width:${pc[0]}%"></i><i class="aut" style="width:${pc[1]}%"></i><i class="ven" style="width:${pc[2]}%"></i></div>
+          <div class="mixt">${pc[0]} / ${pc[1]} / ${pc[2]} contra <b>${tg[0]} / ${tg[1]} / ${tg[2]}</b> del mes${worst[0] >= 15 ? ` <span class="off">${pc[worst[1]] > tg[worst[1]] ? 'sobra' : 'falta'} ${nm[worst[1]]}</span>` : ''}</div>`; })()}
         <div class="stats-mini">${pieces} piezas</div>
       </a>
     `;
