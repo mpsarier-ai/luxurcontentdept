@@ -1101,6 +1101,36 @@ header,.hub-header{position:static !important;background:transparent !important;
 .env-kpis{grid-template-columns:repeat(4,1fr)}
 @media (max-width:520px){.env-kpis{grid-template-columns:repeat(2,1fr)}}
 .env-list{display:flex;flex-direction:column;gap:10px;margin-bottom:40px}
+.act-card{flex:0 0 72%;max-width:280px;border:none;border-radius:20px;background:var(--rosa);color:var(--black);text-align:left;padding:14px 16px;display:flex;flex-direction:column;gap:4px;cursor:pointer;box-shadow:0 1px 2px rgba(0,0,0,.04),0 8px 22px rgba(0,0,0,.06)}
+.act-card b{font-family:'Poppins',sans-serif;font-weight:600;font-size:15px}
+.act-card span{font-size:11.5px;color:#5a3a40;line-height:1.3}
+.act-card.dark{background:var(--black);color:var(--cream)}.act-card.dark span{color:rgba(237,235,230,.7)}
+.shp{flex:0 0 auto;width:178px;border:none;border-radius:20px;background:var(--paper);text-align:left;color:var(--black);padding:0;overflow:hidden;cursor:pointer;display:flex;flex-direction:column;box-shadow:0 1px 2px rgba(0,0,0,.04),0 8px 22px rgba(0,0,0,.06);position:relative}
+.shp .im{height:110px;background:var(--cream-dark);position:relative}
+.shp .im img{width:100%;height:100%;object-fit:cover;display:block}
+.shp .im .dy{position:absolute;right:10px;bottom:8px;font-family:'Poppins',sans-serif;font-weight:300;font-size:30px;letter-spacing:-.02em;line-height:1;color:#fff;text-shadow:0 1px 6px rgba(0,0,0,.45)}
+.shp .im .dy small{display:block;font-size:9px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;text-align:right}
+.shp .bd{padding:10px 12px 12px;display:flex;flex-direction:column;gap:2px}
+.shp .nm{font-family:'Poppins',sans-serif;font-weight:600;font-size:13px;line-height:1.25;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.shp .od{font-size:10.5px;color:var(--grey)}
+.shp .wy{font-size:11.5px;line-height:1.3;margin-top:4px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.shp::before{content:'';position:absolute;left:0;top:0;bottom:0;width:4px;background:transparent}
+.shp.bad::before{background:var(--red-out)}.shp.warn::before{background:var(--yellow-low)}.shp.ok::before{background:var(--green-ok)}
+.shp.bad .wy{color:#8f2f2a}.shp.warn .wy{color:#7a5e00}.shp.ok .wy{color:#1e7b34}
+.bdc{flex:0 0 auto;width:200px;border-radius:20px;background:var(--paper);padding:12px;display:flex;flex-direction:column;gap:6px;box-shadow:0 1px 2px rgba(0,0,0,.04),0 8px 22px rgba(0,0,0,.06)}
+.bdc .hd{display:flex;gap:10px;align-items:center}
+.bdc .hd img,.bdc .hd .noimg{width:48px;height:64px;border-radius:10px;object-fit:cover;background:var(--cream-dark);flex:none}
+.bdc .t{font-family:'Poppins',sans-serif;font-weight:500;font-size:12px;line-height:1.25;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.bdc .n{font-family:'Poppins',sans-serif;font-weight:300;font-size:26px;letter-spacing:-.02em;line-height:1}
+.bdc .n small{font-size:10px;color:var(--grey);font-weight:400;margin-left:3px}
+.bdc .sz{display:flex;flex-wrap:wrap;gap:3px}
+.bdc .sz i{font-style:normal;font-family:'Poppins',sans-serif;font-size:9.5px;font-weight:600;padding:3px 6px;border-radius:6px;background:var(--cream)}
+.bdc .go{border:none;border-radius:999px;background:var(--black);color:var(--cream);font-family:'Poppins',sans-serif;font-weight:600;font-size:12px;padding:9px;margin-top:2px;cursor:pointer}
+.bdc.mv .n{color:var(--rosa-deep)}.bdc.mv.in .n{color:var(--green-ok)}
+.bdc .s{font-size:10.5px;color:var(--grey);line-height:1.3}
+.env-ev{display:grid;grid-template-columns:92px 1fr;gap:8px;font-size:12px;padding:6px 0;border-bottom:1px solid rgba(0,0,0,.06)}
+.env-ev .d{color:var(--grey);font-size:11px}
+.env-ev.inc span:last-child{color:var(--red-out);font-weight:500}
 .env-row{background:var(--paper);border-radius:16px;padding:14px 16px;box-shadow:0 1px 3px rgba(0,0,0,.05);border-left:4px solid var(--cream-dark);display:grid;grid-template-columns:auto 1fr auto;gap:12px;align-items:center;cursor:pointer}
 .env-row.bad{border-left-color:var(--red-out)}.env-row.warn{border-left-color:var(--yellow-low)}.env-row.ok{border-left-color:var(--green-ok)}
 .env-ph{width:44px;height:56px;border-radius:10px;object-fit:cover;background:#f2f2f0;flex:none}
@@ -1460,33 +1490,38 @@ header,.hub-header{position:static !important;background:transparent !important;
   <!-- BODEGA CASA · sub-ubicación de LUXUR Medellín. Solo recepción y traslado. -->
   <section id="hubBodega" class="hub-section" hidden>
     <button class="hub-back" data-hub-back>Inicio</button>
-    <h2 class="section-title"><span>Bodega Casa</span><span class="meta">sale de LUXUR Medellín</span></h2>
-    <p class="av-intro">Lo que hay en la casa y lo que ya está en la tienda. Shopify solo conoce <b>LUXUR Medellín</b> = casa + tienda. <b>Recibir</b> suma en Shopify; <b>trasladar</b> solo mueve entre casa y tienda.</p>
-    <div class="prod-kpis env-kpis" id="bdKpis"></div>
-    <div class="bd-actions">
-      <button class="new-week-btn" id="bdReceiveBtn">＋ Recibir lote</button>
-      <button class="new-week-btn" id="bdMoveBtn" style="background:var(--black)">→ Trasladar a tienda</button>
+    <div class="sec-hero" id="bdHero"><div class="k">Bodega casa</div><p class="say">Cargando la casa…</p></div>
+    <div class="rail">
+      <button class="act-card" id="bdReceiveBtn"><b>Recibir lote</b><span>Llega producción a la casa y, si quieres, suma en Shopify Medellín</span></button>
+      <button class="act-card dark" id="bdMoveBtn"><b>Trasladar a tienda</b><span>Sale de la casa a la tienda, Shopify no cambia</span></button>
     </div>
-    <div class="mk-tabs" id="bdTabs">
-      <button class="mk-tab active" data-bd="casa">En casa</button>
-      <button class="mk-tab" data-bd="historial">Movimientos</button>
+    <div class="sub-tabs" data-tabs="bd">
+      <button class="on" data-tab="casa">En casa</button>
+      <button data-tab="historial">Movimientos</button>
     </div>
-    <div class="av-list" id="bdList"><div class="empty-state">Cargando…</div></div>
+    <div data-panel="bd:casa">
+      <div class="rail" id="bdList"><div class="empty-state">Cargando…</div></div>
+      <p class="rail-hint">Shopify solo conoce LUXUR Medellín, que es casa más tienda</p>
+    </div>
+    <div data-panel="bd:historial" hidden>
+      <div class="rail" id="bdHist"></div>
+    </div>
   </section>
 
   <!-- ENVÍOS · logística: novedades, demorados, sin despachar -->
   <section id="hubEnvios" class="hub-section" hidden>
     <button class="hub-back" data-hub-back>Inicio</button>
-    <h2 class="section-title"><span>Envíos</span><span class="meta" id="envMeta">—</span></h2>
-    <div class="prod-kpis env-kpis" id="envKpis"></div>
-    <div class="mk-tabs" id="envTabs">
-      <button class="mk-tab active" data-env="atencion">Necesitan atención</button>
-      <button class="mk-tab" data-env="camino">En camino</button>
-      <button class="mk-tab" data-env="despachar">Sin despachar</button>
-      <button class="mk-tab" data-env="entregados">Entregados</button>
-      <button class="mk-tab" data-env="confirmar">Sin confirmar</button>
+    <div class="sec-hero" id="envHero"><div class="k">Envíos</div><p class="say">Cargando los envíos…</p></div>
+    <div class="sub-tabs" data-tabs="env">
+      <button class="on" data-tab="atencion">Atención</button>
+      <button data-tab="camino">En camino</button>
+      <button data-tab="despachar">Sin despachar</button>
+      <button data-tab="entregados">Entregados</button>
+      <button data-tab="confirmar">Sin confirmar</button>
     </div>
-    <div class="env-list" id="envList"><div class="empty-state">Cargando…</div></div>
+    <div class="rail" id="envList"><div class="empty-state">Cargando…</div></div>
+    <p class="rail-hint" id="envHint">Toca un envío para ver el recorrido y gestionarlo</p>
+    <div class="need-sheet" id="envSheet"><div class="bg" data-env-close></div><div class="pn" id="envSheetBody"></div></div>
   </section>
 
 <!-- TAB BAR estilo WhatsApp · navegación principal del hub -->
@@ -1988,7 +2023,7 @@ let funnel = [];    // store_funnel_daily: embudo diario de la tienda
 let searches = [];  // store_searches: qué buscan en la tienda y si encontraron
 let shipments = []; // shipments: logística, un renglón por pedido con envío
 let bodega = [];    // bodega_moves: libro mayor de la casa
-let bdTab = 'casa', bdKind = 'recepcion', bdSelected = null, bdMedellin = null;
+let bdKind = 'recepcion', bdSelected = null, bdMedellin = null;
 let envTab = 'atencion';
 let dmTab = 'sin-stock';
 
@@ -2451,47 +2486,47 @@ function bodegaStock(){
   return [...m.values()];
 }
 function renderBodega(){
-  const el = document.getElementById('bdList'), kp = document.getElementById('bdKpis');
+  const el = document.getElementById('bdList'), hist = document.getElementById('bdHist'), hero = document.getElementById('bdHero');
   if (!el) return;
   const stock = bodegaStock();
   const enCasa = stock.reduce((n, x) => n + Math.max(0, x.casa), 0);
+  const refs = new Set(stock.filter(x => x.casa > 0).map(x => x.gid || x.title)).size;
   const weekAgo = Date.now() - 7 * 86400000;
   const recib7 = bodega.filter(r => r.kind === 'recepcion' && new Date(r.created_at) > weekAgo).reduce((n, r) => n + r.qty, 0);
   const tras7 = bodega.filter(r => r.kind === 'traslado' && new Date(r.created_at) > weekAgo).reduce((n, r) => n + r.qty, 0);
   const lastRec = bodega.find(r => r.kind === 'recepcion');
-  if (kp) kp.innerHTML = [
-    ['Unidades en casa', enCasa, stock.filter(x => x.casa > 0).length + ' referencias'],
-    ['Recibidas · 7d', recib7, 'llegaron a la casa'],
-    ['Trasladadas · 7d', tras7, 'pasaron a la tienda'],
-    ['Última recepción', lastRec ? rtFmtD(lastRec.created_at.slice(0,10)) : '—', lastRec ? shortNameFa(lastRec.product_title) : 'ninguna todavía'],
-  ].map(([l, v, sub]) => `<div class="prod-kpi"><div class="pk-label">${l}</div><div class="pk-num">${v}</div><div class="pk-cost"><span class="pk-cost-line">${escapeHtml(String(sub))}</span></div></div>`).join('');
-
-  if (bdTab === 'historial'){
-    if (!bodega.length){ el.innerHTML = '<div class="fa-empty">Sin movimientos todavía.</div>'; return; }
-    el.innerHTML = bodega.slice(0, 80).map(r => {
+  if (hero){
+    let s = enCasa ? `En la casa hay <b>${enCasa}</b> ${enCasa === 1 ? 'unidad' : 'unidades'} de <b>${refs}</b> ${refs === 1 ? 'referencia' : 'referencias'}.` : `La casa está <b>vacía</b>.`;
+    if (recib7 || tras7) s += ` Esta semana ${recib7 ? `llegaron <b>${recib7}</b>` : ''}${recib7 && tras7 ? ' y ' : ''}${tras7 ? `pasaron <b>${tras7}</b> a la tienda` : ''}.`;
+    if (lastRec) s += ` Última recepción: <em>${escapeHtml(shortNameFa(lastRec.product_title))}</em>, ${rtFmtD(lastRec.created_at.slice(0,10))}.`;
+    else s += ' Cuando llegue un lote, tócalo en <em>Recibir lote</em>.';
+    hero.innerHTML = `<div class="k">Bodega casa</div><p class="say">${s}</p>`;
+  }
+  // Movimientos
+  if (hist){
+    hist.innerHTML = bodega.length ? bodega.slice(0, 40).map(r => {
       const img = findCatalogPhoto(r.product_title, r.product_gid);
       const inn = r.to_loc === 'casa';
-      return `<div class="bd-row ${inn ? 'in' : 'out'}">
-        ${img ? `<img class="env-ph" src="${escapeHtml(img)}" alt="" loading="lazy" style="height:56px">` : '<span class="env-ph"></span>'}
-        <div><div class="t">${escapeHtml(shortNameFa(r.product_title))} · ${escapeHtml(r.size)}</div>
-          <div class="s">${r.kind === 'recepcion' ? 'Recibido' : r.kind === 'traslado' ? 'Casa → tienda' : 'Ajuste'}${r.batch_name ? ' · ' + escapeHtml(r.batch_name) : ''} · ${rtFmtD(r.created_at.slice(0,10))}${r.created_by ? ' · ' + escapeHtml(r.created_by.split('@')[0]) : ''}${r.kind === 'recepcion' ? (r.shopify_synced ? ' · ✓ Shopify' : r.shopify_error ? ' · ⚠ Shopify no sumó' : '') : ''}</div></div>
-        <div class="n">${inn ? '+' : '−'}${r.qty}<small>${inn ? 'a casa' : 'a tienda'}</small></div></div>`;
-    }).join('');
-    return;
+      return `<div class="bdc mv ${inn ? 'in' : ''}">
+        <div class="hd">${img ? `<img src="${escapeHtml(img)}" alt="" loading="lazy">` : '<span class="noimg"></span>'}
+          <div style="min-width:0"><div class="n">${inn ? '+' : '−'}${r.qty}<small>${inn ? 'a casa' : 'a tienda'}</small></div><div class="t">${escapeHtml(shortNameFa(r.product_title))}, talla ${escapeHtml(r.size)}</div></div></div>
+        <div class="s">${r.kind === 'recepcion' ? 'Recibido' : r.kind === 'traslado' ? 'Casa a tienda' : 'Ajuste'}${r.batch_name ? ', ' + escapeHtml(r.batch_name) : ''}, ${rtFmtD(r.created_at.slice(0,10))}${r.created_by ? ', ' + escapeHtml(r.created_by.split('@')[0]) : ''}${r.kind === 'recepcion' ? (r.shopify_synced ? ', sumó en Shopify' : r.shopify_error ? ', Shopify no sumó' : '') : ''}</div>
+      </div>`;
+    }).join('') : '<div class="fa-empty" style="flex:1 0 100%">Sin movimientos todavía</div>';
   }
   // En casa: agrupado por producto, con tallas
   const byProd = new Map();
   for (const x of stock){ if (x.casa <= 0) continue; const k = x.gid || x.title; const e = byProd.get(k) || { gid: x.gid, title: x.title, sizes: [], total: 0 }; e.sizes.push(x); e.total += x.casa; byProd.set(k, e); }
   const list = [...byProd.values()].sort((a, b) => b.total - a.total);
-  if (!list.length){ el.innerHTML = '<div class="fa-empty">La casa está vacía. Cuando llegue un lote, tócalo en "Recibir lote".</div>'; return; }
+  if (!list.length){ el.innerHTML = '<div class="fa-empty" style="flex:1 0 100%">La casa está vacía</div>'; return; }
   el.innerHTML = list.map(p => {
     const img = findCatalogPhoto(p.title, p.gid);
     p.sizes.sort((a, b) => sizeOrderIndex(a.size) - sizeOrderIndex(b.size));
-    return `<div class="av-card">
-      <div class="av-head">${img ? `<img class="av-ph" src="${escapeHtml(img)}" alt="" loading="lazy">` : '<span class="av-ph"></span>'}
-        <div style="min-width:0;flex:1"><div class="av-t">${escapeHtml(shortNameFa(p.title))}</div><div class="av-n">${p.total}<small>en casa</small></div></div></div>
-      <div class="av-sizes">${p.sizes.map(x => `<div class="av-sz"><b>${escapeHtml(x.size)}</b><span class="w">${x.casa} en casa</span><span class="st"></span></div>`).join('')}</div>
-      <div class="av-actions"><button class="av-btn primary" data-bd-move="${escapeHtml(p.gid || '')}" data-bd-title="${escapeHtml(p.title)}">→ Trasladar a tienda</button></div>
+    return `<div class="bdc">
+      <div class="hd">${img ? `<img src="${escapeHtml(img)}" alt="" loading="lazy">` : '<span class="noimg"></span>'}
+        <div style="min-width:0"><div class="n">${p.total}<small>en casa</small></div><div class="t">${escapeHtml(shortNameFa(p.title))}</div></div></div>
+      <div class="sz">${p.sizes.map(x => `<i>${escapeHtml(x.size)} ${x.casa}</i>`).join('')}</div>
+      <button class="go" data-bd-move="${escapeHtml(p.gid || '')}" data-bd-title="${escapeHtml(p.title)}">Trasladar a tienda</button>
     </div>`;
   }).join('');
   el.querySelectorAll('[data-bd-move]').forEach(b => b.addEventListener('click', () => openBodegaModal('traslado', b.getAttribute('data-bd-title'))));
@@ -2566,8 +2601,6 @@ document.addEventListener('click', e => {
   if (e.target.id === 'bdReceiveBtn') return openBodegaModal('recepcion');
   if (e.target.id === 'bdMoveBtn') return openBodegaModal('traslado');
   if (e.target.id === 'bdSave') return saveBodegaMove();
-  const t = e.target.closest('.mk-tab[data-bd]');
-  if (t){ bdTab = t.getAttribute('data-bd'); document.querySelectorAll('.mk-tab[data-bd]').forEach(x => x.classList.toggle('active', x === t)); renderBodega(); }
 });
 document.addEventListener('change', e => { if (e.target.id === 'bdProduct') bodegaPickProduct(e.target.value); });
 
@@ -2604,55 +2637,73 @@ function shipmentIssue(sh){
   return { tone: '', why: sh.status_label || ENV_STEP[sh.step], days: sinceShip, dl: 'en camino' };
 }
 function renderShipments(){
-  const el = document.getElementById('envList'), meta = document.getElementById('envMeta'), kp = document.getElementById('envKpis');
+  const el = document.getElementById('envList'), hero = document.getElementById('envHero'), hint = document.getElementById('envHint');
   if (!el) return;
   const rows = (shipments || []).map(sh => ({ sh, i: shipmentIssue(sh) }));
   const open = rows.filter(r => r.sh.step >= 0 && r.sh.step < 4);
   const attention = rows.filter(r => r.i.tone === 'bad' || r.i.tone === 'warn');
+  const urgent = attention.filter(r => r.i.tone === 'bad').length;
   const delivered7 = rows.filter(r => r.sh.step === 4);
   const avgDays = delivered7.filter(r => r.sh.fulfilled_at && r.sh.delivered_at).map(r => (new Date(r.sh.delivered_at) - new Date(r.sh.fulfilled_at)) / 86400000);
   const avg = avgDays.length ? (avgDays.reduce((a,b) => a+b, 0) / avgDays.length) : null;
-  if (meta) meta.textContent = shipments.length ? `actualizado ${rtFmtD(new Date(Math.max(...shipments.map(s => new Date(s.updated_at)))).toISOString().slice(0,10))}` : '—';
-  if (kp) kp.innerHTML = [
-    ['Necesitan atención', attention.length, attention.filter(r => r.i.tone === 'bad').length + ' urgentes', attention.length ? 'bad' : ''],
-    ['En camino', open.filter(r => r.sh.step >= 1 && !r.i.unverified).length, open.filter(r => r.i.unverified).length + ' sin confirmar', ''],
-    ['Sin despachar', open.filter(r => r.sh.step === 0).length, 'pagados sin guía', open.filter(r => r.sh.step === 0 && daysSince(r.sh.order_created_at) >= 2).length ? 'warn' : ''],
-    ['Entregados · 7d', delivered7.length, avg != null ? avg.toFixed(1).replace('.', ',') + ' días promedio' : 'sin datos de viaje', 'ok'],
-  ].map(([l, v, sub, tone]) => `<div class="prod-kpi" style="border-top-color:${tone === 'bad' ? 'var(--red-out)' : tone === 'warn' ? 'var(--yellow-low)' : tone === 'ok' ? 'var(--green-ok)' : 'transparent'}"><div class="pk-label">${l}</div><div class="pk-num">${v}</div><div class="pk-cost"><span class="pk-cost-line">${sub}</span></div></div>`).join('');
-
+  const sinDesp = open.filter(r => r.sh.step === 0), sinDespOld = sinDesp.filter(r => daysSince(r.sh.order_created_at) >= 2).length;
+  const camino = open.filter(r => r.sh.step >= 1 && !r.i.unverified).length, sinConf = open.filter(r => r.i.unverified).length;
+  if (hero){
+    let s = attention.length ? `<b>${attention.length}</b> ${attention.length === 1 ? 'envío necesita' : 'envíos necesitan'} a alguien hoy${urgent ? `, <em>${urgent} ${urgent === 1 ? 'urgente' : 'urgentes'}</em>` : ''}.` : `<b>Ningún envío</b> necesita atención hoy.`;
+    s += ` Van <b>${camino}</b> en camino${sinConf ? ` y <b>${sinConf}</b> sin confirmar` : ''}.`;
+    if (sinDesp.length) s += ` <b>${sinDesp.length}</b> ${sinDesp.length === 1 ? 'pagado' : 'pagados'} sin despachar${sinDespOld ? `, ${sinDespOld} desde hace más de dos días` : ''}.`;
+    if (delivered7.length) s += ` Los <b>${delivered7.length}</b> entregados tardaron ${avg == null ? 'lo normal' : avg < 0.75 ? '<b>menos de un día</b>' : `<b>${avg.toFixed(1).replace('.', ',')} días</b>`}.`;
+    const upd = shipments.length ? rtFmtD(new Date(Math.max(...shipments.map(x => new Date(x.updated_at)))).toISOString().slice(0,10)) : '';
+    hero.innerHTML = `<div class="k">Envíos${upd ? `, actualizado ${upd}` : ''}</div><p class="say">${s}</p>`;
+  }
+  if (envTab === 'atencion' && !attention.length && !window.__envTabTouched){ envTab = sinDesp.length ? 'despachar' : 'camino'; }
+  document.querySelectorAll('.sub-tabs[data-tabs="env"] [data-tab]').forEach(x => x.classList.toggle('on', x.getAttribute('data-tab') === envTab));
   let list;
   if (envTab === 'camino') list = open.filter(r => r.sh.step >= 1 && r.i.tone !== 'bad' && !r.i.unverified);
   else if (envTab === 'confirmar') list = open.filter(r => r.i.unverified);
-  else if (envTab === 'despachar') list = open.filter(r => r.sh.step === 0);
+  else if (envTab === 'despachar') list = sinDesp;
   else if (envTab === 'entregados') list = delivered7;
   else list = attention;
   list.sort((a, b) => (a.i.tone === 'bad' ? 0 : a.i.tone === 'warn' ? 1 : 2) - (b.i.tone === 'bad' ? 0 : b.i.tone === 'warn' ? 1 : 2) || (b.i.days || 0) - (a.i.days || 0));
-  if (!list.length){ el.innerHTML = `<div class="fa-empty">${envTab === 'atencion' ? '✓ Ningún envío necesita atención' : 'Nada aquí por ahora'}</div>`; return; }
-  const num = n => (n || '').replace('#', '');
-  el.innerHTML = list.map(({ sh, i }) => {
+  if (hint) hint.textContent = list.length ? 'Toca un envío para ver el recorrido y gestionarlo' : '';
+  if (!list.length){ el.innerHTML = `<div class="fa-empty" style="flex:1 0 100%">${envTab === 'atencion' ? 'Ningún envío necesita atención' : 'Nada aquí por ahora'}</div>`; return; }
+  el.innerHTML = list.slice(0, 40).map(({ sh, i }) => {
     const item = (sh.items || [])[0];
-    const evs = [...(sh.events || [])].reverse().slice(0, 8);
-    return `<div class="env-row ${i.tone}" data-env-row="${escapeHtml(sh.order_name)}">
-      ${item?.image ? `<img class="env-ph" src="${escapeHtml(item.image)}" alt="" loading="lazy">` : '<span class="env-ph"></span>'}
-      <div style="min-width:0">
-        <div class="env-t">${escapeHtml(sh.customer_name || 'Sin nombre')} <small>${escapeHtml(sh.order_name)}${sh.city ? ' · ' + escapeHtml(sh.city) : ''}</small></div>
-        <div class="env-s">${(sh.items || []).map(x => escapeHtml(shortNameFa(x.title)) + (x.size ? ' ' + escapeHtml(x.size) : '')).join(' · ')}${sh.carrier ? ' · ' + escapeHtml(sh.carrier) : sh.is_local ? ' · mensajero local' : ''}</div>
-        <div class="env-why">${escapeHtml(i.why)}</div>
-      </div>
-      <div class="env-days">${i.days ?? '—'}<small>${i.dl}</small></div>
-      <div class="env-detail">
-        ${evs.length ? evs.map(e => `<div class="env-ev ${e.incidence ? 'inc' : ''}"><span class="d">${rtFmtD(String(e.at).slice(0,10))} ${String(e.at).slice(11,16)}</span><span>${escapeHtml(e.label || '')}${e.city ? ' · ' + escapeHtml(e.city) : ''}</span></div>`).join('') : '<div class="env-ev"><span class="d">—</span><span>Sin eventos de transportadora todavía</span></div>'}
-        <div class="env-acts">
-          <a class="av-btn" href="https://admin.shopify.com/store/luxurunited/orders?query=${encodeURIComponent(sh.order_name)}" target="_blank" rel="noopener">Pedido en Shopify</a>
-          ${sh.tracking_number ? `<a class="av-btn" href="https://luxurunited.com/pages/rastrea-tu-pedido?order=${encodeURIComponent(num(sh.order_name))}" target="_blank" rel="noopener">Guía ${escapeHtml(sh.tracking_number)}</a>` : ''}
-          ${(i.tone === 'bad' || i.tone === 'warn') && !sh.resolved_at ? `<button class="av-btn primary" data-env-resolve="${escapeHtml(sh.order_name)}">Ya lo estoy gestionando</button>` : ''}
-        </div>
-      </div>
-    </div>`;
+    return `<button class="shp ${i.tone}" data-env-open="${escapeHtml(sh.order_name)}">
+      <span class="im">${item?.image ? `<img src="${escapeHtml(item.image)}" alt="" loading="lazy">` : ''}${i.days === 0 ? '<span class="dy" style="font-size:16px;font-weight:600">hoy</span>' : `<span class="dy">${i.days ?? '—'}<small>${escapeHtml(i.dl)}</small></span>`}</span>
+      <span class="bd"><span class="nm">${escapeHtml(sh.customer_name || 'Sin nombre')}</span>
+        <span class="od">${escapeHtml(sh.order_name)}${sh.city ? ', ' + escapeHtml(sh.city) : ''}</span>
+        <span class="wy">${escapeHtml(i.why)}</span></span>
+    </button>`;
   }).join('');
-  el.querySelectorAll('[data-env-row]').forEach(r => r.addEventListener('click', e => { if (e.target.closest('a,button')) return; r.classList.toggle('open'); }));
-  el.querySelectorAll('[data-env-resolve]').forEach(b => b.addEventListener('click', () => resolveShipment(b.getAttribute('data-env-resolve'))));
+  el.querySelectorAll('[data-env-open]').forEach(b => b.addEventListener('click', () => openShipmentSheet(b.getAttribute('data-env-open'))));
 }
+function openShipmentSheet(orderName){
+  const sh = (shipments || []).find(x => x.order_name === orderName); if (!sh) return;
+  const i = shipmentIssue(sh);
+  const sheet = document.getElementById('envSheet'), body = document.getElementById('envSheetBody');
+  const evs = [...(sh.events || [])].reverse().slice(0, 10);
+  const num = n => (n || '').replace('#', '');
+  const item = (sh.items || [])[0];
+  body.innerHTML = `<div class="gr"></div>
+    <div style="display:flex;gap:14px;align-items:flex-start;margin-bottom:14px">
+      ${item?.image ? `<img src="${escapeHtml(item.image)}" alt="" style="width:84px;height:112px;border-radius:16px;object-fit:cover;flex:none">` : ''}
+      <div style="min-width:0"><div class="eyebrow" style="margin:0 0 4px">${escapeHtml(sh.order_name)}${sh.city ? ', ' + escapeHtml(sh.city) : ''}</div>
+        <h3>${escapeHtml(sh.customer_name || 'Sin nombre')}</h3>
+        <div class="sub">${(sh.items || []).map(x => escapeHtml(shortNameFa(x.title)) + (x.size ? ' ' + escapeHtml(x.size) : '')).join(', ')}${sh.carrier ? ', ' + escapeHtml(sh.carrier) : sh.is_local ? ', mensajero local' : ''}</div>
+        <div style="font-size:13px;font-weight:500;color:${i.tone === 'bad' ? '#8f2f2a' : i.tone === 'warn' ? '#7a5e00' : i.tone === 'ok' ? '#1e7b34' : 'var(--black)'}">${escapeHtml(i.why)}</div></div>
+    </div>
+    <div class="eyebrow">Recorrido</div>
+    ${evs.length ? evs.map(e => `<div class="env-ev ${e.incidence ? 'inc' : ''}"><span class="d">${rtFmtD(String(e.at).slice(0,10))} ${String(e.at).slice(11,16)}</span><span>${escapeHtml(e.label || '')}${e.city ? ', ' + escapeHtml(e.city) : ''}</span></div>`).join('') : '<div class="env-ev"><span class="d">—</span><span>Sin eventos de transportadora todavía</span></div>'}
+    <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:16px">
+      <a class="av-btn" style="flex:1 1 auto;padding:12px" href="https://admin.shopify.com/store/luxurunited/orders?query=${encodeURIComponent(sh.order_name)}" target="_blank" rel="noopener">Pedido en Shopify</a>
+      ${sh.tracking_number ? `<a class="av-btn" style="flex:1 1 auto;padding:12px" href="https://luxurunited.com/pages/rastrea-tu-pedido?order=${encodeURIComponent(num(sh.order_name))}" target="_blank" rel="noopener">Guía ${escapeHtml(sh.tracking_number)}</a>` : ''}
+      ${(i.tone === 'bad' || i.tone === 'warn') && !sh.resolved_at ? `<button class="av-btn primary" style="flex:1 1 100%;padding:13px" data-env-resolve="${escapeHtml(sh.order_name)}">Ya lo estoy gestionando</button>` : ''}
+    </div>`;
+  body.querySelectorAll('[data-env-resolve]').forEach(b => b.addEventListener('click', () => { sheet.classList.remove('on'); resolveShipment(b.getAttribute('data-env-resolve')); }));
+  sheet.classList.add('on');
+}
+document.addEventListener('click', e => { if (e.target.closest('[data-env-close]')) document.getElementById('envSheet')?.classList.remove('on'); });
 async function resolveShipment(orderName){
   const note = prompt('¿Qué se hizo? (ej: llamé a la clienta, reprogramé con Coordinadora)');
   if (note === null) return;
@@ -2662,10 +2713,9 @@ async function resolveShipment(orderName){
   renderShipments(); try { renderBriefAlerts(); } catch(_) {}
 }
 document.addEventListener('click', e => {
-  const t = e.target.closest('.mk-tab[data-env]');
+  const t = e.target.closest('.sub-tabs[data-tabs="env"] [data-tab]');
   if (!t) return;
-  envTab = t.getAttribute('data-env');
-  document.querySelectorAll('.mk-tab[data-env]').forEach(x => x.classList.toggle('active', x === t));
+  envTab = t.getAttribute('data-tab'); window.__envTabTouched = true;
   renderShipments();
 });
 
