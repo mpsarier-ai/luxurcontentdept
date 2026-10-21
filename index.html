@@ -1341,7 +1341,7 @@ a.act-card{text-decoration:none}
     </div>
     <div data-panel="pr:proveedores" hidden>
     <a class="fa-inv-link" id="colLink" href="coleccion.html" hidden>🧵 Atelier · colección y órdenes de compra <span>›</span></a>
-    <a class="fa-inv-link" href="#bodega" onclick="event.preventDefault();showHubSection('bodega')">🏠 Bodega Casa · recepción y traslados a Medellín <span>›</span></a>
+    <a class="fa-inv-link" href="#bodega" data-section="bodega">Bodega casa, recepción y traslados a la tienda <span>›</span></a>
     <!-- Cumplimiento por proveedor -->
     <div class="sc-card" id="supScore" hidden></div>
     <!-- Link único del proveedor seleccionado -->
@@ -3090,12 +3090,13 @@ function showHubSection(name){
   document.body.classList.add('hub-locked');
   location.hash = name;
 }
+window.showHubSection = showHubSection;
 document.addEventListener('click', e => {
   const htab = e.target.closest('.ht-tab');
   if (htab && htab.hasAttribute('data-ht')){ showHubSection(htab.getAttribute('data-ht')); return; }
   if (htab) return; // ht-tab tipo <a> (Inventario) → navegación normal
   const tile = e.target.closest('[data-section]');
-  if (tile){ showHubSection(tile.getAttribute('data-section')); return; }
+  if (tile){ e.preventDefault(); showHubSection(tile.getAttribute('data-section')); return; }
   const back = e.target.closest('[data-hub-back]');
   if (back){ showHubSection('home'); return; }
 });
