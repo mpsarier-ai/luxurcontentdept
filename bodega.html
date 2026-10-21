@@ -1,0 +1,512 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="theme-color" content="#EDEBE6">
+<title>LUXUR — Bodega</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Montserrat:wght@500;600;700&display=swap" rel="stylesheet">
+<script type="importmap">
+{ "imports": { "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js", "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/" } }
+</script>
+<style>
+:root{
+  --cream:#EDEBE6;--cream-dark:#E6E2DC;--rosa:#EECDCC;--rosa-hot:#E3A7AE;--rosa-deep:#C9868E;
+  --black:#1C1C1C;--paper:#FBFAF7;--line:#BDBAB3;--ink-warm:#3A2E2E;--grey:#5A5A5A;
+  --green-ok:#5a7a4f;--yellow-low:#c4a04a;--red-out:#b8504a;
+  --safe-top:env(safe-area-inset-top,0px);--safe-bottom:env(safe-area-inset-bottom,0px);
+}
+*{margin:0;padding:0;box-sizing:border-box;font-family:'Poppins',sans-serif}
+body{background:var(--cream);color:var(--black);font-size:14px;line-height:1.45;-webkit-tap-highlight-color:transparent;overscroll-behavior-y:none}
+button,input{font:inherit;color:inherit}button{cursor:pointer}
+.wrap{max-width:760px;margin:0 auto;padding:calc(12px + var(--safe-top)) 16px calc(40px + var(--safe-bottom))}
+.top{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:14px}
+.top .back{font-size:13px;font-weight:500;color:var(--grey);text-decoration:none}
+.top .logo{font-family:'Montserrat',sans-serif;font-weight:600;font-size:17px}
+.top .sync{display:flex;align-items:center;gap:6px;font-size:11px;color:var(--grey);white-space:nowrap}
+.sync-dot{width:7px;height:7px;border-radius:50%;background:var(--line)}.sync-dot.connected{background:var(--green-ok)}.sync-dot.editing{background:var(--yellow-low)}.sync-dot.offline{background:var(--red-out)}
+.sec-hero{position:relative;overflow:hidden;border-radius:26px;padding:20px 20px 18px;color:var(--cream);margin:0 0 12px;background:radial-gradient(120% 140% at 100% 0%,rgba(238,205,204,.6) 0%,rgba(201,134,142,.2) 38%,rgba(28,28,28,0) 70%),linear-gradient(160deg,#2a2224 0%,#1C1C1C 60%)}
+.sec-hero .k{font-weight:600;font-size:9.5px;letter-spacing:.16em;text-transform:uppercase;opacity:.65;margin-bottom:10px}
+.sec-hero .say{font-weight:300;font-size:21px;line-height:1.28;letter-spacing:-.015em;opacity:.8;text-wrap:balance}
+.sec-hero .say b{font-weight:600;opacity:1}.sec-hero .say em{font-style:normal;font-weight:600;color:var(--rosa)}
+
+/* escena */
+.stage{position:relative;height:min(52vh,460px);border-radius:26px;overflow:hidden;background:linear-gradient(180deg,#f3f1ec 0%,#EDEBE6 100%);box-shadow:inset 0 0 0 1px rgba(0,0,0,.04);touch-action:none}
+.stage canvas{display:block;width:100%;height:100%}
+.lbl{position:absolute;transform:translate(-50%,-100%);pointer-events:none;background:rgba(251,250,247,.92);backdrop-filter:blur(6px);border-radius:14px;padding:7px 11px;box-shadow:0 4px 14px rgba(0,0,0,.08);white-space:nowrap;transition:opacity .2s}
+.lbl .t{font-weight:600;font-size:9.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--grey)}
+.lbl .n{font-weight:300;font-size:20px;letter-spacing:-.02em;line-height:1.05}
+.lbl .n small{font-size:10.5px;color:var(--grey);margin-left:3px;font-weight:400}
+.lbl.alert{background:var(--rosa)}
+.lbl.alert .t{color:#8e3b45}
+.stage .hint{position:absolute;left:0;right:0;bottom:10px;text-align:center;font-size:11px;color:var(--grey);pointer-events:none}
+.rail{display:flex;gap:10px;overflow-x:auto;scroll-snap-type:x mandatory;-webkit-overflow-scrolling:touch;padding:2px 2px 10px;margin:0 -2px 4px;scrollbar-width:none}
+.rail::-webkit-scrollbar{display:none}.rail>*{scroll-snap-align:start;flex:0 0 auto}
+.rail-hint{font-size:11.5px;color:var(--grey);text-align:center;margin:0 0 10px}
+.eyebrow{font-weight:600;font-size:9.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--grey);margin:14px 2px 8px;display:flex;justify-content:space-between;align-items:center;gap:8px}
+.act-card{flex:0 0 auto;width:200px;border:none;border-radius:20px;background:var(--paper);color:var(--black);text-align:left;padding:14px 16px;display:flex;flex-direction:column;gap:4px;box-shadow:0 1px 2px rgba(0,0,0,.04),0 8px 22px rgba(0,0,0,.06);text-decoration:none;position:relative}
+.act-card b{font-weight:600;font-size:14.5px}
+.act-card span{font-size:11.5px;color:var(--grey);line-height:1.3}
+.act-card.dark{background:var(--black);color:var(--cream)}.act-card.dark span{color:rgba(237,235,230,.7)}
+.act-card.rosa{background:var(--rosa)}.act-card.rosa span{color:#5a3a40}
+.act-card .bd{position:absolute;right:12px;top:12px;min-width:24px;height:24px;border-radius:999px;background:var(--rosa-deep);color:#fff;font-size:12px;font-weight:600;display:flex;align-items:center;justify-content:center;padding:0 7px}
+.mv{flex:0 0 auto;width:190px;border-radius:18px;background:var(--paper);padding:10px;display:flex;gap:10px;align-items:center;box-shadow:0 1px 2px rgba(0,0,0,.04),0 6px 18px rgba(0,0,0,.05)}
+.mv img,.mv .noimg{width:44px;height:58px;border-radius:10px;object-fit:cover;background:var(--cream-dark);flex:none}
+.mv .n{font-weight:300;font-size:22px;letter-spacing:-.02em;line-height:1}.mv .n small{font-size:10px;color:var(--grey);font-weight:400}
+.mv .t{font-size:11px;font-weight:500;line-height:1.25;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.mv .s{font-size:10px;color:var(--grey)}
+.mv.in .n{color:var(--green-ok)}.mv.out .n{color:var(--rosa-deep)}
+.empty{flex:1 0 100%;border-radius:20px;background:var(--paper);padding:22px;text-align:center;color:var(--grey);font-size:13px}
+
+/* hojas */
+.sheet{position:fixed;inset:0;z-index:60;display:none}.sheet.on{display:block}
+.sheet .bg{position:absolute;inset:0;background:rgba(26,26,26,.38);backdrop-filter:blur(2px)}
+.sheet .pn{position:absolute;left:0;right:0;bottom:0;max-height:88vh;overflow:auto;background:var(--cream);border-radius:26px 26px 0 0;padding:10px 18px calc(24px + var(--safe-bottom));animation:up .32s cubic-bezier(.16,1,.3,1);max-width:760px;margin:0 auto}
+@keyframes up{from{transform:translateY(40px);opacity:0}to{transform:none;opacity:1}}
+.sheet .gr{width:40px;height:4px;border-radius:9px;background:rgba(0,0,0,.18);margin:0 auto 14px}
+.sheet h3{font-weight:300;font-size:24px;letter-spacing:-.02em;margin-bottom:2px}
+.sheet .sub{font-size:12.5px;color:var(--grey);margin-bottom:14px}
+.pcard{flex:0 0 auto;width:150px;border-radius:18px;background:var(--paper);padding:10px;display:flex;flex-direction:column;gap:6px;box-shadow:0 1px 2px rgba(0,0,0,.04),0 6px 18px rgba(0,0,0,.05);border:none;text-align:left;color:var(--black)}
+.pcard.sel{outline:2px solid var(--black);outline-offset:-2px}
+.pcard img,.pcard .noimg{width:100%;aspect-ratio:3/4;border-radius:12px;object-fit:cover;background:var(--cream-dark)}
+.pcard .t{font-size:11px;font-weight:500;line-height:1.25;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.pcard .n{font-weight:300;font-size:22px;letter-spacing:-.02em;line-height:1}.pcard .n small{font-size:10px;color:var(--grey);font-weight:400;margin-left:3px}
+.sz{display:flex;flex-wrap:wrap;gap:3px}.sz i{font-style:normal;font-size:9px;font-weight:600;padding:2px 5px;border-radius:6px;background:var(--cream-dark);color:var(--grey)}
+.qty{display:grid;grid-template-columns:repeat(auto-fill,minmax(64px,1fr));gap:8px;margin:8px 0 4px}
+.qty label{display:flex;flex-direction:column;gap:4px;background:var(--paper);border-radius:14px;padding:8px 8px 6px;box-shadow:0 1px 2px rgba(0,0,0,.05)}
+.qty b{font-size:11px;font-weight:600;text-align:center}.qty small{font-size:9.5px;color:var(--grey);text-align:center}
+.qty input{width:100%;border:none;background:var(--cream);border-radius:10px;padding:8px 4px;text-align:center;font-size:16px;font-weight:500;outline:none}
+.qty input:focus{box-shadow:0 0 0 2px var(--rosa)}
+.inp{width:100%;border:none;background:var(--paper);border-radius:14px;padding:11px 13px;font-size:13.5px;outline:none;box-shadow:0 1px 2px rgba(0,0,0,.05)}
+.btn{border:none;border-radius:999px;padding:12px 18px;font-size:13.5px;font-weight:600;background:var(--paper);color:var(--black);box-shadow:0 1px 2px rgba(0,0,0,.05)}
+.btn.primary{background:var(--black);color:var(--cream);flex:1}.btn.rosa{background:var(--rosa-deep);color:#fff;flex:1}
+.btn:disabled{opacity:.5}
+.acts{display:flex;gap:8px;margin-top:16px;align-items:center}
+.err{font-size:12px;color:var(--red-out);min-height:16px;margin-top:8px}
+.box-card{border-radius:20px;background:var(--paper);padding:14px;box-shadow:0 1px 2px rgba(0,0,0,.04),0 8px 22px rgba(0,0,0,.06);margin-bottom:10px}
+.box-card .h{display:flex;justify-content:space-between;align-items:baseline;gap:8px;margin-bottom:6px}
+.box-card .h b{font-weight:300;font-size:22px;letter-spacing:-.02em}.box-card .h b small{font-size:10.5px;color:var(--grey);font-weight:400;margin-left:3px}
+.box-card .h span{font-size:11px;color:var(--grey)}
+.line{display:flex;gap:10px;align-items:center;padding:6px 0;border-top:1px solid rgba(0,0,0,.06)}
+.line img,.line .noimg{width:30px;height:40px;border-radius:8px;object-fit:cover;background:var(--cream-dark);flex:none}
+.line .t{flex:1;min-width:0;font-size:11.5px;line-height:1.25}.line .t small{display:block;color:var(--grey);font-size:10px}
+.line input{width:58px;border:none;background:var(--cream);border-radius:10px;padding:7px 4px;text-align:center;font-size:15px;font-weight:500;outline:none}
+.line input.diff{background:#f2dad8;color:var(--red-out)}
+.login{position:fixed;inset:0;background:var(--cream);z-index:100;display:none;align-items:center;justify-content:center;padding:24px;text-align:center;color:var(--grey)}
+.login.show{display:flex}.login a{color:var(--black);font-weight:600}
+</style>
+</head>
+<body>
+<div class="login" id="login"><div>Entra primero desde el inicio de la app.<br><br><a href="index.html">Ir al inicio</a></div></div>
+
+<div class="wrap">
+  <div class="top">
+    <a href="index.html?stay=1#bodega" class="back">‹ Inicio</a>
+    <div class="logo">LUXUR</div>
+    <div class="sync"><span class="sync-dot" id="syncDot"></span><span id="syncLabel">Conectando…</span></div>
+  </div>
+
+  <section class="sec-hero"><div class="k">Bodega</div><p class="say" id="heroSay">Cargando la casa y la tienda…</p></section>
+
+  <div class="stage" id="stage">
+    <div class="lbl" id="lblCasa"><div class="t">Casa</div><div class="n">—</div></div>
+    <div class="lbl" id="lblTienda"><div class="t">Tienda</div><div class="n">—</div></div>
+    <div class="hint">Toca la casa o la tienda. Arrastra para girar</div>
+  </div>
+
+  <div class="rail" style="margin-top:12px">
+    <button class="act-card dark" id="actSend"><b>Enviar a la tienda</b><span>Elige el jean y las tallas que salen de la casa</span></button>
+    <button class="act-card rosa" id="actReceive"><b>Recibir en la tienda</b><span>Abre la caja, cuenta y confirma</span><span class="bd" id="pendBadge" style="display:none">0</span></button>
+    <a class="act-card" href="index.html?stay=1#bodega"><b>Recibir lote</b><span>Llega producción del proveedor a la casa</span></a>
+  </div>
+
+  <div class="eyebrow"><span>Últimos movimientos</span></div>
+  <div class="rail" id="moves"><div class="empty">Cargando…</div></div>
+</div>
+
+<!-- Hoja: casa -->
+<div class="sheet" id="shCasa"><div class="bg" data-close></div><div class="pn">
+  <div class="gr"></div><h3>La casa</h3><div class="sub" id="casaSub">—</div>
+  <div class="rail" id="casaRail"></div>
+  <div class="acts"><button class="btn primary" id="casaSend">Enviar a la tienda</button><button class="btn" data-close>Cerrar</button></div>
+</div></div>
+
+<!-- Hoja: enviar -->
+<div class="sheet" id="shSend"><div class="bg" data-close></div><div class="pn">
+  <div class="gr"></div><h3>Enviar a la tienda</h3><div class="sub">Toca el jean que sale de la casa y pon cuántas por talla</div>
+  <div class="rail" id="sendRail"></div>
+  <div id="sendQty"></div>
+  <input class="inp" id="sendNote" placeholder="Nota para quien recibe (opcional)" style="margin-top:8px">
+  <div class="err" id="sendErr"></div>
+  <div class="acts"><button class="btn primary" id="sendGo" disabled>Enviar</button><button class="btn" data-close>Cancelar</button></div>
+</div></div>
+
+<!-- Hoja: tienda -->
+<div class="sheet" id="shTienda"><div class="bg" data-close></div><div class="pn">
+  <div class="gr"></div><h3>La tienda</h3><div class="sub" id="tiendaSub">—</div>
+  <div id="tiendaBoxes"></div>
+  <div class="acts"><button class="btn" data-close style="flex:1">Cerrar</button></div>
+</div></div>
+
+<script type="module">
+import * as THREE from 'three';
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+
+const SUPABASE_URL = "https://nrpgtlcdvtesjbxpkxha.supabase.co";
+const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5ycGd0bGNkdnRlc2pieHBreGhhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg3ODkzNTAsImV4cCI6MjA5NDM2NTM1MH0.ntRHkFobaVK6RW9EYRwoww1ATr8N0zHMzXHM__5x8E0";
+const supabase = window.__mockSupabase || createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+const $ = id => document.getElementById(id);
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const SIZE_ORDER = ['XXS','XS','S','M','L','XL','XXL'];
+const sizeIdx = s => { const i = SIZE_ORDER.indexOf(String(s).toUpperCase()); return i < 0 ? 99 : i; };
+const MES = ['ene','feb','mar','abr','may','jun','jul','ago','sep','oct','nov','dic'];
+const fmtD = iso => { const d = new Date(iso); return `${d.getDate()} ${MES[d.getMonth()]}`; };
+const shortName = t => String(t || '').replace(/^JEAN(S)?\s+/i, '');
+function setSync(s, l){ $('syncDot').className = 'sync-dot ' + s; $('syncLabel').textContent = l; }
+
+const state = { user: null, catalog: [], moves: [], transfers: [], sendGid: null };
+
+// ═══════════════════ ESCENA 3D ═══════════════════
+const stage = $('stage');
+const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+renderer.shadowMap.enabled = true; renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+renderer.outputColorSpace = THREE.SRGBColorSpace;
+stage.insertBefore(renderer.domElement, stage.firstChild);
+const scene = new THREE.Scene();
+scene.fog = new THREE.Fog(0xEDEBE6, 26, 46);
+const camera = new THREE.PerspectiveCamera(38, 1, 0.1, 100);
+camera.position.set(1.5, 7.5, 16);
+const controls = new OrbitControls(camera, renderer.domElement);
+controls.target.set(0, 3.3, 0); controls.enablePan = false; controls.enableDamping = true; controls.dampingFactor = .08;
+ controls.minPolarAngle = .55; controls.maxPolarAngle = 1.35;
+controls.minAzimuthAngle = -.9; controls.maxAzimuthAngle = .9;
+
+scene.add(new THREE.HemisphereLight(0xfff6ec, 0xd8cfc2, 1.05));
+const sun = new THREE.DirectionalLight(0xfff1e0, 1.6);
+sun.position.set(-6, 14, 9); sun.castShadow = true; sun.shadow.mapSize.set(2048, 2048);
+Object.assign(sun.shadow.camera, { left: -16, right: 16, top: 14, bottom: -10, near: 1, far: 40 }); sun.shadow.bias = -0.0005;
+scene.add(sun);
+
+// texturas dibujadas a mano
+function canvasTex(w, h, draw, repeat){ const c = document.createElement('canvas'); c.width = w; c.height = h; draw(c.getContext('2d'), w, h); const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace; if (repeat){ t.wrapS = t.wrapT = THREE.RepeatWrapping; t.repeat.set(repeat[0], repeat[1]); } return t; }
+const brickTex = canvasTex(256, 256, (g, w, h) => {
+  g.fillStyle = '#d9c3ad'; g.fillRect(0, 0, w, h);
+  const bh = 16, bw = 40; let row = 0;
+  for (let y = 0; y < h; y += bh, row++){
+    const off = row % 2 ? bw / 2 : 0;
+    for (let x = -bw; x < w + bw; x += bw){
+      const v = 0.85 + Math.random() * .3;
+      g.fillStyle = `rgb(${Math.round(176*v)},${Math.round(78*v)},${Math.round(52*v)})`;
+      g.fillRect(x + off + 1.5, y + 1.5, bw - 3, bh - 3);
+    }
+  }
+}, [2.2, 2.6]);
+const concreteTex = canvasTex(256, 256, (g, w, h) => {
+  const grad = g.createLinearGradient(0, 0, w, h); grad.addColorStop(0, '#9a968f'); grad.addColorStop(1, '#8a867f'); g.fillStyle = grad; g.fillRect(0, 0, w, h);
+  for (let i = 0; i < 2600; i++){ const a = Math.random(); g.fillStyle = a < .5 ? 'rgba(255,255,255,.07)' : 'rgba(0,0,0,.07)'; g.fillRect(Math.random()*w, Math.random()*h, 2 + Math.random()*5, 1 + Math.random()*3); }
+}, [1.6, 1]);
+const pavingTex = canvasTex(256, 256, (g, w, h) => {
+  g.fillStyle = '#b86a52'; g.fillRect(0, 0, w, h); g.strokeStyle = 'rgba(255,255,255,.28)'; g.lineWidth = 2;
+  for (let y = 0; y <= h; y += 32){ g.beginPath(); g.moveTo(0, y); g.lineTo(w, y); g.stroke(); }
+  for (let x = 0; x <= w; x += 32){ g.beginPath(); g.moveTo(x, 0); g.lineTo(x, h); g.stroke(); }
+}, [3, 1.4]);
+let signTex;
+function makeSignTex(){ return canvasTex(640, 200, (g, w, h) => {
+  g.fillStyle = '#2b2b2b'; g.fillRect(0, 0, w, h);
+  g.font = '500 96px Montserrat, Poppins, sans-serif'; g.textAlign = 'center'; g.textBaseline = 'middle';
+  g.shadowColor = 'rgba(255,255,255,.9)'; g.shadowBlur = 28; g.fillStyle = '#ffffff'; g.fillText('L U X U R', w/2, h/2 + 4);
+  g.shadowBlur = 0; g.fillText('L U X U R', w/2, h/2 + 4);
+}); }
+
+const M = {
+  brick: new THREE.MeshStandardMaterial({ map: brickTex, roughness: .9 }),
+  wood: new THREE.MeshStandardMaterial({ color: 0x3a2a1f, roughness: .8 }),
+  cream: new THREE.MeshStandardMaterial({ color: 0xf2eee6, roughness: .7 }),
+  dark: new THREE.MeshStandardMaterial({ color: 0x2a2a2a, roughness: .6 }),
+  glass: new THREE.MeshPhysicalMaterial({ color: 0xbfd0dc, transparent: true, opacity: .22, roughness: .05, metalness: .1 }),
+  concrete: new THREE.MeshStandardMaterial({ map: concreteTex, roughness: .95 }),
+  interior: new THREE.MeshStandardMaterial({ color: 0x8f8a82, roughness: .9 }),
+  floor: new THREE.MeshStandardMaterial({ color: 0x5f5c58, roughness: .25, metalness: .2 }),
+  paving: new THREE.MeshStandardMaterial({ map: pavingTex, roughness: .9 }),
+  trunk: new THREE.MeshStandardMaterial({ color: 0xa08a6c, roughness: .9 }),
+  leaf: new THREE.MeshStandardMaterial({ color: 0x4f8a45, roughness: .8, side: THREE.DoubleSide }),
+  road: new THREE.MeshStandardMaterial({ color: 0x8f8d89, roughness: 1 }),
+  ground: new THREE.MeshStandardMaterial({ color: 0xE6E2DC, roughness: 1 }),
+  box: new THREE.MeshStandardMaterial({ color: 0xc9a77a, roughness: .9 }),
+  tape: new THREE.MeshStandardMaterial({ color: 0xC9868E, roughness: .6 }),
+  rail: new THREE.MeshStandardMaterial({ color: 0x3a3a3a, roughness: .4, metalness: .6 }),
+};
+function box(w, h, d, mat, x, y, z, shadow = true){ const m = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), mat); m.position.set(x, y, z); m.castShadow = shadow; m.receiveShadow = true; return m; }
+
+// suelo y calle
+const ground = new THREE.Mesh(new THREE.PlaneGeometry(80, 80), M.ground); ground.rotation.x = -Math.PI/2; ground.receiveShadow = true; scene.add(ground);
+const road = new THREE.Mesh(new THREE.PlaneGeometry(40, 4.2), M.road); road.rotation.x = -Math.PI/2; road.position.set(0, .01, 4.2); road.receiveShadow = true; scene.add(road);
+
+// ── Casa: una unidad de ladrillo, alero de madera, balcón y palma ──
+const CX = -5.4, TX = 5.6;
+const casa = new THREE.Group(); casa.position.set(CX, 0, 0);
+casa.add(box(4.4, 5.6, 4.8, M.brick, 0, 2.8, 0));
+casa.add(box(3.4, 2.2, 1.4, M.dark, -.1, 1.1, 1.75));              // garaje (planta baja retranqueada)
+casa.add(box(.5, 2.2, 1.4, M.brick, 1.95, 1.1, 1.75));
+casa.add(box(3.8, .18, 1.1, M.cream, 0, 2.3, 2.8));                 // losa del balcón
+for (let i = -1.7; i <= 1.7; i += .34) casa.add(box(.04, .9, .04, M.dark, i, 2.85, 3.3, false));
+casa.add(box(3.5, .04, .04, M.dark, 0, 3.3, 3.3, false));
+const win = new THREE.Mesh(new THREE.PlaneGeometry(1.7, 1.9), M.glass); win.position.set(.2, 3.6, 2.41); casa.add(win);
+casa.add(box(1.9, .08, .08, M.cream, .2, 4.6, 2.43, false)); casa.add(box(.08, 2.0, .08, M.cream, -.7, 3.6, 2.43, false)); casa.add(box(.08, 2.0, .08, M.cream, 1.1, 3.6, 2.43, false));
+casa.add(box(5.4, .26, 6.2, M.wood, 0, 5.72, .4));                   // alero de madera oscura
+casa.add(box(.5, .5, .36, new THREE.MeshStandardMaterial({ color: 0xcfcfcf, roughness: .5 }), 2.45, 4.4, -.6));  // aire acondicionado
+const pav = new THREE.Mesh(new THREE.PlaneGeometry(6, 3), M.paving); pav.rotation.x = -Math.PI/2; pav.position.set(.4, .012, 3.6); pav.receiveShadow = true; casa.add(pav);
+function palm(x, z, h){
+  const g = new THREE.Group(); g.position.set(x, 0, z);
+  const t = new THREE.Mesh(new THREE.CylinderGeometry(.11, .17, h, 8), M.trunk); t.position.y = h/2; t.castShadow = true; g.add(t);
+  for (let i = 0; i < 8; i++){
+    const leaf = new THREE.Mesh(new THREE.PlaneGeometry(.55, 2.4, 1, 6), M.leaf);
+    const pos = leaf.geometry.attributes.position; for (let k = 0; k < pos.count; k++){ const y = pos.getY(k); pos.setZ(k, -Math.pow((y + 1.2) / 2.4, 2) * 1.1); } leaf.geometry.computeVertexNormals();
+    leaf.position.y = h; leaf.rotation.y = (i / 8) * Math.PI * 2; leaf.rotation.x = -Math.PI / 2.4 - .35; leaf.castShadow = true;
+    const piv = new THREE.Group(); piv.position.y = h; piv.rotation.y = (i / 8) * Math.PI * 2; leaf.position.set(0, 0, 1.05); leaf.rotation.set(-1.0, 0, 0); piv.add(leaf); g.add(piv);
+  }
+  return g;
+}
+casa.add(palm(2.9, 3.4, 5.4)); casa.add(palm(-3.1, 3.2, 4.4));
+scene.add(casa);
+
+// ── Tienda: bloque de microcemento, letrero LUXUR, puerta en arco y vitrina ──
+const tienda = new THREE.Group(); tienda.position.set(TX, 0, 0);
+// cuerpo: fondo + fachada con el hueco de la vitrina (x de -0.4 a 3.4, y de 0.15 a 3.95)
+tienda.add(box(7.8, 5.4, 2.4, M.concrete, 0, 2.7, -1.4));          // fondo
+tienda.add(box(3.5, 5.4, 2.8, M.concrete, -2.15, 2.7, 1.2));        // bloque izquierdo (letrero y puerta)
+tienda.add(box(.5, 5.4, 2.8, M.concrete, 3.65, 2.7, 1.2));          // pilar derecho
+tienda.add(box(3.8, 1.45, 2.8, M.concrete, 1.5, 4.675, 1.2));       // dintel
+tienda.add(box(3.8, .15, 2.8, M.concrete, 1.5, .075, 1.2));         // zócalo
+signTex = makeSignTex();
+const sign = new THREE.Mesh(new THREE.PlaneGeometry(2.9, .9), new THREE.MeshBasicMaterial({ map: signTex })); sign.position.set(-2.3, 3.35, 2.615); tienda.add(sign);
+// puerta en arco (recesión oscura)
+tienda.add(box(1.1, 3.2, .5, M.dark, -.6, 1.6, 2.4));
+const arch = new THREE.Mesh(new THREE.CylinderGeometry(.55, .55, .5, 24, 1, false, 0, Math.PI), M.dark); arch.rotation.z = Math.PI/2; arch.rotation.y = Math.PI/2; arch.position.set(-.6, 3.2, 2.4); tienda.add(arch);
+const doorLight = new THREE.PointLight(0xffe2c0, 1.4, 4); doorLight.position.set(-.6, 2.2, 2.3); tienda.add(doorLight);
+// vitrina: hueco interior cálido con ropa colgada y vidrio
+const inner = box(3.8, 3.8, 4.4, new THREE.MeshStandardMaterial({ color: 0x9d978e, roughness: .9, side: THREE.BackSide }), 1.5, 2.05, .4, false); tienda.add(inner);
+const floorIn = new THREE.Mesh(new THREE.PlaneGeometry(3.8, 4.4), M.floor); floorIn.rotation.x = -Math.PI/2; floorIn.position.set(1.5, .16, .4); tienda.add(floorIn);
+const railBar = new THREE.Mesh(new THREE.CylinderGeometry(.02, .02, 3.6, 8), M.rail); railBar.rotation.z = Math.PI/2; railBar.position.set(1.5, 2.9, 0); tienda.add(railBar);
+const clothColors = [0x5b6d8a, 0x1f1f1f, 0xd9cdb8, 0x7d8fa8, 0xEECDCC, 0x2c3e5a, 0xbfb7a8, 0x3b3b3b, 0x8a9bb5, 0xe8dcc8];
+clothColors.forEach((c, i) => { const m = box(.22, 1.5 + (i % 3) * .15, .07, new THREE.MeshStandardMaterial({ color: c, roughness: .9 }), 0 + i * .33, 2.1, 0 + (i % 2) * .06, false); tienda.add(m); });
+for (let i = 0; i < 3; i++){ const spot = new THREE.PointLight(0xffe6c8, .9, 4.5); spot.position.set(.4 + i * 1.1, 3.6, 1.4); tienda.add(spot); tienda.add(box(.14, .2, .14, M.dark, .4 + i * 1.1, 3.85, 1.4, false)); }
+const glass = new THREE.Mesh(new THREE.PlaneGeometry(3.8, 3.8), M.glass); glass.position.set(1.5, 2.05, 2.61); tienda.add(glass);
+tienda.add(box(.05, 3.8, .06, M.dark, 1.5, 2.05, 2.62, false));
+const walk = new THREE.Mesh(new THREE.PlaneGeometry(8.2, 3), new THREE.MeshStandardMaterial({ color: 0xd6d2cb, roughness: .4 })); walk.rotation.x = -Math.PI/2; walk.position.set(0, .012, 3.9); walk.receiveShadow = true; tienda.add(walk);
+scene.add(tienda);
+
+// ── Cajas (traslados) ──
+const boxes = new THREE.Group(); scene.add(boxes);
+function makeBox(){ const g = new THREE.Group(); g.add(box(.7, .5, .55, M.box, 0, .25, 0)); g.add(box(.72, .08, .14, M.tape, 0, .51, 0, false)); return g; }
+const pathCurve = new THREE.CatmullRomCurve3([new THREE.Vector3(CX - .1, .02, 2.6), new THREE.Vector3(CX + 2, .02, 4.4), new THREE.Vector3(0, .02, 4.9), new THREE.Vector3(TX - 2, .02, 4.4), new THREE.Vector3(TX - .6, .02, 2.95)]);
+const flights = []; // cajas viajando
+const parked = [];  // cajas esperando en la tienda
+function layoutParked(){ parked.forEach((b, i) => { b.position.set(TX - .6 + (i % 3) * .8 - .8, .02 + Math.floor(i / 3) * .52, 3.3 + (i % 2) * .1); }); }
+function setParked(n){
+  while (parked.length > n){ const b = parked.pop(); boxes.remove(b); }
+  while (parked.length < n){ const b = makeBox(); parked.push(b); boxes.add(b); }
+  layoutParked();
+}
+function flyBox(onDone){ const b = makeBox(); boxes.add(b); flights.push({ b, t: 0, onDone }); }
+function openBox(){ if (!parked.length) return; const b = parked[parked.length - 1]; flights.push({ b, t: 0, open: true }); }
+
+// etiquetas y clics
+const anchors = { casa: new THREE.Vector3(CX, 6.5, 0), tienda: new THREE.Vector3(TX, 6.2, 0) };
+function placeLabels(){
+  const r = renderer.domElement.getBoundingClientRect();
+  for (const [k, v] of Object.entries(anchors)){
+    const p = v.clone().project(camera); const el = $(k === 'casa' ? 'lblCasa' : 'lblTienda');
+    el.style.left = ((p.x + 1) / 2 * r.width) + 'px'; el.style.top = ((1 - p.y) / 2 * r.height) + 'px'; el.style.opacity = p.z < 1 ? 1 : 0;
+  }
+}
+const ray = new THREE.Raycaster(); const ptr = new THREE.Vector2(); let downAt = null;
+renderer.domElement.addEventListener('pointerdown', e => { downAt = [e.clientX, e.clientY]; });
+renderer.domElement.addEventListener('pointerup', e => {
+  if (!downAt) return; const moved = Math.hypot(e.clientX - downAt[0], e.clientY - downAt[1]); downAt = null; if (moved > 8) return;
+  const r = renderer.domElement.getBoundingClientRect(); ptr.set(((e.clientX - r.left) / r.width) * 2 - 1, -((e.clientY - r.top) / r.height) * 2 + 1);
+  ray.setFromCamera(ptr, camera);
+  if (ray.intersectObject(casa, true).length) openCasa();
+  else if (ray.intersectObject(tienda, true).length || ray.intersectObject(boxes, true).length) openTienda();
+});
+
+let framed = false;
+function resize(){
+  const w = stage.clientWidth, h = stage.clientHeight; renderer.setSize(w, h, false); camera.aspect = w / h; camera.updateProjectionMatrix();
+  camera.fov = camera.aspect < 1 ? 50 : 40; camera.updateProjectionMatrix();
+  const halfW = 9.6, hHalf = Math.atan(Math.tan(THREE.MathUtils.degToRad(camera.fov / 2)) * camera.aspect);
+  const d = halfW / Math.tan(hHalf) + 2.5;
+  controls.maxDistance = d + 6; controls.minDistance = Math.max(8, d - 7);
+  if (!framed){ framed = true; camera.position.set(1.0, 3.3 + d * .32, d); }
+  else { const off = camera.position.clone().sub(controls.target); off.setLength(d); camera.position.copy(controls.target).add(off); }
+  controls.update();
+}
+window.addEventListener('resize', resize); resize();
+const clock = new THREE.Clock();
+function tick(){
+  requestAnimationFrame(tick);
+  const dt = Math.min(clock.getDelta(), .05);
+  for (let i = flights.length - 1; i >= 0; i--){
+    const f = flights[i]; f.t += dt / (f.open ? .7 : 2.4);
+    if (f.open){ const s = Math.max(0, 1 - f.t); f.b.scale.set(s, s, s); f.b.rotation.y += dt * 6; if (f.t >= 1){ boxes.remove(f.b); parked.splice(parked.indexOf(f.b), 1); flights.splice(i, 1); layoutParked(); } continue; }
+    const u = Math.min(f.t, 1), e = u < .5 ? 2*u*u : -1 + (4 - 2*u) * u;
+    const p = pathCurve.getPointAt(e); f.b.position.set(p.x, p.y + Math.abs(Math.sin(u * Math.PI * 6)) * .25, p.z);
+    const tan = pathCurve.getTangentAt(e); f.b.rotation.y = Math.atan2(tan.x, tan.z);
+    if (u >= 1){ boxes.remove(f.b); flights.splice(i, 1); if (f.onDone) f.onDone(); }
+  }
+  controls.update(); renderer.render(scene, camera); placeLabels();
+}
+tick();
+document.fonts?.ready.then(() => { const t = makeSignTex(); sign.material.map = t; sign.material.needsUpdate = true; });
+
+// ═══════════════════ DATOS ═══════════════════
+function stockCasa(){
+  const m = new Map();
+  for (const r of state.moves){
+    const k = (r.product_gid || r.product_title) + '|' + r.size;
+    const e = m.get(k) || { gid: r.product_gid, title: r.product_title, size: r.size, casa: 0 };
+    if (r.to_loc === 'casa') e.casa += r.qty; else if (r.from_loc === 'casa') e.casa -= r.qty;
+    m.set(k, e);
+  }
+  const byProd = new Map();
+  for (const x of m.values()){ if (x.casa <= 0) continue; const k = x.gid || x.title; const e = byProd.get(k) || { gid: x.gid, title: x.title, sizes: [], total: 0 }; e.sizes.push(x); e.total += x.casa; byProd.set(k, e); }
+  return [...byProd.values()].map(p => { p.sizes.sort((a, b) => sizeIdx(a.size) - sizeIdx(b.size)); return p; }).sort((a, b) => b.total - a.total);
+}
+const photoOf = (gid, title) => { const p = state.catalog.find(x => x.gid === gid) || state.catalog.find(x => x.title === title); return p && p.image ? p.image : null; };
+const pending = () => state.transfers.filter(t => t.status === 'en_camino');
+const linesQty = t => (t.lines || []).reduce((n, l) => n + (l.qty || 0), 0);
+
+async function loadAll(){
+  const [mv, tr, cat] = await Promise.all([
+    supabase.from('bodega_moves').select('*').order('created_at', { ascending: false }).limit(600),
+    supabase.from('bodega_transfers').select('*').order('created_at', { ascending: false }).limit(60),
+    supabase.from('shopify_catalog').select('products').eq('id', 1).maybeSingle()
+  ]);
+  if (mv.error){ setSync('offline', 'Sin acceso'); $('login').classList.add('show'); return; }
+  state.moves = mv.data || []; state.transfers = tr.data || [];
+  state.catalog = (cat.data && Array.isArray(cat.data.products)) ? cat.data.products : [];
+  renderAll(); setSync('connected', 'Sincronizado');
+}
+function renderAll(){
+  const stock = stockCasa(); const units = stock.reduce((n, p) => n + p.total, 0);
+  const pend = pending(); const pendUnits = pend.reduce((n, t) => n + linesQty(t), 0);
+  const today = new Date().toISOString().slice(0, 10);
+  const toStoreToday = state.moves.filter(r => r.kind === 'traslado' && r.created_at.slice(0, 10) === today).reduce((n, r) => n + r.qty, 0);
+  const recToday = state.transfers.filter(t => t.received_at && t.received_at.slice(0, 10) === today);
+  let s = units ? `En la casa hay <b>${units}</b> ${units === 1 ? 'unidad' : 'unidades'} de <b>${stock.length}</b> ${stock.length === 1 ? 'referencia' : 'referencias'}.` : `La casa está <b>vacía</b>.`;
+  if (pend.length) s += ` <em>${pend.length === 1 ? 'Una caja' : pend.length + ' cajas'}</em> con <b>${pendUnits}</b> ${pendUnits === 1 ? 'unidad' : 'unidades'} ${pend.length === 1 ? 'espera' : 'esperan'} que la tienda confirme.`;
+  else if (toStoreToday) s += ` Hoy pasaron <b>${toStoreToday}</b> a la tienda y ya están confirmadas.`;
+  else s += ' Nada en camino a la tienda.';
+  if (recToday.some(t => t.status === 'con_diferencia')) s += ` Hoy una caja llegó <em>con diferencia</em>, revísala.`;
+  $('heroSay').innerHTML = s;
+  $('lblCasa').querySelector('.n').innerHTML = `${units}<small>unds</small>`;
+  const lt = $('lblTienda'); lt.querySelector('.n').innerHTML = pend.length ? `${pend.length}<small>${pend.length === 1 ? 'caja por recibir' : 'cajas por recibir'}</small>` : `al día<small></small>`; lt.classList.toggle('alert', pend.length > 0);
+  const badge = $('pendBadge'); badge.style.display = pend.length ? '' : 'none'; badge.textContent = pend.length;
+  setParked(pend.length);
+  // movimientos
+  const mv = $('moves');
+  const items = [...state.transfers.filter(t => t.received_at).map(t => ({ at: t.received_at, kind: 'rec', t })), ...state.moves.map(r => ({ at: r.created_at, kind: 'mv', r }))].sort((a, b) => b.at.localeCompare(a.at)).slice(0, 24);
+  mv.innerHTML = items.length ? items.map(it => {
+    if (it.kind === 'rec'){ const n = (it.t.received_lines || it.t.lines || []).reduce((a, l) => a + (l.qty || 0), 0);
+      return `<div class="mv in"><span class="noimg" style="background:var(--rosa)"></span><div style="min-width:0"><div class="n">${n}<small> recibidas</small></div><div class="t">${it.t.status === 'con_diferencia' ? 'Caja con diferencia' : 'Caja confirmada en la tienda'}</div><div class="s">${fmtD(it.t.received_at)}${it.t.received_by ? ', ' + esc(it.t.received_by.split('@')[0]) : ''}</div></div></div>`; }
+    const r = it.r; const img = photoOf(r.product_gid, r.product_title); const inn = r.to_loc === 'casa';
+    return `<div class="mv ${inn ? 'in' : 'out'}">${img ? `<img src="${esc(img)}" alt="" loading="lazy">` : '<span class="noimg"></span>'}<div style="min-width:0"><div class="n">${inn ? '+' : '−'}${r.qty}<small> ${inn ? 'a casa' : r.to_loc === 'tienda' ? 'a tienda' : r.to_loc}</small></div><div class="t">${esc(shortName(r.product_title))}, talla ${esc(r.size)}</div><div class="s">${fmtD(r.created_at)}${r.created_by ? ', ' + esc(r.created_by.split('@')[0]) : ''}</div></div></div>`;
+  }).join('') : '<div class="empty">Sin movimientos todavía</div>';
+}
+
+// ── hoja casa ──
+function openCasa(){
+  const stock = stockCasa(); const units = stock.reduce((n, p) => n + p.total, 0);
+  $('casaSub').textContent = units ? `${units} unidades en ${stock.length} ${stock.length === 1 ? 'referencia' : 'referencias'}` : 'La casa está vacía';
+  $('casaRail').innerHTML = stock.length ? stock.map(p => { const img = photoOf(p.gid, p.title);
+    return `<div class="pcard">${img ? `<img src="${esc(img)}" alt="" loading="lazy">` : '<span class="noimg"></span>'}<div class="n">${p.total}<small>en casa</small></div><div class="t">${esc(shortName(p.title))}</div><div class="sz">${p.sizes.map(x => `<i>${esc(x.size)} ${x.casa}</i>`).join('')}</div></div>`; }).join('') : '<div class="empty">Cuando llegue un lote, recíbelo desde el inicio</div>';
+  $('casaSend').disabled = !stock.length;
+  $('shCasa').classList.add('on');
+}
+$('casaSend').addEventListener('click', () => { $('shCasa').classList.remove('on'); openSend(); });
+
+// ── hoja enviar ──
+function openSend(){
+  const stock = stockCasa(); state.sendGid = null; $('sendQty').innerHTML = ''; $('sendErr').textContent = ''; $('sendNote').value = ''; $('sendGo').disabled = true;
+  $('sendRail').innerHTML = stock.length ? stock.map(p => { const img = photoOf(p.gid, p.title);
+    return `<button class="pcard" data-pick="${esc(p.gid || p.title)}">${img ? `<img src="${esc(img)}" alt="" loading="lazy">` : '<span class="noimg"></span>'}<div class="n">${p.total}<small>en casa</small></div><div class="t">${esc(shortName(p.title))}</div></button>`; }).join('') : '<div class="empty">No hay nada en la casa para enviar</div>';
+  $('sendRail').querySelectorAll('[data-pick]').forEach(b => b.addEventListener('click', () => {
+    $('sendRail').querySelectorAll('.pcard').forEach(x => x.classList.toggle('sel', x === b));
+    const p = stock.find(x => (x.gid || x.title) === b.getAttribute('data-pick')); state.sendGid = p;
+    $('sendQty').innerHTML = `<div class="eyebrow" style="margin:12px 2px 6px">Cuántas salen por talla</div><div class="qty">${p.sizes.map(x => `<label><b>${esc(x.size)}</b><input type="number" inputmode="numeric" min="0" max="${x.casa}" placeholder="0" data-sz="${esc(x.size)}"><small>${x.casa} en casa</small></label>`).join('')}</div>`;
+    $('sendGo').disabled = false;
+  }));
+  $('shSend').classList.add('on');
+}
+$('sendGo').addEventListener('click', async () => {
+  const p = state.sendGid; const err = $('sendErr'); err.textContent = ''; if (!p) return;
+  const lines = [...document.querySelectorAll('#sendQty [data-sz]')].map(i => ({ size: i.getAttribute('data-sz'), qty: parseInt(i.value, 10) || 0 })).filter(l => l.qty > 0);
+  if (!lines.length){ err.textContent = 'Pon al menos una unidad en alguna talla.'; return; }
+  const bad = lines.find(l => l.qty > ((p.sizes.find(x => x.size === l.size) || {}).casa || 0)); if (bad){ err.textContent = `En la casa no hay ${bad.qty} de la talla ${bad.size}.`; return; }
+  const btn = $('sendGo'); btn.disabled = true; btn.textContent = 'Enviando…'; setSync('editing', 'Guardando…');
+  const who = state.user?.email || null; const note = $('sendNote').value.trim() || null;
+  const rows = lines.map(l => ({ kind: 'traslado', product_gid: p.gid, product_title: p.title, size: l.size, qty: l.qty, from_loc: 'casa', to_loc: 'tienda', note, created_by: who }));
+  const { error } = await supabase.from('bodega_moves').insert(rows);
+  if (!error){ await supabase.from('bodega_transfers').insert({ created_by: who, note, lines: lines.map(l => ({ product_gid: p.gid, product_title: p.title, size: l.size, qty: l.qty })) }); }
+  btn.disabled = false; btn.textContent = 'Enviar';
+  if (error){ err.textContent = 'No se guardó: ' + error.message; setSync('offline', 'No se guardó'); return; }
+  $('shSend').classList.remove('on');
+  flyBox(() => loadAll());
+  setSync('connected', 'Enviado');
+});
+
+// ── hoja tienda ──
+function openTienda(){
+  const pend = pending();
+  $('tiendaSub').textContent = pend.length ? `${pend.length === 1 ? 'Una caja espera' : pend.length + ' cajas esperan'} confirmación. Cuenta lo que llegó y confirma.` : 'No hay cajas por recibir. Todo lo enviado ya está confirmado.';
+  $('tiendaBoxes').innerHTML = pend.length ? pend.map(t => `<div class="box-card" data-tr="${esc(t.id)}">
+      <div class="h"><b>${linesQty(t)}<small>unidades</small></b><span>enviada el ${fmtD(t.created_at)}${t.created_by ? ' por ' + esc(t.created_by.split('@')[0]) : ''}</span></div>
+      ${t.note ? `<div style="font-size:12px;color:var(--grey);margin-bottom:6px">${esc(t.note)}</div>` : ''}
+      ${(t.lines || []).map((l, i) => { const img = photoOf(l.product_gid, l.product_title); return `<div class="line">${img ? `<img src="${esc(img)}" alt="">` : '<span class="noimg"></span>'}<div class="t">${esc(shortName(l.product_title))}<small>talla ${esc(l.size)}, enviadas ${l.qty}</small></div><input type="number" inputmode="numeric" min="0" value="${l.qty}" data-line="${i}" data-sent="${l.qty}"></div>`; }).join('')}
+      <div class="acts" style="margin-top:12px"><button class="btn rosa" data-confirm="${esc(t.id)}">Confirmar recepción</button></div>
+    </div>`).join('') : '';
+  $('tiendaBoxes').querySelectorAll('input[data-line]').forEach(i => i.addEventListener('input', () => i.classList.toggle('diff', parseInt(i.value, 10) !== parseInt(i.getAttribute('data-sent'), 10))));
+  $('tiendaBoxes').querySelectorAll('[data-confirm]').forEach(b => b.addEventListener('click', () => confirmTransfer(b.getAttribute('data-confirm'), b)));
+  $('shTienda').classList.add('on');
+}
+async function confirmTransfer(id, btn){
+  const t = state.transfers.find(x => x.id === id); if (!t) return;
+  const card = btn.closest('.box-card');
+  const received = (t.lines || []).map((l, i) => ({ ...l, qty: parseInt(card.querySelector(`input[data-line="${i}"]`).value, 10) || 0 }));
+  const diff = received.some((l, i) => l.qty !== (t.lines[i].qty || 0));
+  if (diff && !confirm('Lo contado no coincide con lo enviado. ¿Confirmar con diferencia?')) return;
+  btn.disabled = true; btn.textContent = 'Confirmando…'; setSync('editing', 'Guardando…');
+  const who = state.user?.email || null;
+  const { error } = await supabase.from('bodega_transfers').update({ status: diff ? 'con_diferencia' : 'recibido', received_at: new Date().toISOString(), received_by: who, received_lines: received }).eq('id', id);
+  if (!error && diff){
+    const adj = received.map((l, i) => ({ l, d: (t.lines[i].qty || 0) - l.qty })).filter(x => x.d !== 0)
+      .map(({ l, d }) => ({ kind: 'ajuste', product_gid: l.product_gid, product_title: l.product_title, size: l.size, qty: Math.abs(d), from_loc: d > 0 ? 'tienda' : 'ajuste', to_loc: d > 0 ? 'diferencia' : 'tienda', note: `Diferencia al recibir: ${d > 0 ? 'faltaron' : 'sobraron'} ${Math.abs(d)}`, created_by: who }));
+    if (adj.length) await supabase.from('bodega_moves').insert(adj);
+  }
+  if (error){ btn.disabled = false; btn.textContent = 'Confirmar recepción'; alert('No se guardó: ' + error.message); setSync('offline', 'No se guardó'); return; }
+  $('shTienda').classList.remove('on');
+  openBox(); setTimeout(loadAll, 700); setSync('connected', 'Recibido');
+}
+
+$('actSend').addEventListener('click', openSend);
+$('actReceive').addEventListener('click', openTienda);
+document.querySelectorAll('[data-close]').forEach(b => b.addEventListener('click', () => b.closest('.sheet').classList.remove('on')));
+
+// ── arranque ──
+(async () => {
+  const { data: { session } } = await supabase.auth.getSession();
+  if (!session || !session.user){ $('login').classList.add('show'); setSync('offline', 'Sin sesión'); return; }
+  state.user = session.user;
+  await loadAll();
+  supabase.channel('bodega-3d').on('postgres_changes', { event: '*', schema: 'public', table: 'bodega_transfers' }, () => loadAll()).on('postgres_changes', { event: '*', schema: 'public', table: 'bodega_moves' }, () => loadAll()).subscribe();
+  document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible') loadAll(); });
+})();
+</script>
+</body>
+</html>

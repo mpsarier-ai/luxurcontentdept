@@ -1105,6 +1105,8 @@ header,.hub-header{position:static !important;background:transparent !important;
 .act-card b{font-family:'Poppins',sans-serif;font-weight:600;font-size:15px}
 .act-card span{font-size:11.5px;color:#5a3a40;line-height:1.3}
 .act-card.dark{background:var(--black);color:var(--cream)}.act-card.dark span{color:rgba(237,235,230,.7)}
+.act-card.rosa{background:var(--rosa)}.act-card.rosa span{color:#5a3a40}
+a.act-card{text-decoration:none}
 .shp{flex:0 0 auto;width:178px;border:none;border-radius:20px;background:var(--paper);text-align:left;color:var(--black);padding:0;overflow:hidden;cursor:pointer;display:flex;flex-direction:column;box-shadow:0 1px 2px rgba(0,0,0,.04),0 8px 22px rgba(0,0,0,.06);position:relative}
 .shp .im{height:110px;background:var(--cream-dark);position:relative}
 .shp .im img{width:100%;height:100%;object-fit:cover;display:block}
@@ -1491,6 +1493,7 @@ header,.hub-header{position:static !important;background:transparent !important;
     <button class="hub-back" data-hub-back>Inicio</button>
     <div class="sec-hero" id="bdHero"><div class="k">Bodega casa</div><p class="say">Cargando la casa…</p></div>
     <div class="rail">
+      <a class="act-card rosa" href="bodega.html"><b>Ver la bodega en 3D</b><span>La casa y la tienda: envía cajas y confirma lo que llega</span></a>
       <button class="act-card" id="bdReceiveBtn"><b>Recibir lote</b><span>Llega producción a la casa y, si quieres, suma en Shopify Medellín</span></button>
       <button class="act-card dark" id="bdMoveBtn"><b>Trasladar a tienda</b><span>Sale de la casa a la tienda, Shopify no cambia</span></button>
     </div>
@@ -2591,6 +2594,10 @@ async function saveBodegaMove(){
       batch_name: batch, shopify_synced: synced, shopify_error: serr, created_by: canonicalEmail(user.email) });
   }
   const { error } = await supabase.from('bodega_moves').insert(rows);
+  if (!error && bdKind === 'traslado'){
+    // la tienda confirma la caja en bodega.html
+    await supabase.from('bodega_transfers').insert({ created_by: canonicalEmail(user.email), lines: lines.map(l => ({ product_gid: bdSelected.gid, product_title: bdSelected.title, size: l.size, qty: l.qty })) });
+  }
   btn.disabled = false; btn.textContent = 'Guardar';
   if (error){ err.textContent = 'No se guardó: ' + error.message; return; }
   if (!err.textContent) document.getElementById('bdModal').classList.remove('open');
