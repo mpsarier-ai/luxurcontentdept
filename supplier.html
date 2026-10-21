@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no">
 <meta name="theme-color" content="#edebe6">
-<title>LUXUR · Producción</title>
+<title>LUXUR, Producción</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Montserrat:wght@500;600;700&display=swap" rel="stylesheet">
@@ -106,21 +106,35 @@ html,body{background:var(--cream);color:var(--black);font-family:'Poppins',sans-
 .toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:var(--black);color:var(--cream);padding:12px 22px;border-radius:999px;font-family:'Poppins',sans-serif;font-weight:600;font-size:11px;letter-spacing:.1em;opacity:0;transition:opacity .25s ease,transform .25s ease;pointer-events:none;z-index:50}
 .toast.show{opacity:1;transform:translateX(-50%) translateY(-4px)}
 /* ═══════════ APPLE THEME v2 ═══════════ */
-*{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text','SF Pro Display',system-ui,'Helvetica Neue',sans-serif !important;font-style:normal !important}
-.brand{font-family:'Montserrat',sans-serif !important;font-weight:600 !important}
-html,body{background:#edebe6}
-.tagline{letter-spacing:.08em;color:#8e8e93;font-weight:500}
-.hi{font-weight:700;letter-spacing:-.02em;font-size:24px}
-.count{letter-spacing:.02em;text-transform:none;font-weight:500}
-.product-name,.batch-name{font-weight:700;letter-spacing:-.01em}
-.batch-name::before{letter-spacing:.1em}
-.tu-num{font-weight:800;letter-spacing:-.03em}
-.tu-unit{letter-spacing:.02em}
-.step-name,.variant-name{font-weight:600}
-.step-btn,.variant-btn{letter-spacing:0;text-transform:none;font-weight:600;font-size:13px}
-.card,.batch{box-shadow:0 1px 3px rgba(0,0,0,.05)}
-.delivered,.variant-delivered{font-weight:600}
-.footer{letter-spacing:.02em;text-transform:none;color:#aeaeb2}
+*{font-family:'Poppins',sans-serif;font-style:normal}
+.brand{font-family:'Montserrat',sans-serif;font-weight:600;color:var(--black);font-size:18px;text-align:left;margin:0}
+.tagline{text-align:left;margin:0}
+.topbar{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
+.sec-hero{position:relative;overflow:hidden;border-radius:26px;padding:20px 20px 18px;color:var(--cream);margin:0 0 16px;background:radial-gradient(120% 140% at 100% 0%,rgba(238,205,204,.6) 0%,rgba(201,134,142,.2) 38%,rgba(28,28,28,0) 70%),linear-gradient(160deg,#2a2224 0%,#1C1C1C 60%)}
+.sec-hero .k{font-weight:600;font-size:9.5px;letter-spacing:.16em;text-transform:uppercase;opacity:.65;margin-bottom:10px}
+.sec-hero .say{font-weight:300;font-size:22px;line-height:1.28;letter-spacing:-.015em;opacity:.8;text-wrap:balance}
+.sec-hero .say b{font-weight:600;opacity:1}.sec-hero .say em{font-style:normal;font-weight:600;color:var(--rosa)}
+.sec-hero .ph{display:flex;gap:6px;margin-top:14px}.sec-hero .ph span{width:44px;height:58px;border-radius:10px;background:rgba(255,255,255,.08) center/cover no-repeat}
+.eyebrow{font-weight:600;font-size:9.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--grey);margin:18px 2px 8px;display:flex;justify-content:space-between;gap:8px}
+.rail{display:flex;gap:10px;overflow-x:auto;scroll-snap-type:x mandatory;-webkit-overflow-scrolling:touch;padding:2px 2px 10px;margin:0 -2px 4px;scrollbar-width:none}
+.rail::-webkit-scrollbar{display:none}.rail>*{scroll-snap-align:start;flex:0 0 auto}
+.rail-hint{font-size:11.5px;color:var(--grey);text-align:center;margin:0 0 8px}
+.batch{background:transparent;box-shadow:none;padding:0;border:none;margin-bottom:8px}
+.batch .product-meta{margin-bottom:6px}
+.batch-name{font-size:20px}
+.batch-name::before{content:'Lote';display:block;margin:0 0 2px}
+.card{width:260px;margin:0;border-top:none;padding:14px 14px 12px;border-radius:20px;display:flex;flex-direction:column}
+.card.done{opacity:.8}
+.product-name{font-size:15px!important;font-weight:500;line-height:1.25}
+.product-meta{gap:6px}
+.step-btn{font-size:13px!important;padding:12px 14px;border-radius:999px;background:var(--black);box-shadow:none;letter-spacing:0;text-transform:none;font-weight:600}
+.step-btn.complete{background:var(--green)}
+.delivered{font-style:normal;font-size:13px}
+.footer{text-transform:none;letter-spacing:0;font-weight:400;font-size:11.5px}
+.pstate{font-size:12.5px}.pstate small{display:block;font-weight:400;color:var(--grey)}
+.pph{width:56px;height:74px}
+.notes{font-size:11.5px}
+.batch-msg{font-style:normal}
 /* Rediseño simple: foto + barra de progreso + un botón grande */
 .prow{display:flex;gap:12px;align-items:flex-start}
 .prow .pbody{flex:1;min-width:0}
@@ -152,12 +166,11 @@ html,body{background:#edebe6}
 <body>
 
 <div class="wrap">
-  <div class="brand">LUXUR</div>
-  <div class="tagline">Producción</div>
+  <div class="topbar"><div class="brand">LUXUR</div><div class="tagline">Producción</div></div>
   <div id="root">
     <div class="status-msg loading">Cargando…</div>
   </div>
-  <div class="footer">Marcá cada etapa cuando termines.<br>El equipo LUXUR recibe la actualización en vivo.</div>
+  <div class="footer">Marca cada etapa cuando termines.<br>El equipo LUXUR la recibe al instante.</div>
 </div>
 
 <div class="toast" id="toast"></div>
@@ -257,7 +270,7 @@ function renderCard(entry, supplierToken){
   });
   const totalDays = isFullyDone ? daysBetween(firstHistory(entry.stage_history, 'pre')?.at || startedAt, firstHistory(entry.stage_history, 'entrega')?.at) : null;
   const curveStr = entry.size_curve && typeof entry.size_curve === 'object'
-    ? Object.entries(entry.size_curve).filter(([_,v]) => v > 0).map(([k,v]) => `${k}·${v}`)
+    ? Object.entries(entry.size_curve).filter(([_,v]) => v > 0).map(([k,v]) => `${k} ${v}`)
     : [];
   const entrega = entry.tentative_date ? fmtDateShort(entry.tentative_date + 'T12:00:00') : null;
   const cardCls = isFullyDone ? 'done' : 'active';
@@ -272,8 +285,8 @@ function renderCard(entry, supplierToken){
       <div class="pbody">
         <div class="product-name" style="font-size:18px">${escapeHtml(entry.design_name || entry.product_name || 'Sin nombre')}</div>
         <div class="product-meta">
-          ${entry.quantity ? `<span><b>${entry.quantity}u</b></span>` : ''}
-          ${entrega ? `<span>📅 ${entrega}</span>` : ''}
+          ${entry.quantity ? `<span><b>${entry.quantity}</b> unidades</span>` : ''}
+          ${entrega ? `<span>entrega ${entrega}</span>` : ''}
         </div>
         ${curveStr.length ? `<div class="curve">${curveStr.map(s => `<span class="curve-pill">${escapeHtml(s)}</span>`).join('')}</div>` : ''}
       </div>
@@ -281,12 +294,12 @@ function renderCard(entry, supplierToken){
     ${entry.notes ? `<div class="notes"><b>Nota:</b> ${escapeHtml(entry.notes)}</div>` : ''}
     <div class="pbar ${isFullyDone ? 'full' : ''}"><i style="width:${pct}%"></i></div>
     ${isFullyDone
-      ? `<div class="delivered">✓ Entregado${totalDays != null ? ` · en ${totalDays}d` : ''}</div>`
-      : `<div class="pstate">Va en: <b>${escapeHtml(stages[currentIdx].label.split(' · ')[0])}</b> <small>· etapa ${currentIdx + 1} de ${stages.length}${curDays != null ? ` · lleva ${curDays === 0 ? 'hoy' : curDays + 'd'}` : ''}</small></div>
-         <div class="step-action"><button class="step-btn ${isLastStage ? 'complete' : ''}" data-pid="${entry.id}" data-stage="${nextKey}" data-supplier="${supplierToken}">✓ Ya terminamos ${escapeHtml(nextLabel.split(' · ')[0])}</button></div>`}
-    ${lastDoneIdx >= 0 ? `<div class="revert-row"><button class="revert-btn" data-revert-pid="${entry.id}" data-revert-stage="${lastDoneIdx > 0 ? stages[lastDoneIdx-1].key : 'none'}" data-supplier="${supplierToken}">↩ Me equivoqué · desmarcar última etapa</button></div>` : ''}
+      ? `<div class="delivered">Entregado${totalDays != null ? ` en ${totalDays} días` : ''}</div>`
+      : `<div class="pstate">Va en <b>${escapeHtml(stages[currentIdx].label.split(' · ')[0])}</b><small>Etapa ${currentIdx + 1} de ${stages.length}${curDays != null ? `, ${curDays === 0 ? 'empezó hoy' : 'lleva ' + curDays + (curDays === 1 ? ' día' : ' días')}` : ''}</small></div>
+         <div class="step-action"><button class="step-btn ${isLastStage ? 'complete' : ''}" data-pid="${entry.id}" data-stage="${nextKey}" data-supplier="${supplierToken}">Ya terminamos ${escapeHtml(nextLabel.split(' · ')[0])}</button></div>`}
+    ${lastDoneIdx >= 0 ? `<div class="revert-row"><button class="revert-btn" data-revert-pid="${entry.id}" data-revert-stage="${lastDoneIdx > 0 ? stages[lastDoneIdx-1].key : 'none'}" data-supplier="${supplierToken}">Me equivoqué, desmarcar la última etapa</button></div>` : ''}
     <div class="stage-pick">
-      <button class="stage-pick-toggle" data-pick-toggle>Corregir etapa ▾</button>
+      <button class="stage-pick-toggle" data-pick-toggle>Corregir etapa</button>
       <div class="stage-pick-list" hidden>
         <div class="sp-hint">Toca la última etapa que YA está terminada:</div>
         <button class="sp-item ${lastDoneIdx < 0 ? 'done' : ''}" data-pid="${entry.id}" data-stage="none" data-supplier="${supplierToken}">— Sin empezar</button>
@@ -305,12 +318,13 @@ function renderBatch(batch, variants, supplierToken){
     return `<div class="batch ${allDone ? 'batch-done' : ''}" data-batch-id="${batch.id}">
       <div class="batch-name">${escapeHtml(batch.name || 'Lote sin nombre')}</div>
       <div class="product-meta">
-        ${batch.total_quantity ? `<span><b>${batch.total_quantity}u</b> totales</span>` : ''}
-        ${entrega ? `<span>📅 entrega ${entrega}</span>` : ''}
+        ${batch.total_quantity ? `<span><b>${batch.total_quantity.toLocaleString('es-CO')}</b> unidades</span>` : ''}
+        ${entrega ? `<span>entrega ${entrega}</span>` : ''}
         ${variants.length ? `<span><b>${variants.length}</b> referencias</span>` : ''}
       </div>
       ${batch.notes ? `<div class="notes"><b>Nota:</b> ${escapeHtml(batch.notes)}</div>` : ''}
-      <div style="margin-top:12px">${variants.map(v => renderCard(v, supplierToken)).join('')}</div>
+      <div class="rail" style="margin-top:10px">${variants.map(v => renderCard(v, supplierToken)).join('')}</div>
+      <p class="rail-hint">Desliza para ver todas las referencias del lote</p>
     </div>`;
   }
   const batchStages = supplierFlowType === 'simple'
@@ -344,8 +358,8 @@ function renderBatch(batch, variants, supplierToken){
   let html = `<div class="batch ${cardCls}" data-batch-id="${batch.id}">
     <div class="batch-name">${escapeHtml(batch.name || 'Lote sin nombre')}</div>
     <div class="product-meta">
-      ${batch.total_quantity ? `<span><b>${batch.total_quantity}u</b> totales</span>` : ''}
-      ${entrega ? `<span>📅 entrega ${entrega}</span>` : ''}
+      ${batch.total_quantity ? `<span><b>${batch.total_quantity.toLocaleString('es-CO')}</b> unidades</span>` : ''}
+      ${entrega ? `<span>entrega ${entrega}</span>` : ''}
       ${variants.length ? `<span><b>${variants.length}</b> ${variants.length === 1 ? 'variante' : 'variantes'}</span>` : ''}
     </div>
     ${batch.notes ? `<div class="notes"><b>Nota:</b> ${escapeHtml(batch.notes)}</div>` : ''}
@@ -354,15 +368,15 @@ function renderBatch(batch, variants, supplierToken){
       const pct = Math.round(((lastBatchIdx + 1) / batchStages.length) * 100);
       const curDays = !batchDoneFully ? batchDays[batchCurrentIdx] : null;
       return `<div class="pbar ${batchDoneFully ? 'full' : ''}"><i style="width:${pct}%"></i></div>
-      ${!batchDoneFully ? `<div class="pstate">El lote va en: <b>${escapeHtml(nextBatchStage.label.split(' · ')[0])}</b> <small>· etapa ${batchCurrentIdx + 1} de ${batchStages.length}${curDays != null ? ` · lleva ${curDays === 0 ? 'hoy' : curDays + 'd'}` : ''}</small></div>` : ''}`;
+      ${!batchDoneFully ? `<div class="pstate">El lote va en <b>${escapeHtml(nextBatchStage.label.split(' · ')[0])}</b><small>Etapa ${batchCurrentIdx + 1} de ${batchStages.length}${curDays != null ? `, ${curDays === 0 ? 'empezó hoy' : 'lleva ' + curDays + ' días'}` : ''}</small></div>` : ''}`;
     })()}
 
     ${nextBatchStage ? `<div class="step-action">
-      <button class="step-btn" data-batch-advance="${batch.id}" data-stage="${nextBatchStage.key}" data-supplier="${supplierToken}">✓ Ya terminamos ${escapeHtml(nextBatchStage.label.split(' · ')[0])}</button>
-    </div>` : `<div class="batch-msg">${supplierFlowType === 'simple' ? '✓ Listo · producción completa' : '✓ Lote completo hasta Lavandería · ahora marca cada diseño abajo'}</div>`}
-    ${lastBatchIdx >= 0 ? `<div class="revert-row"><button class="revert-btn" data-revert-batch="${batch.id}" data-revert-stage="${lastBatchIdx > 0 ? batchStages[lastBatchIdx-1].key : 'none'}" data-supplier="${supplierToken}">↩ Me equivoqué · desmarcar última etapa</button></div>` : ''}
+      <button class="step-btn" data-batch-advance="${batch.id}" data-stage="${nextBatchStage.key}" data-supplier="${supplierToken}">Ya terminamos ${escapeHtml(nextBatchStage.label.split(' · ')[0])}</button>
+    </div>` : `<div class="batch-msg">${supplierFlowType === 'simple' ? 'Listo, producción completa' : 'Lote completo hasta lavandería, ahora marca cada diseño abajo'}</div>`}
+    ${lastBatchIdx >= 0 ? `<div class="revert-row"><button class="revert-btn" data-revert-batch="${batch.id}" data-revert-stage="${lastBatchIdx > 0 ? batchStages[lastBatchIdx-1].key : 'none'}" data-supplier="${supplierToken}">Me equivoqué, desmarcar la última etapa</button></div>` : ''}
     <div class="stage-pick">
-      <button class="stage-pick-toggle" data-pick-toggle>Corregir etapa ▾</button>
+      <button class="stage-pick-toggle" data-pick-toggle>Corregir etapa</button>
       <div class="stage-pick-list" hidden>
         <div class="sp-hint">Toca la última etapa que YA está terminada:</div>
         <button class="sp-item ${lastBatchIdx < 0 ? 'done' : ''}" data-batch-advance="${batch.id}" data-stage="none" data-supplier="${supplierToken}">— Sin empezar</button>
@@ -412,7 +426,7 @@ function renderVariant(v, batch, batchReadyForVariants, supplierToken){
         <div class="variant-name">${escapeHtml(designName)}</div>
         <div class="variant-meta">
           ${v.quantity ? `<span><b>${v.quantity}u</b></span>` : ''}
-          ${curveStr.length ? `<span>${curveStr.join(' · ')}</span>` : ''}
+          ${curveStr.length ? `<span>${curveStr.join(', ')}</span>` : ''}
         </div>
         ${stateChip}
       </div>
@@ -448,11 +462,21 @@ function render(payload, supplierToken){
   standaloneInProgress.forEach(e => { standaloneUnits += (e.quantity || 0); });
   const totalUnits = batchUnits + standaloneUnits;
 
-  let html = `<div class="hi">${escapeHtml(greeting)}</div>`;
+  const allEntries = [...batches.flatMap(b => b.variants || []), ...standalone];
+  const nextDates = [...batches.map(b => b.batch.tentative_date), ...standaloneInProgress.map(e => e.tentative_date)].filter(Boolean).sort();
+  const photos = allEntries.map(e => e.photo_url).filter(Boolean).slice(0, 6);
+  let say = `${escapeHtml(greeting)}. `;
   if (totalUnits > 0){
-    html += `<div class="total-units"><span class="tu-num">${totalUnits.toLocaleString('es-CO')}</span><span class="tu-unit">unds</span><span class="tu-label">por entregar</span></div>`;
+    say += `Tienes <b>${totalUnits.toLocaleString('es-CO')} unidades</b> por entregar`;
+    const parts = [];
+    if (batches.length) parts.push(`<b>${batches.length}</b> ${batches.length === 1 ? 'lote' : 'lotes'}`);
+    if (standaloneInProgress.length) parts.push(`<b>${standaloneInProgress.length}</b> ${standaloneInProgress.length === 1 ? 'jean suelto' : 'jeans sueltos'}`);
+    say += parts.length ? ` en ${parts.join(' y ')}.` : '.';
+    if (nextDates.length) say += ` La próxima entrega es el <em>${escapeHtml(fmtDateShort(nextDates[0] + 'T12:00:00'))}</em>.`;
+  } else if (totalInProgress === 0){
+    say += 'Por ahora <b>no hay producción activa</b> para ti.';
   }
-  html += `<div class="count">${batches.length ? `${batches.length} ${batches.length === 1 ? 'lote' : 'lotes'}` : ''}${batches.length && standaloneInProgress.length ? ' · ' : ''}${standaloneInProgress.length ? `${standaloneInProgress.length} ${standaloneInProgress.length === 1 ? 'jean' : 'jeans'} sueltos` : ''}${totalInProgress === 0 ? 'Sin producción activa' : ''}</div>`;
+  let html = `<div class="sec-hero"><div class="k">Producción LUXUR</div><p class="say">${say}</p>${photos.length ? `<div class="ph">${photos.map(u => `<span style="background-image:url('${escapeHtml(u)}')"></span>`).join('')}</div>` : ''}</div>`;
   if (batches.length === 0 && standalone.length === 0){
     html += `<div class="empty">Sin productos asignados todavía</div>`;
   } else {
@@ -460,13 +484,13 @@ function render(payload, supplierToken){
     html += batches.map(b => renderBatch(b.batch, b.variants || [], supplierToken)).join('');
     // Después standalone en curso
     if (standaloneInProgress.length){
-      if (batches.length) html += `<div class="variants-head" style="margin-top:24px">Jeans sueltos</div>`;
-      html += standaloneInProgress.map(it => renderCard(it, supplierToken)).join('');
+      if (batches.length) html += `<div class="eyebrow">Jeans sueltos</div>`;
+      html += `<div class="rail">${standaloneInProgress.map(it => renderCard(it, supplierToken)).join('')}</div>`;
     }
     // Entregados al final
     if (standaloneDone.length){
-      html += `<div class="count" style="margin:24px 0 10px">Entregados</div>`;
-      html += standaloneDone.map(it => renderCard(it, supplierToken)).join('');
+      html += `<div class="eyebrow">Entregados</div>`;
+      html += `<div class="rail">${standaloneDone.map(it => renderCard(it, supplierToken)).join('')}</div>`;
     }
   }
   root.innerHTML = html;
