@@ -340,7 +340,7 @@ header{display:flex;justify-content:space-between;align-items:center;gap:16px;ma
 /* Stepper: checklist VERTICAL estilo Apple — círculos grandes con ✓,
    nombre completo de la etapa, días a la derecha, línea que conecta */
 .tl-stepper{grid-column:1/-1;display:flex;flex-direction:column;align-items:stretch;gap:0;margin-top:12px;padding-top:8px;border-top:1px solid rgba(0,0,0,.05)}
-.tl-stage{display:flex;flex-direction:row;align-items:center;gap:12px;flex:none;text-align:left;font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text',sans-serif;font-size:14.5px;letter-spacing:0;text-transform:none;color:#8e8e93;background:transparent;border:none;padding:7px 6px;border-radius:12px;position:relative;width:100%}
+.tl-stage{display:flex;flex-direction:row;align-items:center;gap:12px;flex:none;text-align:left;font-family:'Poppins',sans-serif;font-size:14.5px;letter-spacing:0;text-transform:none;color:#8e8e93;background:transparent;border:none;padding:7px 6px;border-radius:12px;position:relative;width:100%}
 .tl-stage-dot{width:24px;height:24px;border-radius:50%;background:var(--paper);border:2px solid rgba(0,0,0,.14);flex:none;display:flex;align-items:center;justify-content:center;transition:all .2s ease}
 .tl-stage.done .tl-stage-dot{background:var(--rosa-deep);border-color:var(--rosa-deep)}
 .tl-stage.done .tl-stage-dot::after{content:'✓';color:#fff;font-size:12px;font-weight:700;line-height:1}
@@ -358,7 +358,7 @@ header{display:flex;justify-content:space-between;align-items:center;gap:16px;ma
 .tl-stage-summary.late b{color:#b23a35}
 .tl-line{flex:none;width:2px;height:14px;background:rgba(0,0,0,.1);align-self:flex-start;margin:-7px 0 -7px 17px}
 .tl-line.done{background:var(--rosa-deep)}
-.tl-stage-summary{margin-top:8px;padding:9px 14px;background:rgba(212,132,142,.08);border-radius:12px;font-family:-apple-system,sans-serif;font-size:12.5px;color:#555;letter-spacing:.01em;text-align:center}
+.tl-stage-summary{margin-top:8px;padding:9px 14px;background:rgba(212,132,142,.08);border-radius:12px;font-family:'Poppins',sans-serif;font-size:12.5px;color:#555;letter-spacing:.01em;text-align:center}
 .tl-stage-summary b{color:var(--black);font-weight:600}
 .tl-stage-summary.done{background:rgba(91,154,91,.1);color:#3a5a3a}
 /* Variantes: stepper colapsado — un chip de estado lo abre/cierra */
@@ -379,23 +379,23 @@ header{display:flex;justify-content:space-between;align-items:center;gap:16px;ma
 .ps-v-n .tl-edit-mark{font-size:11px;color:#c7c7cc}
 .ps-v-m{font-size:12px;color:#8e8e93;margin-top:1px}
 .ps-actions{display:flex;gap:8px;justify-content:center;margin-top:16px;flex-wrap:wrap}
-.ps-act{background:rgba(0,0,0,.05);border:none;border-radius:999px;padding:9px 16px;font-size:12.5px;font-weight:600;font-family:-apple-system,sans-serif;color:var(--black);cursor:pointer}
+.ps-act{background:rgba(0,0,0,.05);border:none;border-radius:999px;padding:9px 16px;font-size:12.5px;font-weight:600;font-family:'Poppins',sans-serif;color:var(--black);cursor:pointer}
 .ps-act:active{opacity:.6}
 .ps-act.danger{color:#b23a35}
 .ps-bulk{margin-top:10px}
 .ps-bulk-list{background:var(--cream);border-radius:12px;padding:8px;margin-top:8px}
-.ps-bulk-item{display:block;width:100%;text-align:left;background:var(--paper);border:none;border-radius:10px;padding:11px 14px;font-size:13.5px;font-weight:500;margin-bottom:6px;font-family:-apple-system,sans-serif;cursor:pointer}
+.ps-bulk-item{display:block;width:100%;text-align:left;background:var(--paper);border:none;border-radius:10px;padding:11px 14px;font-size:13.5px;font-weight:500;margin-bottom:6px;font-family:'Poppins',sans-serif;cursor:pointer}
 .ps-bulk-item:last-child{margin-bottom:0}
 .ps-bulk-item:active{opacity:.6}
-.tl-vstate{background:var(--cream);border:none;border-radius:999px;padding:6px 12px;font-size:11px;font-weight:600;font-family:-apple-system,sans-serif;color:var(--black);cursor:pointer;white-space:nowrap}
+.tl-vstate{background:var(--cream);border:none;border-radius:999px;padding:6px 12px;font-size:11px;font-weight:600;font-family:'Poppins',sans-serif;color:var(--black);cursor:pointer;white-space:nowrap}
 .tl-vstate.done{background:#e2efe5;color:#3e7a4e}
 .tl-vstate:active{opacity:.6}
 /* CTA del pipeline: un solo botón grande para avanzar + deshacer discreto */
 .tl-cta-row{grid-column:1/-1;display:flex;gap:8px;align-items:center;margin-top:10px}
-.tl-adv{flex:1;background:linear-gradient(135deg,#e0949e 0%,var(--rosa-deep) 55%,#c4737d 100%);color:#fff;border:none;border-radius:999px;padding:13px 18px;font-size:14.5px;font-weight:600;font-family:-apple-system,BlinkMacSystemFont,sans-serif;cursor:pointer;box-shadow:0 1px 2px rgba(0,0,0,.06),0 4px 12px rgba(212,132,142,.3)}
+.tl-adv{flex:1;background:linear-gradient(135deg,#e0949e 0%,var(--rosa-deep) 55%,#c4737d 100%);color:#fff;border:none;border-radius:999px;padding:13px 18px;font-size:14.5px;font-weight:600;font-family:'Poppins',sans-serif;cursor:pointer;box-shadow:0 1px 2px rgba(0,0,0,.06),0 4px 12px rgba(212,132,142,.3)}
 .tl-adv:active{transform:scale(.98);opacity:.9}
 .tl-adv:disabled{opacity:.5}
-.tl-undo{background:none;border:none;color:#8e8e93;font-size:12.5px;font-weight:500;font-family:-apple-system,sans-serif;cursor:pointer;padding:10px 8px;white-space:nowrap}
+.tl-undo{background:none;border:none;color:#8e8e93;font-size:12.5px;font-weight:500;font-family:'Poppins',sans-serif;cursor:pointer;padding:10px 8px;white-space:nowrap}
 .tl-undo:active{opacity:.5}
 
 .tl-prod-actions{grid-column:1/-1;display:flex;justify-content:flex-end;gap:8px;margin-top:8px}
@@ -480,7 +480,7 @@ header{display:flex;justify-content:space-between;align-items:center;gap:16px;ma
 .hub-section.open{transform:translateX(0);pointer-events:auto}
 .hub-section-bar{position:sticky;top:0;background:rgba(237,235,230,.92);backdrop-filter:saturate(180%) blur(18px);-webkit-backdrop-filter:saturate(180%) blur(18px);margin:0 -22px 18px;padding:12px 22px;border-bottom:1px solid rgba(0,0,0,.05);display:flex;align-items:center;gap:14px;z-index:5}
 .hub-back{display:inline-flex;align-items:center;gap:4px;background:transparent;border:none;color:var(--rosa-deep);font-family:'Poppins',sans-serif;font-weight:600;font-size:12px;letter-spacing:.1em;cursor:pointer;padding:8px 10px;border-radius:8px;font-weight:500;text-transform:none;margin:0}
-.hub-back::before{content:'‹';font-size:22px;font-family:-apple-system,serif;line-height:1;margin-right:2px}
+.hub-back::before{content:'‹';font-size:22px;line-height:1;margin-right:2px}
 .hub-back:hover{background:rgba(212,132,142,.08);color:var(--black)}
 .hub-section-title{font-family:'Poppins',sans-serif;font-weight:300;letter-spacing:-.01em;font-size:18px;font-weight:700;color:var(--black);line-height:1}
 body.hub-locked{overflow:hidden}
@@ -602,29 +602,29 @@ body{padding-top:env(safe-area-inset-top);padding-bottom:env(safe-area-inset-bot
    del sistema para UI (Poppins en todo; Montserrat solo en el logo). */
 
 /* Tipografía base del sistema (los elementos con font-family propio no cambian) */
-body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text','Poppins',sans-serif}
+body{font-family:'Poppins',sans-serif}
 
 /* Section titles → iOS large title (sin subrayado duro) */
-.section-title{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','Poppins',sans-serif;font-style:normal;font-weight:700;font-size:26px;letter-spacing:-.02em;border-bottom:none;padding-bottom:2px}
-.section-title .meta{font-family:-apple-system,sans-serif;font-size:12px;letter-spacing:0;text-transform:none;font-weight:400;color:#8e8e93}
+.section-title{font-family:'Poppins',sans-serif;font-style:normal;font-weight:700;font-size:26px;letter-spacing:-.02em;border-bottom:none;padding-bottom:2px}
+.section-title .meta{font-family:'Poppins',sans-serif;font-size:12px;letter-spacing:0;text-transform:none;font-weight:400;color:#8e8e93}
 
 /* Modales → cards flotantes iOS */
 .modal{border:none;border-radius:24px;background:var(--paper);box-shadow:0 8px 20px rgba(0,0,0,.08),0 24px 60px rgba(0,0,0,.18);padding:28px 24px}
-.modal h3{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display',sans-serif;font-style:normal;font-weight:700;font-size:22px;letter-spacing:-.01em}
-.modal .modal-meta{font-family:-apple-system,sans-serif;font-size:12px;letter-spacing:0;text-transform:none;color:#8e8e93;font-weight:500}
+.modal h3{font-family:'Poppins',sans-serif;font-style:normal;font-weight:700;font-size:22px;letter-spacing:-.01em}
+.modal .modal-meta{font-family:'Poppins',sans-serif;font-size:12px;letter-spacing:0;text-transform:none;color:#8e8e93;font-weight:500}
 .modal p{color:#6e6e73;font-size:13.5px}
-.modal label{font-family:-apple-system,sans-serif;font-size:12px;letter-spacing:0;text-transform:none;font-weight:600;color:#6e6e73}
-.modal input,.modal select{border:none;border-radius:12px;background:#f2f2f0;font-family:-apple-system,sans-serif;font-size:15px;padding:12px 14px;transition:box-shadow .15s ease}
+.modal label{font-family:'Poppins',sans-serif;font-size:12px;letter-spacing:0;text-transform:none;font-weight:600;color:#6e6e73}
+.modal input,.modal select{border:none;border-radius:12px;background:#f2f2f0;font-family:'Poppins',sans-serif;font-size:15px;padding:12px 14px;transition:box-shadow .15s ease}
 .modal input:focus,.modal select:focus{border:none;box-shadow:0 0 0 3px rgba(212,132,142,.35);background:var(--paper)}
 .curve-inputs .ci input{border:none;border-radius:10px;background:#f2f2f0}
 .curve-inputs .ci input:focus{border:none;box-shadow:0 0 0 3px rgba(212,132,142,.35);background:var(--paper)}
 
 /* Botones → pills iOS */
-.modal-btn{border:none;border-radius:999px;background:rgba(0,0,0,.05);color:var(--black);font-family:-apple-system,sans-serif;font-size:14px;font-weight:600;letter-spacing:0;text-transform:none;padding:11px 20px;transition:background .15s ease}
+.modal-btn{border:none;border-radius:999px;background:rgba(0,0,0,.05);color:var(--black);font-family:'Poppins',sans-serif;font-size:14px;font-weight:600;letter-spacing:0;text-transform:none;padding:11px 20px;transition:background .15s ease}
 .modal-btn:hover{background:rgba(0,0,0,.1);color:var(--black)}
 .modal-btn.primary{background:var(--rosa-deep);color:#fff}
 .modal-btn.primary:hover{background:#bf6e78;color:#fff}
-.new-week-btn{border:none;border-radius:999px;background:rgba(212,132,142,.12);color:var(--rosa-deep);font-family:-apple-system,sans-serif;font-size:13px;font-weight:600;letter-spacing:0;text-transform:none;padding:9px 16px;transition:background .15s ease}
+.new-week-btn{border:none;border-radius:999px;background:rgba(212,132,142,.12);color:var(--rosa-deep);font-family:'Poppins',sans-serif;font-size:13px;font-weight:600;letter-spacing:0;text-transform:none;padding:9px 16px;transition:background .15s ease}
 .new-week-btn:hover{background:rgba(212,132,142,.2);color:var(--rosa-deep)}
 #addEntryBtn{background:rgba(0,0,0,.05)!important;color:var(--black)!important;border:none!important}
 #addEntryBtn:hover{background:rgba(0,0,0,.1)!important}
@@ -632,20 +632,20 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text','Poppins',sans-s
 /* Login → inputs suaves y botón pill */
 #loginEmail,#loginCode{border:none;border-radius:14px;background:var(--paper);box-shadow:0 1px 3px rgba(0,0,0,.08);font-size:16px;padding:15px 16px}
 #loginEmail:focus,#loginCode:focus{box-shadow:0 0 0 3px rgba(212,132,142,.35)}
-#loginBtn,#loginVerifyBtn{border-radius:999px;font-family:-apple-system,sans-serif;font-size:15px;font-weight:600;letter-spacing:0;text-transform:none;background:var(--black)}
+#loginBtn,#loginVerifyBtn{border-radius:999px;font-family:'Poppins',sans-serif;font-size:15px;font-weight:600;letter-spacing:0;text-transform:none;background:var(--black)}
 #loginBtn:hover:not(:disabled),#loginVerifyBtn:hover:not(:disabled){background:var(--rosa-deep)}
 .login-help{color:#6e6e73}
 
 /* Footer sin borde duro */
-.footer{border-top:none;font-family:-apple-system,sans-serif;font-size:11px;letter-spacing:.02em;text-transform:none;color:#aeaeb2}
+.footer{border-top:none;font-family:'Poppins',sans-serif;font-size:11px;letter-spacing:.02em;text-transform:none;color:#aeaeb2}
 
 /* Labels mono → sistema, menos agresivos */
-.pk-label,.fa-kpi-label,.ptb-label,.slb-label,.fa-top-head,.fa-filters-head,.variants-head{font-family:-apple-system,sans-serif;letter-spacing:.04em;font-weight:600;color:#8e8e93}
+.pk-label,.fa-kpi-label,.ptb-label,.slb-label,.fa-top-head,.fa-filters-head,.variants-head{font-family:'Poppins',sans-serif;letter-spacing:.04em;font-weight:600;color:#8e8e93}
 
 /* Timeline rows y cards → radios más generosos, sin hard borders */
 .tl-row{border-radius:18px;border-color:rgba(0,0,0,.04)}
-.tl-status{border-radius:999px;font-family:-apple-system,sans-serif;font-size:12px;font-weight:600;letter-spacing:0;text-transform:none;border-color:rgba(0,0,0,.15)}
-.tl-type{font-family:-apple-system,sans-serif;font-weight:600;letter-spacing:.02em}
+.tl-status{border-radius:999px;font-family:'Poppins',sans-serif;font-size:12px;font-weight:600;letter-spacing:0;text-transform:none;border-color:rgba(0,0,0,.15)}
+.tl-type{font-family:'Poppins',sans-serif;font-weight:600;letter-spacing:.02em}
 .tl-batch{border:1px solid rgba(212,132,142,.15);border-radius:20px}
 
 /* Hub tiles ya son apple — refinar sombra */
@@ -653,18 +653,16 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text','Poppins',sans-s
 .hub-tile:active{transform:scale(.98)}
 
 /* KPI números → SF rounded feel */
-.pk-num,.fa-kpi-num{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display',sans-serif;font-weight:700;letter-spacing:-.03em;font-size:38px}
-.pk-unit{font-family:-apple-system,sans-serif;font-weight:500;letter-spacing:.02em;text-transform:lowercase}
+.pk-num,.fa-kpi-num{font-family:'Poppins',sans-serif;font-weight:700;letter-spacing:-.03em;font-size:38px}
+.pk-unit{font-family:'Poppins',sans-serif;font-weight:500;letter-spacing:.02em;text-transform:lowercase}
 
 /* Chips proveedor → segmented feel */
-.sup-chip{font-family:-apple-system,sans-serif;box-shadow:0 1px 2px rgba(0,0,0,.03)}
-.fa-chip{font-family:-apple-system,sans-serif}
+.sup-chip{font-family:'Poppins',sans-serif;box-shadow:0 1px 2px rgba(0,0,0,.03)}
+.fa-chip{font-family:'Poppins',sans-serif}
 
-/* ═══════════ APPLE THEME v2 · rediseño completo ═══════════
-   Fondo iOS grouped, fuente del sistema en TODO (serif y mono fuera),
-   el logo LUXUR queda en Montserrat SemiBold. */
-/* Fondo = cream LUXUR #EDEBE6 (variables originales intactas) */
-*{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text','SF Pro Display',system-ui,'Helvetica Neue',sans-serif !important;font-style:normal !important}
+/* ═══════════ TRIMESTRE DORADO · Poppins en todo ═══════════
+   (antes: fuente del sistema con !important; ahora Poppins, el logo en Montserrat) */
+*{font-family:'Poppins',sans-serif !important;font-style:normal !important}
 .logo,.login-logo{font-family:'Montserrat',sans-serif !important;font-weight:600 !important}
 html,body{background:#edebe6}
 
