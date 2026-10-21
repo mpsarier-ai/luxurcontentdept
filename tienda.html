@@ -10,75 +10,76 @@
 <title>LUXUR · Tienda</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;700&family=Montserrat:wght@600&family=Outfit:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Montserrat:wght@500;600;700&display=swap" rel="stylesheet">
 <style>
 :root{
-  --cream:#edebe6; --cream-dark:#dedad3; --rosa:#f2d4d7; --rosa-deep:#d4848e;
-  --black:#1a1a1a; --grey:#7a7570; --green:#5b9a5b; --red:#bd6b6b;
+  --cream:#edebe6; --cream-dark:#E6E2DC; --rosa:#EECDCC; --rosa-deep:#C9868E;
+  --black:#1C1C1C;--paper:#FBFAF7;--line:#BDBAB3;--ink-warm:#3A2E2E; --grey:#5A5A5A; --green:#5b9a5b; --red:#bd6b6b;
 }
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
-html,body{background:var(--cream);color:var(--black);font-family:'Outfit',sans-serif;font-weight:300;
+html,body{background:var(--cream);color:var(--black);font-family:'Poppins',sans-serif;font-weight:300;
   min-height:100dvh;-webkit-font-smoothing:antialiased;
   padding:env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left)}
 .wrap{max-width:430px;margin:0 auto;padding:30px 20px 40px;display:flex;flex-direction:column;gap:18px;min-height:100dvh}
 
 .brand{font-family:'Montserrat',sans-serif;font-weight:600;font-size:24px;text-align:center;color:var(--rosa-deep)}
-.tagline{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.2em;text-transform:uppercase;
+.tagline{font-family:'Poppins',sans-serif;font-weight:600;font-size:10px;letter-spacing:.2em;text-transform:uppercase;
   color:var(--grey);text-align:center;margin-top:2px}
 
-.q{font-family:'Cormorant Garamond',serif;font-weight:700;font-size:27px;text-align:center;line-height:1.15;margin-top:14px}
+.q{font-family:'Poppins',sans-serif;font-weight:300;letter-spacing:-.02em;font-size:27px;text-align:center;line-height:1.15;margin-top:14px}
 
-.card{background:#fff;border-radius:20px;padding:20px 18px;box-shadow:0 1px 2px rgba(0,0,0,.04),0 6px 18px rgba(0,0,0,.05);
+.card{background:var(--paper);border-radius:20px;padding:20px 18px;box-shadow:0 1px 2px rgba(0,0,0,.04),0 6px 18px rgba(0,0,0,.05);
   display:flex;flex-direction:column;gap:14px}
-.lbl{font-family:'JetBrains Mono',monospace;font-size:9.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--grey)}
+.lbl{font-family:'Poppins',sans-serif;font-weight:600;font-size:9.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--grey)}
 
 .daychips{display:flex;gap:8px}
-.dc{flex:1;border:1px solid rgba(0,0,0,.08);background:#fff;border-radius:999px;padding:11px 8px;
-  font-family:'Outfit',sans-serif;font-size:13.5px;font-weight:500;color:#555;cursor:pointer;text-align:center}
+.dc{flex:1;border:1px solid rgba(0,0,0,.08);background:var(--paper);border-radius:999px;padding:11px 8px;
+  font-family:'Poppins',sans-serif;font-size:13.5px;font-weight:500;color:#555;cursor:pointer;text-align:center}
 .dc.on{background:var(--rosa);border-color:transparent;color:var(--black);font-weight:600}
-input[type=date]{border:1px solid rgba(0,0,0,.08);background:#fff;border-radius:14px;padding:13px 14px;
-  font-family:'Outfit',sans-serif;font-size:16px;width:100%;color:var(--black)}
+input[type=date]{border:1px solid rgba(0,0,0,.08);background:var(--paper);border-radius:14px;padding:13px 14px;
+  font-family:'Poppins',sans-serif;font-size:16px;width:100%;color:var(--black)}
 
 .numbox{display:flex;align-items:center;gap:10px}
 .step{border:none;background:var(--cream);border-radius:16px;width:64px;height:74px;font-size:28px;
   font-weight:400;color:var(--black);cursor:pointer;flex:none;touch-action:manipulation}
 .step:active{background:var(--cream-dark)}
 input[type=number]{flex:1;min-width:0;border:none;background:transparent;text-align:center;
-  font-family:'Cormorant Garamond',serif;font-weight:700;font-size:64px;color:var(--black);
+  font-family:'Poppins',sans-serif;font-weight:300;letter-spacing:-.02em;font-size:64px;color:var(--black);
   font-variant-numeric:tabular-nums;-moz-appearance:textfield}
 input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none}
 .prev{font-size:12.5px;color:var(--grey);text-align:center;min-height:18px}
 
 .save{border:none;border-radius:999px;background:var(--black);color:var(--cream);width:100%;
-  font-family:'Outfit',sans-serif;font-size:17px;font-weight:600;padding:18px;cursor:pointer;
+  font-family:'Poppins',sans-serif;font-size:17px;font-weight:600;padding:18px;cursor:pointer;
   box-shadow:0 6px 20px rgba(0,0,0,.12);touch-action:manipulation}
 .save:active{transform:scale(.98)}
 .save:disabled{background:var(--cream-dark);color:#9a948e;box-shadow:none}
 .save.ok{background:var(--green)}
 
-.msg{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.06em;color:var(--grey);
+.msg{font-family:'Poppins',sans-serif;font-weight:600;font-size:10px;letter-spacing:.06em;color:var(--grey);
   text-align:center;min-height:16px}
 .msg.err{color:var(--red)}
 
 .badpage{text-align:center;padding:80px 24px;font-size:15px;color:var(--grey)}
 
 /* Meta del día (presupuesto de Juliana · venta POS de Shopify) */
-.goal{gap:12px}
+.goal{gap:12px;background:radial-gradient(120% 140% at 100% 0%,rgba(238,205,204,.55) 0%,rgba(201,134,142,.18) 38%,rgba(28,28,28,0) 70%),linear-gradient(160deg,#2a2224 0%,#1C1C1C 60%);color:var(--cream);border-radius:24px}
+.goal .lbl{color:rgba(237,235,230,.6)}
 .goal-top{display:flex;justify-content:space-between;align-items:center;gap:8px}
-.ev{font-family:'JetBrains Mono',monospace;font-size:9.5px;letter-spacing:.08em;text-transform:uppercase;
-  background:var(--black);color:var(--cream);border-radius:999px;padding:4px 10px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:60%}
-.goal-num{font-family:'Cormorant Garamond',serif;font-weight:700;font-size:44px;line-height:1;font-variant-numeric:tabular-nums}
-.goal-sub{font-size:13px;color:var(--grey)}
-.bar{height:10px;background:var(--cream);border-radius:999px;overflow:hidden}
-.bar i{display:block;height:100%;background:var(--rosa-deep);border-radius:999px;transition:width .4s}
+.ev{font-family:'Poppins',sans-serif;font-weight:600;font-size:9.5px;letter-spacing:.08em;text-transform:uppercase;
+  background:var(--rosa);color:var(--black);border-radius:999px;padding:4px 10px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:60%}
+.goal-num{font-family:'Poppins',sans-serif;font-weight:300;letter-spacing:-.02em;font-size:44px;line-height:1;font-variant-numeric:tabular-nums}
+.goal-sub{font-size:13px;color:rgba(237,235,230,.65)}
+.bar{height:10px;background:rgba(237,235,230,.14);border-radius:999px;overflow:hidden}
+.bar i{display:block;height:100%;background:var(--rosa);border-radius:999px;transition:width .4s}
 .bar.done i{background:var(--green)}
 .goal-row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-.gbox{background:var(--cream);border-radius:14px;padding:12px}
-.gbox b{display:block;font-family:'Cormorant Garamond',serif;font-weight:700;font-size:26px;line-height:1.1;font-variant-numeric:tabular-nums}
-.gbox span{font-size:12px;color:var(--grey)}
-.gbox.ok b{color:var(--green)}
-.goal-month{font-size:12.5px;color:var(--grey);border-top:1px solid rgba(0,0,0,.06);padding-top:10px}
-.goal-month b{color:var(--black);font-weight:600}
+.gbox{background:rgba(237,235,230,.1);border-radius:16px;padding:12px}
+.gbox b{display:block;font-family:'Poppins',sans-serif;font-weight:300;letter-spacing:-.02em;font-size:26px;line-height:1.1;font-variant-numeric:tabular-nums}
+.gbox span{font-size:12px;color:rgba(237,235,230,.65)}
+.gbox.ok b{color:#9fd3a4}
+.goal-month{font-size:12.5px;color:rgba(237,235,230,.65);border-top:1px solid rgba(237,235,230,.12);padding-top:10px}
+.goal-month b{color:var(--cream);font-weight:600}
 @media (prefers-reduced-motion:reduce){.bar i{transition:none}}
 </style>
 </head>
@@ -192,10 +193,10 @@ async function loadGoal(){
     $('goalBar').classList.toggle('done', left <= 0);
     $('goalSold').textContent = cop(sold);
     const upd = g.updated_at ? new Date(g.updated_at).toLocaleTimeString('es-CO', { hour: 'numeric', minute: '2-digit', timeZone: 'America/Bogota' }) : null;
-    $('boxSold').querySelector('span').textContent = `vendido en caja · ${g.orders} ticket${g.orders === 1 ? '' : 's'}` + (upd ? ` · ${upd}` : '');
+    $('boxSold').querySelector('span').textContent = `vendido en caja, ${g.orders} ticket${g.orders === 1 ? '' : 's'}` + (upd ? ` (${upd})` : '');
     if (left > 0){
       $('goalLeft').textContent = cop(left);
-      $('goalLeftLbl').textContent = g.ticket ? `falta · ${Math.ceil(left / g.ticket)} tickets más` : 'falta';
+      $('goalLeftLbl').textContent = g.ticket ? `falta, ${Math.ceil(left / g.ticket)} tickets más` : 'falta';
       $('boxLeft').classList.remove('ok');
     } else {
       $('goalLeft').textContent = '+' + cop(-left);
@@ -204,7 +205,7 @@ async function loadGoal(){
     }
     if (g.month_goal_to_date){
       const c = g.month_sold / g.month_goal_to_date;
-      $('goalMonth').innerHTML = `En el mes: <b>${mill(g.month_sold)}</b> de ${mill(g.month_goal_to_date)} a la fecha (${Math.round(c*100)} %) · meta del mes ${mill(g.month_goal)}`;
+      $('goalMonth').innerHTML = `En el mes van <b>${mill(g.month_sold)}</b> de ${mill(g.month_goal_to_date)} a la fecha (${Math.round(c*100)} %). La meta del mes es ${mill(g.month_goal)}.`;
     }
   } catch (e) {
     $('goalCard').hidden = true;

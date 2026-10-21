@@ -9,16 +9,14 @@ Dashboard de contenidos y calendario para LUXUR Jeans. Genera HTMLs de calendari
 - GitHub para versionamiento y deploy trigger
 - Netlify para hosting y deploy automático
 
-## Marca LUXUR — Identidad Visual
-- Color primario: `#edebe6` (cream)
-- Color secundario: `#f2d4d7` (rosa claro)
-- Color accent: `#e8a5ad` (rosa hot)
-- Color deep: `#d4848e` (rosa profundo)
-- Negro: `#1a1a1a`
-- Tipografía display: Cormorant Garamond (serif, 700/900)
-- Tipografía body: Outfit (sans-serif, 300-700)
-- Tipografía mono: JetBrains Mono (datos, tags, badges)
-- Google Fonts URL: `https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400&family=Outfit:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap`
+## Marca LUXUR — Identidad Visual (Q4 2026 · Trimestre dorado)
+- Papel (fondo de tarjetas): `#FBFAF7` · Cream (fondo de página): `#EDEBE6` · Rosa: `#EECDCC`
+- Tinta: `#1C1C1C` · Gris: `#5A5A5A` · Línea: `#BDBAB3` · Suave: `#E6E2DC` · Tinta cálida: `#3A2E2E`
+- Rosa profundo (acento de marca): `#C9868E` · Rosa hot: `#E3A7AE`
+- Semánticos: ok `#5a7a4f` · atención `#c4a04a` · alerta `#b8504a`
+- Tipografía: **Poppins** en todo (300 para números y títulos grandes con `letter-spacing:-.02em`; 400/500 cuerpo; 600 etiquetas en mayúscula con `letter-spacing:.14em`). Montserrat SemiBold solo para el logo LUXUR, sin tracking.
+- Google Fonts URL: `https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Montserrat:wght@500;600;700&display=swap`
+- Lenguaje de pantalla: primero una frase que resume (hero oscuro con rosa en degradado), después tarjetas en carrusel horizontal, y el detalle en una hoja que sube desde abajo. Evitar tablas a la vista, bullets y separadores "·" en el texto. Siempre que haya producto, mostrar la foto del jean.
 
 ## Estructura de Archivos
 ```
