@@ -106,17 +106,14 @@ create policy plan_actions_team on public.plan_actions
   for select to authenticated using (public.is_team_member());
 
 -- ── Categoría en el pipeline ────────────────────────────────────────────
-alter table public.product_pipeline add column if not exists category text;
-update public.product_pipeline
-   set category = case when product_name ilike '%tank%' then 'tank_tops' else 'jeans' end
- where category is null;
-alter table public.product_pipeline alter column category set default 'jeans';
+alter table public.product_pipeline add column if not exists category text default 'jeans';
+update public.product_pipeline set category = 'tank_tops' where product_name ilike '%tank%';
 
 create or replace function public.pipeline_set_category() returns trigger
 language plpgsql as $$
 begin
-  if new.category is null or (tg_op = 'INSERT' and new.category = 'jeans' and new.product_name ilike '%tank%') then
-    new.category := case when new.product_name ilike '%tank%' then 'tank_tops' else 'jeans' end;
+  if new.product_name ilike '%tank%' then new.category := 'tank_tops';
+  elsif new.category is null then new.category := 'jeans';
   end if;
   return new;
 end $$;
