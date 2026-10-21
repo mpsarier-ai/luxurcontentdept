@@ -61,6 +61,25 @@ input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none}
 .msg.err{color:var(--red)}
 
 .badpage{text-align:center;padding:80px 24px;font-size:15px;color:var(--grey)}
+
+/* Meta del día (presupuesto de Juliana · venta POS de Shopify) */
+.goal{gap:12px}
+.goal-top{display:flex;justify-content:space-between;align-items:center;gap:8px}
+.ev{font-family:'JetBrains Mono',monospace;font-size:9.5px;letter-spacing:.08em;text-transform:uppercase;
+  background:var(--black);color:var(--cream);border-radius:999px;padding:4px 10px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:60%}
+.goal-num{font-family:'Cormorant Garamond',serif;font-weight:700;font-size:44px;line-height:1;font-variant-numeric:tabular-nums}
+.goal-sub{font-size:13px;color:var(--grey)}
+.bar{height:10px;background:var(--cream);border-radius:999px;overflow:hidden}
+.bar i{display:block;height:100%;background:var(--rosa-deep);border-radius:999px;transition:width .4s}
+.bar.done i{background:var(--green)}
+.goal-row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.gbox{background:var(--cream);border-radius:14px;padding:12px}
+.gbox b{display:block;font-family:'Cormorant Garamond',serif;font-weight:700;font-size:26px;line-height:1.1;font-variant-numeric:tabular-nums}
+.gbox span{font-size:12px;color:var(--grey)}
+.gbox.ok b{color:var(--green)}
+.goal-month{font-size:12.5px;color:var(--grey);border-top:1px solid rgba(0,0,0,.06);padding-top:10px}
+.goal-month b{color:var(--black);font-weight:600}
+@media (prefers-reduced-motion:reduce){.bar i{transition:none}}
 </style>
 </head>
 <body>
@@ -68,8 +87,26 @@ input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none}
   <div>
     <div class="brand">LUXUR</div>
     <div class="tagline">Tienda Medellín</div>
-    <div class="q">¿Cuántas personas<br>entraron?</div>
   </div>
+
+  <div class="card goal" id="goalCard" hidden>
+    <div class="goal-top">
+      <span class="lbl" id="goalLbl">Meta de hoy</span>
+      <span class="ev" id="goalEv" hidden></span>
+    </div>
+    <div>
+      <div class="goal-num" id="goalNum">—</div>
+      <div class="goal-sub" id="goalSub"></div>
+    </div>
+    <div class="bar" id="goalBar"><i id="goalFill" style="width:0%"></i></div>
+    <div class="goal-row">
+      <div class="gbox" id="boxSold"><b id="goalSold">—</b><span>vendido en caja</span></div>
+      <div class="gbox" id="boxLeft"><b id="goalLeft">—</b><span id="goalLeftLbl">falta</span></div>
+    </div>
+    <div class="goal-month" id="goalMonth"></div>
+  </div>
+
+  <div class="q">¿Cuántas personas<br>entraron?</div>
 
   <div class="card">
     <span class="lbl">Día</span>
@@ -107,13 +144,6 @@ const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 const token = new URLSearchParams(location.search).get('t') || '';
 const $ = id => document.getElementById(id);
 
-if (!/^[0-9a-f-]{36}$/.test(token)){
-  $('badToken').hidden = false;
-} else {
-  $('app').hidden = false;
-  init();
-}
-
 const bogotaISO = shift => {
   const d = new Date(Date.now() - 5*60*60*1000);
   d.setUTCDate(d.getUTCDate() + (shift || 0));
@@ -130,6 +160,7 @@ function init(){
   di.value = day;
   $('numLbl').textContent = 'Personas hoy';
   loadDay();
+  loadGoal();
 }
 
 function setDay(iso, chip){
@@ -138,7 +169,48 @@ function setDay(iso, chip){
   $('dayInput').hidden = (chip !== 'chipOtro');
   $('numLbl').textContent = day === bogotaISO(0) ? 'Personas hoy' : `Personas el ${bonito(day)}`;
   loadDay();
+  loadGoal();
 }
+
+// ── Meta del día: presupuesto diario de la tienda vs venta neta del POS (sin IVA) ──
+const cop = v => '$' + Math.round(v).toLocaleString('es-CO');
+const mill = v => '$' + (v/1e6).toFixed(1).replace('.', ',') + ' M';
+async function loadGoal(){
+  try {
+    const { data: g, error } = await supabase.rpc('store_get_goal', { p_token: token, p_day: day });
+    if (error) throw error;
+    if (!g || g.goal == null){ $('goalCard').hidden = true; return; }
+    $('goalCard').hidden = false;
+    const isToday = day === bogotaISO(0);
+    $('goalLbl').textContent = isToday ? 'Meta de hoy' : `Meta del ${bonito(day)}`;
+    $('goalEv').hidden = !g.event; $('goalEv').textContent = g.event || '';
+    const goal = +g.goal, sold = +g.sold, left = goal - sold;
+    $('goalNum').textContent = cop(goal);
+    $('goalSub').textContent = g.ticket ? `unos ${Math.ceil(goal / g.ticket)} tickets de ${cop(g.ticket)}` : '';
+    const pct = goal > 0 ? Math.min(100, sold / goal * 100) : 0;
+    $('goalFill').style.width = pct.toFixed(0) + '%';
+    $('goalBar').classList.toggle('done', left <= 0);
+    $('goalSold').textContent = cop(sold);
+    const upd = g.updated_at ? new Date(g.updated_at).toLocaleTimeString('es-CO', { hour: 'numeric', minute: '2-digit', timeZone: 'America/Bogota' }) : null;
+    $('boxSold').querySelector('span').textContent = `vendido en caja · ${g.orders} ticket${g.orders === 1 ? '' : 's'}` + (upd ? ` · ${upd}` : '');
+    if (left > 0){
+      $('goalLeft').textContent = cop(left);
+      $('goalLeftLbl').textContent = g.ticket ? `falta · ${Math.ceil(left / g.ticket)} tickets más` : 'falta';
+      $('boxLeft').classList.remove('ok');
+    } else {
+      $('goalLeft').textContent = '+' + cop(-left);
+      $('goalLeftLbl').textContent = 'meta cumplida';
+      $('boxLeft').classList.add('ok');
+    }
+    if (g.month_goal_to_date){
+      const c = g.month_sold / g.month_goal_to_date;
+      $('goalMonth').innerHTML = `En el mes: <b>${mill(g.month_sold)}</b> de ${mill(g.month_goal_to_date)} a la fecha (${Math.round(c*100)} %) · meta del mes ${mill(g.month_goal)}`;
+    }
+  } catch (e) {
+    $('goalCard').hidden = true;
+  }
+}
+setInterval(() => { if (day === bogotaISO(0)) loadGoal(); }, 10 * 60 * 1000);
 
 $('chipHoy').addEventListener('click', () => setDay(bogotaISO(0), 'chipHoy'));
 $('chipAyer').addEventListener('click', () => setDay(bogotaISO(-1), 'chipAyer'));
@@ -189,6 +261,14 @@ $('saveBtn').addEventListener('click', async () => {
     showMsg('no se guardó — revisa la señal e intenta otra vez', true);
   }
 });
+
+// Arranque al final: antes se llamaba init() antes de declarar bogotaISO y la página fallaba al cargar
+if (!/^[0-9a-f-]{36}$/.test(token)){
+  $('badToken').hidden = false;
+} else {
+  $('app').hidden = false;
+  init();
+}
 </script>
 </body>
 </html>

@@ -896,6 +896,31 @@ header,.hub-header{position:static !important;background:transparent !important;
 .pk-sp span{font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:var(--grey)}
 .pk-sp b{font-family:'Cormorant Garamond',serif;font-weight:700;font-size:20px;line-height:1}
 .pk-sp.slow b{color:var(--red-out)}.pk-sp.rota b{color:var(--green-ok)}.pk-sp.nuevo b{color:var(--yellow-low)}
+/* ── Necesidad vs producción (plan de María × pipeline) ── */
+.need-card{background:#fff;border-radius:16px;padding:14px 16px 12px;box-shadow:0 1px 3px rgba(0,0,0,.05);margin:0 0 18px}
+.need-head{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:10px}
+.need-t{font-family:'JetBrains Mono',monospace;font-size:9.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--grey)}
+.need-tabs{display:flex;gap:6px}
+.need-tabs .mk-tab{padding:6px 12px;font-size:12px}
+.need-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}
+.need-m{border-radius:12px;padding:10px 10px 9px;background:var(--cream);border-top:4px solid var(--cream-dark);min-width:0}
+.need-m.ok{border-top-color:var(--green-ok)}.need-m.warn{border-top-color:var(--yellow-low)}.need-m.bad{border-top-color:var(--red-out)}
+.need-m .mn{font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:var(--grey)}
+.need-m .gp{font-family:'Cormorant Garamond',serif;font-weight:700;font-size:26px;line-height:1.05;margin:4px 0 2px;font-variant-numeric:tabular-nums}
+.need-m.ok .gp{color:var(--green-ok)}.need-m.warn .gp{color:#8a6b1f}.need-m.bad .gp{color:var(--red-out)}
+.need-m .ln{font-size:11.5px;color:#555;line-height:1.35}
+.need-m .ln b{font-weight:600;color:var(--black)}
+.need-note{font-size:12px;color:#555;line-height:1.4;margin-top:10px}
+.need-more{border:none;background:none;font-family:inherit;font-size:12.5px;font-weight:600;color:var(--black);padding:8px 0 0;cursor:pointer;text-decoration:underline;text-underline-offset:3px}
+.need-detail{overflow-x:auto;margin-top:8px}
+.need-detail table{border-collapse:collapse;width:100%;font-size:12px;font-variant-numeric:tabular-nums;min-width:420px}
+.need-detail th{font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:.08em;text-transform:uppercase;color:var(--grey);text-align:right;padding:6px 6px;border-bottom:1.5px solid var(--black);font-weight:500}
+.need-detail th:first-child,.need-detail td:first-child{text-align:left}
+.need-detail td{text-align:right;padding:5px 6px;border-bottom:1px solid rgba(0,0,0,.06)}
+.need-detail tr.hl td{background:var(--cream);font-weight:600}
+.need-detail tr.sep td{border-top:1.5px solid var(--black)}
+.need-detail .pos{color:var(--green-ok)}.need-detail .neg{color:var(--red-out)}
+@media (max-width:520px){.need-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
 .cov-card{background:#fff;border-radius:16px;padding:14px 16px;box-shadow:0 1px 3px rgba(0,0,0,.05);margin:-4px 0 18px;border-left:4px solid var(--green-ok)}
 .cov-card.bad{border-left-color:var(--red-out);background:rgba(184,80,74,.06)}
 .cov-top{display:flex;justify-content:space-between;align-items:baseline;gap:10px;flex-wrap:wrap}
@@ -1132,6 +1157,8 @@ header,.hub-header{position:static !important;background:transparent !important;
     </div>
     <!-- Cobertura: stock de jeans + producción contra el mínimo -->
     <div class="cov-card" id="covCard"></div>
+    <!-- Necesidad vs producción: plan de María (demand_plan) contra el pipeline -->
+    <div class="need-card" id="needCard" hidden></div>
     <!-- Cumplimiento por proveedor -->
     <div class="sc-card" id="supScore" hidden></div>
     <!-- Entregas semana a semana (swipe) -->
@@ -3387,6 +3414,98 @@ document.addEventListener('click', e => {
   }, 350); // dejá que termine la transición de slide-in de la sección
 });
 
+// ═══ Necesidad vs producción ═══
+// Recalcula la hoja de María (demand_plan) y la cruza con lo que llega según el pipeline.
+// Reglas M1–M8 del documento "Reglas y fórmulas": demanda = (presupuesto × participación − ya vendido) / precio neto;
+// stock de seguridad = semanas × ritmo semanal (diciembre usa el ritmo de enero = octubre × factor);
+// necesidad = ⌈max(0, demanda + seguridad − inventario inicial)⌉.
+let demandPlans = null, needCat = 'jeans', needOpen = false, needSettings = null;
+async function loadNeedPlan(){
+  if (demandPlans) return;
+  const [dp, bs] = await Promise.all([
+    supabase.from('demand_plan').select('*').eq('is_current', true),
+    supabase.from('budget_settings').select('ss_weeks,discount_obsolete,jan_mult').eq('id', 1).maybeSingle(),
+  ]);
+  if (dp.error){ console.warn('demand_plan', dp.error.message); demandPlans = []; return; }
+  demandPlans = dp.data || [];
+  needSettings = bs.data || { ss_weeks: 8, discount_obsolete: true, jan_mult: 1 };
+}
+function computeNeed(plan, st){
+  const B = [plan.budget.oct, plan.budget.nov, plan.budget.dic].map(Number);
+  const days = [31, 30, 31];
+  const target = B.map(b => b * plan.share);
+  const pending = [Math.max(0, target[0] - plan.sold_before), target[1], target[2]];
+  const demand = pending.map(v => v / plan.net_price);
+  const full = target.map(v => v / plan.net_price);
+  const weekly = full.map((u, i) => u / days[i] * 7);
+  const ritmo = [weekly[0], weekly[1], (st.jan_mult ?? 1) * full[0] / 31 * 7];
+  const ss = ritmo.map(r => (st.ss_weeks ?? 8) * r);
+  const avail = plan.stock_active - (st.discount_obsolete === false ? 0 : plan.stock_obsolete);
+  const inv0 = [], need = [], inv1 = [];
+  let cur = avail;
+  for (let i = 0; i < 3; i++){ inv0.push(cur); const n = Math.ceil(Math.max(0, demand[i] + ss[i] - cur)); need.push(n); cur = cur + n - demand[i]; inv1.push(cur); }
+  return { target, pending, demand, full, weekly, ritmo, ss, avail, inv0, need, inv1 };
+}
+function needArrivals(cat, cutoff){
+  // [oct (desde el día después del corte), nov, dic, ene o después], solo lo pendiente
+  const out = [0, 0, 0, 0]; let stale = 0;
+  const later = cutoff.slice(0, 10);
+  (pipeline || []).forEach(e => {
+    if ((e.category || 'jeans') !== cat) return;
+    if (e.status !== 'pendiente' || e.stage === 'entrega') return;
+    const q = e.quantity || 0, d = e.tentative_date;
+    if (!d){ out[3] += q; return; }
+    if (d <= later){ stale += q; return; }
+    const m = d.slice(0, 7);
+    if (m <= '2026-10') out[0] += q; else if (m === '2026-11') out[1] += q; else if (m === '2026-12') out[2] += q; else out[3] += q;
+  });
+  return { out, stale };
+}
+function renderNeed(){
+  const el = document.getElementById('needCard');
+  if (!el || !demandPlans || !demandPlans.length) return;
+  const plan = demandPlans.find(p => p.category === needCat) || demandPlans[0];
+  const st = needSettings || {};
+  const r = computeNeed(plan, st);
+  const { out: arr, stale } = needArrivals(plan.category, plan.cutoff);
+  const n0 = v => Math.round(v).toLocaleString('es-CO');
+  const sg = v => (v >= 0 ? '+' : '−') + n0(Math.abs(v));
+  const months = ['Oct (14–31)', 'Noviembre', 'Diciembre', 'Enero o después'];
+  // Inventario proyectado con lo que llega (sin comprar nada más)
+  let inv = r.avail; const proj = [];
+  for (let i = 0; i < 3; i++){ inv = inv + arr[i] - r.demand[i]; proj.push(inv); }
+  const cls = i => { if (i === 3) return ''; const g = arr[i] - r.need[i]; return g >= 0 ? 'ok' : (g >= -0.1 * r.need[i] ? 'warn' : 'bad'); };
+  const cards = months.map((m, i) => i < 3
+    ? `<div class="need-m ${cls(i)}"><div class="mn">${m}</div><div class="gp">${sg(arr[i] - r.need[i])}</div>
+        <div class="ln">necesita <b>${n0(r.need[i])}</b> · llega <b>${n0(arr[i])}</b><br>cierra con ${n0(Math.max(0, proj[i]))} · ${(Math.max(0, proj[i]) / r.ritmo[i]).toFixed(1).replace('.', ',')} sem.</div></div>`
+    : `<div class="need-m"><div class="mn">${m}</div><div class="gp">${n0(arr[3])}</div><div class="ln">llega fuera del Q4<br>María no calcula enero</div></div>`).join('');
+  const short = proj.findIndex(v => v < 0);
+  const note = short >= 0
+    ? `Con lo que llega hoy, ${needCat === 'jeans' ? 'los jeans' : 'los tank tops'} se acaban en ${months[short].toLowerCase()}.`
+    : `Con lo que llega hoy no se acaba el total; el cierre de cada mes se compara con ${st.ss_weeks ?? 8} semanas de stock de seguridad.`;
+  const rows = [
+    ['Venta objetivo de la categoría', r.target.map(v => '$' + (v / 1e6).toFixed(1).replace('.', ',') + ' M')],
+    ['Demanda a cubrir (unid.)', r.demand.map(n0)],
+    ['Stock de seguridad al cierre', r.ss.map(n0)],
+    ['Inventario inicial', r.inv0.map(n0)],
+    ['Necesidad de compra', r.need.map(n0), 'hl'],
+    ['Llega según pipeline', arr.slice(0, 3).map(n0), 'sep'],
+    ['Brecha', arr.slice(0, 3).map((a, i) => `<span class="${a - r.need[i] >= 0 ? 'pos' : 'neg'}">${sg(a - r.need[i])}</span>`), 'hl'],
+  ];
+  el.hidden = false;
+  el.innerHTML = `<div class="need-head"><span class="need-t">Necesidad vs producción · plan de María</span>
+      <span class="need-tabs"><button class="mk-tab ${needCat === 'jeans' ? 'active' : ''}" data-need="jeans">Jeans</button><button class="mk-tab ${needCat === 'tank_tops' ? 'active' : ''}" data-need="tank_tops">Tank tops</button></span></div>
+    <div class="need-grid">${cards}</div>
+    <div class="need-note">${note}${stale ? ` · ${n0(stale)} unidades siguen "pendientes" con fecha anterior al ${plan.cutoff.slice(8, 10)}/${plan.cutoff.slice(5, 7)} y no se cuentan: actualízalas.` : ''}</div>
+    <button class="need-more" id="needMore">${needOpen ? 'Ocultar el cálculo' : 'Ver el cálculo de María'}</button>
+    <div class="need-detail" ${needOpen ? '' : 'hidden'}><table><thead><tr><th>${escapeHtml(plan.version)}</th><th>Oct</th><th>Nov</th><th>Dic</th></tr></thead><tbody>
+      ${rows.map(([l, v, c]) => `<tr class="${c || ''}"><td>${l}</td>${v.map(x => `<td>${x}</td>`).join('')}</tr>`).join('')}
+    </tbody></table>
+    <div class="need-note">Stock al ${plan.cutoff.slice(8, 10)}/${plan.cutoff.slice(5, 7)}: ${n0(plan.stock_active)} activos, ${n0(plan.stock_obsolete)} obsoletos · precio neto $${n0(plan.net_price)} · participación ${(plan.share * 100).toFixed(1).replace('.', ',')} % · total oct–dic ${n0(r.need.reduce((a, b) => a + b, 0))}.</div></div>`;
+  el.querySelectorAll('[data-need]').forEach(b => b.addEventListener('click', () => { needCat = b.getAttribute('data-need'); renderNeed(); }));
+  document.getElementById('needMore').addEventListener('click', () => { needOpen = !needOpen; renderNeed(); });
+}
+
 let pipeline = [];
 let batches = []; // production_batches rows
 
@@ -3402,6 +3521,7 @@ async function loadPipeline(){
   if (batchRes.error) console.warn('batches load failed (¿corriste production_batches_upgrade.sql?):', batchRes.error.message);
   renderPipeline();
   loadSupplierLink();
+  loadNeedPlan().then(renderNeed).catch(e => console.warn('need', e));
 }
 
 // Etapas a nivel LOTE (Corte → Lavandería)
