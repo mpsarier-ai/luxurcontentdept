@@ -1014,6 +1014,65 @@ header,.hub-header{position:static !important;background:transparent !important;
 .td-own select{flex:1;font:500 14px 'Poppins',sans-serif;padding:8px 10px;border:1.5px solid var(--line);border-radius:10px;background:var(--cream);color:var(--black)}
 .td-kpi{font-size:12.5px;color:var(--grey);line-height:1.45}
 
+
+/* ═══ SISTEMA Q4 · frase arriba, carruseles, detalle en hoja ═══ */
+.sub-tabs{display:flex;gap:4px;padding:4px;border-radius:999px;background:rgba(28,28,28,.06);margin:0 0 14px;overflow-x:auto;scrollbar-width:none}
+.sub-tabs::-webkit-scrollbar{display:none}
+.sub-tabs button{flex:1 0 auto;border:none;background:none;color:var(--grey);font-family:'Poppins',sans-serif;font-size:13px;font-weight:500;padding:9px 14px;border-radius:999px;cursor:pointer;white-space:nowrap}
+.sub-tabs button.on{background:var(--black);color:var(--cream);font-weight:600}
+.sub-tabs button:focus-visible{outline:2px solid var(--black);outline-offset:2px}
+.sec-hero{position:relative;overflow:hidden;border-radius:26px;padding:20px 20px 18px;color:var(--cream);margin:0 0 12px;
+  background:radial-gradient(120% 140% at 100% 0%,rgba(238,205,204,.6) 0%,rgba(201,134,142,.2) 38%,rgba(28,28,28,0) 70%),linear-gradient(160deg,#2a2224 0%,#1C1C1C 60%)}
+.sec-hero.light{background:var(--rosa);color:var(--black)}
+.sec-hero .k{font-family:'Poppins',sans-serif;font-weight:600;font-size:9.5px;letter-spacing:.16em;text-transform:uppercase;opacity:.65;margin-bottom:10px}
+.sec-hero .say{font-family:'Poppins',sans-serif;font-weight:300;font-size:23px;line-height:1.25;letter-spacing:-.015em;opacity:.78;text-wrap:balance;margin:0}
+.sec-hero .say b{font-weight:600;opacity:1}
+.sec-hero .say em{font-style:normal;font-weight:600;color:var(--rosa)}
+.sec-hero.light .say em{color:#8e3b45}
+.rail{display:flex;gap:10px;overflow-x:auto;scroll-snap-type:x mandatory;-webkit-overflow-scrolling:touch;padding:2px 2px 8px;margin:0 -2px 6px;scrollbar-width:none}
+.rail::-webkit-scrollbar{display:none}
+.rail>*{scroll-snap-align:start;flex:0 0 auto}
+.rail-hint{font-size:11.5px;color:var(--grey);text-align:center;margin:0 0 14px}
+.eyebrow{font-family:'Poppins',sans-serif;font-weight:600;font-size:9.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--grey);margin:16px 2px 8px;display:flex;justify-content:space-between;align-items:center}
+.eyebrow .act{font-size:12px;letter-spacing:0;text-transform:none;font-weight:600;color:var(--black);border:none;background:var(--paper);border-radius:999px;padding:7px 12px;cursor:pointer;box-shadow:0 1px 2px rgba(0,0,0,.05)}
+/* KPIs en carrusel */
+.prod-kpis{display:flex!important;gap:10px;overflow-x:auto;scroll-snap-type:x mandatory;padding:2px 2px 8px;margin:0 -2px 8px;scrollbar-width:none;grid-template-columns:none!important}
+.prod-kpis::-webkit-scrollbar{display:none}
+.prod-kpi{flex:0 0 46%;min-width:150px;scroll-snap-align:start;border-radius:22px!important;border-top:none!important;padding:14px 14px 12px!important}
+.prod-kpi .pk-label{font-family:'Poppins',sans-serif;font-weight:600;font-size:9.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--grey)}
+.prod-kpi .pk-num{font-family:'Poppins',sans-serif;font-weight:300;letter-spacing:-.02em;font-size:34px!important;line-height:1.05}
+.prod-kpi .pk-unit{font-size:12px;color:var(--grey);margin-left:4px;letter-spacing:0}
+/* Listas → tarjetas en carrusel donde hay fotos */
+#briefAlerts.brief-list{display:flex;flex-direction:row;gap:10px;overflow-x:auto;scroll-snap-type:x mandatory;background:transparent;box-shadow:none;border-radius:0;padding:2px 2px 8px;margin:0 -2px;scrollbar-width:none}
+#briefAlerts::-webkit-scrollbar{display:none}
+#briefAlerts .brief-row{flex:0 0 46%;min-width:150px;scroll-snap-align:start;flex-direction:column;align-items:flex-start;gap:8px;border:none;border-radius:22px;padding:12px;box-shadow:0 1px 2px rgba(0,0,0,.04),0 8px 22px rgba(0,0,0,.06)}
+#briefAlerts .brief-thumb{width:100%;height:120px;border-radius:14px}
+#briefAlerts .brief-ico{width:100%;height:120px;border-radius:14px;background:var(--cream);display:flex;align-items:center;justify-content:center;font-size:26px}
+#briefAlerts .brief-body{width:100%}
+#briefAlerts .brief-row-title{white-space:normal;font-size:13.5px;line-height:1.3;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+#briefAlerts .brief-row-sub{font-size:11.5px;color:var(--grey);line-height:1.3;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+#briefAlerts .brief-empty{flex:1 0 100%}
+.brief-list{border-radius:22px;box-shadow:0 1px 2px rgba(0,0,0,.04),0 8px 22px rgba(0,0,0,.06)}
+.cal-list{display:flex!important;gap:10px;overflow-x:auto;scroll-snap-type:x mandatory;padding:2px 2px 8px;margin:0 -2px 6px;scrollbar-width:none;min-height:0!important}
+.cal-list::-webkit-scrollbar{display:none}
+.cal-card{flex:0 0 72%;min-width:230px;scroll-snap-align:start}
+.cal-card .num{font-size:40px}
+/* Semana en curso · un día por tarjeta */
+.day-card{flex:0 0 34%;min-width:118px;border-radius:20px;background:var(--paper);padding:12px 12px 10px;text-decoration:none;color:var(--black);display:flex;flex-direction:column;gap:4px;box-shadow:0 1px 2px rgba(0,0,0,.04),0 8px 22px rgba(0,0,0,.06);position:relative;overflow:hidden}
+.day-card.today{background:var(--rosa)}
+.day-card .d{font-family:'Poppins',sans-serif;font-weight:600;font-size:9.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--grey)}
+.day-card.today .d{color:#8e3b45}
+.day-card .n{font-family:'Poppins',sans-serif;font-weight:300;font-size:30px;line-height:1;letter-spacing:-.02em}
+.day-card .n small{font-size:11px;color:var(--grey);letter-spacing:0;margin-left:3px}
+.day-card .st{display:flex;gap:3px;height:5px;border-radius:9px;overflow:hidden;background:rgba(0,0,0,.08);margin-top:4px}
+.day-card .st i{display:block;height:100%}
+.day-card .st .ok{background:var(--green-ok)}.day-card .st .ap{background:var(--rosa-deep)}
+.day-card .ph{display:flex;gap:4px;margin-top:6px;min-height:40px}
+.day-card .ph img{width:30px;height:40px;border-radius:8px;object-fit:cover;background:var(--cream)}
+.day-card .who{font-size:10.5px;color:var(--grey);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.section-title{font-family:'Poppins',sans-serif;font-weight:600;font-size:15px;margin:16px 2px 8px}
+.hub-section{padding-bottom:110px}
+
 .cov-card{background:var(--paper);border-radius:16px;padding:14px 16px;box-shadow:0 1px 3px rgba(0,0,0,.05);margin:-4px 0 18px;border-left:4px solid var(--green-ok)}
 .cov-card.bad{border-left-color:var(--red-out);background:rgba(184,80,74,.06)}
 .cov-top{display:flex;justify-content:space-between;align-items:baseline;gap:10px;flex-wrap:wrap}
@@ -1220,17 +1279,23 @@ header,.hub-header{position:static !important;background:transparent !important;
   <section id="hubMarketing" class="hub-section" hidden>
     <button class="hub-back" data-hub-back>Inicio</button>
 
-    <!-- Trimestre dorado: estrategia del Q4 y plan de acción comercial -->
-    <div class="td-card" id="tdCard" hidden></div>
-    <!-- ── CALENDARIOS ── -->
-    <div id="mkCal">
-      <h2 class="section-title">
-        <span>Calendarios Semanales</span>
-        <button class="new-week-btn" id="newWeekBtn">+ Nueva Semana</button>
-      </h2>
-      <div class="cal-list" id="calList">
-        <div class="empty-state">Cargando…</div>
-      </div>
+    <div class="sec-hero" id="mkHero"><div class="k">Marketing</div><p class="say">Cargando la semana…</p></div>
+    <div class="sub-tabs" data-tabs="mk">
+      <button class="on" data-tab="semana">Esta semana</button>
+      <button data-tab="calendarios">Calendarios</button>
+      <button data-tab="trimestre">Trimestre</button>
+    </div>
+    <div data-panel="mk:semana">
+      <div class="rail" id="mkDays"></div>
+      <div class="rail-hint">Toca un día para abrir el calendario</div>
+    </div>
+    <div data-panel="mk:calendarios" hidden>
+      <div class="eyebrow"><span>Semanas</span><button class="act" id="newWeekBtn">+ Nueva semana</button></div>
+      <div id="mkCal"><div class="cal-list" id="calList"><div class="empty-state">Cargando…</div></div></div>
+    </div>
+    <div data-panel="mk:trimestre" hidden>
+      <!-- Trimestre dorado: estrategia del Q4 y plan de acción comercial -->
+      <div class="td-card" id="tdCard" hidden></div>
     </div>
   </section>
 
@@ -1238,12 +1303,30 @@ header,.hub-header{position:static !important;background:transparent !important;
   <section id="hubProduccion" class="hub-section" hidden>
     <button class="hub-back" data-hub-back>Inicio</button>
     <!-- Colección (solo Paulina + Isabella) -->
+    <div class="sub-tabs" data-tabs="pr">
+      <button class="on" data-tab="plan">Plan</button>
+      <button data-tab="lotes">Lotes</button>
+      <button data-tab="proveedores">Proveedores</button>
+    </div>
+    <div data-panel="pr:proveedores" hidden>
     <a class="fa-inv-link" id="colLink" href="coleccion.html" hidden>🧵 Atelier · colección y órdenes de compra <span>›</span></a>
     <a class="fa-inv-link" href="#bodega" onclick="event.preventDefault();showHubSection('bodega')">🏠 Bodega Casa · recepción y traslados a Medellín <span>›</span></a>
-    <!-- Selector de proveedor (chips) -->
-    <div class="supplier-chips" id="supplierChips"></div>
+    <!-- Cumplimiento por proveedor -->
+    <div class="sc-card" id="supScore" hidden></div>
+    <!-- Link único del proveedor seleccionado -->
+    <div class="supplier-link-box" id="supplierLinkBox" hidden>
+      <div class="slb-label">Link para tu proveedor</div>
+      <div class="slb-name" id="slbName">—</div>
+      <button class="slb-copy" id="slbCopy">📋 Copiar link</button>
+    </div>
+    </div>
+    <div data-panel="pr:plan">
     <!-- Plan de compra: necesidad (demand_plan) contra el pipeline -->
     <div class="need-card" id="needCard" hidden></div>
+    </div>
+    <div data-panel="pr:lotes" hidden>
+    <!-- Selector de proveedor (chips) -->
+    <div class="supplier-chips" id="supplierChips"></div>
     <!-- Dashboard 4 stat tiles -->
     <div class="prod-kpis" id="prodKpis">
       <div class="prod-kpi" data-kpi="stock">
@@ -1270,17 +1353,9 @@ header,.hub-header{position:static !important;background:transparent !important;
     </div>
     <!-- Cobertura: stock de jeans + producción contra el mínimo -->
     <div class="cov-card" id="covCard"></div>
-    <!-- Cumplimiento por proveedor -->
-    <div class="sc-card" id="supScore" hidden></div>
     <!-- Entregas semana a semana (swipe) -->
     <div class="wk-head" id="weekRailHead" hidden><span>Entregas por semana</span><span class="wk-hint">‹ desliza ›</span></div>
     <div class="week-rail" id="weekRail" hidden></div>
-    <!-- Link único del proveedor seleccionado -->
-    <div class="supplier-link-box" id="supplierLinkBox" hidden>
-      <div class="slb-label">Link para tu proveedor</div>
-      <div class="slb-name" id="slbName">—</div>
-      <button class="slb-copy" id="slbCopy">📋 Copiar link</button>
-    </div>
     <h2 class="section-title">
       <span>Añadir</span>
       <span style="display:flex;gap:8px">
@@ -1289,13 +1364,23 @@ header,.hub-header{position:static !important;background:transparent !important;
       </span>
     </h2>
     <div class="timeline" id="timeline"><div class="empty-state">Cargando…</div></div>
+    </div>
   </section>
 
   <!-- FASHIONALYTICS · estado de productos -->
   <section id="hubFashionalytics" class="hub-section" hidden>
     <button class="hub-back" data-hub-back>Inicio</button>
 
-    <h2 class="section-title"><span>Tienda física</span><span class="meta">LUXUR Medellín</span></h2>
+    <div class="sec-hero" id="anHero"><div class="k">Analytics</div><p class="say">Cargando ventas…</p></div>
+    <div class="sub-tabs" data-tabs="an">
+      <button class="on" data-tab="canales">Canales</button>
+      <button data-tab="tienda">Tienda</button>
+      <button data-tab="online">Online</button>
+      <button data-tab="demanda">Demanda</button>
+      <button data-tab="jeans">Jeans</button>
+    </div>
+    <div data-panel="an:canales"><div class="rail" id="anChannels"></div><div class="rail-hint" id="anChannelsHint">Presupuesto de Juliana contra la venta real del mes, por canal</div></div>
+    <div data-panel="an:tienda" hidden>
     <div class="mk-tabs" id="stPeriod">
       <button class="mk-tab active" data-st="hoy">Hoy</button>
       <button class="mk-tab" data-st="semana">Semana</button>
@@ -1331,7 +1416,9 @@ header,.hub-header{position:static !important;background:transparent !important;
       <details class="st-table-wrap"><summary>Ver como tabla</summary><div class="tw" id="stTable"></div></details>
     </div>
 
-    <h2 class="section-title" style="margin-top:26px"><span>Tienda online</span><span class="meta">canal Online Store · mismas vistas</span></h2>
+    </div>
+    <div data-panel="an:online" hidden>
+    <h2 class="section-title"><span>Tienda online</span><span class="meta">canal Online Store, mismas vistas</span></h2>
     <div class="prod-kpis st-kpis on4" id="onKpis">
       <div class="prod-kpi"><div class="pk-label">Ventas online</div>
         <div class="pk-num"><span id="onOrdenes">—</span></div>
@@ -1347,7 +1434,9 @@ header,.hub-header{position:static !important;background:transparent !important;
         <div class="pk-cost"><span class="pk-cost-line" id="onTicketSub"></span></div></div>
     </div>
 
-    <h2 class="section-title" style="margin-top:34px"><span>Demanda</span><span class="meta" id="avisameMeta">—</span></h2>
+    </div>
+    <div data-panel="an:demanda" hidden>
+    <h2 class="section-title"><span>Demanda</span><span class="meta" id="avisameMeta">—</span></h2>
     <p class="av-intro">Toda la demanda, en sus etapas: cuántas <b>llegaron</b> a la página del producto, cuántas lo <b>pusieron en el carrito</b>, cuántas <b>compraron</b>, cuántas <b>pidieron aviso</b> por una talla que no había y cuánto se <b>perdió</b> por agotado. Solo las de los últimos 30 días.</p>
     <div class="dm-funnel" id="dmFunnel"></div>
     <div class="dm-tabs" id="dmTabs">
@@ -1359,9 +1448,12 @@ header,.hub-header{position:static !important;background:transparent !important;
     </div>
     <div class="av-list" id="avisameList"><div class="empty-state">Cargando…</div></div>
 
-    <h2 class="section-title" style="margin-top:34px"><span>Dashboard · Jeans activos</span><span class="meta" id="prodStatusMeta">—</span></h2>
+    </div>
+    <div data-panel="an:jeans" hidden>
+    <h2 class="section-title"><span>Jeans activos</span><span class="meta" id="prodStatusMeta">—</span></h2>
     <a class="fa-inv-link" href="calendars/calendar.html?view=inventory">📦 Ver inventario completo por tallas <span>›</span></a>
     <div class="prod-status" id="prodStatus"><div class="empty-state">Cargando catálogo…</div></div>
+    </div>
   </section>
 </div>
 
@@ -3526,6 +3618,98 @@ document.addEventListener('click', e => {
   }, 350); // dejá que termine la transición de slide-in de la sección
 });
 
+
+
+// ═══ Sistema Q4 · pestañas por sección ═══
+function wireSubTabs(){
+  document.querySelectorAll('.sub-tabs[data-tabs]').forEach(bar => {
+    const ns = bar.getAttribute('data-tabs');
+    bar.querySelectorAll('[data-tab]').forEach(b => b.addEventListener('click', () => {
+      const t = b.getAttribute('data-tab');
+      bar.querySelectorAll('[data-tab]').forEach(x => x.classList.toggle('on', x === b));
+      document.querySelectorAll(`[data-panel^="${ns}:"]`).forEach(pn => { pn.hidden = pn.getAttribute('data-panel') !== `${ns}:${t}`; });
+    }));
+  });
+}
+wireSubTabs();
+
+// ═══ Marketing · esta semana ═══
+const DOW_SHORT = ['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb'];
+async function renderWeekNow(){
+  const hero = document.getElementById('mkHero'), rail = document.getElementById('mkDays');
+  if (!hero || !rail) return;
+  const now = new Date(Date.now() - 5 * 3600_000), today = now.toISOString().slice(0, 10);
+  const { data: cal } = await supabase.from('calendars').select('id,week_number,start_date,end_date')
+    .lte('start_date', today).gte('end_date', today).order('start_date', { ascending: false }).limit(1).maybeSingle();
+  if (!cal){ hero.innerHTML = `<div class="k">Marketing</div><p class="say">No hay calendario para esta semana. <b>Crea la semana</b> en Calendarios.</p>`; rail.innerHTML = ''; return; }
+  const { data: pieces } = await supabase.from('calendar_pieces').select('id,day,type,title,assignee,status,approved,color,image_url,product_gid').eq('calendar_id', cal.id).order('position');
+  const all = pieces || [];
+  const done = all.filter(p => p.status === 'listo' || p.approved).length, appr = all.filter(p => p.approved).length;
+  const pend = all.filter(p => p.status === 'listo' && !p.approved).length;
+  const lever = c => c === 'launch' ? 0 : c === 'recap' ? 1 : (c === 'push' || c === 'cross') ? 2 : -1;
+  const mx = [0, 0, 0]; all.forEach(p => { const k = lever(p.color); if (k >= 0) mx[k]++; });
+  const tot = mx[0] + mx[1] + mx[2] || 1, pc = mx.map(v => Math.round(v / tot * 100));
+  const m = cal.start_date.slice(5, 7), tg = m === '10' ? TD.oct.mix : m === '11' ? TD.nov.mix : TD.dic.mix;
+  const gap = [0, 1, 2].map(i => [pc[i] - tg[i], i]).sort((a, b) => a[0] - b[0])[0];
+  const nm = ['adquisición', 'autoridad', 'venta'];
+  hero.innerHTML = `<div class="k">Semana ${cal.week_number}</div><p class="say">Van <b>${done} de ${all.length} piezas</b> listas${pend ? `, <em>${pend}</em> esperan aprobación` : ''}. La mezcla va <b>${pc.join(' / ')}</b> contra ${tg.join(' / ')} del mes${gap[0] <= -15 ? `: <em>falta ${nm[gap[1]]}</em>` : ''}.</p>`;
+  // un día por tarjeta
+  const days = []; const d0 = new Date(cal.start_date + 'T12:00:00');
+  for (let i = 0; i < 7; i++){ const d = new Date(d0); d.setDate(d0.getDate() + i); days.push(d); }
+  const nameOf = e => { const k = canonicalEmail(e || ''); const t = (pacPeople || []).find(n => n.toLowerCase() === k.split('@')[0].toLowerCase()); return t || (e ? e.split('@')[0] : ''); };
+  rail.innerHTML = days.map(d => {
+    const key = `${DOW_SHORT[d.getDay()]} ${d.getDate()}`, iso = d.toISOString().slice(0, 10);
+    const ps = all.filter(p => p.day === key);
+    const ok = ps.filter(p => p.approved).length, lis = ps.filter(p => p.status === 'listo' && !p.approved).length;
+    const photos = ps.map(p => p.image_url || (p.product_gid ? findCatalogPhoto(null, p.product_gid) : null)).filter(Boolean).slice(0, 3);
+    const who = [...new Set(ps.map(p => p.assignee).filter(Boolean))].map(e => e.split('@')[0]).slice(0, 3).join(', ');
+    return `<a class="day-card ${iso === today ? 'today' : ''}" href="calendars/calendar.html?id=${encodeURIComponent(cal.id)}">
+      <span class="d">${DOW_SHORT[d.getDay()]} ${d.getDate()}${iso === today ? ' hoy' : ''}</span>
+      <span class="n">${ps.length}<small>piezas</small></span>
+      <span class="st">${ps.length ? `<i class="ap" style="width:${ok / ps.length * 100}%"></i><i class="ok" style="width:${lis / ps.length * 100}%"></i>` : ''}</span>
+      ${photos.length ? `<span class="ph">${photos.map(u => `<img src="${escapeHtml(u)}" alt="" loading="lazy">`).join('')}</span>` : '<span class="ph"></span>'}
+      <span class="who">${escapeHtml(who)}</span></a>`;
+  }).join('');
+}
+
+// ═══ Analytics · presupuesto contra real por canal (reglas J5–J8 de Juliana) ═══
+async function renderChannels(){
+  const hero = document.getElementById('anHero'), rail = document.getElementById('anChannels');
+  if (!hero || !rail) return;
+  const now = new Date(Date.now() - 5 * 3600_000), today = now.toISOString().slice(0, 10), m0 = today.slice(0, 7) + '-01';
+  const mEnd = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth() + 1, 0)).toISOString().slice(0, 10);
+  const [bd, sd, st] = await Promise.all([
+    supabase.from('budget_daily').select('day,channel,amount').gte('day', m0).lte('day', mEnd),
+    supabase.from('sales_channel_daily').select('day,channel,net,orders').gte('day', m0).lte('day', today),
+    supabase.from('budget_settings').select('th_on_target,th_attention,th_pace_max,ticket').eq('id', 1).maybeSingle(),
+  ]);
+  const th = st.data || { th_on_target: 1, th_attention: .9, th_pace_max: 1.1 };
+  const CH = [['tienda', 'Tienda'], ['online', 'Online'], ['whatsapp', 'WhatsApp'], ['falabella', 'Falabella']];
+  const agg = {}; CH.forEach(([c]) => agg[c] = { month: 0, toDate: 0, real: 0, today: 0, todayGoal: 0, orders: 0 });
+  (bd.data || []).forEach(r => { const a = agg[r.channel]; if (!a) return; a.month += +r.amount; if (r.day <= today) a.toDate += +r.amount; if (r.day === today) a.todayGoal = +r.amount; });
+  (sd.data || []).forEach(r => { const a = agg[r.channel]; if (!a) return; a.real += +r.net; a.orders += r.orders || 0; if (r.day === today) a.today = +r.net; });
+  const mill = v => '$' + (v / 1e6).toFixed(1).replace('.', ',') + ' M';
+  const MESF = ['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'];
+  const T = { month: 0, toDate: 0, real: 0 }; CH.forEach(([c]) => { T.month += agg[c].month; T.toDate += agg[c].toDate; T.real += agg[c].real; });
+  const cards = CH.map(([c, label]) => {
+    const a = agg[c]; const has = a.month > 0;
+    const cump = a.toDate ? a.real / a.toDate : null;
+    const rest = a.month - a.toDate, falta = Math.max(0, a.month - a.real), ritmo = rest > 0 ? falta / rest : null;
+    const proj = a.toDate ? a.real + rest * cump : a.month;
+    const state = !has ? 'sin' : cump == null ? 'sin' : (cump < th.th_attention || (ritmo != null && ritmo > th.th_pace_max)) ? 'bad' : cump < th.th_on_target ? 'warn' : 'ok';
+    const lbl = { ok: 'En meta', warn: 'Atención', bad: 'Alerta', sin: 'Sin meta' }[state];
+    return `<div class="need-m ${state === 'sin' ? '' : state}" style="cursor:default"><span class="mn">${label}</span>
+      <span class="gp">${has ? Math.round((cump || 0) * 100) + ' %' : mill(a.real)}</span>
+      <span class="gu">${has ? `${mill(a.real)} de ${mill(a.toDate)} a la fecha` : 'vendido este mes, sin presupuesto'}</span>
+      <span class="cv"><span>${has ? `proyecta <b>${mill(proj)} de ${mill(a.month)}</b>` : `<b>${a.orders} pedidos</b>`}</span><span class="chip" style="background:rgba(0,0,0,.08);border-radius:999px;padding:3px 8px;font-size:10px;font-weight:600">${lbl}</span></span>
+      ${has && ritmo != null ? `<span class="gu" style="margin-top:4px">para cumplir hay que vender el ${Math.round(ritmo * 100)} % del presupuesto que queda</span>` : ''}</div>`;
+  }).join('');
+  rail.innerHTML = cards;
+  const cT = T.toDate ? T.real / T.toDate : null;
+  const best = CH.map(([c, l]) => [agg[c].toDate ? agg[c].real / agg[c].toDate : -1, l]).sort((a, b) => b[0] - a[0])[0];
+  const worst = CH.map(([c, l]) => [agg[c].toDate ? agg[c].real / agg[c].toDate : 9, l]).sort((a, b) => a[0] - b[0])[0];
+  hero.innerHTML = `<div class="k">${MESF[now.getUTCMonth()]}, al ${now.getUTCDate()}</div><p class="say">${cT == null ? `Llevamos <b>${mill(T.real)}</b> este mes.` : `Vamos en <b>${mill(T.real)}</b> de ${mill(T.toDate)} que debíamos llevar: <em>${Math.round(cT * 100)} %</em>. ${best[0] >= 0 ? `${best[1]} es el canal que mejor va` : ''}${worst[0] < 9 && worst[1] !== best[1] ? `, ${worst[1]} el que más falta` : ''}.`}</p>`;
+}
 
 // ═══ Inicio · hero del día ═══
 // Una frase con lo que importa hoy: tus piezas, la meta de la tienda y lo que llega esta semana.
@@ -6147,7 +6331,8 @@ document.addEventListener('click', e => {
 });
 
 async function loadCalendars(){
-  loadPac().then(renderTrimestre).catch(e => console.warn('trimestre', e));
+  loadPac().then(() => { renderTrimestre(); renderWeekNow().catch(e => console.warn('semana', e)); }).catch(e => console.warn('trimestre', e));
+  renderChannels().catch(e => console.warn('canales', e));
   const { data, error } = await supabase
     .from('calendars')
     .select('id, week_number, start_date, end_date, status')
