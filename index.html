@@ -425,14 +425,14 @@ header{display:flex;justify-content:space-between;align-items:center;gap:16px;ma
 /* LOGIN */
 .login-overlay{position:fixed;inset:0;background:var(--cream);display:none;align-items:center;justify-content:center;z-index:300;flex-direction:column;padding:24px}
 .login-overlay.show{display:flex}
-.login-card{max-width:440px;width:100%;text-align:center}
-.login-logo{font-family:'Montserrat',sans-serif;font-weight:600;font-size:38px;letter-spacing:normal;line-height:1}
-.login-tagline{font-family:'Poppins',sans-serif;font-weight:600;font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:var(--grey);margin-top:6px;margin-bottom:56px}
-.login-title{font-family:'Poppins',sans-serif;font-weight:300;letter-spacing:-.01em;font-style:italic;font-weight:700;font-size:34px;margin-bottom:12px}
-.login-help{font-size:13px;color:var(--grey);line-height:1.55;margin-bottom:28px}
-#loginEmail,#loginCode{width:100%;padding:13px 16px;font-family:'Poppins',sans-serif;font-weight:600;font-size:13px;border:1px solid var(--black);background:var(--paper);outline:none;margin-bottom:10px;text-align:center}
-#loginEmail:focus,#loginCode:focus{border-color:var(--rosa-deep)}
-#loginBtn,#loginVerifyBtn{width:100%;padding:14px;background:var(--black);color:var(--cream);border:none;font-family:'Poppins',sans-serif;font-weight:600;font-size:11px;letter-spacing:.18em;text-transform:uppercase;cursor:pointer}
+.login-card{max-width:400px;width:100%;text-align:left;background:var(--paper);border-radius:26px;padding:30px 26px;box-shadow:0 20px 50px rgba(0,0,0,.08)}
+.login-logo{font-family:'Montserrat',sans-serif;font-weight:600;font-size:26px;letter-spacing:normal;line-height:1}
+.login-tagline{font-family:'Poppins',sans-serif;font-weight:600;font-size:9.5px;letter-spacing:.2em;text-transform:uppercase;color:var(--grey);margin-top:4px;margin-bottom:22px}
+.login-title{font-family:'Poppins',sans-serif;font-weight:300;letter-spacing:-.02em;font-style:normal;font-size:24px;margin-bottom:6px}
+.login-help{font-size:13px;color:var(--grey);line-height:1.5;margin-bottom:14px}
+#loginEmail,#loginCode{width:100%;padding:13px 14px;font-family:'Poppins',sans-serif;font-weight:400;font-size:15px;border:none;border-radius:14px;background:var(--cream);outline:none;margin-bottom:10px;text-align:left}
+#loginEmail:focus,#loginCode:focus{box-shadow:0 0 0 2px var(--rosa)}
+#loginBtn,#loginVerifyBtn{width:100%;padding:13px;background:var(--black);color:var(--cream);border:none;border-radius:999px;font-family:'Poppins',sans-serif;font-weight:600;font-size:14px;letter-spacing:0;text-transform:none;cursor:pointer}
 #loginBtn:hover:not(:disabled),#loginVerifyBtn:hover:not(:disabled){background:var(--rosa-deep)}
 #loginBtn:disabled,#loginVerifyBtn:disabled{opacity:.5;cursor:not-allowed}
 .login-status{margin-top:20px;font-size:13px;color:var(--rosa-deep);min-height:1.2em;line-height:1.55}
@@ -1243,19 +1243,18 @@ header,.hub-header{position:static !important;background:transparent !important;
     <h2 class="login-title">Acceso del equipo</h2>
 
     <div id="loginStep1">
-      <p class="login-help">Pegá tu email LUXUR. Te llega un código de 6 dígitos al inbox.</p>
+      <p class="login-help">Escribe tu email LUXUR y te llega un código de 6 dígitos al inbox.</p>
       <input type="email" id="loginEmail" placeholder="tu@email.com" autocomplete="email" inputmode="email">
       <button id="loginBtn">Enviar código</button>
     </div>
 
     <div id="loginStep2" style="display:none">
       <p class="login-help">
-        Te enviamos un código a <b id="loginEmailLabel">—</b>.<br>
-        <small style="opacity:.7">Revisá tu inbox · puede tardar 10-30 segundos.</small>
+        Te enviamos un código a <b id="loginEmailLabel">—</b>. Puede tardar unos segundos.
       </p>
       <input type="text" id="loginCode" placeholder="código del email" inputmode="numeric" autocomplete="one-time-code" maxlength="10" style="letter-spacing:.3em;text-align:center;font-size:22px;font-family:'Poppins',sans-serif;font-weight:600">
       <button id="loginVerifyBtn">Entrar</button>
-      <button id="loginBackBtn" style="background:transparent;color:var(--grey);border:none;text-decoration:underline;cursor:pointer;font-family:inherit;font-size:12px;margin-top:6px">← Usar otro email</button>
+      <button id="loginBackBtn" style="background:transparent;color:var(--grey);border:none;text-decoration:underline;cursor:pointer;font-family:inherit;font-size:12px;margin-top:6px">Usar otro email</button>
     </div>
 
     <div class="login-status" id="loginStatus"></div>
