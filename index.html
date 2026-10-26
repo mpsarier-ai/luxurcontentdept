@@ -1298,6 +1298,60 @@ a.act-card{text-decoration:none}
   .apv .bar .cnt{flex:0 0 auto;margin:0 0 0 10px}
 }
 
+/* ═══ Producción · tablero por etapa ═══ */
+.sb-strip{display:flex;gap:4px;align-items:flex-end;margin:0 0 14px;padding:0 2px;overflow-x:auto;scrollbar-width:none}
+.sb-strip::-webkit-scrollbar{display:none}
+.sb-strip button{flex:1 0 auto;min-width:54px;border:none;background:transparent;font-family:inherit;color:var(--grey);cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:4px;padding:0;position:relative}
+.sb-strip .bar{width:100%;height:46px;display:flex;align-items:flex-end;border-radius:10px;background:rgba(0,0,0,.05);overflow:hidden}
+.sb-strip .bar i{display:block;width:100%;background:var(--rosa-deep);border-radius:10px 10px 0 0;min-height:3px;transition:height .35s cubic-bezier(.16,1,.3,1)}
+.sb-strip .bar i.late{background:var(--red-out)}
+.sb-strip .bar i.zero{background:var(--line);min-height:2px}
+.sb-strip .n{font-family:'Poppins',sans-serif;font-weight:300;font-size:16px;letter-spacing:-.02em;line-height:1;color:var(--black)}
+.sb-strip .l{font-family:'Poppins',sans-serif;font-weight:600;font-size:8.5px;letter-spacing:.1em;text-transform:uppercase;white-space:nowrap}
+.sb-strip button.on .l{color:var(--black)}
+.sb-strip button.on .bar{outline:2px solid var(--black);outline-offset:-2px}
+.sb-strip .arrow{align-self:center;color:var(--line);font-size:14px;padding:0 0 22px;flex:0 0 auto}
+.sb-board{display:flex;gap:10px;overflow-x:auto;scroll-snap-type:x mandatory;-webkit-overflow-scrolling:touch;padding:2px 2px 10px;margin:0 -2px;scrollbar-width:none;align-items:flex-start}
+.sb-board::-webkit-scrollbar{display:none}
+.sb-col{flex:0 0 78%;max-width:300px;scroll-snap-align:start;border-radius:22px;background:rgba(0,0,0,.035);padding:10px;display:flex;flex-direction:column;gap:8px;min-height:160px}
+.sb-col.done{background:rgba(90,122,79,.08)}
+.sb-col.empty{min-height:90px}
+.sb-col-h{display:flex;align-items:baseline;gap:8px;padding:4px 6px 2px}
+.sb-col-h .t{font-family:'Poppins',sans-serif;font-weight:600;font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--black)}
+.sb-col-h .n{margin-left:auto;font-family:'Poppins',sans-serif;font-weight:300;font-size:22px;letter-spacing:-.02em;line-height:1}
+.sb-col-h .n small{font-size:10.5px;color:var(--grey);font-weight:400;letter-spacing:0;margin-left:3px}
+.sb-col-s{font-size:10.5px;color:var(--grey);padding:0 6px 4px;margin-top:-6px}
+.sb-col-s b{color:var(--red-out);font-weight:600}
+.sb-empty{border-radius:16px;border:1.5px dashed var(--line);padding:16px 10px;text-align:center;font-size:11.5px;color:var(--grey)}
+.sb-card{border-radius:18px;background:var(--paper);padding:0;border:none;text-align:left;color:var(--black);font-family:inherit;overflow:hidden;box-shadow:0 1px 2px rgba(0,0,0,.04);display:grid;grid-template-columns:62px 1fr;gap:10px;cursor:pointer;position:relative;width:100%}
+.sb-card:hover{box-shadow:0 0 0 2px var(--line)}
+.sb-card.late{box-shadow:inset 3px 0 0 var(--red-out)}
+.sb-card .im{width:62px;height:82px;background:var(--cream-dark);position:relative}
+.sb-card .im img{width:100%;height:100%;object-fit:cover;display:block}
+.sb-card .im .no{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-family:'Poppins',sans-serif;font-weight:300;font-size:22px;color:var(--rosa-deep)}
+.sb-card .x{min-width:0;display:flex;flex-direction:column;gap:1px;padding:8px 10px 8px 0}
+.sb-card .y{font-family:'Poppins',sans-serif;font-size:9px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--rosa-deep);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sb-card .t{font-size:12.5px;font-weight:500;line-height:1.25;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.sb-card .m{font-size:11px;color:var(--grey);margin-top:2px;line-height:1.3}
+.sb-card .m b{font-weight:600;color:var(--black)}
+.sb-card .m .ov{color:var(--red-out);font-weight:600}
+.sb-card .adv{margin-top:auto;padding-top:6px;display:flex;gap:6px;align-items:center}
+.sb-card .adv button{border:none;border-radius:999px;padding:5px 10px;font-family:inherit;font-size:10.5px;font-weight:600;background:var(--cream);color:var(--black);cursor:pointer;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
+.sb-card .adv button:hover{background:var(--rosa)}
+.sb-card .adv button:disabled{opacity:.5}
+.sb-card .bt{font-size:9.5px;color:var(--grey);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+@media (min-width:1024px){
+  .sb-board{display:grid;grid-template-columns:repeat(var(--sb-cols,7),minmax(196px,1fr));gap:10px;overflow-x:auto;scroll-snap-type:none;margin:0;padding-bottom:12px}
+  .sb-col{flex:none;max-width:none;scroll-snap-align:none;padding:10px 8px}
+  .sb-card{grid-template-columns:52px 1fr}
+  .sb-card .im{width:52px;height:70px}
+  .sb-strip button{min-width:0}
+  .sb-strip .bar{height:64px}
+  .sb-strip .n{font-size:20px}
+  .sb-strip .l{font-size:9.5px}
+  .sb-strip .arrow{padding-bottom:30px}
+}
+
 /* ═══ Escritorio: la app como dashboard ═══ */
 @media (min-width:1024px){
   :root{--side:220px}
@@ -1448,9 +1502,18 @@ a.act-card{text-decoration:none}
     <button class="hub-back" data-hub-back>Inicio</button>
     <!-- Colección (solo Paulina + Isabella) -->
     <div class="sub-tabs" data-tabs="pr">
-      <button class="on" data-tab="plan">Plan</button>
+      <button class="on" data-tab="tablero">Tablero</button>
+      <button data-tab="plan">Plan</button>
       <button data-tab="lotes">Lotes</button>
       <button data-tab="proveedores">Proveedores</button>
+    </div>
+    <!-- Selector de proveedor (chips): filtra Tablero, Lotes y el link del proveedor -->
+    <div class="supplier-chips" id="supplierChips"></div>
+    <div data-panel="pr:tablero">
+      <div class="sec-hero" id="sbHero"><div class="k">Producción por etapa</div><p class="say">Cargando el pipeline…</p></div>
+      <div class="sb-strip" id="sbStrip"></div>
+      <div class="sb-board" id="sbBoard"></div>
+      <div class="rail-hint" id="sbHint">Cada columna es una etapa del proceso. Toca un jean para abrir su desglose o marca la etapa desde la tarjeta</div>
     </div>
     <div data-panel="pr:proveedores" hidden>
     <a class="fa-inv-link" id="colLink" href="coleccion.html" hidden>🧵 Atelier · colección y órdenes de compra <span>›</span></a>
@@ -1464,13 +1527,11 @@ a.act-card{text-decoration:none}
       <button class="slb-copy" id="slbCopy">📋 Copiar link</button>
     </div>
     </div>
-    <div data-panel="pr:plan">
+    <div data-panel="pr:plan" hidden>
     <!-- Plan de compra: necesidad (demand_plan) contra el pipeline -->
     <div class="need-card" id="needCard" hidden></div>
     </div>
     <div data-panel="pr:lotes" hidden>
-    <!-- Selector de proveedor (chips) -->
-    <div class="supplier-chips" id="supplierChips"></div>
     <!-- Dashboard 4 stat tiles -->
     <div class="prod-kpis" id="prodKpis">
       <div class="prod-kpi" data-kpi="stock">
@@ -5090,6 +5151,7 @@ function renderPipeline(){
   const filterSid = currentSupplierId;
   const filteredBatches = filterSid ? batches.filter(b => b.supplier_id === filterSid) : batches.slice();
   const filteredPipeline = filterSid ? pipeline.filter(e => e.supplier_id === filterSid) : pipeline.slice();
+  try { renderStageBoard(filteredBatches, filteredPipeline); } catch(e){ console.warn('tablero etapas', e); }
 
   // Indexá las variantes por batch_id, y separá standalone
   const variantsByBatch = {};
@@ -5393,6 +5455,147 @@ function renderPipeline(){
   wireEl.querySelectorAll('[data-edit-batch]').forEach(b => b.addEventListener('click', () => openBatchModal(b.getAttribute('data-edit-batch'))));
   wireEl.querySelectorAll('[data-add-variant]').forEach(b => b.addEventListener('click', () => openVariantModal(b.getAttribute('data-add-variant'))));
   wireEl.querySelectorAll('[data-del-batch]').forEach(b => b.addEventListener('click', () => deleteBatch(b.getAttribute('data-del-batch'))));
+}
+
+// ═══ Producción · tablero por etapa ═══════════════════════════════════
+// Una columna por etapa del proceso. Cada referencia (jean) cae en la etapa en
+// la que está AHORA (stage guarda la última completada, así que la actual es la
+// siguiente). Se ve cuántas referencias y unidades hay en cada paso, cuáles se
+// pasaron de la meta de días, y se puede marcar la etapa desde la tarjeta.
+const SB_COLS = [
+  { key: 'pre', label: 'Pre · muestra', short: 'Pre' },
+  { key: 'planeado', label: 'Planeado', short: 'Plan.', simple: true },
+  { key: 'pagado', label: 'Pagado', short: 'Pagado', simple: true },
+  { key: 'corte', label: 'Corte', short: 'Corte' },
+  { key: 'confeccion', label: 'Confección', short: 'Confec.' },
+  { key: 'proceso', label: 'Proceso', short: 'Proceso' },
+  { key: 'lavanderia', label: 'Lavandería', short: 'Lavand.' },
+  { key: 'entregado', label: 'Entregado al taller', short: 'Entreg.', simple: true },
+  { key: 'terminacion', label: 'Terminación', short: 'Termin.' },
+  { key: 'entrega', label: 'En entrega', short: 'Entrega' },
+  { key: 'listo', label: 'Llegó', short: 'Llegó', done: true },
+];
+let sbFocus = null; // columna resaltada desde la tira
+function sbCurrentOf(e){
+  if (e.stage === 'entrega' || e.status === 'llego') return { key: 'listo', timing: null };
+  const stages = getFlowStages(e);
+  const t = computeStageTimings(e, stages);
+  const cur = t.items[t.lastDoneIdx + 1];
+  return { key: cur ? cur.stage.key : 'listo', timing: cur || null, stages, t };
+}
+function renderStageBoard(fBatches, fPipeline){
+  const board = document.getElementById('sbBoard'), hero = document.getElementById('sbHero'), strip = document.getElementById('sbStrip');
+  if (!board || !hero) return;
+  const todayIso = new Date(Date.now() - 5 * 3600e3).toISOString().slice(0, 10);
+  const since = new Date(Date.now() - 21 * 86400e3).toISOString();
+  const batchOf = id => (fBatches || batches).find(b => b.id === id) || null;
+  const items = [];
+  (fPipeline || []).forEach(e => {
+    if (e.status === 'cancelado') return;
+    const cur = sbCurrentOf(e);
+    if (cur.key === 'listo'){
+      // Solo lo que llegó hace poco, para ver el final del proceso sin llenar la columna
+      const hist = Array.isArray(e.stage_history) ? e.stage_history : [];
+      const at = hist.filter(h => h && h.stage === 'entrega').map(h => h.at).sort().pop() || e.created_at;
+      if (!at || at < since) return;
+    }
+    const b = e.batch_id ? batchOf(e.batch_id) : null;
+    const sup = suppliers.find(x => x.id === (e.supplier_id || (b && b.supplier_id)));
+    const tm = cur.timing;
+    const over = !!(tm && tm.goal != null && tm.days != null && tm.days > tm.goal);
+    const promised = e.tentative_date || (b && b.tentative_date) || null;
+    const est = cur.key === 'listo' ? null : estimatedDateOf(e);
+    const lateDate = !!(promised && cur.key !== 'listo' && ((est && est > promised) || (!est && promised < todayIso)));
+    items.push({ e, b, sup, col: cur.key, days: tm ? tm.days : null, goal: tm ? tm.goal : null, over, promised, est, lateDate, nextKey: cur.key, stages: cur.stages });
+  });
+  // Lotes sin referencias (el lote entero avanza como una sola cosa)
+  (fBatches || []).forEach(b => {
+    if ((fPipeline || []).some(e => e.batch_id === b.id)) return;
+    const sup = suppliers.find(x => x.id === b.supplier_id);
+    const stages = (sup && sup.flow_type === 'simple') ? PROD_STAGES_SIMPLE : getBatchStages(b.has_proceso);
+    const t = computeStageTimings({ stage: b.batch_stage, stage_history: b.batch_stage_history, created_at: b.created_at, supplier_id: b.supplier_id }, stages);
+    const cur = t.items[t.lastDoneIdx + 1];
+    const key = b.batch_stage === 'entrega' ? 'listo' : (cur ? cur.stage.key : 'terminacion');
+    if (key === 'listo') return;
+    const over = !!(cur && cur.goal != null && cur.days != null && cur.days > cur.goal);
+    items.push({ e: { id: b.id, design_name: b.name, product_name: b.name, quantity: b.total_quantity, photo_url: null }, b, sup, col: key, days: cur ? cur.days : null, goal: cur ? cur.goal : null, over, promised: b.tentative_date, est: null, lateDate: !!(b.tentative_date && b.tentative_date < todayIso), isBatch: true });
+  });
+  const unit = it => it.e.quantity || 0;
+  const active = items.filter(it => it.col !== 'listo');
+  const totalRefs = active.length, totalUnits = active.reduce((a, it) => a + unit(it), 0);
+  const overCount = active.filter(it => it.over).length, lateCount = active.filter(it => it.lateDate).length;
+  const cols = SB_COLS.filter(c => !c.simple || items.some(it => it.col === c.key));
+  const byCol = {}; cols.forEach(c => byCol[c.key] = items.filter(it => it.col === c.key));
+  // Hero: una frase con dónde está el grueso y qué se atrasó
+  const top = cols.filter(c => !c.done).map(c => ({ c, u: byCol[c.key].reduce((a, it) => a + unit(it), 0), n: byCol[c.key].length })).sort((a, b) => b.u - a.u)[0];
+  const supName = currentSupplier ? currentSupplier.name : null;
+  let say = totalRefs ? `${supName ? `<b>${escapeHtml(supName)}</b> tiene` : 'Hay'} <b>${totalRefs} referencia${totalRefs === 1 ? '' : 's'}</b> en producción, ${totalUnits.toLocaleString('es-CO')} unidades.` : `${supName ? `<b>${escapeHtml(supName)}</b> no tiene` : 'No hay'} nada en producción ahora mismo.`;
+  if (top && top.n) say += ` El grueso está en <em>${top.c.label}</em>, ${top.u.toLocaleString('es-CO')} unidades en ${top.n} referencia${top.n === 1 ? '' : 's'}.`;
+  if (overCount) say += ` <b>${overCount}</b> ${overCount === 1 ? 'lleva' : 'llevan'} más días de la meta en su etapa.`;
+  if (lateCount) say += ` <em>${lateCount}</em> ${lateCount === 1 ? 'va' : 'van'} a llegar después de lo prometido.`;
+  hero.innerHTML = `<div class="k">Producción por etapa${supName ? `, ${escapeHtml(supName)}` : ''}</div><p class="say">${say}</p>`;
+  // Tira: barras por etapa, proporcionales a las unidades
+  const maxU = Math.max(1, ...cols.map(c => byCol[c.key].reduce((a, it) => a + unit(it), 0)));
+  strip.innerHTML = cols.map((c, i) => {
+    const list = byCol[c.key], u = list.reduce((a, it) => a + unit(it), 0), late = list.filter(it => it.over).length;
+    const h = u ? Math.max(8, Math.round(u / maxU * 100)) : 0;
+    return `${i ? '<span class="arrow">›</span>' : ''}<button class="${sbFocus === c.key ? 'on' : ''}" data-sb-col="${c.key}" title="${escapeHtml(c.label)}"><span class="bar"><i class="${u ? (late && late === list.length ? 'late' : '') : 'zero'}" style="height:${h}%"></i></span><span class="n">${list.length || '0'}</span><span class="l">${escapeHtml(c.short)}</span></button>`;
+  }).join('');
+  strip.querySelectorAll('[data-sb-col]').forEach(b => b.addEventListener('click', () => {
+    const k = b.getAttribute('data-sb-col'); sbFocus = sbFocus === k ? null : k;
+    renderStageBoard(fBatches, fPipeline);
+    const col = document.querySelector(`.sb-col[data-sb-key="${k}"]`); if (col && sbFocus) col.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'start' });
+  }));
+  // Columnas
+  const fmtD = iso => { if (!iso) return ''; const p = iso.split('-'); return `${parseInt(p[2])} ${MONTH_ABBR[parseInt(p[1]) - 1]}`; };
+  board.style.setProperty('--sb-cols', cols.length);
+  board.innerHTML = cols.map(c => {
+    const list = byCol[c.key].slice().sort((a, b) => (b.over - a.over) || (b.lateDate - a.lateDate) || ((b.days || 0) - (a.days || 0)));
+    const u = list.reduce((a, it) => a + unit(it), 0), late = list.filter(it => it.over).length;
+    const cards = list.map(it => {
+      const photo = it.isBatch ? null : prodPhoto(it.e); const name = it.e.design_name || it.e.product_name || '—';
+      const fit = (!it.isBatch && it.e.product_name && it.e.design_name && it.e.product_name !== it.e.design_name) ? it.e.product_name.replace(/^JEAN\s+/i, '') : '';
+      const dayStr = c.done ? '' : (it.days != null ? `<b>${it.days}d</b>${it.goal != null ? ` de ${it.goal}d` : ''}` : (c.key === 'pre' ? 'sin empezar' : 'recién'));
+      const when = c.done ? 'ya en bodega' : (it.est ? `llega ~${fmtD(it.est)}` : (it.promised ? `promesa ${fmtD(it.promised)}` : ''));
+      const nextLabel = (!c.done && !it.isBatch && it.stages) ? (it.stages.find(s => s.key === c.key) || {}).long : null;
+      return `<div class="sb-card ${it.over || it.lateDate ? 'late' : ''}" role="button" tabindex="0" data-sb-open="${it.isBatch ? 'batch:' + it.b.id : (it.b ? 'batch:' + it.b.id + ':' + it.e.id : 'entry:' + it.e.id)}">
+        <span class="im">${photo ? `<img src="${escapeHtml(photo)}" alt="" loading="lazy" onerror="this.style.visibility='hidden'">` : `<span class="no">${escapeHtml(String(name).slice(0, 1))}</span>`}</span>
+        <span class="x">
+          <span class="y">${it.sup ? escapeHtml(it.sup.name) : 'Sin proveedor'}${it.isBatch ? ', lote' : ''}</span>
+          <span class="t">${escapeHtml(name)}</span>
+          ${fit ? `<span class="bt">${escapeHtml(fit)}</span>` : ''}
+          <span class="m"><b>${unit(it).toLocaleString('es-CO')}u</b>${dayStr ? ', ' + (it.over ? `<span class="ov">${dayStr.replace(/<\/?b>/g, '')}</span>` : dayStr) : ''}${when ? `<br>${it.lateDate && !c.done ? `<span class="ov">${when}</span>` : when}` : ''}</span>
+          ${nextLabel ? `<span class="adv"><button type="button" data-sb-adv="${it.e.id}" title="Marcar ${escapeHtml(nextLabel)} como terminada">✓ ${escapeHtml(nextLabel)} lista</button></span>` : ''}
+        </span>
+      </div>`;
+    }).join('');
+    return `<div class="sb-col ${c.done ? 'done' : ''} ${list.length ? '' : 'empty'}" data-sb-key="${c.key}" ${sbFocus && sbFocus !== c.key ? 'style="opacity:.45"' : ''}>
+      <div class="sb-col-h"><span class="t">${escapeHtml(c.label)}</span><span class="n">${list.length}<small>${list.length === 1 ? 'ref' : 'refs'}</small></span></div>
+      <div class="sb-col-s">${u ? `${u.toLocaleString('es-CO')} unidades` : 'nada aquí'}${late ? `, <b>${late} fuera de meta</b>` : ''}</div>
+      ${cards || `<div class="sb-empty">${c.done ? 'Nada llegó en las últimas 3 semanas' : 'Ninguna referencia en esta etapa'}</div>`}
+    </div>`;
+  }).join('');
+  board.querySelectorAll('[data-sb-open]').forEach(card => card.addEventListener('click', e => {
+    if (e.target.closest('[data-sb-adv]')) return;
+    const [kind, id, vid] = card.getAttribute('data-sb-open').split(':');
+    selectedProdItem = { kind, id };
+    if (vid) openVariants.add(vid);
+    renderPipeline();
+    const sheet = document.getElementById('prodSheet'); if (sheet) sheet.scrollIntoView({ block: 'nearest' });
+  }));
+  board.querySelectorAll('[data-sb-adv]').forEach(b => b.addEventListener('click', async e => {
+    e.stopPropagation();
+    const id = b.getAttribute('data-sb-adv'); const entry = pipeline.find(x => x.id === id); if (!entry) return;
+    const stages = getFlowStages(entry);
+    const idx = entry.stage ? stages.findIndex(x => x.key === entry.stage) : -1;
+    const next = stages[idx + 1]; if (!next) return;
+    const hist = (Array.isArray(entry.stage_history) ? entry.stage_history.slice() : []); hist.push({ stage: next.key, at: new Date().toISOString(), by: (user && user.email) || 'team' });
+    b.disabled = true; b.textContent = 'Guardando…';
+    const { error } = await supabase.from('product_pipeline').update({ stage: next.key, stage_history: hist }).eq('id', id);
+    if (error){ alert('Error al guardar: ' + error.message); b.disabled = false; return; }
+    entry.stage = next.key; entry.stage_history = hist;
+    renderPipeline();
+  }));
 }
 
 async function togglePipelineStatus(id){
