@@ -1270,6 +1270,34 @@ a.act-card{text-decoration:none}
 .apb-empty{border-radius:18px;background:var(--paper);padding:20px 16px;text-align:center;color:var(--grey);font-size:12.5px}
 .apb-empty b{display:block;font-family:'Poppins',sans-serif;font-weight:300;font-size:30px;color:var(--rosa-deep);margin-bottom:4px}
 
+/* ═══ Visor de aprobación · el arte grande y Aprobar sin salir del Inicio ═══ */
+.apv{position:fixed;inset:0;z-index:250;display:none;background:rgba(20,16,17,.92);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px)}
+.apv.open{display:flex;flex-direction:column}
+.apv .top{display:flex;align-items:center;gap:12px;padding:calc(14px + env(safe-area-inset-top,0px)) 18px 10px;color:var(--cream)}
+.apv .top .x{min-width:0;flex:1}
+.apv .top .y{font-family:'Poppins',sans-serif;font-size:9.5px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:var(--rosa);margin-bottom:2px}
+.apv .top .t{font-size:15px;font-weight:500;line-height:1.3;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.apv .top .w{font-size:12px;opacity:.65;margin-top:1px}
+.apv .top .cl{border:none;background:rgba(255,255,255,.14);color:#fff;width:38px;height:38px;border-radius:50%;font-size:20px;cursor:pointer;flex:0 0 auto}
+.apv .med{flex:1;min-height:0;display:flex;align-items:center;justify-content:center;padding:0 18px}
+.apv .med img,.apv .med video{max-width:100%;max-height:100%;width:auto;height:auto;object-fit:contain;border-radius:14px;background:#000;display:block}
+.apv .med iframe{width:min(100%,560px);height:100%;max-height:80vh;border:0;border-radius:14px;background:#000}
+.apv .med .no{color:rgba(255,255,255,.7);text-align:center;font-size:14px;padding:30px}
+.apv .med .no b{display:block;font-family:'Poppins',sans-serif;font-weight:300;font-size:40px;color:var(--rosa);margin-bottom:6px}
+.apv .med a.no{text-decoration:underline;color:var(--rosa)}
+.apv .bar{display:flex;gap:8px;align-items:center;justify-content:center;flex-wrap:wrap;padding:12px 18px calc(16px + env(safe-area-inset-bottom,0px))}
+.apv .bar button,.apv .bar a{border:none;border-radius:999px;padding:12px 18px;font-family:inherit;font-size:13.5px;font-weight:600;background:rgba(255,255,255,.14);color:#fff;cursor:pointer;text-decoration:none}
+.apv .bar button:hover,.apv .bar a:hover{background:rgba(255,255,255,.22)}
+.apv .bar .ok{background:var(--rosa-deep);color:#fff;padding:12px 26px}
+.apv .bar .ok:hover{background:#b7737c}
+.apv .bar .ok.done{background:#5a7a4f}
+.apv .bar .cnt{font-size:12px;color:rgba(255,255,255,.6);flex:1 0 100%;text-align:center;margin-top:2px}
+@media (min-width:1024px){
+  .apv .top{padding:18px 28px 10px;max-width:1200px;margin:0 auto;width:100%}
+  .apv .med img,.apv .med video{max-height:calc(100vh - 170px)}
+  .apv .bar .cnt{flex:0 0 auto;margin:0 0 0 10px}
+}
+
 /* ═══ Escritorio: la app como dashboard ═══ */
 @media (min-width:1024px){
   :root{--side:220px}
@@ -1612,6 +1640,22 @@ a.act-card{text-decoration:none}
   </section>
 
 <!-- TAB BAR estilo WhatsApp · navegación principal del hub -->
+<!-- VISOR · ver el arte y aprobar sin salir del Inicio -->
+<div class="apv" id="apv">
+  <div class="top">
+    <div class="x"><div class="y" id="apvK">Pieza</div><div class="t" id="apvT">—</div><div class="w" id="apvW"></div></div>
+    <button class="cl" id="apvClose" aria-label="Cerrar">×</button>
+  </div>
+  <div class="med" id="apvMed"></div>
+  <div class="bar">
+    <button id="apvPrev">‹ Anterior</button>
+    <button class="ok" id="apvOk">Aprobar</button>
+    <button id="apvNext">Siguiente ›</button>
+    <a id="apvOpen" href="#">Abrir en el calendario</a>
+    <span class="cnt" id="apvCnt"></span>
+  </div>
+</div>
+
 <nav class="hub-tabbar" id="hubTabbar">
   <button class="ht-tab active" data-ht="home"><span class="vt-ico">🏠</span><span class="vt-lbl">Inicio</span></button>
   <button class="ht-tab" data-ht="marketing"><span class="vt-ico">📅</span><span class="vt-lbl">Marketing</span></button>
@@ -2319,18 +2363,76 @@ function renderApprovalBoard(){
     const parts = String(p.title || '').split(/\s*[·•]\s*/).filter(Boolean); const label = parts.length > 1 ? parts[0] : ''; const title = parts.length > 1 ? parts.slice(1).join(', ') : (parts[0] || 'Sin título');
     const type = String(p.type || 'Pieza').replace(/\s*[·•]\s*/g, ' + '); const isVideo = p.image_url && !(/^data:|\.(jpe?g|png|webp|gif|avif)(\?|$)/i.test(p.image_url)) && !(/supabase\.co\/storage/i.test(p.image_url));
     html += `<div class="apc" data-apc="${escapeHtml(p.id)}">
-      <a class="im" href="${href}">${img ? `<img src="${escapeHtml(img)}" alt="" loading="lazy" onerror="this.style.visibility='hidden'">` : `<span class="no">${escapeHtml(type.slice(0, 1))}</span>`}${isVideo ? '<span class="vd">▶</span>' : ''}</a>
+      <a class="im" href="${href}" data-apb-view="${escapeHtml(p.id)}">${img ? `<img src="${escapeHtml(img)}" alt="" loading="lazy" onerror="this.style.visibility='hidden'">` : `<span class="no">${escapeHtml(type.slice(0, 1))}</span>`}${isVideo ? '<span class="vd">▶</span>' : ''}</a>
       <div class="x">
         <span class="y">${escapeHtml(type)}${label ? ', ' + escapeHtml(label) : ''}</span>
-        <a class="t" href="${href}">${escapeHtml(title)}</a>
+        <a class="t" href="${href}" data-apb-view="${escapeHtml(p.id)}">${escapeHtml(title)}</a>
         <span class="w">${m ? `<span class="av" style="background:${m.color || '#5a5a5a'}">${ini(m.name)}</span>${escapeHtml(m.name.split(' ')[0])}` : 'Sin dueño'}${p.image_url ? '' : ', sin arte'}</span>
-        <div class="acts"><button class="ok" data-apb-ok="${escapeHtml(p.id)}">Aprobar</button><a href="${href}">Ver</a></div>
+        <div class="acts"><button class="ok" data-apb-ok="${escapeHtml(p.id)}">Aprobar</button><button data-apb-view="${escapeHtml(p.id)}">Ver</button></div>
       </div>
     </div>`;
   }
   list.innerHTML = html;
   list.querySelectorAll('[data-apb-ok]').forEach(b => b.addEventListener('click', () => approveFromBoard(b.getAttribute('data-apb-ok'))));
+  list.querySelectorAll('[data-apb-view]').forEach(b => b.addEventListener('click', e => { e.preventDefault(); openApv(b.getAttribute('data-apb-view')); }));
 }
+
+// ── Visor: el arte grande, Aprobar y pasar a la siguiente sin salir del Inicio ──
+const apv = { id: null };
+function apvQueue(){ return apb.filter ? apb.pieces.filter(p => p.calendar_id === apb.filter) : apb.pieces; }
+function apvMedia(url){
+  const u = (url || '').trim(); if (!u) return { type: 'empty' };
+  const dv = u.match(/drive\.google\.com\/file\/d\/([^\/?#]+)/); if (dv) return { type: 'iframe', src: `https://drive.google.com/file/d/${dv[1]}/preview` };
+  const yt = u.match(/(?:youtube\.com\/watch\?v=|youtube\.com\/shorts\/|youtu\.be\/)([^&?#/]+)/); if (yt) return { type: 'iframe', src: `https://www.youtube.com/embed/${yt[1]}` };
+  const vm = u.match(/vimeo\.com\/(\d+)/); if (vm) return { type: 'iframe', src: `https://player.vimeo.com/video/${vm[1]}` };
+  if (/\.(mp4|mov|webm|m4v|m3u8)(\?|$)/i.test(u)) return { type: 'video', src: u };
+  if (/canva\.com|docs\.google|notion\.so|drive\.google/i.test(u)) return { type: 'link', src: u };
+  return { type: 'image', src: u };
+}
+function openApv(id){
+  const p = apb.pieces.find(x => x.id === id); if (!p) return;
+  apv.id = id;
+  const el = document.getElementById('apv'); const med = document.getElementById('apvMed');
+  const c = apb.weeks.find(x => x.id === p.calendar_id); const m = apb.team.find(t => canonicalEmail(t.email) === canonicalEmail(p.assignee || ''));
+  const type = String(p.type || 'Pieza').replace(/\s*[·•]\s*/g, ' + ');
+  document.getElementById('apvK').textContent = `${type}${c ? `, semana ${c.week_number}` : ''}, ${p._dayFull || p.day}`;
+  document.getElementById('apvT').textContent = String(p.title || '').replace(/\s*[·•]\s*/g, ', ') || 'Sin título';
+  document.getElementById('apvW').textContent = m ? `La hace ${m.name.split(' ')[0]}` : 'Sin dueño';
+  const media = apvMedia(p.image_url); const fallback = p.product_gid ? findCatalogPhoto(null, p.product_gid) : null;
+  if (media.type === 'image') med.innerHTML = `<img src="${escapeHtml(media.src)}" alt="">`;
+  else if (media.type === 'video') med.innerHTML = `<video src="${escapeHtml(media.src)}" controls autoplay playsinline></video>`;
+  else if (media.type === 'iframe') med.innerHTML = `<iframe src="${escapeHtml(media.src)}" allow="autoplay; encrypted-media; fullscreen; picture-in-picture" allowfullscreen></iframe>`;
+  else if (media.type === 'link') med.innerHTML = `<a class="no" href="${escapeHtml(media.src)}" target="_blank" rel="noopener"><b>↗</b>El arte está en otro sitio, ábrelo en una pestaña nueva</a>`;
+  else if (fallback) med.innerHTML = `<img src="${escapeHtml(fallback)}" alt="">`;
+  else med.innerHTML = `<div class="no"><b>${escapeHtml(type.slice(0, 1))}</b>Todavía no tiene arte, solo el concepto</div>`;
+  const ok = document.getElementById('apvOk'); ok.className = 'ok'; ok.textContent = 'Aprobar'; ok.disabled = false;
+  document.getElementById('apvOpen').href = `calendars/calendar.html?id=${encodeURIComponent(p.calendar_id)}&piece=${encodeURIComponent(p.id)}`;
+  const q = apvQueue(); const i = q.findIndex(x => x.id === id);
+  document.getElementById('apvPrev').style.visibility = i > 0 ? '' : 'hidden';
+  document.getElementById('apvNext').style.visibility = i >= 0 && i < q.length - 1 ? '' : 'hidden';
+  document.getElementById('apvCnt').textContent = q.length > 1 ? `${i + 1} de ${q.length} por aprobar` : '';
+  el.classList.add('open'); document.body.style.overflow = 'hidden';
+}
+function closeApv(){ const el = document.getElementById('apv'); el.classList.remove('open'); document.getElementById('apvMed').innerHTML = ''; document.body.style.overflow = ''; apv.id = null; }
+function apvStep(dir){ const q = apvQueue(); const i = q.findIndex(x => x.id === apv.id); const n = q[i + dir]; if (n) openApv(n.id); }
+document.getElementById('apvClose').addEventListener('click', closeApv);
+document.getElementById('apvPrev').addEventListener('click', () => apvStep(-1));
+document.getElementById('apvNext').addEventListener('click', () => apvStep(1));
+document.getElementById('apv').addEventListener('click', e => { if (e.target.id === 'apvMed' || e.target.id === 'apv') closeApv(); });
+document.getElementById('apvOk').addEventListener('click', async () => {
+  const id = apv.id; if (!id) return;
+  const q = apvQueue(); const i = q.findIndex(x => x.id === id); const next = q[i + 1] || q[i - 1] || null;
+  const ok = document.getElementById('apvOk'); ok.disabled = true; ok.textContent = 'Aprobando…';
+  try { await approveFromBoard(id); } catch(e){ console.error('aprobar', e); }
+  if (apb.pieces.some(x => x.id === id)){ ok.disabled = false; ok.textContent = 'Aprobar'; return; }
+  ok.className = 'ok done'; ok.textContent = '✓ Aprobada';
+  setTimeout(() => { if (next && apb.pieces.some(x => x.id === next.id)) openApv(next.id); else closeApv(); }, 650);
+});
+document.addEventListener('keydown', e => {
+  if (!document.getElementById('apv').classList.contains('open')) return;
+  if (e.key === 'Escape') closeApv(); else if (e.key === 'ArrowRight') apvStep(1); else if (e.key === 'ArrowLeft') apvStep(-1);
+  else if (e.key === 'Enter' && !e.repeat && !document.getElementById('apvOk').disabled) document.getElementById('apvOk').click();
+});
 async function approveFromBoard(id){
   const p = apb.pieces.find(x => x.id === id); if (!p || !apb.can) return;
   const card = document.querySelector(`[data-apc="${CSS.escape(id)}"]`); if (card) card.classList.add('gone');
