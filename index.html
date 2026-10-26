@@ -1233,6 +1233,81 @@ a.act-card{text-decoration:none}
 .modal-btn.primary:hover,.slb-copy:hover,#loginBtn:hover:not(:disabled),#loginVerifyBtn:hover:not(:disabled){filter:brightness(1.05)}
 .new-week-btn{background:linear-gradient(135deg,rgba(224,148,158,.18),rgba(212,132,142,.14))}
 .slb-copy.copied{background:#5b9a5b!important}
+
+/* ═══ Tablero de aprobación (Inicio) ═══ */
+#briefApprovalsWrap{margin-top:18px}
+.apb-head{position:relative;overflow:hidden;border-radius:22px;padding:18px 18px 16px;color:var(--cream);margin:0 0 10px;
+  background:radial-gradient(120% 140% at 100% 0%,rgba(238,205,204,.55) 0%,rgba(201,134,142,.2) 40%,rgba(28,28,28,0) 72%),linear-gradient(160deg,#2a2224 0%,#1C1C1C 60%)}
+.apb-head .k{font-family:'Poppins',sans-serif;font-weight:600;font-size:9.5px;letter-spacing:.16em;text-transform:uppercase;opacity:.65;margin-bottom:8px}
+.apb-head b{display:block;font-family:'Poppins',sans-serif;font-weight:300;font-size:48px;letter-spacing:-.03em;line-height:1}
+.apb-head small{display:block;font-size:12px;opacity:.75;margin-top:6px;line-height:1.35}
+.apb-filters{display:flex;gap:6px;flex-wrap:wrap;margin:0 0 10px}
+.apb-filters:empty{display:none}
+.apb-filters button{border:none;background:var(--paper);border-radius:999px;padding:7px 12px;font-family:inherit;font-size:12px;font-weight:500;color:var(--grey);box-shadow:0 1px 2px rgba(0,0,0,.05);cursor:pointer;display:inline-flex;align-items:center;gap:6px}
+.apb-filters button b{font-weight:600;color:var(--rosa-deep)}
+.apb-filters button.on{background:var(--black);color:var(--cream)}
+.apb-filters button.on b{color:var(--rosa)}
+.apb-group{font-family:'Poppins',sans-serif;font-weight:600;font-size:9.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--grey);margin:12px 4px 6px;display:flex;justify-content:space-between;gap:8px}
+.apb-group:first-child{margin-top:2px}
+.apb-group a{color:var(--grey);text-decoration:none;letter-spacing:0;text-transform:none;font-weight:500}
+.apb-list{display:flex;flex-direction:column;gap:8px}
+.apc{display:grid;grid-template-columns:64px 1fr;gap:12px;border-radius:18px;background:var(--paper);padding:10px;box-shadow:0 1px 2px rgba(0,0,0,.04);transition:opacity .25s,transform .25s}
+.apc.gone{opacity:0;transform:translateX(24px)}
+.apc .im{width:64px;height:84px;border-radius:12px;overflow:hidden;background:var(--cream-dark);display:block;position:relative;text-decoration:none}
+.apc .im img{width:100%;height:100%;object-fit:cover;display:block}
+.apc .im .no{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-family:'Poppins',sans-serif;font-weight:300;font-size:26px;color:var(--rosa-deep)}
+.apc .im .vd{position:absolute;right:5px;bottom:5px;width:18px;height:18px;border-radius:50%;background:rgba(28,28,28,.8);color:#fff;font-size:8px;display:flex;align-items:center;justify-content:center}
+.apc .x{min-width:0;display:flex;flex-direction:column;gap:2px}
+.apc .y{font-family:'Poppins',sans-serif;font-size:9.5px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--rosa-deep);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.apc .t{font-size:13px;font-weight:500;line-height:1.3;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;color:var(--black);text-decoration:none}
+.apc .w{font-size:11.5px;color:var(--grey);display:flex;align-items:center;gap:6px}
+.apc .w .av{width:16px;height:16px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-size:7px;font-weight:600;color:#fff;font-family:'Poppins',sans-serif}
+.apc .acts{display:flex;gap:6px;margin-top:auto;padding-top:6px}
+.apc .acts a,.apc .acts button{border:none;border-radius:999px;padding:7px 12px;font-family:inherit;font-size:12px;font-weight:600;background:var(--cream);color:var(--black);text-decoration:none;cursor:pointer}
+.apc .acts a:hover,.apc .acts button:hover{background:var(--cream-dark)}
+.apc .acts .ok{background:var(--rosa-deep);color:#fff}
+.apc .acts .ok:hover{background:#b7737c}
+.apb-empty{border-radius:18px;background:var(--paper);padding:20px 16px;text-align:center;color:var(--grey);font-size:12.5px}
+.apb-empty b{display:block;font-family:'Poppins',sans-serif;font-weight:300;font-size:30px;color:var(--rosa-deep);margin-bottom:4px}
+
+/* ═══ Escritorio: la app como dashboard ═══ */
+@media (min-width:1024px){
+  :root{--side:220px}
+  .wrap{max-width:none;margin:0;padding:28px 40px 60px calc(var(--side) + 48px)}
+  header{margin-bottom:12px}
+  .hub-tabbar{left:20px;top:20px;bottom:20px;right:auto;width:var(--side);max-width:none;margin:0;flex-direction:column;justify-content:flex-start;align-items:stretch;border-radius:26px;padding:22px 12px;gap:4px;background:rgba(251,250,247,.85)}
+  .hub-tabbar::before{content:'LUXUR';font-family:'Montserrat',sans-serif;font-weight:600;font-size:18px;letter-spacing:normal;color:var(--black);padding:4px 14px 18px}
+  .ht-tab{flex:0 0 auto;flex-direction:row;justify-content:flex-start;gap:10px;padding:9px 12px;border-radius:14px;font-size:13.5px;width:100%}
+  .ht-tab .vt-ico{font-size:18px;padding:0;background:none!important;width:26px;text-align:center}
+  .ht-tab .vt-lbl{font-size:13.5px}
+  .ht-tab.active{background:var(--rosa);color:var(--black)}
+  .ht-tab:hover:not(.active){background:rgba(0,0,0,.04)}
+  header .logo{display:none}
+  .hub-section{left:0;padding-left:calc(var(--side) + 48px);padding-right:40px;padding-top:28px}
+  .footer{padding-left:calc(var(--side) + 48px)}
+  .hub-brief{display:grid;grid-template-columns:minmax(0,1fr) 440px;grid-template-rows:auto auto auto auto auto auto 1fr;grid-template-areas:"hero hero" "bar bar" "tasks board" "launches board" "alerts board" "payments board" "wa board";gap:0 28px;align-items:start}
+  .hub-brief.no-board{grid-template-columns:minmax(0,860px);grid-template-areas:"hero" "bar" "tasks" "launches" "alerts" "payments" "wa"}
+  .home-hero{grid-area:hero;padding:28px 30px 24px;margin-bottom:14px}
+  .home-hero .say{font-size:27px;max-width:900px}
+  .home-stats{max-width:720px}
+  .session-bar{grid-area:bar}
+  #briefTasksWrap{grid-area:tasks}
+  #briefLaunchWrap{grid-area:launches}
+  #briefApprovalsWrap{grid-area:board;margin-top:0;position:sticky;top:24px;max-height:calc(100vh - 48px);overflow:auto;scrollbar-width:none;padding-bottom:12px}
+  #briefApprovalsWrap::-webkit-scrollbar{display:none}
+  #briefAlertsWrap{grid-area:alerts}
+  #briefPaymentsWrap{grid-area:payments}
+  .brief-wa{grid-area:wa;justify-self:start}
+  #briefAlerts .brief-row{flex:0 0 calc(33.333% - 7px)}
+  .brief-title{margin-top:12px}
+  .rail{flex-wrap:wrap;overflow:visible;scroll-snap-type:none}
+  .cal-list{flex-wrap:wrap;overflow:visible!important}
+  .cal-card{flex:0 0 calc(33.333% - 7px);min-width:0}
+  .day-card{flex:0 0 calc(14.285% - 9px)!important;min-width:0!important}
+  .prod-kpis{flex-wrap:wrap;overflow:visible}
+  .prod-kpi{flex:1 1 calc(25% - 8px)!important;min-width:0}
+  .wk-card{flex:0 0 calc(33.333% - 7px)!important}
+}
 </style>
 </head>
 <body>
@@ -1282,21 +1357,31 @@ a.act-card{text-decoration:none}
       <button class="signout-btn" id="signOutBtn">Salir</button>
     </div>
 
-    <h2 class="brief-title">Tus tareas de hoy</h2>
-    <div id="briefTasks" class="brief-list"><div class="brief-empty">Cargando…</div></div>
+    <div id="briefTasksWrap">
+      <h2 class="brief-title">Tus tareas de hoy</h2>
+      <div id="briefTasks" class="brief-list"><div class="brief-empty">Cargando…</div></div>
+    </div>
 
     <div id="briefLaunchWrap" hidden>
       <h2 class="brief-title">Lanzamientos nuevos</h2>
       <div id="briefLaunches" class="brief-list"></div>
     </div>
 
+    <!-- Tablero de aprobación: todas las semanas activas, solo para quien aprueba -->
     <div id="briefApprovalsWrap" hidden>
-      <h2 class="brief-title">Para aprobar</h2>
-      <div id="briefApprovals" class="brief-list"></div>
+      <div class="apb-head">
+        <div class="k">Por aprobar</div>
+        <b id="apbCount">0</b>
+        <small id="apbSub">Cargando…</small>
+      </div>
+      <div class="apb-filters" id="apbFilters"></div>
+      <div class="apb-list" id="apbList"></div>
     </div>
 
-    <h2 class="brief-title">A tener en cuenta</h2>
-    <div id="briefAlerts" class="brief-list"><div class="brief-empty">Cargando…</div></div>
+    <div id="briefAlertsWrap">
+      <h2 class="brief-title">A tener en cuenta</h2>
+      <div id="briefAlerts" class="brief-list"><div class="brief-empty">Cargando…</div></div>
+    </div>
 
     <div id="briefPaymentsWrap" hidden>
       <h2 class="brief-title">Próximos pagos a proveedores</h2>
@@ -1973,7 +2058,7 @@ const MONTH_ABBR = ['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct',
 const MONTH_SLUG = ['jan','feb','mar','apr','may','jun','jul','aug','sep','oct','nov','dec'];
 const DOW_ABBR = ['Dom','Lun','Mar','Mié','Jue','Vie','Sáb'];
 
-const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+const supabase = window.__mockSupabase || createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 const loginOverlay = document.getElementById('loginOverlay');
 const loginEmail = document.getElementById('loginEmail');
@@ -2101,7 +2186,7 @@ async function loadDailyBrief(){
   const { data: cal } = await supabase.from('calendars').select('id')
     .lte('start_date', todayISO).gte('end_date', todayISO)
     .order('start_date', { ascending: false }).limit(1).maybeSingle();
-  if (!cal){ elT.innerHTML = '<div class="brief-empty">No hay calendario activo esta semana</div>'; renderBriefAlerts(); return; }
+  if (!cal){ elT.innerHTML = '<div class="brief-empty">No hay calendario activo esta semana</div>'; loadApprovalBoard().catch(e => console.warn('tablero aprobación', e)); renderBriefAlerts(); return; }
   const link = p => `calendars/calendar.html?id=${encodeURIComponent(cal.id)}&piece=${encodeURIComponent(p.id)}`;
   const typeIco = t => {
     const s = (t||'').toLowerCase();
@@ -2165,29 +2250,96 @@ async function loadDailyBrief(){
   } catch(_) {}
   elT.innerHTML = rowsHtml || '<div class="brief-empty done">✓ Sin tareas asignadas hoy</div>';
   elT.querySelectorAll('[data-brief-go]').forEach(b => b.addEventListener('click', ev => { ev.preventDefault(); showHubSection(b.getAttribute('data-brief-go')); }));
-  // "Para aprobar" — solo leads, toda la semana
-  try {
-    const { data: tm } = await supabase.from('team_members').select('role').eq('email', canonicalEmail(user.email)).maybeSingle();
-    const wrap = document.getElementById('briefApprovalsWrap');
-    const elA = document.getElementById('briefApprovals');
-    if (tm && (tm.role === 'lead' || tm.role === 'admin') && wrap && elA){
-      const { data: toApprove } = await supabase.from('calendar_pieces')
-        .select('id,day,type,title,assignee')
-        .eq('calendar_id', cal.id).eq('status', 'listo').eq('approved', false)
-        .order('position').limit(6);
-      if (toApprove && toApprove.length){
-        const { data: team } = await supabase.from('team_members').select('email,name');
-        const nameOf = em => { const t = (team||[]).find(x => x.email.toLowerCase() === (em||'').toLowerCase()); return t ? t.name.split(' ')[0] : (em||'').split('@')[0]; };
-        wrap.hidden = false;
-        elA.innerHTML = toApprove.map(p => `<a class="brief-row" href="${link(p)}">
-          <span class="brief-ico">☑️</span>
-          <span class="brief-body"><span class="brief-row-title">${escapeHtml(p.title||p.type)}</span><span class="brief-row-sub">${escapeHtml(p.day)} · ${escapeHtml(nameOf(p.assignee))}</span></span>
-          <span class="brief-arrow">›</span></a>`).join('');
-      } else { wrap.hidden = true; }
-    }
-  } catch(_) {}
+  loadApprovalBoard().catch(e => console.warn('tablero aprobación', e));
   renderBriefAlerts();
 }
+
+// === Tablero de aprobación · todas las semanas activas, para quien aprueba ===
+// Antes "Para aprobar" solo miraba la semana en curso: lo que quedaba listo en
+// una semana vieja nunca aparecía. Ahora cruza todas las semanas activas,
+// deja aprobar desde aquí y abre la pieza en el calendario si hay que revisarla.
+const apb = { weeks: [], pieces: [], team: [], filter: null, can: false, busy: false };
+function apbDayKeys(startDate){
+  const [y, m, d] = String(startDate || '').split('-').map(Number); if (!y) return [];
+  const DOW = ['Dom','Lun','Mar','Mié','Jue','Vie','Sáb']; const out = [];
+  for (let i = 0; i < 7; i++){ const dt = new Date(y, m - 1, d + i); out.push({ key: `${DOW[dt.getDay()]} ${dt.getDate()}`, full: ['Domingo','Lunes','Martes','Miércoles','Jueves','Viernes','Sábado'][dt.getDay()] + ' ' + dt.getDate() }); }
+  return out;
+}
+function apbImage(p){
+  const u = p.image_url || '';
+  if (u){
+    const dv = u.match(/drive\.google\.com\/file\/d\/([^\/?#]+)/); if (dv) return `https://drive.google.com/thumbnail?id=${dv[1]}&sz=w600`;
+    const isMedia = /youtube\.com|youtu\.be|vimeo\.com|canva\.com|docs\.google|notion\.so|\.(mp4|mov|webm|m4v|m3u8)(\?|$)/i.test(u);
+    if (!isMedia) return u;
+  }
+  return p.product_gid ? findCatalogPhoto(null, p.product_gid) : null;
+}
+async function loadApprovalBoard(){
+  const wrap = document.getElementById('briefApprovalsWrap'); const brief = document.querySelector('.hub-brief');
+  if (!wrap || !user) return;
+  const { data: me } = await supabase.from('team_members').select('role,can_approve').eq('email', canonicalEmail(user.email)).maybeSingle();
+  apb.can = !!(me && (me.can_approve || me.role === 'lead' || me.role === 'admin'));
+  if (!apb.can){ wrap.hidden = true; if (brief) brief.classList.add('no-board'); return; }
+  wrap.hidden = false; if (brief) brief.classList.remove('no-board');
+  const [cals, team] = await Promise.all([
+    supabase.from('calendars').select('id,week_number,start_date,end_date').eq('status', 'active').order('start_date', { ascending: false }).limit(6),
+    supabase.from('team_members').select('email,name,color'),
+  ]);
+  apb.weeks = (cals.data || []).sort((a, b) => String(a.start_date).localeCompare(String(b.start_date)));
+  apb.team = team.data || [];
+  if (!apb.weeks.length){ apb.pieces = []; renderApprovalBoard(); return; }
+  const { data: rows } = await supabase.from('calendar_pieces')
+    .select('id,calendar_id,day,type,title,assignee,status,approved,image_url,product_gid,position')
+    .in('calendar_id', apb.weeks.map(c => c.id)).eq('status', 'listo').eq('approved', false);
+  const idx = {}; apb.weeks.forEach((c, i) => { idx[c.id] = { w: i, days: apbDayKeys(c.start_date) }; });
+  apb.pieces = (rows || []).map(p => { const k = idx[p.calendar_id] || { w: 99, days: [] }; const di = k.days.findIndex(d => d.key === p.day); return { ...p, _w: k.w, _d: di < 0 ? 99 : di, _dayFull: di < 0 ? p.day : k.days[di].full }; })
+    .sort((a, b) => a._w - b._w || a._d - b._d || (a.position || 0) - (b.position || 0));
+  if (apb.filter && !apb.pieces.some(p => p.calendar_id === apb.filter)) apb.filter = null;
+  if (!catalog || !catalog.length){ try { const { data } = await supabase.from('shopify_catalog').select('products').eq('id', 1).maybeSingle(); if (data && Array.isArray(data.products)) catalog = data.products; } catch(_) {} }
+  renderApprovalBoard();
+}
+function renderApprovalBoard(){
+  const list = document.getElementById('apbList'), filt = document.getElementById('apbFilters'); if (!list) return;
+  const all = apb.pieces, n = all.length;
+  document.getElementById('apbCount').textContent = n;
+  const weeksWith = apb.weeks.filter(c => all.some(p => p.calendar_id === c.id));
+  document.getElementById('apbSub').textContent = n ? `${n === 1 ? 'pieza lista espera' : 'piezas listas esperan'} tu visto bueno${weeksWith.length > 1 ? `, en ${weeksWith.length} semanas` : ''}. Aprueba desde aquí o abre la pieza para ver el arte` : 'Todo lo que el equipo marcó como listo ya está aprobado';
+  filt.innerHTML = weeksWith.length > 1 ? `<button class="${!apb.filter ? 'on' : ''}" data-apb-w="">Todas <b>${n}</b></button>` + weeksWith.map(c => `<button class="${apb.filter === c.id ? 'on' : ''}" data-apb-w="${escapeHtml(c.id)}">Semana ${c.week_number} <b>${all.filter(p => p.calendar_id === c.id).length}</b></button>`).join('') : '';
+  filt.querySelectorAll('[data-apb-w]').forEach(b => b.addEventListener('click', () => { apb.filter = b.getAttribute('data-apb-w') || null; renderApprovalBoard(); }));
+  const show = apb.filter ? all.filter(p => p.calendar_id === apb.filter) : all;
+  if (!show.length){ list.innerHTML = `<div class="apb-empty"><b>✓</b>Nada por aprobar</div>`; return; }
+  const memberOf = em => apb.team.find(m => canonicalEmail(m.email) === canonicalEmail(em || '')) || null;
+  const ini = nm => (nm || '?').trim().split(/\s+/).map(w => w[0]).slice(0, 2).join('').toUpperCase();
+  let html = '', lastG = '';
+  for (const p of show){
+    const c = apb.weeks.find(x => x.id === p.calendar_id); const g = `${p.calendar_id}|${p.day}`;
+    if (g !== lastG){ lastG = g; const cnt = show.filter(x => x.calendar_id === p.calendar_id && x.day === p.day).length;
+      html += `<div class="apb-group"><span>${c ? `Semana ${c.week_number}, ` : ''}${escapeHtml(p._dayFull)}</span><span>${cnt}</span></div>`; }
+    const img = apbImage(p); const m = memberOf(p.assignee); const href = `calendars/calendar.html?id=${encodeURIComponent(p.calendar_id)}&piece=${encodeURIComponent(p.id)}`;
+    const parts = String(p.title || '').split(/\s*[·•]\s*/).filter(Boolean); const label = parts.length > 1 ? parts[0] : ''; const title = parts.length > 1 ? parts.slice(1).join(', ') : (parts[0] || 'Sin título');
+    const type = String(p.type || 'Pieza').replace(/\s*[·•]\s*/g, ' + '); const isVideo = p.image_url && !(/^data:|\.(jpe?g|png|webp|gif|avif)(\?|$)/i.test(p.image_url)) && !(/supabase\.co\/storage/i.test(p.image_url));
+    html += `<div class="apc" data-apc="${escapeHtml(p.id)}">
+      <a class="im" href="${href}">${img ? `<img src="${escapeHtml(img)}" alt="" loading="lazy" onerror="this.style.visibility='hidden'">` : `<span class="no">${escapeHtml(type.slice(0, 1))}</span>`}${isVideo ? '<span class="vd">▶</span>' : ''}</a>
+      <div class="x">
+        <span class="y">${escapeHtml(type)}${label ? ', ' + escapeHtml(label) : ''}</span>
+        <a class="t" href="${href}">${escapeHtml(title)}</a>
+        <span class="w">${m ? `<span class="av" style="background:${m.color || '#5a5a5a'}">${ini(m.name)}</span>${escapeHtml(m.name.split(' ')[0])}` : 'Sin dueño'}${p.image_url ? '' : ', sin arte'}</span>
+        <div class="acts"><button class="ok" data-apb-ok="${escapeHtml(p.id)}">Aprobar</button><a href="${href}">Ver</a></div>
+      </div>
+    </div>`;
+  }
+  list.innerHTML = html;
+  list.querySelectorAll('[data-apb-ok]').forEach(b => b.addEventListener('click', () => approveFromBoard(b.getAttribute('data-apb-ok'))));
+}
+async function approveFromBoard(id){
+  const p = apb.pieces.find(x => x.id === id); if (!p || !apb.can) return;
+  const card = document.querySelector(`[data-apc="${CSS.escape(id)}"]`); if (card) card.classList.add('gone');
+  const { error } = await supabase.from('calendar_pieces').update({ approved: true, approved_by: user.email, status: 'listo', updated_at: new Date().toISOString() }).eq('id', id);
+  if (error){ console.error('aprobar', error); if (card) card.classList.remove('gone'); alert('No se pudo aprobar: ' + error.message); return; }
+  apb.pieces = apb.pieces.filter(x => x.id !== id);
+  setTimeout(renderApprovalBoard, 220);
+}
+document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible' && user && apb.can) loadApprovalBoard().catch(() => {}); });
 
 // === Avísame · demanda real sin stock ===
 // Cada clienta que pide aviso en la tienda queda etiquetada en Shopify como

@@ -220,6 +220,13 @@ img{display:block}
 .sh-ap.wait{background:var(--paper);color:var(--black)}
 .sh-ap.wait .ic{background:var(--rosa);color:#8e3b45}
 .sh-ap.wait .t2{color:var(--grey);opacity:1}
+.sh-ap>div:nth-child(2){flex:1;min-width:0}
+.sh-ap .acts{display:flex;gap:6px;flex:0 0 auto}
+.sh-ap .acts:empty{display:none}
+.sh-ap .acts button{border:none;border-radius:999px;padding:9px 14px;font-size:12.5px;font-weight:600;background:rgba(255,255,255,.22);color:#fff;white-space:nowrap}
+.sh-ap .acts .ok{background:var(--rosa-deep);color:#fff}
+.sh-ap.wait .acts .nx{background:var(--cream);color:var(--black)}
+@media (max-width:699px){.sh-ap{flex-wrap:wrap}.sh-ap .acts{flex:1 0 100%;margin-top:4px}.sh-ap .acts button{flex:1}}
 .sh-head .tx{flex:1;min-width:0}
 .sh-head .eb{font-weight:600;font-size:9.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--grey);margin-bottom:4px}
 .sh-head h3{font-weight:500;font-size:19px;line-height:1.25;letter-spacing:-.01em;outline:none;border-radius:8px}
@@ -296,6 +303,103 @@ img{display:block}
   .pc{flex-basis:200px}
   .sheet .pn{border-radius:26px;bottom:24px;left:24px;right:24px}
 }
+
+/* ── columna de aprobación (escritorio) ── */
+.ap-side{display:none}
+.kpis{display:none}
+.aps-head{position:relative;overflow:hidden;border-radius:22px;padding:18px 18px 16px;color:var(--cream);margin:0 0 12px;
+  background:radial-gradient(120% 140% at 100% 0%,rgba(238,205,204,.55) 0%,rgba(201,134,142,.2) 40%,rgba(28,28,28,0) 72%),linear-gradient(160deg,#2a2224 0%,#1C1C1C 60%)}
+.aps-head .k{font-weight:600;font-size:9.5px;letter-spacing:.16em;text-transform:uppercase;opacity:.65;margin-bottom:8px}
+.aps-head b{display:block;font-weight:300;font-size:48px;letter-spacing:-.03em;line-height:1}
+.aps-head small{display:block;font-size:12px;opacity:.75;margin-top:6px;line-height:1.35}
+.aps-head .all{position:absolute;right:14px;top:14px;border:none;background:rgba(255,255,255,.14);color:var(--cream);border-radius:999px;padding:7px 12px;font-size:11.5px;font-weight:600}
+.aps-head .all:hover{background:rgba(255,255,255,.24)}
+.aps-day{font-weight:600;font-size:9.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--grey);margin:12px 4px 6px;display:flex;justify-content:space-between}
+.aps-day:first-child{margin-top:2px}
+.aps-list{display:flex;flex-direction:column;gap:8px}
+.apc{display:grid;grid-template-columns:64px 1fr;gap:12px;border-radius:18px;background:var(--paper);padding:10px;box-shadow:0 1px 2px rgba(0,0,0,.04);transition:opacity .25s,transform .25s}
+.apc.gone{opacity:0;transform:translateX(24px)}
+.apc .im{width:64px;height:84px;border-radius:12px;overflow:hidden;background:var(--cream-dark);border:none;padding:0;cursor:pointer;position:relative}
+.apc .im img{width:100%;height:100%;object-fit:cover}
+.apc .im .no{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-weight:300;font-size:26px;color:var(--rosa-deep)}
+.apc .im .vd{position:absolute;right:5px;bottom:5px;width:18px;height:18px;border-radius:50%;background:rgba(28,28,28,.8);color:#fff;font-size:8px;display:flex;align-items:center;justify-content:center}
+.apc .x{min-width:0;display:flex;flex-direction:column;gap:2px}
+.apc .y{font-size:9.5px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--rosa-deep);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.apc .t{font-size:13px;font-weight:500;line-height:1.3;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;cursor:pointer}
+.apc .w{font-size:11.5px;color:var(--grey);display:flex;align-items:center;gap:6px}
+.apc .w .av{width:16px;height:16px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-size:7px;font-weight:600;color:#fff}
+.apc .acts{display:flex;gap:6px;margin-top:auto;padding-top:6px}
+.apc .acts button{border:none;border-radius:999px;padding:7px 12px;font-size:12px;font-weight:600;background:var(--cream);color:var(--black)}
+.apc .acts button:hover{background:var(--cream-dark)}
+.apc .acts .ok{background:var(--rosa-deep);color:#fff}
+.apc .acts .ok:hover{background:#b7737c}
+.aps-empty{border-radius:18px;background:var(--paper);padding:20px 16px;text-align:center;color:var(--grey);font-size:12.5px}
+.aps-empty b{display:block;font-weight:300;font-size:30px;color:var(--rosa-deep);margin-bottom:4px}
+.aps-other{margin-top:16px}
+.aps-other .k{font-weight:600;font-size:9.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--grey);margin:0 4px 6px}
+.aps-other a{display:flex;justify-content:space-between;align-items:center;gap:10px;border-radius:16px;background:var(--paper);padding:11px 14px;text-decoration:none;color:var(--black);font-size:12.5px;margin-bottom:6px;box-shadow:0 1px 2px rgba(0,0,0,.04)}
+.aps-other a:hover{background:#fff}
+.aps-other a b{font-weight:300;font-size:24px;letter-spacing:-.02em;line-height:1;color:var(--rosa-deep)}
+.aps-other a small{display:block;color:var(--grey);font-size:11px}
+.aps-done{margin-top:16px}
+.aps-done .k{font-weight:600;font-size:9.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--grey);margin:0 4px 6px;display:flex;justify-content:space-between}
+.aps-done .row{display:flex;align-items:center;gap:10px;border-radius:14px;background:var(--paper);padding:8px 10px;margin-bottom:5px;border:none;width:100%;text-align:left;color:var(--black);cursor:pointer}
+.aps-done .row img,.aps-done .row .noimg{width:30px;height:40px;border-radius:8px;object-fit:cover;background:var(--cream-dark);flex:0 0 auto}
+.aps-done .row .t{font-size:12px;line-height:1.25;display:-webkit-box;-webkit-line-clamp:1;-webkit-box-orient:vertical;overflow:hidden}
+.aps-done .row .s{font-size:10.5px;color:var(--rosa-deep);font-weight:600}
+.btn.next{background:var(--rosa);color:#8e3b45}
+
+/* ── escritorio: la app como dashboard ── */
+@media (min-width:1024px){
+  .wrap{max-width:1400px;padding:26px 32px 60px;display:grid;grid-template-columns:minmax(0,1fr) 400px;gap:0 28px;align-items:start}
+  .top{grid-column:1/-1;margin-bottom:18px}
+  .top .logo{font-size:19px}
+  .top .sync{max-width:none}
+  .main{min-width:0}
+  .ap-side{display:block;position:sticky;top:20px;max-height:calc(100vh - 40px);overflow:auto;scrollbar-width:none;padding-bottom:20px}
+  .ap-side::-webkit-scrollbar{display:none}
+  .sec-hero{padding:26px 28px 22px;margin-bottom:16px}
+  .sec-hero .say{font-size:25px;max-width:880px}
+  .sec-hero .ph img{width:48px;height:64px}
+  .kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin:0 0 18px}
+  .kpi{border:none;text-align:left;border-radius:20px;background:var(--paper);padding:14px 16px 12px;box-shadow:0 1px 2px rgba(0,0,0,.04);color:var(--black);display:flex;flex-direction:column;gap:2px;cursor:pointer}
+  .kpi:hover{background:#fff}
+  .kpi .l{font-weight:600;font-size:9.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--grey)}
+  .kpi .v{font-weight:300;font-size:36px;letter-spacing:-.02em;line-height:1.05}
+  .kpi .v small{font-size:12px;color:var(--grey);letter-spacing:0;margin-left:4px}
+  .kpi .s{font-size:11.5px;color:var(--grey)}
+  .kpi.hot{background:var(--rosa)}
+  .kpi.hot .l,.kpi.hot .s{color:#8e3b45}
+  .rail{flex-wrap:wrap;overflow:visible;scroll-snap-type:none;gap:12px;padding:2px 0 8px;margin:0 0 4px}
+  .rail>*{scroll-snap-align:none}
+  #dayRail{display:grid;grid-template-columns:repeat(7,1fr);gap:10px;margin-bottom:6px}
+  .day-card{flex-basis:auto;min-width:0}
+  .day-card:hover{background:#fff}
+  .day-card.today:hover{background:var(--rosa)}
+  #weekRail{display:grid;grid-template-columns:repeat(7,1fr);gap:10px;align-items:start}
+  .wk{width:auto;min-width:0}
+  .pc{flex:0 0 calc(20% - 10px);max-width:none;min-width:0;cursor:pointer}
+  .pc:hover{box-shadow:0 0 0 2px var(--line)}
+  .pc.aprob:hover{box-shadow:0 0 0 2px var(--rosa-deep)}
+  .tm{width:calc(20% - 10px)}
+  .prd,.sl,.iv{width:calc(25% - 9px)}
+  .stat{flex:1}
+  .mc{flex:1 1 30%;max-width:none}
+  .fab{display:none}
+  .rail-hint{text-align:left;margin:0 2px 14px}
+  .sub-tabs{display:inline-flex;margin:4px 0 16px;overflow:visible}
+  .sub-tabs button{flex:0 0 auto;padding:9px 16px}
+  .eyebrow{margin-top:18px}
+  .sheet .pn{left:auto;right:18px;top:18px;bottom:18px;width:min(720px,54vw);max-height:none;border-radius:26px;margin:0;padding:18px 26px 28px;animation:slideIn .32s cubic-bezier(.16,1,.3,1)}
+  @keyframes slideIn{from{transform:translateX(40px);opacity:0}to{transform:none;opacity:1}}
+  .sheet .gr{display:none}
+  .sh-media{height:min(54vh,560px)}
+  .footer{grid-column:1/-1;text-align:left;margin-top:12px}
+}
+@media (min-width:1360px){
+  .pc{flex-basis:calc(16.666% - 10px)}
+  .tm{width:calc(16.666% - 10px)}
+}
 </style>
 </head>
 <body>
@@ -335,11 +439,14 @@ img{display:block}
     <div class="sync"><span class="sync-dot" id="syncDot"></span><span id="syncLabel">Conectando…</span></div>
   </div>
 
+  <div class="main">
   <section class="sec-hero" id="hero">
     <div class="k"><span id="heroK">Calendario</span><a href="../index.html?stay=1" id="heroLink">Todas las semanas</a></div>
     <p class="say" id="heroSay">Cargando la semana…</p>
     <div class="ph" id="heroPh"></div>
   </section>
+
+  <div class="kpis" id="kpis"></div>
 
   <div class="rail" id="dayRail"></div>
 
@@ -411,6 +518,20 @@ img{display:block}
     </div>
     <p class="rail-hint">Se guarda solo mientras escribes</p>
   </div>
+  </div><!-- /main -->
+
+  <!-- COLUMNA DE APROBACIÓN (escritorio) -->
+  <aside class="ap-side" id="apSide">
+    <div class="aps-head">
+      <div class="k">Por aprobar esta semana</div>
+      <b id="apsCount">0</b>
+      <small id="apsSub">Cargando…</small>
+      <button class="all" id="apsApproveAll" style="display:none">Aprobar todas</button>
+    </div>
+    <div class="aps-list" id="apsList"></div>
+    <div class="aps-other" id="apsOther" style="display:none"></div>
+    <div class="aps-done" id="apsDone" style="display:none"></div>
+  </aside>
 
   <div class="footer"><span id="footerCalendar">—</span><span id="editorList"></span><button id="signOutBtn">Salir</button></div>
 </div>
@@ -483,6 +604,7 @@ img{display:block}
 
     <div class="sh-actions">
       <button type="button" class="btn approve" data-pm-approve>Aprobar</button>
+      <button type="button" class="btn next" data-pm-next style="display:none">Siguiente por aprobar ›</button>
       <button type="button" class="btn primary" data-urls-save>Guardar</button>
     </div>
     <div class="sh-actions" style="margin-top:6px;justify-content:space-between">
@@ -762,6 +884,7 @@ async function loadCalendar(){
   const dl = $('catalogList'); if (dl) dl.innerHTML = state.catalog.map(p => `<option value="${escapeAttr(p.title)}">`).join('');
   renderAll();
   bindFieldEditors();
+  loadOtherWeeks();
 
   if (!state.__pieceDeepLinkDone){
     state.__pieceDeepLinkDone = true;
@@ -874,7 +997,113 @@ function piecesOf(dayKey){ return visiblePieces().filter(p => p.day === dayKey);
 // === RENDER ===
 function renderAll(){
   if (!state.days.length) return;
-  renderHero(); renderDayRail(); renderDayPanel(); renderWeekPanel(); renderTeamPanel(); renderInventory();
+  renderHero(); renderKpis(); renderDayRail(); renderDayPanel(); renderWeekPanel(); renderTeamPanel(); renderInventory(); renderApSide();
+}
+
+// === ESCRITORIO: KPIs y columna de aprobación ===
+function dayIdx(key){ const i = state.days.findIndex(d => d.key === key); return i < 0 ? 99 : i; }
+function pendingPieces(){
+  return state.pieces.filter(p => p.status === 'listo' && !p.approved).sort((a, b) => dayIdx(a.day) - dayIdx(b.day) || (a.position || 0) - (b.position || 0));
+}
+function renderKpis(){
+  const box = $('kpis'); if (!box) return;
+  const all = state.pieces, total = all.length;
+  const wait = pendingPieces().length, ap = all.filter(p => p.approved).length, done = all.filter(isDone).length;
+  const noOwner = all.filter(p => !p.assignee).length, noArt = all.filter(p => !p.imageUrl && !p.approved).length;
+  const pct = total ? Math.round(done / total * 100) : 0;
+  box.innerHTML = `
+    <button class="kpi ${wait ? 'hot' : ''}" data-kpi="aprobar"><span class="l">Por aprobar</span><span class="v">${wait}<small>${wait === 1 ? 'pieza lista' : 'piezas listas'}</small></span><span class="s">${wait ? 'esperan tu visto bueno' : 'nada pendiente de ti'}</span></button>
+    <button class="kpi" data-kpi="aprobadas"><span class="l">Aprobadas</span><span class="v">${ap}<small>de ${total}</small></span><span class="s">ya se pueden publicar</span></button>
+    <button class="kpi" data-kpi="avance"><span class="l">Avance de la semana</span><span class="v">${pct}<small>%</small></span><span class="s">${done} de ${total} listas o aprobadas</span></button>
+    <button class="kpi" data-kpi="faltan"><span class="l">Sin arte o sin dueño</span><span class="v">${noArt}<small>sin arte</small></span><span class="s">${noOwner ? `${noOwner} sin dueño` : 'todas tienen dueño'}</span></button>`;
+  box.querySelectorAll('[data-kpi]').forEach(b => b.addEventListener('click', () => {
+    const k = b.getAttribute('data-kpi');
+    if (k === 'aprobar'){ const first = pendingPieces()[0]; if (first) openUrlsModal(first.id); else { $('apSide').scrollIntoView({ behavior: 'smooth' }); } }
+    else if (k === 'aprobadas'){ setTab('equipo'); }
+    else if (k === 'avance'){ setTab('semana'); }
+    else { setTab('equipo'); }
+  }));
+}
+function renderApSide(){
+  const list = $('apsList'); if (!list) return;
+  const wait = pendingPieces(); const can = canApprove();
+  $('apsCount').textContent = wait.length;
+  $('apsSub').textContent = wait.length ? (can ? `${wait.length === 1 ? 'pieza lista espera' : 'piezas listas esperan'} tu visto bueno, aprueba desde aquí o abre cada una` : 'listas, esperando a quien aprueba') : 'Todo lo que está listo ya fue aprobado';
+  const allBtn = $('apsApproveAll'); allBtn.style.display = can && wait.length > 1 ? '' : 'none';
+  if (!wait.length){ list.innerHTML = `<div class="aps-empty"><b>✓</b>Nada por aprobar en esta semana</div>`; }
+  else {
+    let lastDay = null, html = '';
+    for (const p of wait){
+      if (p.day !== lastDay){ lastDay = p.day; const d = state.days.find(x => x.key === p.day); const n = wait.filter(x => x.day === p.day).length;
+        html += `<div class="aps-day"><span>${d ? `${d.fullDow} ${d.dnum}` : escapeHtml(p.day)}</span><span>${n}</span></div>`; }
+      const img = pieceImage(p); const { label, title } = splitTitle(p.title); const m = p.assignee ? teamMember(p.assignee) : null;
+      const isVideo = p.imageUrl && detectMediaType(p.imageUrl).type !== 'image';
+      html += `<div class="apc" data-apc="${p.id}">
+        <button class="im" data-ap-open="${p.id}" aria-label="Abrir">${img ? `<img src="${escapeAttr(img)}" alt="" loading="lazy" onerror="this.style.visibility='hidden'">` : `<span class="no">${escapeHtml(fmtType(p.type).slice(0,1))}</span>`}${isVideo ? '<span class="vd">▶</span>' : ''}</button>
+        <div class="x">
+          <span class="y">${escapeHtml(fmtType(p.type))}${label ? ', ' + escapeHtml(label) : ''}</span>
+          <span class="t" data-ap-open="${p.id}">${escapeHtml(title)}</span>
+          <span class="w">${m ? `<span class="av" style="background:${m.color}">${initials(m.name)}</span>${escapeHtml(m.name.split(' ')[0])}` : 'Sin dueño'}${p.imageUrl ? '' : ', sin arte'}</span>
+          <div class="acts">${can ? `<button class="ok" data-ap-ok="${p.id}">Aprobar</button>` : ''}<button data-ap-open="${p.id}">Ver</button></div>
+        </div>
+      </div>`;
+    }
+    list.innerHTML = html;
+  }
+  list.querySelectorAll('[data-ap-open]').forEach(b => b.addEventListener('click', () => openUrlsModal(b.getAttribute('data-ap-open'))));
+  list.querySelectorAll('[data-ap-ok]').forEach(b => b.addEventListener('click', () => {
+    const id = b.getAttribute('data-ap-ok'); const card = list.querySelector(`[data-apc="${id}"]`);
+    if (card) card.classList.add('gone');
+    setTimeout(() => setApproved(id, true), 220);
+  }));
+  // Aprobadas hoy, lo más reciente primero
+  const done = state.pieces.filter(p => p.approved).sort((a, b) => String(b.approvedAt || '').localeCompare(String(a.approvedAt || '')));
+  const dn = $('apsDone');
+  if (done.length){
+    dn.style.display = '';
+    dn.innerHTML = `<div class="k"><span>Ya aprobadas</span><span>${done.length}</span></div>` + done.slice(0, 8).map(p => { const img = pieceImage(p); const { title } = splitTitle(p.title);
+      return `<button class="row" data-ap-open="${p.id}">${img ? `<img src="${escapeAttr(img)}" alt="" loading="lazy">` : '<span class="noimg"></span>'}<span style="min-width:0"><span class="t">${escapeHtml(title)}</span><span class="s">✓ ${escapeHtml(approverName(p))}${p.approvedAt ? ', ' + escapeHtml(fmtApprovedAt(p.approvedAt)) : ''}</span></span></button>`; }).join('') +
+      (done.length > 8 ? `<button class="row" id="apsDoneMore" style="justify-content:center;color:var(--grey);font-size:12px">${done.length - 8} más en Equipo</button>` : '');
+    dn.querySelectorAll('[data-ap-open]').forEach(b => b.addEventListener('click', () => openUrlsModal(b.getAttribute('data-ap-open'))));
+    const more = $('apsDoneMore'); if (more) more.addEventListener('click', () => setTab('equipo'));
+  } else { dn.style.display = 'none'; dn.innerHTML = ''; }
+}
+// Otras semanas activas con piezas sin aprobar, para que nada se quede escondido en una semana vieja
+async function loadOtherWeeks(){
+  const box = $('apsOther'); if (!box) return;
+  try {
+    const { data: cals } = await supabase.from('calendars').select('id,week_number,start_date,end_date,status').eq('status', 'active').neq('id', state.calendarId).order('start_date', { ascending: false }).limit(6);
+    if (!cals || !cals.length){ box.style.display = 'none'; return; }
+    const { data: rows } = await supabase.from('calendar_pieces').select('calendar_id').in('calendar_id', cals.map(c => c.id)).eq('status', 'listo').eq('approved', false);
+    const counts = {}; (rows || []).forEach(r => { counts[r.calendar_id] = (counts[r.calendar_id] || 0) + 1; });
+    const withPending = cals.filter(c => counts[c.id]);
+    if (!withPending.length){ box.style.display = 'none'; return; }
+    box.style.display = '';
+    box.innerHTML = `<div class="k">Otras semanas con piezas por aprobar</div>` + withPending.map(c => `<a href="calendar.html?id=${encodeURIComponent(c.id)}"><span>Semana ${c.week_number}<small>${niceDate(c.start_date)} al ${niceDate(c.end_date)}</small></span><b>${counts[c.id]}</b></a>`).join('');
+  } catch(e){ console.warn('otras semanas', e); box.style.display = 'none'; }
+}
+async function setApproved(pieceId, nowApproved){
+  if (!canApprove()) return;
+  const piece = state.pieces.find(p => p.id === pieceId); if (!piece) return;
+  const updated = { ...piece, approved: nowApproved, approvedBy: nowApproved ? state.user.email : null, approvedAt: nowApproved ? new Date().toISOString() : null, status: nowApproved ? 'listo' : piece.status };
+  state.pieces = state.pieces.map(p => p.id === pieceId ? updated : p);
+  await saveOnePiece(updated);
+  renderAll();
+  return updated;
+}
+function nextPendingAfter(pieceId){
+  const wait = pendingPieces().filter(p => p.id !== pieceId);
+  if (!wait.length) return null;
+  const cur = state.pieces.find(p => p.id === pieceId);
+  if (!cur) return wait[0];
+  const after = wait.find(p => dayIdx(p.day) > dayIdx(cur.day) || (dayIdx(p.day) === dayIdx(cur.day) && (p.position || 0) > (cur.position || 0)));
+  return after || wait[0];
+}
+function updateNextBtn(pieceId){
+  const b = document.querySelector('[data-pm-next]'); if (!b) return;
+  const nxt = nextPendingAfter(pieceId);
+  b.style.display = nxt && canApprove() ? '' : 'none';
+  b.textContent = nxt ? `Siguiente por aprobar ›` : '';
 }
 
 function renderHero(){
@@ -1175,6 +1404,7 @@ function openUrlsModal(pieceId){
   approveBtn.classList.toggle('on', !!piece.approved);
   approveBtn.textContent = piece.approved ? 'Quitar aprobación' : (canApprove() ? 'Aprobar' : 'Pendiente de aprobar');
   renderApBanner(piece);
+  updateNextBtn(pieceId);
 
   const prodInput = modal.querySelector('[data-pm="productSearch"]');
   const cp = piece.productGid ? catalogProduct(piece.productGid) : null;
@@ -1187,13 +1417,17 @@ function openUrlsModal(pieceId){
 }
 function renderApBanner(piece){
   const b = document.querySelector('[data-pm-apbanner]'); if (!b) return;
+  const nxt = nextPendingAfter(piece.id);
+  const nextBtn = nxt && canApprove() ? `<button type="button" class="nx" data-ap-banner-next>Siguiente ›</button>` : '';
   if (piece.approved){
     b.className = 'sh-ap on';
-    b.innerHTML = `<span class="ic">✓</span><div><div class="t1">${escapeHtml(approvedLine(piece))}</div><div class="t2">Ya se puede publicar</div></div>`;
+    b.innerHTML = `<span class="ic">✓</span><div><div class="t1">${escapeHtml(approvedLine(piece))}</div><div class="t2">Ya se puede publicar</div></div><div class="acts">${nextBtn}</div>`;
   } else if (piece.status === 'listo'){
     b.className = 'sh-ap on wait';
-    b.innerHTML = `<span class="ic">…</span><div><div class="t1">Lista, esperando aprobación</div><div class="t2">Todavía no la han aprobado</div></div>`;
+    b.innerHTML = `<span class="ic">…</span><div><div class="t1">Lista, esperando aprobación</div><div class="t2">${canApprove() ? 'Revisa el arte y apruébala aquí mismo' : 'Todavía no la han aprobado'}</div></div><div class="acts">${canApprove() ? `<button type="button" class="ok" data-ap-banner-approve>Aprobar</button>` : ''}${nextBtn}</div>`;
   } else { b.className = 'sh-ap'; b.innerHTML = ''; }
+  const ok = b.querySelector('[data-ap-banner-approve]'); if (ok) ok.addEventListener('click', toggleApprove);
+  const nb = b.querySelector('[data-ap-banner-next]'); if (nb) nb.addEventListener('click', goNextPending);
 }
 function closeUrlsModal(){ $('urlsModal').classList.remove('open'); document.body.style.overflow = ''; }
 
@@ -1238,15 +1472,17 @@ async function toggleApprove(){
   const pieceId = modal.getAttribute('data-piece-id');
   const piece = state.pieces.find(p => p.id === pieceId); if (!piece) return;
   const nowApproved = !piece.approved;
-  const updated = { ...piece, approved: nowApproved, approvedBy: nowApproved ? state.user.email : null, approvedAt: nowApproved ? new Date().toISOString() : null, status: nowApproved ? 'listo' : piece.status };
-  state.pieces = state.pieces.map(p => p.id === pieceId ? updated : p);
-  saveOnePiece(updated);
   const btn = modal.querySelector('[data-pm-approve]');
   btn.classList.toggle('on', nowApproved);
   btn.textContent = nowApproved ? 'Quitar aprobación' : 'Aprobar';
-  renderApBanner(updated);
   if (nowApproved) modal.querySelectorAll('[data-pm-status] button').forEach(b => b.classList.toggle('active', b.getAttribute('data-status') === 'listo'));
-  renderAll();
+  const updated = await setApproved(pieceId, nowApproved);
+  if (updated) renderApBanner(updated);
+  updateNextBtn(pieceId);
+}
+function goNextPending(){
+  const pieceId = $('urlsModal').getAttribute('data-piece-id');
+  const nxt = nextPendingAfter(pieceId); if (nxt) openUrlsModal(nxt.id);
 }
 
 // === SUBIR FOTO ===
@@ -1335,6 +1571,12 @@ titleEl.addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDef
 titleEl.addEventListener('paste', e => { e.preventDefault(); const text = (e.clipboardData || window.clipboardData).getData('text/plain') || ''; document.execCommand('insertText', false, text.replace(/\n/g, ' ')); });
 urlsModalEl.querySelectorAll('[data-pm-status] button').forEach(b => b.addEventListener('click', () => { urlsModalEl.querySelectorAll('[data-pm-status] button').forEach(x => x.classList.remove('active')); b.classList.add('active'); }));
 urlsModalEl.querySelector('[data-pm-approve]').addEventListener('click', toggleApprove);
+urlsModalEl.querySelector('[data-pm-next]').addEventListener('click', goNextPending);
+$('apsApproveAll').addEventListener('click', async () => {
+  const wait = pendingPieces(); if (!wait.length || !canApprove()) return;
+  if (!confirm(`¿Aprobar las ${wait.length} piezas que están listas esta semana?`)) return;
+  for (const p of wait) await setApproved(p.id, true);
+});
 urlsModalEl.querySelector('[data-pm="productSearch"]').addEventListener('input', e => {
   const txt = e.target.value.trim().toLowerCase(); const match = state.catalog.find(p => p.title.toLowerCase() === txt); renderModalInventory(match ? match.gid : null);
 });
