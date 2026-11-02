@@ -1033,6 +1033,56 @@ header,.hub-header{position:static !important;background:transparent !important;
 .rail::-webkit-scrollbar{display:none}
 .rail>*{scroll-snap-align:start;flex:0 0 auto}
 .rail-hint{font-size:11.5px;color:var(--grey);text-align:center;margin:0 0 14px}
+/* Semáforo diario del presupuesto */
+.sm-seg{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;margin:0 0 10px}
+.sm-seg::-webkit-scrollbar{display:none}
+.sm-seg button{border:1px solid var(--line);background:transparent;color:var(--black);font-family:'Poppins',sans-serif;font-size:12.5px;font-weight:500;padding:7px 14px;border-radius:999px;cursor:pointer;white-space:nowrap}
+.sm-seg button.on{background:var(--black);border-color:var(--black);color:var(--cream);font-weight:600}
+.sm-card{align-self:flex-start;width:min(78vw,280px);border-radius:22px;padding:16px 16px 14px;display:flex;flex-direction:column;gap:4px;background:var(--paper);color:var(--black);box-shadow:0 1px 2px rgba(0,0,0,.04);border:none;text-align:left;font-family:inherit}
+.sm-card .mn{font-family:'Poppins',sans-serif;font-weight:600;font-size:9.5px;letter-spacing:.14em;text-transform:uppercase;opacity:.7;display:flex;justify-content:space-between;align-items:center;gap:8px}
+.sm-card .lt{display:inline-flex;align-items:center;gap:6px;letter-spacing:.06em}
+.sm-card .lt i{width:10px;height:10px;border-radius:50%;background:currentColor;box-shadow:0 0 0 3px rgba(255,255,255,.35)}
+.sm-card .gp{font-family:'Poppins',sans-serif;font-weight:300;font-size:40px;line-height:1.05;letter-spacing:-.02em;font-variant-numeric:tabular-nums;margin-top:4px}
+.sm-card .gu{font-size:12.5px;opacity:.8;line-height:1.35}
+.sm-card .gu b{font-weight:600}
+.sm-card .br{height:6px;border-radius:9px;background:rgba(0,0,0,.1);overflow:hidden;margin:6px 0 2px}
+.sm-card .br i{display:block;height:100%;border-radius:9px;background:currentColor}
+.sm-card.ok{background:linear-gradient(165deg,#eef2ea 0%,#cfdcc6 100%);color:#2f4527}
+.sm-card.warn{background:linear-gradient(165deg,#fbf3df 0%,#efd9a0 100%);color:#5e4813}
+.sm-card.bad{background:linear-gradient(165deg,#d98a87 0%,#b8504a 100%);color:#fff}
+.sm-card.live{background:radial-gradient(120% 140% at 100% 0%,rgba(238,205,204,.5) 0%,rgba(201,134,142,.16) 40%,rgba(28,28,28,0) 70%),linear-gradient(160deg,#2a2224 0%,#1C1C1C 60%);color:var(--cream)}
+.sm-nav{display:flex;gap:6px}
+.sm-cal{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:5px;margin:0 0 10px}
+.sm-cal .dw{font-family:'Poppins',sans-serif;font-weight:600;font-size:9px;letter-spacing:.12em;text-transform:uppercase;color:var(--grey);text-align:center;padding:2px 0}
+.sm-cal .dc{border:none;font-family:inherit;cursor:pointer;aspect-ratio:1/1.08;border-radius:12px;padding:6px 4px 5px;display:flex;flex-direction:column;justify-content:space-between;align-items:center;background:var(--paper);color:var(--black);min-width:0}
+.sm-cal .dc .n{font-size:11px;font-weight:600;opacity:.75;align-self:flex-start;padding-left:2px}
+.sm-cal .dc .p{font-family:'Poppins',sans-serif;font-weight:500;font-size:12.5px;font-variant-numeric:tabular-nums;letter-spacing:-.01em}
+.sm-cal .dc{position:relative}
+.sm-cal .dc .e{width:6px;height:6px;border-radius:50%;background:var(--rosa-deep);position:absolute;top:7px;right:7px}
+.sm-cal .dc.bad .e,.sm-cal .dc.live .e{background:var(--rosa)}
+.sm-cal .dc.ok{background:#cfdcc6;color:#2f4527}
+.sm-cal .dc.warn{background:#efd9a0;color:#5e4813}
+.sm-cal .dc.bad{background:#b8504a;color:#fff}
+.sm-cal .dc.fut{background:transparent;border:1px dashed var(--line);color:var(--grey)}
+.sm-cal .dc.fut .p{font-size:10.5px;font-weight:400}
+.sm-cal .dc.live{background:var(--black);color:var(--cream)}
+.sm-cal .dc.today{outline:2px solid var(--rosa-deep);outline-offset:1px}
+.sm-cal .dc:focus-visible{outline:2px solid var(--black);outline-offset:2px}
+.sm-cal .gap{visibility:hidden}
+.sm-leg{display:flex;flex-wrap:wrap;gap:6px 14px;justify-content:center;font-size:11px;color:var(--grey);margin:0 0 6px}
+.sm-leg span{display:inline-flex;align-items:center;gap:5px}
+.sm-leg i{width:10px;height:10px;border-radius:3px;display:inline-block}
+.sm-leg i.ok{background:#cfdcc6}.sm-leg i.warn{background:#efd9a0}.sm-leg i.bad{background:#b8504a}.sm-leg i.fut{border:1px dashed var(--line)}
+.sm-rows{display:flex;flex-direction:column;gap:8px;margin-bottom:12px}
+.sm-row{display:grid;grid-template-columns:auto 1fr auto;align-items:center;gap:12px;background:var(--paper);border-radius:16px;padding:12px 14px}
+.sm-row .dot{width:12px;height:12px;border-radius:50%;background:var(--line)}
+.sm-row .dot.ok{background:#5a7a4f}.sm-row .dot.warn{background:#c4a04a}.sm-row .dot.bad{background:#b8504a}.sm-row .dot.live{background:var(--rosa-deep)}
+.sm-row .nm{font-weight:600;font-size:14px}
+.sm-row .sb{font-size:12px;color:var(--grey)}
+.sm-row .vl{text-align:right;font-variant-numeric:tabular-nums}
+.sm-row .vl b{display:block;font-weight:500;font-size:15px}
+.sm-row .vl span{font-size:11.5px;color:var(--grey)}
+@media (min-width:900px){.sm-cal{max-width:720px}.sm-cal .dc .p{font-size:14px}}
 .eyebrow{font-family:'Poppins',sans-serif;font-weight:600;font-size:9.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--grey);margin:16px 2px 8px;display:flex;justify-content:space-between;align-items:center}
 .eyebrow .act{font-size:12px;letter-spacing:0;text-transform:none;font-weight:600;color:var(--black);border:none;background:var(--paper);border-radius:999px;padding:7px 12px;cursor:pointer;box-shadow:0 1px 2px rgba(0,0,0,.05)}
 /* KPIs en carrusel */
@@ -1578,13 +1628,24 @@ a.act-card{text-decoration:none}
 
     <div class="sec-hero" id="anHero"><div class="k">Analytics</div><p class="say">Cargando ventas…</p></div>
     <div class="sub-tabs" data-tabs="an">
-      <button class="on" data-tab="canales">Canales</button>
+      <button class="on" data-tab="semaforo">Semáforo</button>
+      <button data-tab="canales">Canales</button>
       <button data-tab="tienda">Tienda</button>
       <button data-tab="online">Online</button>
       <button data-tab="demanda">Demanda</button>
       <button data-tab="jeans">Jeans</button>
     </div>
-    <div data-panel="an:canales"><div class="rail" id="anChannels"></div><div class="rail-hint" id="anChannelsHint">Presupuesto de Juliana contra la venta real del mes, por canal</div></div>
+    <div data-panel="an:semaforo">
+      <div class="sm-seg" id="smSeg" role="tablist" aria-label="Canal"></div>
+      <div class="rail" id="smCards"></div>
+      <div class="eyebrow"><span id="smMonthLbl">Día a día</span>
+        <span class="sm-nav"><button class="act" id="smPrev" aria-label="Mes anterior">‹</button><button class="act" id="smNext" aria-label="Mes siguiente">›</button></span></div>
+      <div class="sm-cal" id="smCal"><div class="empty-state">Cargando…</div></div>
+      <div class="sm-leg"><span><i class="ok"></i>Cumplido</span><span><i class="warn"></i>Casi (90 a 99 %)</span><span><i class="bad"></i>No cumplido</span><span><i class="fut"></i>Por venir</span></div>
+      <div class="rail-hint" id="smFoot">Venta neta sin IVA contra el presupuesto diario. Toca un día para ver cada canal.</div>
+      <div class="need-sheet" id="smSheet"><div class="bg" data-sm-close></div><div class="pn" id="smSheetBody"></div></div>
+    </div>
+    <div data-panel="an:canales" hidden><div class="rail" id="anChannels"></div><div class="rail-hint" id="anChannelsHint">Presupuesto de Juliana contra la venta real del mes, por canal</div></div>
     <div data-panel="an:tienda" hidden>
     <div class="mk-tabs" id="stPeriod">
       <button class="mk-tab active" data-st="hoy">Hoy</button>
@@ -4083,6 +4144,174 @@ async function renderChannels(){
   hero.innerHTML = `<div class="k">${MESF[now.getUTCMonth()]}, al ${now.getUTCDate()}</div><p class="say">${cT == null ? `Llevamos <b>${mill(T.real)}</b> este mes.` : `Vamos en <b>${mill(T.real)}</b> de ${mill(T.toDate)} que debíamos llevar: <em>${Math.round(cT * 100)} %</em>. ${best[0] >= 0 ? `${best[1]} es el canal que mejor va` : ''}${worst[0] < 9 && worst[1] !== best[1] ? `, ${worst[1]} el que más falta` : ''}.`}</p>`;
 }
 
+// ═══ Analytics · semáforo diario del presupuesto ═══
+// Cada día: venta neta sin IVA (sales_channel_daily, la llena refresh-channels cada hora) contra budget_daily.
+// Verde = cumplido (≥ th_on_target), amarillo = casi (≥ th_attention), rojo = no cumplido.
+// "Atrás" = presupuesto de los días ya cerrados − lo vendido esos días. Hoy va aparte, "en curso".
+// Total = Tienda + Online + WhatsApp + Falabella (Falabella no tiene presupuesto propio, pero su venta suma).
+const SM_CH = [['total', 'Total'], ['tienda', 'Tienda'], ['online', 'Online'], ['whatsapp', 'WhatsApp']];
+const SM_CHN = { tienda: 'Tienda', online: 'Online', whatsapp: 'WhatsApp', falabella: 'Falabella', otro: 'Otros' };
+const SM_MES = ['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'];
+const SM_DOW = ['domingo','lunes','martes','miércoles','jueves','viernes','sábado'];
+let smCh = 'total', smMonth = null, smCache = {}, smTh = null, smRange = null, smData = null;
+const smToday = () => new Date(Date.now() - 5 * 3600_000).toISOString().slice(0, 10);
+const smMill = v => { const a = Math.abs(v), sg = v < 0 ? '−' : ''; return sg + (a >= 1e6 ? '$' + (a / 1e6).toFixed(1).replace('.', ',') + ' M' : '$' + Math.round(a / 1e3).toLocaleString('es-CO') + ' mil'); };
+const smShort = v => v >= 1e6 ? '$' + (v / 1e6).toFixed(1).replace('.', ',') + 'M' : '$' + Math.round(v / 1e3) + 'k';
+const smPct = (s, g) => g ? Math.floor(s / g * 100) : null; // hacia abajo: 99,6 % no es 100 %
+const smLong = iso => { const d = new Date(iso + 'T12:00:00Z'); return `${SM_DOW[d.getUTCDay()]} ${d.getUTCDate()} de ${SM_MES[d.getUTCMonth()]}`; };
+const smShortDay = iso => { const d = new Date(iso + 'T12:00:00Z'); return `${SM_DOW[d.getUTCDay()].slice(0, 3)} ${d.getUTCDate()}`; };
+
+async function smLoad(month, force){
+  if (smCache[month] && !force) return smCache[month];
+  const [y, m] = month.split('-').map(Number);
+  const n = new Date(Date.UTC(y, m, 0)).getUTCDate();
+  const m0 = `${month}-01`, mEnd = `${month}-${String(n).padStart(2, '0')}`;
+  const [bd, sd, st] = await Promise.all([
+    supabase.from('budget_daily').select('day,channel,amount,event').gte('day', m0).lte('day', mEnd),
+    supabase.from('sales_channel_daily').select('day,channel,net,orders,updated_at').gte('day', m0).lte('day', mEnd),
+    smTh ? Promise.resolve({ data: smTh }) : supabase.from('budget_settings').select('th_on_target,th_attention').eq('id', 1).maybeSingle(),
+  ]);
+  if (bd.error) throw bd.error;
+  smTh = st.data || { th_on_target: 1, th_attention: .9 };
+  const days = {};
+  for (let d = 1; d <= n; d++){ const k = `${month}-${String(d).padStart(2, '0')}`; days[k] = { day: k, event: null, goal: {}, sold: {}, orders: {} }; }
+  (bd.data || []).forEach(r => { const x = days[r.day]; if (!x) return; x.goal[r.channel] = (x.goal[r.channel] || 0) + +r.amount; if (r.event) x.event = r.event; });
+  let upd = null;
+  (sd.data || []).forEach(r => { const x = days[r.day]; if (!x) return; x.sold[r.channel] = (x.sold[r.channel] || 0) + +r.net; x.orders[r.channel] = (x.orders[r.channel] || 0) + (r.orders || 0); if (!upd || r.updated_at > upd) upd = r.updated_at; });
+  return (smCache[month] = { month, days: Object.values(days), upd });
+}
+function smVal(x, ch){
+  const sum = o => Object.values(o).reduce((a, b) => a + b, 0);
+  return ch === 'total' ? { goal: sum(x.goal), sold: sum(x.sold), orders: sum(x.orders) } : { goal: x.goal[ch] || 0, sold: x.sold[ch] || 0, orders: x.orders[ch] || 0 };
+}
+function smState(goal, sold){
+  if (!goal) return 'sin';
+  const r = sold / goal, th = smTh || { th_on_target: 1, th_attention: .9 };
+  return r >= th.th_on_target ? 'ok' : r >= th.th_attention ? 'warn' : 'bad';
+}
+function smSummary(data, ch, today){
+  const S = { goalClosed: 0, soldClosed: 0, goalMonth: 0, soldAll: 0, goalRest: 0, daysRest: 0, ok: 0, warn: 0, bad: 0 };
+  data.days.forEach(x => {
+    const v = smVal(x, ch); S.goalMonth += v.goal;
+    if (x.day <= today) S.soldAll += v.sold;
+    if (x.day < today){ S.goalClosed += v.goal; S.soldClosed += v.sold; const st = smState(v.goal, v.sold); if (S[st] != null) S[st]++; }
+    else { S.goalRest += v.goal; if (v.goal) S.daysRest++; }
+  });
+  S.gap = S.soldClosed - S.goalClosed;
+  S.falta = Math.max(0, S.goalMonth - S.soldAll);
+  return S;
+}
+const SM_LBL = { ok: 'Cumplido', warn: 'Casi', bad: 'No cumplido', sin: 'Sin meta' };
+
+async function renderSemaforo(force){
+  const cards = document.getElementById('smCards'), cal = document.getElementById('smCal');
+  if (!cards || !cal) return;
+  const today = smToday();
+  if (!smMonth) smMonth = today.slice(0, 7);
+  if (!smRange){
+    const [a, b] = await Promise.all([
+      supabase.from('budget_daily').select('day').order('day', { ascending: true }).limit(1).maybeSingle(),
+      supabase.from('budget_daily').select('day').order('day', { ascending: false }).limit(1).maybeSingle(),
+    ]);
+    smRange = [a.data?.day?.slice(0, 7) || smMonth, b.data?.day?.slice(0, 7) || smMonth];
+  }
+  const seg = document.getElementById('smSeg');
+  seg.innerHTML = SM_CH.map(([c, l]) => `<button role="tab" aria-selected="${c === smCh}" class="${c === smCh ? 'on' : ''}" data-sm-ch="${c}">${l}</button>`).join('');
+  seg.querySelectorAll('[data-sm-ch]').forEach(b => b.addEventListener('click', () => { smCh = b.getAttribute('data-sm-ch'); renderSemaforo(); }));
+  const prev = document.getElementById('smPrev'), next = document.getElementById('smNext');
+  prev.disabled = smMonth <= smRange[0]; next.disabled = smMonth >= smRange[1];
+  prev.style.opacity = prev.disabled ? .35 : 1; next.style.opacity = next.disabled ? .35 : 1;
+
+  const data = smData = await smLoad(smMonth, force || smMonth === today.slice(0, 7));
+  const [y, m] = smMonth.split('-').map(Number);
+  const S = smSummary(data, smCh, today);
+  const isCur = smMonth === today.slice(0, 7), isPast = smMonth < today.slice(0, 7);
+  const mesL = SM_MES[m - 1], chL = SM_CH.find(c => c[0] === smCh)[1];
+  document.getElementById('smMonthLbl').textContent = `${mesL.charAt(0).toUpperCase() + mesL.slice(1)} día a día${smCh === 'total' ? '' : ', ' + chL}`;
+
+  const out = [];
+  // Ayer
+  const yIso = new Date(new Date(today + 'T12:00:00Z').getTime() - 86400_000).toISOString().slice(0, 10);
+  const yRow = isCur && data.days.find(x => x.day === yIso);
+  if (yRow){
+    const v = smVal(yRow, smCh), st = smState(v.goal, v.sold), d = v.sold - v.goal;
+    out.push(`<button class="sm-card ${st === 'sin' ? '' : st}" data-sm-day="${yIso}"><span class="mn"><span>Ayer, ${smShortDay(yIso)}</span><span class="lt"><i></i>${SM_LBL[st]}</span></span>
+      <span class="gp">${v.goal ? smPct(v.sold, v.goal) + ' %' : smMill(v.sold)}</span>
+      <span class="gu">${smMill(v.sold)} de ${smMill(v.goal)}. ${v.goal ? (d >= 0 ? `Se pasó por <b>${smMill(d)}</b>.` : `Faltaron <b>${smMill(-d)}</b>.`) : ''}</span></button>`);
+  }
+  // Hoy
+  const tRow = isCur && data.days.find(x => x.day === today);
+  if (tRow){
+    const v = smVal(tRow, smCh), p = smPct(v.sold, v.goal), f = v.goal - v.sold;
+    out.push(`<button class="sm-card live" data-sm-day="${today}"><span class="mn"><span>Hoy, en curso</span><span class="lt">${tRow.event ? escapeHtml(tRow.event) : ''}</span></span>
+      <span class="gp">${p != null ? p + ' %' : smMill(v.sold)}</span>
+      <span class="br"><i style="width:${Math.min(100, p || 0)}%;background:var(--rosa)"></i></span>
+      <span class="gu">${smMill(v.sold)} de ${smMill(v.goal)}. ${v.goal ? (f > 0 ? `Faltan <b>${smMill(f)}</b> para la meta.` : `<b>Meta cumplida</b>, va ${smMill(-f)} arriba.`) : ''}</span></button>`);
+  }
+  // Mes
+  if (S.goalMonth){
+    if (isPast){
+      const st = smState(S.goalMonth, S.soldAll), d = S.soldAll - S.goalMonth;
+      out.push(`<div class="sm-card ${st}"><span class="mn"><span>Cierre de ${mesL}</span><span class="lt"><i></i>${SM_LBL[st]}</span></span>
+        <span class="gp">${smPct(S.soldAll, S.goalMonth)} %</span>
+        <span class="gu">${smMill(S.soldAll)} de ${smMill(S.goalMonth)}. ${d >= 0 ? `Se pasó por <b>${smMill(d)}</b>` : `Quedó <b>${smMill(-d)} atrás</b>`}. ${S.ok} días en verde, ${S.warn} en amarillo y ${S.bad} en rojo.</span></div>`);
+    } else if (S.goalClosed){
+      const st = smState(S.goalClosed, S.soldClosed);
+      const per = S.daysRest ? S.falta / S.daysRest : 0, plan = S.daysRest ? S.goalRest / S.daysRest : 0, r = S.goalRest ? Math.round(S.falta / S.goalRest * 100) : null;
+      out.push(`<div class="sm-card ${st}"><span class="mn"><span>${mesL} hasta ayer</span><span class="lt"><i></i>${S.gap >= 0 ? 'Adelante' : 'Atrás'}</span></span>
+        <span class="gp">${S.gap >= 0 ? '+' : ''}${smMill(S.gap)}</span>
+        <span class="gu">${S.gap >= 0 ? 'por encima' : 'por debajo'} del presupuesto: ${smMill(S.soldClosed)} de ${smMill(S.goalClosed)}. ${S.ok} días en verde, ${S.warn} en amarillo y ${S.bad} en rojo.</span>
+        ${S.daysRest ? `<span class="gu" style="margin-top:4px">Para cerrar en ${smMill(S.goalMonth)} cada día que queda necesita <b>${smMill(per)}</b> en promedio, el plan dice ${smMill(plan)}${r != null ? ` (${r} %)` : ''}.</span>` : ''}</div>`);
+    } else {
+      out.push(`<div class="sm-card"><span class="mn"><span>Meta de ${mesL}</span></span><span class="gp">${smMill(S.goalMonth)}</span>
+        <span class="gu">${S.daysRest} días con presupuesto, en promedio ${smMill(S.goalMonth / (S.daysRest || 1))} por día.</span></div>`);
+    }
+  } else {
+    out.push(`<div class="sm-card"><span class="mn"><span>${mesL}</span></span><span class="gu">Este mes no tiene presupuesto cargado${smCh === 'total' ? '' : ' para ' + chL}.</span></div>`);
+  }
+  cards.innerHTML = out.join('');
+
+  // Calendario
+  const first = (new Date(Date.UTC(y, m - 1, 1)).getUTCDay() + 6) % 7;
+  let html = ['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom'].map(d => `<span class="dw">${d}</span>`).join('');
+  for (let i = 0; i < first; i++) html += '<span class="dc gap"></span>';
+  data.days.forEach(x => {
+    const v = smVal(x, smCh), dn = +x.day.slice(8);
+    let cls, txt;
+    if (x.day > today){ cls = 'fut'; txt = v.goal ? smShort(v.goal) : ''; }
+    else if (x.day === today){ cls = 'live today'; txt = v.goal ? smPct(v.sold, v.goal) + '%' : ''; }
+    else { const st = smState(v.goal, v.sold); cls = st === 'sin' ? '' : st; txt = v.goal ? smPct(v.sold, v.goal) + '%' : smShort(v.sold); }
+    const lab = `${smLong(x.day)}: ${smMill(v.sold)} de ${smMill(v.goal)}${x.event ? ', ' + x.event : ''}`;
+    html += `<button class="dc ${cls}" data-sm-day="${x.day}" aria-label="${escapeHtml(lab)}" title="${escapeHtml(lab)}"><span class="n">${dn}</span><span class="p">${txt}</span>${x.event ? '<span class="e"></span>' : ''}</button>`;
+  });
+  cal.innerHTML = html;
+  document.querySelectorAll('#smCards [data-sm-day], #smCal [data-sm-day]').forEach(b => b.addEventListener('click', () => smOpenDay(b.getAttribute('data-sm-day'))));
+  const mins = data.upd ? Math.round((Date.now() - new Date(data.upd).getTime()) / 60000) : null;
+  document.getElementById('smFoot').textContent = `Venta neta sin IVA contra el presupuesto diario${mins != null && isCur ? `, actualizada hace ${mins < 60 ? mins + ' min' : Math.round(mins / 60) + ' h'}` : ''}. Toca un día para ver cada canal.`;
+}
+function smOpenDay(iso){
+  const x = smData && smData.days.find(d => d.day === iso); if (!x) return;
+  const today = smToday(), T = smVal(x, 'total'), live = iso === today, fut = iso > today;
+  const chs = ['tienda', 'online', 'whatsapp', 'falabella', 'otro'].filter(c => (x.goal[c] || 0) > 0 || (x.sold[c] || 0) > 0);
+  const st = smState(T.goal, T.sold), d = T.sold - T.goal;
+  const head = fut ? `Meta del día ${smMill(T.goal)}.` : live ? `En curso: ${smMill(T.sold)} de ${smMill(T.goal)}${T.goal ? `, faltan ${smMill(Math.max(0, -d))}` : ''}.`
+    : `${SM_LBL[st]}: ${smMill(T.sold)} de ${smMill(T.goal)}${T.goal ? (d >= 0 ? `, se pasó por ${smMill(d)}` : `, faltaron ${smMill(-d)}`) : ''}.`;
+  const rows = chs.map(c => {
+    const g = x.goal[c] || 0, s = x.sold[c] || 0, o = x.orders[c] || 0, cs = fut ? '' : live ? 'live' : smState(g, s);
+    return `<div class="sm-row"><span class="dot ${cs}"></span><span><span class="nm">${SM_CHN[c]}</span><br><span class="sb">${fut ? 'por venir' : `${o} pedido${o === 1 ? '' : 's'}`}${g ? '' : ', sin presupuesto'}</span></span>
+      <span class="vl"><b>${fut ? smMill(g) : smMill(s)}</b><span>${fut ? 'meta' : g ? `de ${smMill(g)}, ${smPct(s, g)} %` : ''}</span></span></div>`;
+  }).join('') || '<div class="sm-row"><span></span><span class="sb">Sin presupuesto ni ventas este día.</span><span></span></div>';
+  document.getElementById('smSheetBody').innerHTML = `<div class="gr"></div><h3>${smLong(iso).charAt(0).toUpperCase() + smLong(iso).slice(1)}</h3>
+    <div class="sub">${x.event ? escapeHtml(x.event) + '. ' : ''}${head}</div><div class="sm-rows">${rows}</div>
+    <div class="need-foot">Montos sin IVA. Con IVA la meta del día es ${smMill(T.goal * 1.19)}.</div>`;
+  document.getElementById('smSheet').classList.add('on');
+}
+document.getElementById('smSheet')?.querySelector('[data-sm-close]')?.addEventListener('click', () => document.getElementById('smSheet').classList.remove('on'));
+document.getElementById('smPrev')?.addEventListener('click', () => { const [y, m] = smMonth.split('-').map(Number); const d = new Date(Date.UTC(y, m - 2, 1)); smMonth = d.toISOString().slice(0, 7); renderSemaforo().catch(e => console.warn('semáforo', e)); });
+document.getElementById('smNext')?.addEventListener('click', () => { const [y, m] = smMonth.split('-').map(Number); const d = new Date(Date.UTC(y, m, 1)); smMonth = d.toISOString().slice(0, 7); renderSemaforo().catch(e => console.warn('semáforo', e)); });
+// La venta se actualiza cada hora: refrescar cada 10 min mientras la app está abierta
+setInterval(() => { if (document.visibilityState === 'visible' && typeof user !== 'undefined' && user && smMonth === smToday().slice(0, 7)) renderSemaforo(true).catch(() => {}); }, 600_000);
+
 // ═══ Inicio · hero del día ═══
 // Una frase con lo que importa hoy: tus piezas, la meta de la tienda y lo que llega esta semana.
 let homeMine = null, homeName = '';
@@ -4109,6 +4338,13 @@ async function renderHomeHero(){
   const parts = [];
   parts.push(n ? `tienes <b>${n} pieza${n === 1 ? '' : 's'}</b> por entregar${done ? ` (${done} lista${done === 1 ? '' : 's'})` : ''}` : 'no tienes piezas asignadas');
   if (goal) parts.push(pct >= 100 ? `la tienda <em>ya cumplió</em> la meta del día` : `la tienda va en <b>${pct} %</b> de su meta`);
+  try {
+    const md = await smLoad(today.slice(0, 7), true), S = smSummary(md, 'total', today);
+    const yIso = new Date(new Date(today + 'T12:00:00Z').getTime() - 86400_000).toISOString().slice(0, 10);
+    const yr = md.days.find(x => x.day === yIso), yv = yr && smVal(yr, 'total');
+    if (yv && yv.goal) parts.push(yv.sold >= yv.goal ? `ayer <em>cumplimos</em> el presupuesto` : `ayer quedamos <b>${smMill(yv.goal - yv.sold)}</b> cortos`);
+    if (S.goalClosed) parts.push(S.gap >= 0 ? `el mes va <em>${smMill(S.gap)} adelante</em>` : `el mes va <b>${smMill(-S.gap)} atrás</b> del presupuesto`);
+  } catch (e) { console.warn('semáforo home', e); }
   if (units) parts.push(`esta semana llegan <b>${units.toLocaleString('es-CO')} jeans</b>`);
   const say = `${hello}, <b>${escapeHtml(homeName)}</b>. Hoy ${parts.join(', ')}.`;
   const mill = v => '$' + (v / 1e6).toFixed(1).replace('.', ',') + ' M';
@@ -6847,6 +7083,7 @@ document.addEventListener('click', e => {
 async function loadCalendars(){
   loadPac().then(() => { renderTrimestre(); renderWeekNow().catch(e => console.warn('semana', e)); }).catch(e => console.warn('trimestre', e));
   renderChannels().catch(e => console.warn('canales', e));
+  renderSemaforo(true).catch(e => console.warn('semáforo', e));
   const { data, error } = await supabase
     .from('calendars')
     .select('id, week_number, start_date, end_date, status')
