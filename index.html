@@ -1248,6 +1248,12 @@ a.act-card{text-decoration:none}
 .brief-amt{flex-shrink:0;font-size:13px;font-weight:600;color:var(--rosa-deep);font-variant-numeric:tabular-nums}
 .brief-amt.total{color:var(--black);font-size:14px}
 .brief-week-head{display:flex;justify-content:space-between;align-items:center;padding:10px 16px 6px;background:#faf9f7;font-size:12px;font-weight:600;color:#8e8e93;text-transform:uppercase;letter-spacing:.04em;border-bottom:1px solid rgba(0,0,0,.045)}
+/* Inicio en 3 bloques: frase del día, tareas y por aprobar. Lanzamientos y alertas viven en su sección. */
+#briefLaunchWrap,#briefAlertsWrap{display:none!important}
+#hubProduccion #briefPaymentsWrap{margin:4px 0 14px}
+.home-foot{display:flex;align-items:center;gap:18px;margin-top:22px;padding:0 4px;font-size:12px}
+.home-foot a{color:var(--grey);text-decoration:none;font-weight:500}
+.home-foot button{border:none;background:none;color:var(--grey);font:500 12px Poppins,sans-serif;padding:0;margin-left:auto;cursor:pointer}
 .brief-wa{display:flex;align-items:center;justify-content:center;gap:8px;margin-top:22px;padding:13px;background:rgba(37,211,102,.12);color:#128c4b;border-radius:999px;text-decoration:none;font-size:14px;font-weight:600}
 .brief-wa:active{opacity:.7}
 
@@ -1417,8 +1423,8 @@ a.act-card{text-decoration:none}
   header .logo{display:none}
   .hub-section{left:0;padding-left:calc(var(--side) + 48px);padding-right:40px;padding-top:28px}
   .footer{padding-left:calc(var(--side) + 48px)}
-  .hub-brief{display:grid;grid-template-columns:minmax(0,1fr) 440px;grid-template-rows:auto auto auto auto auto auto 1fr;grid-template-areas:"hero hero" "bar bar" "tasks board" "launches board" "alerts board" "payments board" "wa board";gap:0 28px;align-items:start}
-  .hub-brief.no-board{grid-template-columns:minmax(0,860px);grid-template-areas:"hero" "bar" "tasks" "launches" "alerts" "payments" "wa"}
+  .hub-brief{display:grid;grid-template-columns:minmax(0,1fr) 440px;grid-template-rows:auto auto 1fr;grid-template-areas:"hero hero" "tasks board" "wa board";gap:0 28px;align-items:start}
+  .hub-brief.no-board{grid-template-columns:minmax(0,860px);grid-template-areas:"hero" "tasks" "wa"}
   .home-hero{grid-area:hero;padding:28px 30px 24px;margin-bottom:14px}
   .home-hero .say{font-size:27px;max-width:900px}
   .home-stats{max-width:720px}
@@ -1429,7 +1435,7 @@ a.act-card{text-decoration:none}
   #briefApprovalsWrap::-webkit-scrollbar{display:none}
   #briefAlertsWrap{grid-area:alerts}
   #briefPaymentsWrap{grid-area:payments}
-  .brief-wa{grid-area:wa;justify-self:start}
+  .home-foot{grid-area:wa}
   #briefAlerts .brief-row{flex:0 0 calc(33.333% - 7px)}
   .brief-title{margin-top:12px}
   .rail{flex-wrap:wrap;overflow:visible;scroll-snap-type:none}
@@ -1481,13 +1487,6 @@ a.act-card{text-decoration:none}
   <!-- HUB HOME · brief del día: tus tareas + a tener en cuenta -->
   <section id="hubHome" class="hub-brief">
     <div class="home-hero" id="homeHero"><div class="k" id="briefDate">—</div><p class="say">Cargando tu día…</p></div>
-    <div class="session-bar">
-      <div class="session-status">
-        <span class="sync-dot connected"></span>
-        <span class="editor-chip" id="editorList">—</span>
-      </div>
-      <button class="signout-btn" id="signOutBtn">Salir</button>
-    </div>
 
     <div id="briefTasksWrap">
       <h2 class="brief-title">Tus tareas de hoy</h2>
@@ -1515,12 +1514,7 @@ a.act-card{text-decoration:none}
       <div id="briefAlerts" class="brief-list"><div class="brief-empty">Cargando…</div></div>
     </div>
 
-    <div id="briefPaymentsWrap" hidden>
-      <h2 class="brief-title">Próximos pagos a proveedores</h2>
-      <div id="briefPayments" class="brief-list"></div>
-    </div>
-
-    <a class="brief-wa" href="https://chat.whatsapp.com/GCmEivfGHfxL9NwWcES7IF?mode=gi_t" target="_blank" rel="noopener">💬 Grupo del equipo <span>↗</span></a>
+    <div class="home-foot"><a href="https://chat.whatsapp.com/GCmEivfGHfxL9NwWcES7IF?mode=gi_t" target="_blank" rel="noopener">Grupo del equipo ↗</a><span id="editorList" hidden></span><button id="signOutBtn">Salir</button></div>
   </section>
 
   <!-- MARKETING DEPT · calendarios semanales. Los lanzamientos viven en Inicio. -->
@@ -1566,6 +1560,10 @@ a.act-card{text-decoration:none}
       <div class="rail-hint" id="sbHint">Cada columna es una etapa del proceso. Toca un jean para abrir su desglose o marca la etapa desde la tarjeta</div>
     </div>
     <div data-panel="pr:proveedores" hidden>
+    <div id="briefPaymentsWrap" hidden>
+      <h2 class="brief-title">Próximos pagos a proveedores</h2>
+      <div id="briefPayments" class="brief-list"></div>
+    </div>
     <a class="fa-inv-link" id="colLink" href="coleccion.html" hidden>🧵 Atelier · colección y órdenes de compra <span>›</span></a>
     <a class="fa-inv-link" href="#bodega" data-section="bodega">Bodega casa, recepción y traslados a la tienda <span>›</span></a>
     <!-- Cumplimiento por proveedor -->
@@ -4356,7 +4354,7 @@ async function renderHomeHero(){
       <button data-go="fashionalytics"><span class="v">${goal ? mill(sold) : '—'}</span><span class="l">${goal ? 'de ' + mill(goal) + ' en tienda' : 'tienda hoy'}</span></button>
       <button data-go="produccion"><span class="v">${units.toLocaleString('es-CO')}</span><span class="l">jeans llegan esta semana</span></button>
     </div>
-    ${photos.length ? `<div class="home-ph">${photos.map(u => `<img src="${escapeHtml(u)}" alt="" loading="lazy">`).join('')}${arr.length > photos.length ? `<span>+${arr.length - photos.length}</span>` : ''}</div>` : ''}`;
+    `;
   el.querySelectorAll('[data-go]').forEach(b => b.addEventListener('click', () => showHubSection(b.getAttribute('data-go'))));
 }
 
