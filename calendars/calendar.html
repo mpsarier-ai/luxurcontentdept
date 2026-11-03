@@ -304,6 +304,11 @@ img{display:block}
   .sheet .pn{border-radius:26px;bottom:24px;left:24px;right:24px}
 }
 
+/* ── calendario simplificado ── */
+.hero-go{margin-top:14px;border:none;border-radius:999px;padding:10px 16px;font:600 12.5px Poppins,sans-serif;background:var(--rosa);color:#8e3b45;cursor:pointer}
+.day-card .ph,.day-card .who{display:none}
+@media (min-width:1024px){ .hero-go{display:none!important} }
+
 /* ── columna de aprobación (escritorio) ── */
 .ap-side{display:none}
 .kpis{display:none}
@@ -443,19 +448,14 @@ img{display:block}
   <section class="sec-hero" id="hero">
     <div class="k"><span id="heroK">Calendario</span><a href="../index.html?stay=1" id="heroLink">Todas las semanas</a></div>
     <p class="say" id="heroSay">Cargando la semana…</p>
-    <div class="ph" id="heroPh"></div>
+    <button class="hero-go" id="heroGo" style="display:none"></button>
   </section>
-
-  <div class="kpis" id="kpis"></div>
 
   <div class="rail" id="dayRail"></div>
 
   <div class="sub-tabs" id="tabs">
     <button class="on" data-tab="dia">Día</button>
     <button data-tab="semana">Semana</button>
-    <button data-tab="equipo">Equipo</button>
-    <button data-tab="inventario">Inventario</button>
-    <button data-tab="midcheck">Midcheck</button>
   </div>
 
   <!-- DÍA -->
@@ -463,9 +463,6 @@ img{display:block}
     <div class="eyebrow"><span id="diaLabel">Piezas del día</span><button class="act" id="diaAdd">+ Pieza</button></div>
     <div class="rail" id="pieceRail"></div>
     <p class="rail-hint" id="diaHint">Toca una pieza para editarla, subir el arte o aprobarla</p>
-    <div class="eyebrow"><span>Jeans del día en Shopify</span><button class="act" id="prodAdd">+ Producto</button></div>
-    <div id="prodPicker" style="display:none;margin:0 0 10px"><input list="catalogList" class="inp" id="prodInput" placeholder="Busca un producto de la tienda…" autocomplete="off"></div>
-    <div class="rail" id="prodRail"></div>
   </div>
 
   <!-- SEMANA -->
@@ -473,51 +470,14 @@ img{display:block}
     <div class="eyebrow"><span>Toda la semana</span><span id="weekMeta"></span></div>
     <div class="rail" id="weekRail"></div>
     <p class="rail-hint">Desliza para ver los siete días, toca una pieza para abrirla</p>
-    <div class="eyebrow"><span>Cómo vendió la tienda, últimos 7 días</span><span id="salesStamp"></span></div>
-    <div class="rail" id="statRail"></div>
-    <div class="eyebrow"><span>Lo que más se vendió</span></div>
-    <div class="rail" id="sellRail"></div>
   </div>
 
-  <!-- EQUIPO -->
-  <div data-panel="equipo">
-    <div class="eyebrow"><span>Carga por persona</span><button class="act" id="mineToggle">Solo lo mío</button></div>
-    <div class="rail" id="teamRail"></div>
-    <p class="rail-hint">Toca a alguien para ver solo sus piezas en Día y Semana</p>
-    <div class="eyebrow"><span>Esperan aprobación</span><span id="apMeta"></span></div>
-    <div class="rail" id="approveRail"></div>
-    <div class="eyebrow"><span>Ya aprobadas, lo más reciente primero</span><span id="apDoneMeta"></span></div>
-    <div class="rail" id="approvedRail"></div>
-  </div>
-
-  <!-- INVENTARIO -->
+  <!-- INVENTARIO (solo se abre desde el link de Inicio, sin pestaña) -->
   <div data-panel="inventario">
     <div class="inv-tools"><input type="text" id="invSearch" placeholder="Buscar un producto de la tienda…"></div>
     <div id="invGroups"></div>
   </div>
 
-  <!-- MIDCHECK -->
-  <div data-panel="midcheck">
-    <div class="eyebrow"><span id="midcheckMeta">Midcheck</span></div>
-    <div class="rail">
-      <div class="mc"><h4>Tracking</h4>
-        <div class="ln" data-field="mid-t1" contenteditable="true" data-ph="Qué va bien"></div>
-        <div class="ln" data-field="mid-t2" contenteditable="true" data-ph="Qué va flojo"></div>
-        <div class="ln" data-field="mid-t3" contenteditable="true" data-ph="Dato que sorprendió"></div>
-      </div>
-      <div class="mc"><h4>Decisiones</h4>
-        <div class="ln" data-field="mid-d1" contenteditable="true" data-ph="Qué cambiamos"></div>
-        <div class="ln" data-field="mid-d2" contenteditable="true" data-ph="Qué empujamos"></div>
-        <div class="ln" data-field="mid-d3" contenteditable="true" data-ph="Qué paramos"></div>
-      </div>
-      <div class="mc"><h4>Próximos drops</h4>
-        <div class="ln" data-field="mid-n1" contenteditable="true" data-ph="Qué llega"></div>
-        <div class="ln" data-field="mid-n2" contenteditable="true" data-ph="Qué se agota"></div>
-        <div class="ln" data-field="mid-n3" contenteditable="true" data-ph="Qué preparar"></div>
-      </div>
-    </div>
-    <p class="rail-hint">Se guarda solo mientras escribes</p>
-  </div>
   </div><!-- /main -->
 
   <!-- COLUMNA DE APROBACIÓN (escritorio) -->
@@ -530,7 +490,6 @@ img{display:block}
     </div>
     <div class="aps-list" id="apsList"></div>
     <div class="aps-other" id="apsOther" style="display:none"></div>
-    <div class="aps-done" id="apsDone" style="display:none"></div>
   </aside>
 
   <div class="footer"><span id="footerCalendar">—</span><span id="editorList"></span><button id="signOutBtn">Salir</button></div>
@@ -842,7 +801,7 @@ async function enterApp(){
   }
   await loadCalendar();
   const wantedView = params.get('view');
-  if (wantedView === 'inventory') setTab('inventario');
+  if (wantedView === 'inventory'){ setTab('inventario'); renderInventory(); }
   else if (wantedView === 'calendar') setTab('semana');
 }
 
@@ -862,7 +821,6 @@ async function loadCalendar(){
   document.title = `LUXUR, semana ${cal.week_number}`;
   $('heroK').textContent = `Semana ${cal.week_number}, ${rangeLabel().replace(/^del /, '')}${cal.status === 'active' ? '' : ', ' + cal.status}`;
   $('footerCalendar').textContent = `Semana ${cal.week_number}`;
-  $('midcheckMeta').textContent = `Revisión del ${state.days[2].fullDow.toLowerCase()} ${state.days[2].dnum}`;
 
   const [piecesRes, fieldsRes, teamRes, catalogRes, pipelineRes] = await Promise.all([
     supabase.from('calendar_pieces').select('*').eq('calendar_id', state.calendarId).order('position', { ascending: true }),
@@ -997,32 +955,13 @@ function piecesOf(dayKey){ return visiblePieces().filter(p => p.day === dayKey);
 // === RENDER ===
 function renderAll(){
   if (!state.days.length) return;
-  renderHero(); renderKpis(); renderDayRail(); renderDayPanel(); renderWeekPanel(); renderTeamPanel(); renderInventory(); renderApSide();
+  renderHero(); renderDayRail(); renderDayPanel(); renderWeekPanel(); renderApSide(); if (state.tab === 'inventario') renderInventory();
 }
 
 // === ESCRITORIO: KPIs y columna de aprobación ===
 function dayIdx(key){ const i = state.days.findIndex(d => d.key === key); return i < 0 ? 99 : i; }
 function pendingPieces(){
   return state.pieces.filter(p => p.status === 'listo' && !p.approved).sort((a, b) => dayIdx(a.day) - dayIdx(b.day) || (a.position || 0) - (b.position || 0));
-}
-function renderKpis(){
-  const box = $('kpis'); if (!box) return;
-  const all = state.pieces, total = all.length;
-  const wait = pendingPieces().length, ap = all.filter(p => p.approved).length, done = all.filter(isDone).length;
-  const noOwner = all.filter(p => !p.assignee).length, noArt = all.filter(p => !p.imageUrl && !p.approved).length;
-  const pct = total ? Math.round(done / total * 100) : 0;
-  box.innerHTML = `
-    <button class="kpi ${wait ? 'hot' : ''}" data-kpi="aprobar"><span class="l">Por aprobar</span><span class="v">${wait}<small>${wait === 1 ? 'pieza lista' : 'piezas listas'}</small></span><span class="s">${wait ? 'esperan tu visto bueno' : 'nada pendiente de ti'}</span></button>
-    <button class="kpi" data-kpi="aprobadas"><span class="l">Aprobadas</span><span class="v">${ap}<small>de ${total}</small></span><span class="s">ya se pueden publicar</span></button>
-    <button class="kpi" data-kpi="avance"><span class="l">Avance de la semana</span><span class="v">${pct}<small>%</small></span><span class="s">${done} de ${total} listas o aprobadas</span></button>
-    <button class="kpi" data-kpi="faltan"><span class="l">Sin arte o sin dueño</span><span class="v">${noArt}<small>sin arte</small></span><span class="s">${noOwner ? `${noOwner} sin dueño` : 'todas tienen dueño'}</span></button>`;
-  box.querySelectorAll('[data-kpi]').forEach(b => b.addEventListener('click', () => {
-    const k = b.getAttribute('data-kpi');
-    if (k === 'aprobar'){ const first = pendingPieces()[0]; if (first) openUrlsModal(first.id); else { $('apSide').scrollIntoView({ behavior: 'smooth' }); } }
-    else if (k === 'aprobadas'){ setTab('equipo'); }
-    else if (k === 'avance'){ setTab('semana'); }
-    else { setTab('equipo'); }
-  }));
 }
 function renderApSide(){
   const list = $('apsList'); if (!list) return;
@@ -1056,17 +995,6 @@ function renderApSide(){
     if (card) card.classList.add('gone');
     setTimeout(() => setApproved(id, true), 220);
   }));
-  // Aprobadas hoy, lo más reciente primero
-  const done = state.pieces.filter(p => p.approved).sort((a, b) => String(b.approvedAt || '').localeCompare(String(a.approvedAt || '')));
-  const dn = $('apsDone');
-  if (done.length){
-    dn.style.display = '';
-    dn.innerHTML = `<div class="k"><span>Ya aprobadas</span><span>${done.length}</span></div>` + done.slice(0, 8).map(p => { const img = pieceImage(p); const { title } = splitTitle(p.title);
-      return `<button class="row" data-ap-open="${p.id}">${img ? `<img src="${escapeAttr(img)}" alt="" loading="lazy">` : '<span class="noimg"></span>'}<span style="min-width:0"><span class="t">${escapeHtml(title)}</span><span class="s">✓ ${escapeHtml(approverName(p))}${p.approvedAt ? ', ' + escapeHtml(fmtApprovedAt(p.approvedAt)) : ''}</span></span></button>`; }).join('') +
-      (done.length > 8 ? `<button class="row" id="apsDoneMore" style="justify-content:center;color:var(--grey);font-size:12px">${done.length - 8} más en Equipo</button>` : '');
-    dn.querySelectorAll('[data-ap-open]').forEach(b => b.addEventListener('click', () => openUrlsModal(b.getAttribute('data-ap-open'))));
-    const more = $('apsDoneMore'); if (more) more.addEventListener('click', () => setTab('equipo'));
-  } else { dn.style.display = 'none'; dn.innerHTML = ''; }
 }
 // Otras semanas activas con piezas sin aprobar, para que nada se quede escondido en una semana vieja
 async function loadOtherWeeks(){
@@ -1107,35 +1035,27 @@ function updateNextBtn(pieceId){
 }
 
 function renderHero(){
-  const say = $('heroSay'), ph = $('heroPh');
-  const all = state.pieces;
-  const total = all.length, done = all.filter(isDone).length, waiting = all.filter(p => p.status === 'listo' && !p.approved).length, unassigned = all.filter(p => !p.assignee).length;
+  const say = $('heroSay'), go = $('heroGo');
+  const all = state.pieces, total = all.length, waiting = pendingPieces().length;
   const ti = todayIndex();
   let s = '';
   if (!total) s = `Esta semana todavía <b>no tiene piezas</b>. Toca <em>+</em> para planear el primer día.`;
-  else {
-    s = `Van <b>${done} de ${total}</b> piezas listas`;
-    s += waiting ? ` y <b>${waiting}</b> ${waiting === 1 ? 'espera' : 'esperan'} aprobación.` : '.';
-    if (ti >= 0){
-      const td = state.days[ti]; const tp = all.filter(p => p.day === td.key); const mine = tp.filter(isMine).length;
-      s += ` Hoy ${td.fullDow.toLowerCase()} ${tp.length ? `hay <b>${tp.length}</b> ${tp.length === 1 ? 'pieza' : 'piezas'}` : 'no hay piezas'}`;
-      s += mine ? `, <em>${mine} ${mine === 1 ? 'tuya' : 'tuyas'}</em>.` : '.';
-    }
-    if (unassigned) s += ` <b>${unassigned}</b> sin dueño.`;
+  else if (ti >= 0){
+    const td = state.days[ti]; const n = all.filter(p => p.day === td.key).length;
+    s = `Hoy ${td.fullDow.toLowerCase()} ${n ? `hay <b>${n} ${n === 1 ? 'pieza' : 'piezas'}</b>` : 'no hay piezas'}`;
+    s += waiting ? ` y <em>${waiting} por aprobar</em>.` : '.';
+  } else {
+    s = waiting ? `<b>${waiting} ${waiting === 1 ? 'pieza espera' : 'piezas esperan'}</b> aprobación.` : `<b>${total} piezas</b> en la semana, nada por aprobar.`;
   }
   const wStart = state.calendar.start_date, wEnd = state.calendar.end_date;
-  const hits = (state.pipeline || []).filter(e => e.status !== 'llego' && e.tentative_date && e.tentative_date <= wEnd && (e.tentative_date_end || e.tentative_date) >= wStart);
-  const photos = (state.pipeline || []).filter(e => e.status !== 'llego' && e.entry_type === 'launch' && e.photo_date && e.photo_date >= wStart && e.photo_date <= wEnd);
-  if (hits.length){
-    const names = hits.slice(0,2).map(e => `<em>${escapeHtml(e.design_name || e.product_name)}</em>`).join(' y ');
-    s += ` Esta semana ${hits.some(e => e.entry_type === 'launch') ? 'se lanza' : 'llega'} ${names}${hits.length > 2 ? ` y ${hits.length - 2} más` : ''}.`;
-  }
-  if (photos.length) s += ` Fotos de ${photos.map(e => `<em>${escapeHtml(e.design_name || e.product_name)}</em>`).join(' y ')}.`;
+  const launch = (state.pipeline || []).find(e => e.status !== 'llego' && e.entry_type === 'launch' && e.tentative_date && e.tentative_date <= wEnd && (e.tentative_date_end || e.tentative_date) >= wStart);
+  if (launch) s += ` Se lanza <em>${escapeHtml(launch.design_name || launch.product_name)}</em>.`;
   say.innerHTML = s;
-  const imgs = []; const seen = new Set();
-  for (const p of all){ const u = pieceImage(p); if (u && !seen.has(u)){ seen.add(u); imgs.push(u); } if (imgs.length >= 6) break; }
-  ph.innerHTML = imgs.map(u => `<img src="${escapeAttr(u)}" alt="" loading="lazy">`).join('');
-  ph.style.display = imgs.length ? '' : 'none';
+  if (go){
+    const show = waiting && canApprove();
+    go.style.display = show ? '' : 'none';
+    go.textContent = `Revisar ${waiting === 1 ? 'la pieza' : 'las ' + waiting} por aprobar ›`;
+  }
 }
 
 function renderDayRail(){
@@ -1187,19 +1107,6 @@ function renderDayPanel(){
   rail.querySelector('[data-add-day]').addEventListener('click', () => addPiece(d.key));
   $('diaHint').textContent = ps.length ? 'Toca una pieza para editarla, subir el arte o aprobarla' : (state.filterMine || state.filterPerson ? 'Nada asignado este día con el filtro puesto' : 'Día libre, agrega la primera pieza');
 
-  const manual = state.dayProducts[d.index] || [];
-  const fromPieces = state.pieces.filter(p => p.day === d.key && p.productGid).map(p => p.productGid);
-  const gids = [...new Set([...manual, ...fromPieces])];
-  const prail = $('prodRail');
-  prail.innerHTML = gids.map(gid => {
-    const cp = catalogProduct(gid); if (!cp) return '';
-    const isManual = manual.includes(gid);
-    return `<div class="prd">${cp.image ? `<img src="${escapeAttr(cp.image)}" alt="" loading="lazy">` : '<span class="noimg"></span>'}
-      <div style="min-width:0"><div class="n">${cp.total}<small> unds</small></div><div class="t">${escapeHtml(cp.title)}</div><div class="sz">${sizeChips(cp)}</div></div>
-      ${isManual ? `<button class="x" data-dp-remove="${escapeAttr(gid)}" aria-label="Quitar">×</button>` : ''}</div>`;
-  }).join('') + (gids.length ? '' : `<button class="prd add" id="prodAddInline">Elegir un jean para este día</button>`);
-  prail.querySelectorAll('[data-dp-remove]').forEach(b => b.addEventListener('click', () => removeDayProduct(d.index, b.getAttribute('data-dp-remove'))));
-  const inl = $('prodAddInline'); if (inl) inl.addEventListener('click', toggleProdPicker);
 }
 function toggleProdPicker(){
   const pk = $('prodPicker'); pk.style.display = pk.style.display === 'none' ? '' : 'none';
@@ -1228,49 +1135,6 @@ function renderWeekPanel(){
   bindPieceCards(rail);
   rail.querySelectorAll('[data-plan]').forEach(b => b.addEventListener('click', () => { state.dayCursor = parseInt(b.getAttribute('data-plan')); setTab('dia'); renderDayRail(); renderDayPanel(); }));
 
-  const sd = (state.calendar && state.calendar.shopify_data) || {};
-  const m = sd.metrics || {};
-  $('salesStamp').textContent = sd.timestamp ? `Shopify al ${niceDate(sd.timestamp)}` : '';
-  $('statRail').innerHTML = m.gross_sales ? `
-    <div class="stat"><div class="l">Ventas</div><div class="v">${escapeHtml(m.gross_sales)}</div><div class="s">${escapeHtml(niceRange((m.gross_sales_sub || '').replace(/COP\s*[·•]\s*/, '')))}</div></div>
-    <div class="stat"><div class="l">Órdenes</div><div class="v">${escapeHtml(String(m.orders || '—'))}</div><div class="s">${escapeHtml(m.orders_sub || '')}</div></div>
-    <div class="stat"><div class="l">Mejor día</div><div class="v">${escapeHtml(m.best_day_label || '—')}</div><div class="s">${escapeHtml((m.best_day_sub || '').replace(/\s*[·•]\s*/g, ', '))}</div></div>` : `<div class="empty" style="flex:1 0 100%">Sin data de Shopify todavía</div>`;
-  const ts = Array.isArray(sd.top_sellers) ? sd.top_sellers.slice(0,6) : [];
-  $('sellRail').innerHTML = ts.length ? ts.map((s, i) => {
-    const cp = matchCatalog(s.name);
-    return `<div class="sl">${cp && cp.image ? `<img src="${escapeAttr(cp.image)}" alt="" loading="lazy">` : '<span class="noimg"></span>'}
-      <div style="min-width:0"><div class="r">${String(i+1).padStart(2,'0')}</div><div class="t">${escapeHtml(s.name)}</div><div class="v">${escapeHtml(s.sales)}</div><div class="r" style="color:var(--grey)">${s.orders} órdenes</div></div></div>`;
-  }).join('') : `<div class="empty" style="flex:1 0 100%">Sin data de ventas todavía</div>`;
-}
-
-function renderTeamPanel(){
-  const rail = $('teamRail');
-  rail.innerHTML = state.team.filter(m => m.role !== 'viewer').map(m => {
-    const mine = state.pieces.filter(p => canonicalEmail(p.assignee) === canonicalEmail(m.email));
-    const n = mine.length, ok = mine.filter(p => p.status === 'listo' && !p.approved).length, ap = mine.filter(p => p.approved).length;
-    return `<button class="tm ${state.filterPerson && canonicalEmail(state.filterPerson) === canonicalEmail(m.email) ? 'sel' : ''}" data-person="${escapeAttr(m.email)}">
-      <span class="av" style="background:${m.color}">${initials(m.name)}</span>
-      <div class="nm">${escapeHtml(m.name)}</div><div class="ro">${escapeHtml(String(m.focus || m.role || '').replace(/\s*[·•]\s*/g, ', '))}</div>
-      <div class="n">${ap + ok}<small> de ${n}</small></div>
-      <div class="st">${n ? `<i class="ap" style="width:${ap/n*100}%"></i><i class="ok" style="width:${ok/n*100}%"></i>` : ''}</div>
-    </button>`;
-  }).join('');
-  rail.querySelectorAll('[data-person]').forEach(b => b.addEventListener('click', () => {
-    const e = b.getAttribute('data-person');
-    state.filterPerson = (state.filterPerson && canonicalEmail(state.filterPerson) === canonicalEmail(e)) ? null : e;
-    state.filterMine = false; $('mineToggle').classList.remove('on');
-    renderAll();
-  }));
-  const wait = state.pieces.filter(p => p.status === 'listo' && !p.approved);
-  $('apMeta').textContent = wait.length ? `${wait.length}` : 'nada pendiente';
-  const ar = $('approveRail');
-  ar.innerHTML = wait.length ? wait.map(pieceCard).join('') : `<div class="empty" style="flex:1 0 100%">Todo lo que está listo ya fue aprobado</div>`;
-  bindPieceCards(ar);
-  const done = state.pieces.filter(p => p.approved).sort((a, b) => String(b.approvedAt || '').localeCompare(String(a.approvedAt || '')));
-  $('apDoneMeta').textContent = done.length ? `${done.length}` : '';
-  const dr = $('approvedRail');
-  dr.innerHTML = done.length ? done.map(pieceCard).join('') : `<div class="empty" style="flex:1 0 100%">Todavía no hay piezas aprobadas esta semana</div>`;
-  bindPieceCards(dr);
 }
 
 const invOpen = {};
@@ -1585,18 +1449,7 @@ document.addEventListener('keydown', e => { if (e.key === 'Escape' && urlsModalE
 // Día: agregar pieza y producto
 $('diaAdd').addEventListener('click', () => { const d = state.days[state.dayCursor]; if (d) addPiece(d.key); });
 $('fabAdd').addEventListener('click', () => { const d = state.days[state.dayCursor]; if (d) addPiece(d.key); });
-$('prodAdd').addEventListener('click', toggleProdPicker);
-$('prodInput').addEventListener('change', () => {
-  const inp = $('prodInput'); const match = state.catalog.find(p => p.title.toLowerCase() === inp.value.trim().toLowerCase());
-  if (match){ addDayProduct(state.dayCursor, match.gid); inp.value = ''; $('prodPicker').style.display = 'none'; }
-});
-
-// Equipo: solo lo mío
-$('mineToggle').addEventListener('click', () => {
-  state.filterMine = !state.filterMine; state.filterPerson = null;
-  $('mineToggle').classList.toggle('on', state.filterMine);
-  renderAll();
-});
+$('heroGo').addEventListener('click', () => { const first = pendingPieces()[0]; if (first) openUrlsModal(first.id); });
 
 // Inventario
 $('invSearch').addEventListener('input', renderInventory);
