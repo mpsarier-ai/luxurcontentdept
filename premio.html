@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#EDEBE6">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Mi premio LUXUR">
+<meta name="robots" content="noindex">
+<title>LUXUR · Tu premio</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Montserrat:wght@500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/qrcode-generator@1.4.4/qrcode.js"></script>
+<style>
+:root{--cream:#EDEBE6;--paper:#FBFAF7;--rosa:#EECDCC;--rosa-deep:#C9868E;--ink:#1C1C1C;--ink-warm:#3A2E2E;--grey:#5A5A5A;--line:#BDBAB3}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{background:var(--cream);color:var(--ink);font-family:'Poppins',sans-serif;font-weight:300;min-height:100dvh;-webkit-font-smoothing:antialiased}
+.wrap{max-width:430px;margin:0 auto;padding:max(28px,env(safe-area-inset-top)) 16px 40px;display:flex;flex-direction:column;gap:16px}
+.logo{font-family:'Montserrat',sans-serif;font-weight:600;letter-spacing:0;font-size:24px;text-align:center;color:var(--ink)}
+.hero{background:var(--ink);color:var(--paper);border-radius:24px;padding:28px 22px;display:flex;flex-direction:column;gap:10px}
+.eyebrow{font-weight:600;font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--rosa)}
+h1{font-weight:300;letter-spacing:-.02em;font-size:38px;line-height:1.08}
+.hero p{font-size:15px;line-height:1.5;color:#e2dcd5}
+.card{background:var(--paper);border-radius:20px;padding:22px 18px;display:flex;flex-direction:column;gap:14px;align-items:center}
+.lbl{font-weight:600;font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:var(--grey);align-self:flex-start}
+.qr{width:220px}.qr svg{width:100%;height:auto;display:block}
+.code{font-weight:500;font-size:22px;letter-spacing:.06em;background:var(--rosa);border-radius:12px;padding:10px 16px;user-select:all}
+.dates{font-size:15px;text-align:center;line-height:1.5}
+.how{display:flex;flex-direction:column;gap:12px;align-items:stretch;width:100%}
+.how p{font-size:15px;line-height:1.5}
+.how b{font-weight:600}
+button{border:0;border-radius:999px;background:var(--ink);color:var(--paper);font-family:'Poppins',sans-serif;font-weight:600;
+  font-size:15px;letter-spacing:.04em;padding:16px 22px;min-height:52px;width:100%;cursor:pointer}
+.small{font-size:12.5px;color:var(--grey);text-align:center;line-height:1.5}
+.bad{text-align:center;font-size:16px;line-height:1.5;padding:40px 10px}
+</style>
+</head>
+<body>
+<div class="wrap" id="app">
+  <div class="logo">LUXUR</div>
+  <p class="bad" id="loading">Cargando tu premio…</p>
+</div>
+<script type="module">
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+const supabase = createClient("https://nrpgtlcdvtesjbxpkxha.supabase.co",
+  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5ycGd0bGNkdnRlc2pieHBreGhhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg3ODkzNTAsImV4cCI6MjA5NDM2NTM1MH0.ntRHkFobaVK6RW9EYRwoww1ATr8N0zHMzXHM__5x8E0");
+const t = new URLSearchParams(location.search).get('t') || location.pathname.split('/').filter(Boolean).pop() || '';
+const app = document.getElementById('app');
+const esc = s => String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const { data } = await supabase.rpc('ruleta_premio', { p_token: t });
+if (!data) {
+  app.innerHTML = `<div class="logo">LUXUR</div><p class="bad">Este link no es válido.<br>Escríbenos por WhatsApp y te ayudamos.</p>`;
+} else {
+  const q = qrcode(0, 'M'); q.addData(data.code); q.make();
+  app.innerHTML = `
+  <div class="logo">LUXUR</div>
+  <section class="hero">
+    <p class="eyebrow">Tu premio de la ruleta</p>
+    <h1>${esc(data.titulo)}</h1>
+    <p>${esc(data.detalle)}</p>
+  </section>
+  <section class="card">
+    <p class="lbl">Tu código</p>
+    <div class="qr">${q.createSvgTag({ cellSize: 6, margin: 0, scalable: true })}</div>
+    <div class="code" id="code">${esc(data.code)}</div>
+    <p class="dates">Válido del <b>1 al 16 de diciembre</b>.<br>Un solo uso.</p>
+  </section>
+  <section class="card how">
+    <p class="lbl">Cómo usarlo</p>
+    <p><b>En la tienda:</b> muestra este código en caja, en Ámsterdam Plaza.</p>
+    <p><b>En la web:</b> escríbelo en el campo de descuento al pagar.</p>
+    <button id="copy">Copiar código</button>
+  </section>
+  <p class="small">Guárdalo: toma un pantallazo o agrega esta página a tu pantalla de inicio. No se acumula con otros descuentos.</p>`;
+  document.getElementById('copy').onclick = async e => {
+    try { await navigator.clipboard.writeText(data.code); e.target.textContent = 'Copiado'; } catch { e.target.textContent = data.code; }
+  };
+}
+</script>
+</body>
+</html>

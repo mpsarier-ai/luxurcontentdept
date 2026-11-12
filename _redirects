@@ -12,3 +12,7 @@
 # /p/{product_token} → vista legacy de UN producto (back-compat con links viejos)
 /s/*  /supplier.html?t=:splat  200
 /p/*  /supplier.html?t=:splat  200
+
+# Ruleta BF 2026 · /premio/{token} → página del premio de la clienta
+/premio/*  /premio.html?t=:splat  200
+/ruleta  /ruleta.html  200
