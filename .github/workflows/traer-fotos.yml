@@ -1,0 +1,22 @@
+# Descarga a assets/promo/ las fotos de producto listadas en assets/promo/fotos.txt
+# (solo del CDN de Shopify de LUXUR), para usarlas en piezas gráficas.
+name: traer-fotos
+on:
+  push:
+    paths: ["assets/promo/fotos.txt"]
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  fetch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: |
+          while read -r name url; do
+            [ -z "$name" ] && continue
+            case "$url" in https://cdn.shopify.com/s/files/1/0553/9518/8916/*) ;; *) continue;; esac
+            curl -sSfL -o "assets/promo/$name" "$url"
+          done < assets/promo/fotos.txt
+          git config user.name "luxur-bot"; git config user.email "bot@luxurjeans.com"
+          git add assets/promo; git commit -m "fotos de producto para piezas" || true; git push
