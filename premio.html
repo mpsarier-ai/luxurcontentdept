@@ -70,6 +70,7 @@ if (!data) {
     <p class="lbl">Cómo usarlo</p>
     <p><b>En la tienda:</b> muestra este código en caja, en Ámsterdam Plaza.</p>
     <p><b>En la web:</b> escríbelo en el campo de descuento al pagar.</p>
+    ${/iPhone|iPad|iPod|Macintosh/.test(navigator.userAgent) ? `<a href="https://nrpgtlcdvtesjbxpkxha.supabase.co/functions/v1/ruleta-pass?t=${encodeURIComponent(t)}" style="display:block;text-align:center;text-decoration:none;border-radius:999px;background:#000;color:#fff;font-weight:600;font-size:15px;padding:16px 22px">Agregar a Apple Wallet</a>` : ''}
     <button id="copy">Copiar código</button>
   </section>
   <p class="small">Guárdalo: toma un pantallazo o agrega esta página a tu pantalla de inicio. No se acumula con otros descuentos.</p>`;

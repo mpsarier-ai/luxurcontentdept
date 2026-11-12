@@ -86,7 +86,7 @@ button:disabled{opacity:.5}
     <div class="prize">
       <h2 id="r-title"></h2>
       <p id="r-detail"></p>
-      <p>Escanea el código con tu celular y guarda tu premio. Lo usas del 1 al 16 de diciembre, en la tienda o en la web.</p>
+      <p>Escanea el código con la cámara de tu celular y guarda tu premio en Apple Wallet. Lo usas del 1 al 16 de diciembre, en la tienda o en la web.</p>
       <p class="note" id="r-note"></p>
     </div>
     <div class="qr" id="r-qr"></div>
@@ -166,7 +166,8 @@ $('go').onclick = async () => {
   if (error || !data) { $('order-err').textContent = 'Sin conexión. Intenta de nuevo.'; return; }
   if (data.error === 'pin') { $('reset').click(); return; }
   if (data.error) { $('order-err').textContent = data.error === 'sin_codigos' ? 'Se acabaron los premios. Avísale a Paulina.' : 'Intenta de nuevo.'; return; }
-  const url = `${location.origin}/premio/${data.token}`;
+  // En iPhone abre el pase de Apple Wallet; en Android redirige a la página del premio.
+  const url = `https://nrpgtlcdvtesjbxpkxha.supabase.co/functions/v1/ruleta-pass?t=${data.token}`;
   $('r-title').textContent = data.titulo;
   $('r-detail').textContent = data.detalle;
   $('r-qr').innerHTML = qrSvg(url);
