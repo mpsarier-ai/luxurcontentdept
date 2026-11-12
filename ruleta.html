@@ -36,10 +36,10 @@ button:disabled{opacity:.5}
 .err{min-height:28px;color:var(--rosa-hot);font-size:18px;text-align:center}
 .wheelbox{position:relative;width:min(70vmin,620px);aspect-ratio:1}
 .wheelbox svg{width:100%;height:100%;display:block}
-#wheel{transition:transform 5.2s cubic-bezier(.12,.62,.08,1);transform-box:fill-box;transform-origin:center}
+#spinner{width:100%;height:100%;transform-origin:50% 50%;will-change:transform}
 .pointer{position:absolute;left:50%;top:-14px;transform:translateX(-50%);width:0;height:0;
   border-left:22px solid transparent;border-right:22px solid transparent;border-top:40px solid var(--rosa);
-  filter:drop-shadow(0 4px 6px rgba(0,0,0,.4))}
+  filter:drop-shadow(0 4px 6px rgba(0,0,0,.4));z-index:2}
 .result{display:flex;gap:48px;align-items:center;flex-wrap:wrap;justify-content:center}
 .qr{background:var(--paper);border-radius:28px;padding:22px;width:min(42vmin,340px)}
 .qr svg{width:100%;height:auto;display:block}
@@ -76,7 +76,7 @@ button:disabled{opacity:.5}
 
 <!-- RUEDA -->
 <section class="screen" id="s-wheel">
-  <div class="wheelbox"><div class="pointer"></div><svg viewBox="-210 -210 420 420" aria-label="Ruleta de premios"><g id="wheel"></g></svg></div>
+  <div class="wheelbox"><div class="pointer"></div><div id="spinner"><svg viewBox="-210 -210 420 420" aria-label="Ruleta de premios"><g id="wheel"></g></svg></div></div>
 </section>
 
 <!-- RESULTADO -->
@@ -124,15 +124,21 @@ SEG.forEach((s, i) => {
 });
 g.insertAdjacentHTML('beforeend', `<circle r="40" fill="#1C1C1C" stroke="#EECDCC" stroke-width="3"/>
   <text text-anchor="middle" dominant-baseline="middle" font-family="Montserrat, sans-serif" font-weight="600" font-size="15" fill="#EECDCC">LUXUR</text>`);
-let turns = 0;
+/* La rueda gira con Web Animations sobre un <div> (no sobre el <g> del SVG):
+   en Safari/iPad la transición CSS en un SVG que acaba de pasar de display:none no arranca. */
+const spinner = $('spinner');
+let current = 0;
 function spinTo(prize){
   const opts = SEG.map((s,i)=>s.p===prize?i:-1).filter(i=>i>=0);
   const idx = opts[Math.floor(Math.random()*opts.length)];
   const jitter = (Math.random()-.5) * A * 0.6;
-  turns += 6;
-  const deg = turns*360 - idx*A + jitter;
-  g.style.transform = `rotate(${deg}deg)`;
-  return new Promise(r => setTimeout(r, 5400));
+  const base = Math.ceil(current / 360) * 360;
+  const target = base + 6*360 - idx*A + jitter;
+  const anim = spinner.animate(
+    [{ transform: `rotate(${current}deg)` }, { transform: `rotate(${target}deg)` }],
+    { duration: 5200, easing: 'cubic-bezier(.12,.62,.08,1)', fill: 'forwards' });
+  current = target;
+  return new Promise(r => { anim.onfinish = () => setTimeout(r, 600); });
 }
 
 function qrSvg(text){
