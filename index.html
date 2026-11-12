@@ -1038,6 +1038,8 @@ header,.hub-header{position:static !important;background:transparent !important;
 .sm-seg::-webkit-scrollbar{display:none}
 .sm-seg button{border:1px solid var(--line);background:transparent;color:var(--black);font-family:'Poppins',sans-serif;font-size:12.5px;font-weight:500;padding:7px 14px;border-radius:999px;cursor:pointer;white-space:nowrap}
 .sm-seg button.on{background:var(--black);border-color:var(--black);color:var(--cream);font-weight:600}
+.sm-seg.sm-unit button{font-size:11.5px;padding:5px 12px}
+.sm-seg.sm-unit button.on{background:var(--rosa);border-color:var(--rosa);color:var(--black)}
 .sm-card{align-self:flex-start;width:min(78vw,280px);border-radius:22px;padding:16px 16px 14px;display:flex;flex-direction:column;gap:4px;background:var(--paper);color:var(--black);box-shadow:0 1px 2px rgba(0,0,0,.04);border:none;text-align:left;font-family:inherit}
 .sm-card .mn{font-family:'Poppins',sans-serif;font-weight:600;font-size:9.5px;letter-spacing:.14em;text-transform:uppercase;opacity:.7;display:flex;justify-content:space-between;align-items:center;gap:8px}
 .sm-card .lt{display:inline-flex;align-items:center;gap:6px;letter-spacing:.06em}
@@ -1635,6 +1637,7 @@ a.act-card{text-decoration:none}
     </div>
     <div data-panel="an:semaforo">
       <div class="sm-seg" id="smSeg" role="tablist" aria-label="Canal"></div>
+      <div class="sm-seg sm-unit" id="smUnitSeg" role="tablist" aria-label="Medir en"></div>
       <div class="rail" id="smCards"></div>
       <div class="eyebrow"><span id="smMonthLbl">Día a día</span>
         <span class="sm-nav"><button class="act" id="smPrev" aria-label="Mes anterior">‹</button><button class="act" id="smNext" aria-label="Mes siguiente">›</button></span></div>
@@ -4152,9 +4155,13 @@ const SM_CHN = { tienda: 'Tienda', online: 'Online', whatsapp: 'WhatsApp', falab
 const SM_MES = ['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'];
 const SM_DOW = ['domingo','lunes','martes','miércoles','jueves','viernes','sábado'];
 let smCh = 'total', smMonth = null, smCache = {}, smTh = null, smRange = null, smData = null;
+// Pesos o unidades. Unidades = presupuesto del día ÷ precio neto por unidad del canal (budget_settings.unit_price, jun–sep como el plan de María)
+let smUnit = false, smUP = null;
+try { smUnit = localStorage.getItem('smUnit') === '1'; } catch (e) {}
 const smToday = () => new Date(Date.now() - 5 * 3600_000).toISOString().slice(0, 10);
-const smMill = v => { const a = Math.abs(v), sg = v < 0 ? '−' : ''; return sg + (a >= 1e6 ? '$' + (a / 1e6).toFixed(1).replace('.', ',') + ' M' : '$' + Math.round(a / 1e3).toLocaleString('es-CO') + ' mil'); };
-const smShort = v => v >= 1e6 ? '$' + (v / 1e6).toFixed(1).replace('.', ',') + 'M' : '$' + Math.round(v / 1e3) + 'k';
+const smUnd = v => { const a = Math.round(Math.abs(v)), sg = v < 0 && a ? '−' : ''; return sg + a.toLocaleString('es-CO') + (a === 1 ? ' und' : ' unds'); };
+const smMill = v => { if (smUnit) return smUnd(v); const a = Math.abs(v), sg = v < 0 ? '−' : ''; return sg + (a >= 1e6 ? '$' + (a / 1e6).toFixed(1).replace('.', ',') + ' M' : '$' + Math.round(a / 1e3).toLocaleString('es-CO') + ' mil'); };
+const smShort = v => smUnit ? Math.round(v) + 'u' : v >= 1e6 ? '$' + (v / 1e6).toFixed(1).replace('.', ',') + 'M' : '$' + Math.round(v / 1e3) + 'k';
 const smPct = (s, g) => g ? Math.floor(s / g * 100) : null; // hacia abajo: 99,6 % no es 100 %
 const smLong = iso => { const d = new Date(iso + 'T12:00:00Z'); return `${SM_DOW[d.getUTCDay()]} ${d.getUTCDate()} de ${SM_MES[d.getUTCMonth()]}`; };
 const smShortDay = iso => { const d = new Date(iso + 'T12:00:00Z'); return `${SM_DOW[d.getUTCDay()].slice(0, 3)} ${d.getUTCDate()}`; };
@@ -4166,21 +4173,23 @@ async function smLoad(month, force){
   const m0 = `${month}-01`, mEnd = `${month}-${String(n).padStart(2, '0')}`;
   const [bd, sd, st] = await Promise.all([
     supabase.from('budget_daily').select('day,channel,amount,event').gte('day', m0).lte('day', mEnd),
-    supabase.from('sales_channel_daily').select('day,channel,net,orders,updated_at').gte('day', m0).lte('day', mEnd),
-    smTh ? Promise.resolve({ data: smTh }) : supabase.from('budget_settings').select('th_on_target,th_attention').eq('id', 1).maybeSingle(),
+    supabase.from('sales_channel_daily').select('day,channel,net,units,orders,updated_at').gte('day', m0).lte('day', mEnd),
+    smTh ? Promise.resolve({ data: smTh }) : supabase.from('budget_settings').select('th_on_target,th_attention,unit_price').eq('id', 1).maybeSingle(),
   ]);
   if (bd.error) throw bd.error;
   smTh = st.data || { th_on_target: 1, th_attention: .9 };
+  smUP = smTh.unit_price || smUP || {};
   const days = {};
-  for (let d = 1; d <= n; d++){ const k = `${month}-${String(d).padStart(2, '0')}`; days[k] = { day: k, event: null, goal: {}, sold: {}, orders: {} }; }
-  (bd.data || []).forEach(r => { const x = days[r.day]; if (!x) return; x.goal[r.channel] = (x.goal[r.channel] || 0) + +r.amount; if (r.event) x.event = r.event; });
+  for (let d = 1; d <= n; d++){ const k = `${month}-${String(d).padStart(2, '0')}`; days[k] = { day: k, event: null, goal: {}, sold: {}, orders: {}, goalU: {}, soldU: {} }; }
+  (bd.data || []).forEach(r => { const x = days[r.day]; if (!x) return; x.goal[r.channel] = (x.goal[r.channel] || 0) + +r.amount; const up = +(smUP[r.channel] || 0); if (up) x.goalU[r.channel] = (x.goalU[r.channel] || 0) + r.amount / up; if (r.event) x.event = r.event; });
   let upd = null;
-  (sd.data || []).forEach(r => { const x = days[r.day]; if (!x) return; x.sold[r.channel] = (x.sold[r.channel] || 0) + +r.net; x.orders[r.channel] = (x.orders[r.channel] || 0) + (r.orders || 0); if (!upd || r.updated_at > upd) upd = r.updated_at; });
+  (sd.data || []).forEach(r => { const x = days[r.day]; if (!x) return; x.sold[r.channel] = (x.sold[r.channel] || 0) + +r.net; x.soldU[r.channel] = (x.soldU[r.channel] || 0) + (+r.units || 0); x.orders[r.channel] = (x.orders[r.channel] || 0) + (r.orders || 0); if (!upd || r.updated_at > upd) upd = r.updated_at; });
   return (smCache[month] = { month, days: Object.values(days), upd });
 }
 function smVal(x, ch){
   const sum = o => Object.values(o).reduce((a, b) => a + b, 0);
-  return ch === 'total' ? { goal: sum(x.goal), sold: sum(x.sold), orders: sum(x.orders) } : { goal: x.goal[ch] || 0, sold: x.sold[ch] || 0, orders: x.orders[ch] || 0 };
+  const G = smUnit ? x.goalU : x.goal, S = smUnit ? x.soldU : x.sold;
+  return ch === 'total' ? { goal: sum(G), sold: sum(S), orders: sum(x.orders) } : { goal: G[ch] || 0, sold: S[ch] || 0, orders: x.orders[ch] || 0 };
 }
 function smState(goal, sold){
   if (!goal) return 'sin';
@@ -4216,6 +4225,11 @@ async function renderSemaforo(force){
   const seg = document.getElementById('smSeg');
   seg.innerHTML = SM_CH.map(([c, l]) => `<button role="tab" aria-selected="${c === smCh}" class="${c === smCh ? 'on' : ''}" data-sm-ch="${c}">${l}</button>`).join('');
   seg.querySelectorAll('[data-sm-ch]').forEach(b => b.addEventListener('click', () => { smCh = b.getAttribute('data-sm-ch'); renderSemaforo(); }));
+  const useg = document.getElementById('smUnitSeg');
+  if (useg){
+    useg.innerHTML = [[false, 'Pesos'], [true, 'Unidades']].map(([u, l]) => `<button role="tab" aria-selected="${u === smUnit}" class="${u === smUnit ? 'on' : ''}" data-sm-u="${u ? 1 : 0}">${l}</button>`).join('');
+    useg.querySelectorAll('[data-sm-u]').forEach(b => b.addEventListener('click', () => { smUnit = b.getAttribute('data-sm-u') === '1'; try { localStorage.setItem('smUnit', smUnit ? '1' : '0'); } catch (e) {} renderSemaforo(); }));
+  }
   const prev = document.getElementById('smPrev'), next = document.getElementById('smNext');
   prev.disabled = smMonth <= smRange[0]; next.disabled = smMonth >= smRange[1];
   prev.style.opacity = prev.disabled ? .35 : 1; next.style.opacity = next.disabled ? .35 : 1;
@@ -4293,23 +4307,24 @@ async function renderSemaforo(force){
   cal.innerHTML = html;
   document.querySelectorAll('#smCards [data-sm-day], #smCal [data-sm-day]').forEach(b => b.addEventListener('click', () => smOpenDay(b.getAttribute('data-sm-day'))));
   const mins = data.upd ? Math.round((Date.now() - new Date(data.upd).getTime()) / 60000) : null;
-  document.getElementById('smFoot').textContent = `Venta neta sin IVA contra el presupuesto diario${mins != null && isCur ? `, actualizada hace ${mins < 60 ? mins + ' min' : Math.round(mins / 60) + ' h'}` : ''}. Toca un día para ver cada canal.`;
+  document.getElementById('smFoot').textContent = smUnit ? `Unidades vendidas contra el presupuesto del día convertido a unidades con el precio neto por unidad de cada canal (jun–sep)${mins != null && isCur ? `, actualizada hace ${mins < 60 ? mins + ' min' : Math.round(mins / 60) + ' h'}` : ''}. Toca un día para ver cada canal.` : `Venta neta sin IVA contra el presupuesto diario${mins != null && isCur ? `, actualizada hace ${mins < 60 ? mins + ' min' : Math.round(mins / 60) + ' h'}` : ''}. Toca un día para ver cada canal.`;
 }
 function smOpenDay(iso){
   const x = smData && smData.days.find(d => d.day === iso); if (!x) return;
   const today = smToday(), T = smVal(x, 'total'), live = iso === today, fut = iso > today;
-  const chs = ['tienda', 'online', 'whatsapp', 'falabella', 'otro'].filter(c => (x.goal[c] || 0) > 0 || (x.sold[c] || 0) > 0);
+  const XG = smUnit ? x.goalU : x.goal, XS = smUnit ? x.soldU : x.sold;
+  const chs = ['tienda', 'online', 'whatsapp', 'falabella', 'otro'].filter(c => (XG[c] || 0) > 0 || (XS[c] || 0) > 0);
   const st = smState(T.goal, T.sold), d = T.sold - T.goal;
   const head = fut ? `Meta del día ${smMill(T.goal)}.` : live ? `En curso: ${smMill(T.sold)} de ${smMill(T.goal)}${T.goal ? `, faltan ${smMill(Math.max(0, -d))}` : ''}.`
     : `${SM_LBL[st]}: ${smMill(T.sold)} de ${smMill(T.goal)}${T.goal ? (d >= 0 ? `, se pasó por ${smMill(d)}` : `, faltaron ${smMill(-d)}`) : ''}.`;
   const rows = chs.map(c => {
-    const g = x.goal[c] || 0, s = x.sold[c] || 0, o = x.orders[c] || 0, cs = fut ? '' : live ? 'live' : smState(g, s);
+    const g = XG[c] || 0, s = XS[c] || 0, o = x.orders[c] || 0, cs = fut ? '' : live ? 'live' : smState(g, s);
     return `<div class="sm-row"><span class="dot ${cs}"></span><span><span class="nm">${SM_CHN[c]}</span><br><span class="sb">${fut ? 'por venir' : `${o} pedido${o === 1 ? '' : 's'}`}${g ? '' : ', sin presupuesto'}</span></span>
       <span class="vl"><b>${fut ? smMill(g) : smMill(s)}</b><span>${fut ? 'meta' : g ? `de ${smMill(g)}, ${smPct(s, g)} %` : ''}</span></span></div>`;
   }).join('') || '<div class="sm-row"><span></span><span class="sb">Sin presupuesto ni ventas este día.</span><span></span></div>';
   document.getElementById('smSheetBody').innerHTML = `<div class="gr"></div><h3>${smLong(iso).charAt(0).toUpperCase() + smLong(iso).slice(1)}</h3>
     <div class="sub">${x.event ? escapeHtml(x.event) + '. ' : ''}${head}</div><div class="sm-rows">${rows}</div>
-    <div class="need-foot">Montos sin IVA. Con IVA la meta del día es ${smMill(T.goal * 1.19)}.</div>`;
+    <div class="need-foot">${smUnit ? `Unidades netas. Precio por unidad usado: ${['tienda', 'online', 'whatsapp'].filter(c => smUP && smUP[c]).map(c => `${SM_CHN[c]} $${Math.round(smUP[c]).toLocaleString('es-CO')}`).join(', ')}, sin IVA.` : `Montos sin IVA. Con IVA la meta del día es ${smMill(T.goal * 1.19)}.`}</div>`;
   document.getElementById('smSheet').classList.add('on');
 }
 document.getElementById('smSheet')?.querySelector('[data-sm-close]')?.addEventListener('click', () => document.getElementById('smSheet').classList.remove('on'));
