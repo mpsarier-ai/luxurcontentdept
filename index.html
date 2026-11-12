@@ -4188,10 +4188,10 @@ function smState(goal, sold){
   return r >= th.th_on_target ? 'ok' : r >= th.th_attention ? 'warn' : 'bad';
 }
 function smSummary(data, ch, today){
-  const S = { goalClosed: 0, soldClosed: 0, goalMonth: 0, soldAll: 0, goalRest: 0, daysRest: 0, ok: 0, warn: 0, bad: 0 };
+  const S = { goalClosed: 0, soldClosed: 0, goalMonth: 0, soldAll: 0, goalToDate: 0, goalRest: 0, daysRest: 0, ok: 0, warn: 0, bad: 0 };
   data.days.forEach(x => {
     const v = smVal(x, ch); S.goalMonth += v.goal;
-    if (x.day <= today) S.soldAll += v.sold;
+    if (x.day <= today){ S.soldAll += v.sold; S.goalToDate += v.goal; }
     if (x.day < today){ S.goalClosed += v.goal; S.soldClosed += v.sold; const st = smState(v.goal, v.sold); if (S[st] != null) S[st]++; }
     else { S.goalRest += v.goal; if (v.goal) S.daysRest++; }
   });
@@ -4245,6 +4245,14 @@ async function renderSemaforo(force){
       <span class="gp">${p != null ? p + ' %' : smMill(v.sold)}</span>
       <span class="br"><i style="width:${Math.min(100, p || 0)}%;background:var(--rosa)"></i></span>
       <span class="gu">${smMill(v.sold)} de ${smMill(v.goal)}. ${v.goal ? (f > 0 ? `Faltan <b>${smMill(f)}</b> para la meta.` : `<b>Meta cumplida</b>, va ${smMill(-f)} arriba.`) : ''}</span></button>`);
+  }
+  // Mes a la fecha (incluye hoy): lo vendido contra el presupuesto acumulado del 1 a hoy
+  if (isCur && S.goalToDate){
+    const st = smState(S.goalToDate, S.soldAll), d = S.soldAll - S.goalToDate;
+    out.push(`<div class="sm-card ${st}"><span class="mn"><span>${mesL} a la fecha</span><span class="lt"><i></i>${d >= 0 ? 'Adelante' : 'Atrás'}</span></span>
+      <span class="gp">${smPct(S.soldAll, S.goalToDate)} %</span>
+      <span class="br"><i style="width:${Math.min(100, smPct(S.soldAll, S.goalToDate) || 0)}%"></i></span>
+      <span class="gu">${smMill(S.soldAll)} de ${smMill(S.goalToDate)} que el presupuesto pide del 1 al ${+today.slice(8)}. ${d >= 0 ? `Va <b>${smMill(d)} arriba</b>` : `Faltan <b>${smMill(-d)}</b> para ir al día`}. La meta del mes es ${smMill(S.goalMonth)}.</span></div>`);
   }
   // Mes
   if (S.goalMonth){
