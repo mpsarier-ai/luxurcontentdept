@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#EDEBE6">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Sellos LUXUR">
+<meta name="robots" content="noindex">
+<title>LUXUR · Tus sellos</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Montserrat:wght@500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/qrcode-generator@1.4.4/qrcode.js"></script>
+<style>
+:root{--cream:#EDEBE6;--paper:#FBFAF7;--rosa:#EECDCC;--rosa-deep:#C9868E;--ink:#1C1C1C;--grey:#5A5A5A;--line:#BDBAB3}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{background:var(--cream);color:var(--ink);font-family:'Poppins',sans-serif;font-weight:300;min-height:100dvh;-webkit-font-smoothing:antialiased}
+.wrap{max-width:430px;margin:0 auto;padding:max(28px,env(safe-area-inset-top)) 16px 40px;display:flex;flex-direction:column;gap:16px}
+.logo{font-family:'Montserrat',sans-serif;font-weight:600;letter-spacing:0;font-size:24px;text-align:center}
+.hero{background:var(--ink);color:var(--paper);border-radius:24px;padding:26px 22px;display:flex;flex-direction:column;gap:10px}
+.eyebrow{font-weight:600;font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--rosa)}
+h1{font-weight:300;letter-spacing:-.02em;font-size:36px;line-height:1.08}
+.hero p{font-size:15px;line-height:1.5;color:#e2dcd5}
+.card{background:var(--paper);border-radius:20px;padding:22px 18px;display:flex;flex-direction:column;gap:14px}
+.lbl{font-weight:600;font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:var(--grey)}
+.dots{display:grid;grid-template-columns:repeat(5,1fr);gap:12px}
+.dot{aspect-ratio:1;border-radius:50%;border:1.5px dashed var(--line);display:flex;align-items:center;justify-content:center;font-weight:500;font-size:15px;color:var(--line)}
+.dot.on{background:var(--rosa);border:0;color:var(--ink)}
+.dot.gift{border-color:var(--rosa-deep);color:var(--rosa-deep);font-size:11px;font-weight:600;letter-spacing:.06em}
+.big{font-weight:300;letter-spacing:-.02em;font-size:44px;line-height:1}
+.qr{width:200px;align-self:center}.qr svg{width:100%;height:auto;display:block}
+.prize{background:var(--rosa);border-radius:16px;padding:16px;font-size:15px;line-height:1.45}
+input{width:100%;background:#fff;border:1px solid rgba(0,0,0,.1);border-radius:14px;padding:15px 14px;font-family:'Poppins',sans-serif;font-size:16px}
+button,.btn{display:block;text-align:center;text-decoration:none;border:0;border-radius:999px;background:var(--ink);color:var(--paper);font-family:'Poppins',sans-serif;font-weight:600;font-size:15px;padding:16px 22px;width:100%;cursor:pointer}
+.small{font-size:12.5px;color:var(--grey);text-align:center;line-height:1.5}
+.err{color:#b8504a;font-size:14px;min-height:20px}
+</style>
+</head>
+<body>
+<div class="wrap" id="app"><div class="logo">LUXUR</div><p class="small">Cargando…</p></div>
+<script type="module">
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+const supabase = createClient("https://nrpgtlcdvtesjbxpkxha.supabase.co",
+  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5ycGd0bGNkdnRlc2pieHBreGhhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg3ODkzNTAsImV4cCI6MjA5NDM2NTM1MH0.ntRHkFobaVK6RW9EYRwoww1ATr8N0zHMzXHM__5x8E0");
+const app = document.getElementById('app');
+const esc = s => String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const cop = n => '$' + Math.round(n).toLocaleString('es-CO');
+const fecha = d => new Date(d).toLocaleDateString('es-CO', { day:'numeric', month:'long', year:'numeric' });
+const isApple = /iPhone|iPad|iPod|Macintosh/.test(navigator.userAgent);
+const seg = location.pathname.split('/').filter(Boolean);
+const token = new URLSearchParams(location.search).get('t') || (seg[0] === 'sellos' && seg[1]) || '';
+
+function registro(msg='') {
+  app.innerHTML = `
+  <div class="logo">LUXUR</div>
+  <section class="hero">
+    <p class="eyebrow">Tarjeta de sellos</p>
+    <h1>Compra 10 jeans y el siguiente es nuestro</h1>
+    <p>Cada jean que compres en LUXUR suma un sello. Al sello 10 te regalamos el jean de menor precio de esos 10. Tienes 10 meses desde tu primer sello.</p>
+  </section>
+  <section class="card">
+    <p class="lbl">Crea tu tarjeta</p>
+    <input id="n" placeholder="Tu nombre" autocomplete="name">
+    <input id="c" placeholder="Tu celular" inputmode="tel" autocomplete="tel">
+    <p class="err" id="e">${esc(msg)}</p>
+    <button id="go">Crear mi tarjeta</button>
+    <p class="small">Si ya tienes tarjeta, escribe tu mismo celular y te la mostramos.</p>
+  </section>`;
+  document.getElementById('go').onclick = async () => {
+    const { data } = await supabase.rpc('sellos_inscribir', { p_nombre: document.getElementById('n').value, p_celular: document.getElementById('c').value });
+    if (!data || data.error) { document.getElementById('e').textContent = 'Revisa tu nombre y tu celular (10 dígitos).'; return; }
+    location.href = `/sellos/${data.token}`;
+  };
+}
+
+async function tarjeta() {
+  const { data: s } = await supabase.rpc('sellos_estado', { p_token: token });
+  if (!s) return registro('Esta tarjeta no existe. Crea la tuya.');
+  const q = qrcode(0, 'M'); q.addData(`https://ops.luxurjeans.com/caja/sellos?t=${s.token}`); q.make();
+  const dots = Array.from({length:10}, (_, i) => i < s.sellos ? `<div class="dot on">${i+1}</div>` : (i === 9 ? `<div class="dot gift">GRATIS</div>` : `<div class="dot">${i+1}</div>`)).join('');
+  const premios = s.premios.map(p => `<div class="prize"><b>Tienes un jean gratis</b> de hasta ${cop(p.valor)}. Muestra esta tarjeta en caja para reclamarlo.</div>`).join('');
+  app.innerHTML = `
+  <div class="logo">LUXUR</div>
+  <section class="hero">
+    <p class="eyebrow">Tarjeta de sellos de ${esc(s.nombre.split(' ')[0])}</p>
+    <h1>${s.sellos} de 10 jeans</h1>
+    <p>${s.sellos === 0 ? 'Tu próximo jean es tu primer sello.' : `Te faltan ${10 - s.sellos} para tu jean gratis.${s.vence ? ` Tienes hasta el ${fecha(s.vence)}.` : ''}`}</p>
+  </section>
+  ${premios}
+  <section class="card"><p class="lbl">Tus sellos</p><div class="dots">${dots}</div></section>
+  <section class="card" style="align-items:center">
+    <p class="lbl" style="align-self:flex-start">Muéstralo en caja</p>
+    <div class="qr">${q.createSvgTag({ cellSize: 6, margin: 0, scalable: true })}</div>
+    <p class="small">Con cada compra de jeans, la vendedora escanea este código y te suma los sellos.</p>
+    ${isApple ? `<a class="btn" style="background:#000" href="https://nrpgtlcdvtesjbxpkxha.supabase.co/functions/v1/sellos-pass?t=${s.token}">Agregar a Apple Wallet</a>` : ''}
+  </section>
+  <p class="small">Guarda esta página en tu pantalla de inicio para verla siempre. Los sellos de compras en la web y por WhatsApp se suman mostrando la tarjeta en la tienda o escribiéndonos.</p>`;
+}
+
+token ? tarjeta() : registro();
+</script>
+</body>
+</html>

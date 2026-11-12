@@ -16,3 +16,8 @@
 # Ruleta BF 2026 · /premio/{token} → página del premio de la clienta
 /premio/*  /premio.html?t=:splat  200
 /ruleta  /ruleta.html  200
+
+# Sellos de jeans · /sellos (registro), /sellos/{token} (tarjeta), /caja/sellos (vendedora)
+/sellos  /sellos.html  200
+/sellos/*  /sellos.html?t=:splat  200
+/caja/sellos  /caja-sellos.html  200

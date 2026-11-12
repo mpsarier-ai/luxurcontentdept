@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no">
+<meta name="theme-color" content="#EDEBE6">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Sellos caja">
+<meta name="robots" content="noindex">
+<title>LUXUR · Sellos en caja</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Montserrat:wght@500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{--cream:#EDEBE6;--paper:#FBFAF7;--rosa:#EECDCC;--rosa-deep:#C9868E;--ink:#1C1C1C;--grey:#5A5A5A;--line:#BDBAB3;--ok:#5a7a4f;--alert:#b8504a}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{background:var(--cream);color:var(--ink);font-family:'Poppins',sans-serif;font-weight:300;min-height:100dvh;-webkit-font-smoothing:antialiased}
+.wrap{max-width:560px;margin:0 auto;padding:max(24px,env(safe-area-inset-top)) 16px 40px;display:flex;flex-direction:column;gap:16px}
+.logo{font-family:'Montserrat',sans-serif;font-weight:600;letter-spacing:0;font-size:22px;text-align:center}
+.tag{font-weight:600;font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:var(--grey);text-align:center}
+.hero{background:var(--ink);color:var(--paper);border-radius:24px;padding:24px 22px;display:flex;flex-direction:column;gap:8px}
+.hero .k{font-weight:600;font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--rosa)}
+.hero h1{font-weight:300;letter-spacing:-.02em;font-size:34px;line-height:1.1}
+.hero p{font-size:15px;color:#e2dcd5}
+.card{background:var(--paper);border-radius:20px;padding:20px 18px;display:flex;flex-direction:column;gap:12px}
+.lbl{font-weight:600;font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:var(--grey)}
+input{width:100%;background:#fff;border:1px solid rgba(0,0,0,.1);border-radius:14px;padding:15px 14px;font-family:'Poppins',sans-serif;font-size:17px}
+.row{display:flex;gap:10px;align-items:center}
+.step{display:flex;align-items:center;gap:14px}
+.step button{width:52px;height:52px;padding:0;border-radius:50%;font-size:24px;background:var(--rosa);color:var(--ink)}
+.step span{font-weight:300;font-size:40px;min-width:48px;text-align:center}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{border:1px solid rgba(0,0,0,.1);background:#fff;border-radius:999px;padding:11px 14px;font-family:'Poppins',sans-serif;font-size:15px;font-weight:500;cursor:pointer}
+.chip.on{background:var(--rosa);border-color:transparent}
+button.main{border:0;border-radius:999px;background:var(--ink);color:var(--paper);font-family:'Poppins',sans-serif;font-weight:600;font-size:16px;padding:17px 22px;width:100%;cursor:pointer;min-height:56px}
+button.ghost{background:transparent;color:var(--ink);border:1px solid var(--line)}
+.dots{display:grid;grid-template-columns:repeat(10,1fr);gap:6px}
+.dot{aspect-ratio:1;border-radius:50%;border:1.5px dashed var(--line)}
+.dot.on{background:var(--rosa-deep);border:0}
+.prize{background:var(--rosa);border-radius:16px;padding:16px;display:flex;flex-direction:column;gap:10px;font-size:15px}
+.msg{font-size:15px;min-height:22px}
+.msg.err{color:var(--alert)} .msg.ok{color:var(--ok);font-weight:500}
+.hide{display:none!important}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="logo">LUXUR</div>
+  <p class="tag">Sellos de jeans · caja</p>
+
+  <section class="card" id="s-pin">
+    <p class="lbl">PIN de la tienda</p>
+    <input id="pin" inputmode="numeric" placeholder="••••••">
+    <button class="main" id="pin-ok">Entrar</button>
+    <p class="msg err" id="pin-msg"></p>
+  </section>
+
+  <section class="card hide" id="s-find">
+    <p class="lbl">Buscar la tarjeta de la clienta</p>
+    <p style="font-size:14px;color:var(--grey)">Escanea el QR de su tarjeta con la cámara del iPad, o búscala por celular.</p>
+    <input id="cel" inputmode="tel" placeholder="Celular de la clienta">
+    <button class="main" id="find">Buscar</button>
+    <p class="msg err" id="find-msg"></p>
+    <div id="new" class="hide" style="display:flex;flex-direction:column;gap:10px">
+      <p style="font-size:15px">No tiene tarjeta todavía. Créala con su nombre:</p>
+      <input id="nom" placeholder="Nombre de la clienta">
+      <button class="main ghost" id="create">Crear tarjeta</button>
+    </div>
+  </section>
+
+  <div id="s-card" class="hide" style="display:flex;flex-direction:column;gap:16px">
+    <section class="hero"><p class="k" id="c-name"></p><h1 id="c-count"></h1><p id="c-sub"></p></section>
+    <section class="card"><div class="dots" id="c-dots"></div></section>
+    <div id="c-prizes"></div>
+    <section class="card">
+      <p class="lbl">Sumar sellos de esta compra</p>
+      <input id="fac" placeholder="Número de factura" autocapitalize="characters">
+      <p class="lbl">Jeans en la factura</p>
+      <div class="step"><button id="minus">−</button><span id="qty">1</span><button id="plus">+</button></div>
+      <p class="lbl">Precio del jean más barato de la compra</p>
+      <div class="chips" id="prices"></div>
+      <input id="precio" inputmode="numeric" placeholder="Otro precio">
+      <button class="main" id="add">Sumar sellos</button>
+      <p class="msg" id="add-msg"></p>
+    </section>
+    <button class="main ghost" id="other">Otra clienta</button>
+  </div>
+</div>
+
+<script type="module">
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+const supabase = createClient("https://nrpgtlcdvtesjbxpkxha.supabase.co",
+  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5ycGd0bGNkdnRlc2pieHBreGhhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg3ODkzNTAsImV4cCI6MjA5NDM2NTM1MH0.ntRHkFobaVK6RW9EYRwoww1ATr8N0zHMzXHM__5x8E0");
+const $ = id => document.getElementById(id);
+const store = { get(k){ try { return localStorage.getItem(k) } catch { return null } }, set(k,v){ try { localStorage.setItem(k,v) } catch {} } };
+const cop = n => '$' + Math.round(n).toLocaleString('es-CO');
+const fecha = d => new Date(d).toLocaleDateString('es-CO', { day:'numeric', month:'long' });
+let PIN = store.get('ruleta_pin'), TOKEN = new URLSearchParams(location.search).get('t'), qty = 1, precio = null;
+const show = (...ids) => ['s-pin','s-find','s-card'].forEach(i => $(i).classList.toggle('hide', !ids.includes(i)));
+
+const PRICES = [189000, 199000, 209000, 219000, 229000, 249000];
+$('prices').innerHTML = PRICES.map(p => `<button class="chip" data-p="${p}">${cop(p)}</button>`).join('');
+$('prices').onclick = e => { const b = e.target.closest('.chip'); if (!b) return;
+  precio = +b.dataset.p; $('precio').value = ''; document.querySelectorAll('.chip').forEach(c => c.classList.toggle('on', c === b)); };
+$('precio').oninput = () => { precio = +$('precio').value.replace(/\D/g,'') || null; document.querySelectorAll('.chip').forEach(c => c.classList.remove('on')); };
+$('minus').onclick = () => { qty = Math.max(1, qty-1); $('qty').textContent = qty; };
+$('plus').onclick = () => { qty = Math.min(20, qty+1); $('qty').textContent = qty; };
+
+function render(s) {
+  TOKEN = s.token;
+  $('c-name').textContent = s.nombre;
+  $('c-count').textContent = `${s.sellos} de 10 jeans`;
+  $('c-sub').textContent = s.sellos ? `Le faltan ${10-s.sellos}. Vence el ${fecha(s.vence)}.` : 'Todavía no tiene sellos en este ciclo.';
+  $('c-dots').innerHTML = Array.from({length:10}, (_, i) => `<div class="dot ${i < s.sellos ? 'on' : ''}"></div>`).join('');
+  $('c-prizes').innerHTML = s.premios.map(p => `
+    <div class="prize"><b>Jean gratis hasta ${cop(p.valor)}</b>
+      <span style="font-size:14px">Aplica en el POS un descuento por el valor del jean (máximo ${cop(p.valor)}) y escribe aquí la factura del canje.</span>
+      <input id="cf-${p.id}" placeholder="Factura del canje">
+      <button class="main" data-canje="${p.id}">Marcar como canjeado</button></div>`).join('');
+  show('s-card');
+}
+$('c-prizes').onclick = async e => {
+  const id = e.target.dataset.canje; if (!id) return;
+  const { data } = await supabase.rpc('sellos_canjear', { p_token: TOKEN, p_pin: PIN, p_premio: +id, p_factura: $(`cf-${id}`).value });
+  if (data && !data.error) render(data);
+};
+
+async function load() {
+  const { data } = await supabase.rpc('sellos_estado', { p_token: TOKEN });
+  if (!data) { TOKEN = null; show('s-find'); $('find-msg').textContent = 'Ese QR no es una tarjeta válida.'; return; }
+  render(data);
+}
+
+$('pin-ok').onclick = async () => {
+  const v = $('pin').value.trim();
+  const { data } = await supabase.rpc('sellos_buscar', { p_celular: '0', p_pin: v });
+  if (data && data.error === 'pin') { $('pin-msg').textContent = 'PIN incorrecto'; return; }
+  PIN = v; store.set('ruleta_pin', v); TOKEN ? load() : show('s-find');
+};
+$('find').onclick = async () => {
+  $('find-msg').textContent = ''; $('new').classList.add('hide');
+  const { data } = await supabase.rpc('sellos_buscar', { p_celular: $('cel').value, p_pin: PIN });
+  if (!data || data.error === 'pin') { show('s-pin'); return; }
+  if (data.error === 'no_existe') { $('new').classList.remove('hide'); return; }
+  render(data);
+};
+$('create').onclick = async () => {
+  const { data } = await supabase.rpc('sellos_inscribir', { p_nombre: $('nom').value, p_celular: $('cel').value });
+  if (!data || data.error) { $('find-msg').textContent = 'Revisa el nombre y el celular (10 dígitos).'; return; }
+  TOKEN = data.token; load();
+};
+$('add').onclick = async () => {
+  const m = $('add-msg'); m.className = 'msg err';
+  if (!$('fac').value.trim()) { m.textContent = 'Escribe la factura.'; return; }
+  if (!precio) { m.textContent = 'Elige el precio del jean más barato.'; return; }
+  $('add').disabled = true;
+  const { data } = await supabase.rpc('sellos_sumar', { p_token: TOKEN, p_pin: PIN, p_factura: $('fac').value, p_jeans: qty, p_precio: precio });
+  $('add').disabled = false;
+  if (!data) { m.textContent = 'Sin conexión. Intenta de nuevo.'; return; }
+  if (data.error) { m.textContent = ({factura_usada:'Esa factura ya sumó sellos.', pin:'PIN vencido.', factura:'Revisa la factura.'})[data.error] || 'Revisa los datos.'; return; }
+  render(data);
+  m.className = 'msg ok';
+  m.textContent = data.premios_nuevos ? `¡Completó 10! Se ganó un jean gratis. Lleva ${data.sellos} en la nueva tarjeta.` : `+${data.sumados} ${data.sumados === 1 ? 'sello' : 'sellos'}. Lleva ${data.sellos} de 10.`;
+  $('fac').value = ''; qty = 1; $('qty').textContent = '1';
+};
+$('other').onclick = () => { TOKEN = null; $('cel').value = ''; $('nom').value = ''; $('add-msg').textContent = ''; history.replaceState(null, '', '/caja/sellos'); show('s-find'); };
+
+if (!PIN) show('s-pin'); else if (TOKEN) load(); else show('s-find');
+</script>
+</body>
+</html>
