@@ -108,9 +108,9 @@ let PIN = store.get('ruleta_pin');
 /* ---- rueda: 10 segmentos, cada premio puede caer en varios ---- */
 const SEG = [
   {p:'P10',  t:'10%'},        {p:'TANK', t:'TANK TOP'}, {p:'30K', t:'$30.000'}, {p:'P10', t:'10%'},
-  {p:'ENVIO',t:'ENVÍO'},      {p:'JEAN', t:'JEAN'},     {p:'P10', t:'10%'},     {p:'TANK',t:'TANK TOP'},
-  {p:'30K',  t:'$30.000'},    {p:'ENVIO',t:'ENVÍO'}];
-const FILL = ['#FBFAF7','#EECDCC','#3A2E2E','#FBFAF7','#E3A7AE','#C9868E','#EECDCC','#FBFAF7','#3A2E2E','#E3A7AE'];
+  {p:'3X2',  t:'3X2 JEANS'},  {p:'TANK', t:'TANK TOP'}, {p:'P10', t:'10%'},     {p:'30K', t:'$30.000'},
+  {p:'3X2',  t:'3X2 JEANS'},  {p:'P10',  t:'10%'}];
+const FILL = ['#FBFAF7','#EECDCC','#3A2E2E','#FBFAF7','#C9868E','#EECDCC','#FBFAF7','#3A2E2E','#C9868E','#E3A7AE'];
 const N = SEG.length, A = 360 / N, R = 200;
 const g = $('wheel');
 SEG.forEach((s, i) => {
