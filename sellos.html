@@ -93,7 +93,7 @@ async function tarjeta() {
     <p class="lbl" style="align-self:flex-start">Muéstralo en caja</p>
     <div class="qr">${q.createSvgTag({ cellSize: 6, margin: 0, scalable: true })}</div>
     <p class="small">Con cada compra de jeans, la vendedora escanea este código y te suma los sellos.</p>
-    ${isApple ? `<a class="btn" style="background:#000" href="https://nrpgtlcdvtesjbxpkxha.supabase.co/functions/v1/sellos-pass?t=${s.token}">Agregar a Apple Wallet</a>` : ''}
+    ${isApple ? `<a class="btn" style="background:#000" href="https://nrpgtlcdvtesjbxpkxha.supabase.co/functions/v1/wallet-ws/pass?t=${s.token}">Agregar a Apple Wallet</a>` : ''}
   </section>
   <p class="small">Guarda esta página en tu pantalla de inicio para verla siempre. Los sellos de compras en la web y por WhatsApp se suman mostrando la tarjeta en la tienda o escribiéndonos.</p>`;
 }
