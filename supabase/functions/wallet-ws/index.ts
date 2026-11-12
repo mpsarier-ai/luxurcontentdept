@@ -13,7 +13,6 @@
 import forge from "npm:node-forge@1.3.1";
 import { zipSync, strToU8 } from "npm:fflate@0.8.2";
 import { createClient } from "npm:@supabase/supabase-js@2.45.4";
-import http2 from "node:http2";
 
 const URL_BASE = "https://nrpgtlcdvtesjbxpkxha.supabase.co/functions/v1/wallet-ws";
 const PTI = "pass.com.luxurjeans.ruleta";
@@ -119,20 +118,24 @@ const pkpassResponse = (bytes: Uint8Array, t: Tarjeta) => new Response(bytes, { 
   "Last-Modified": new Date(t.updated_at).toUTCString(), "Cache-Control": "no-store" } });
 
 // ---- APNs (certificado del pase, HTTP/2) ----
-async function apnsPush(token: string): Promise<{ status: number; body: string }> {
+async function apnsPush(token: string): Promise<{ status: number; body: string; via?: string }> {
   const sec = await getSecrets();
-  return await new Promise((resolve) => {
-    const session = http2.connect("https://api.push.apple.com:443", { cert: sec.cert, key: sec.key });
-    session.on("error", (e: Error) => resolve({ status: 0, body: "session: " + e.message }));
-    const req = session.request({ ":method": "POST", ":path": `/3/device/${token}`, "apns-topic": PTI, "apns-push-type": "background", "content-type": "application/json" });
-    let status = 0, body = "";
-    req.on("response", (h: Record<string, unknown>) => { status = Number(h[":status"]); });
-    req.on("data", (c: Uint8Array) => { body += new TextDecoder().decode(c); });
-    req.on("end", () => { session.close(); resolve({ status, body }); });
-    req.on("error", (e: Error) => { session.close(); resolve({ status: 0, body: "req: " + e.message }); });
-    req.end("{}");
-    setTimeout(() => { try { session.close(); } catch { /* */ } resolve({ status: 0, body: "timeout" }); }, 10000);
-  });
+  // 1) fetch con certificado de cliente (Deno.createHttpClient)
+  // deno-lint-ignore no-explicit-any
+  const D = Deno as any;
+  if (typeof D.createHttpClient === "function") {
+    try {
+      const client = D.createHttpClient({ cert: sec.cert, key: sec.key }); // probado: APNs acepta el certificado
+      const r = await fetch(`https://api.push.apple.com/3/device/${token}`, {
+        method: "POST", body: "{}", client,
+        headers: { "apns-topic": PTI, "content-type": "application/json" },
+      } as RequestInit);
+      return { status: r.status, body: await r.text(), via: "createHttpClient" };
+    } catch (e) {
+      console.error("createHttpClient", e);
+    }
+  }
+  return { status: 0, body: "sin cliente TLS" };
 }
 
 function authOk(req: Request, t: Tarjeta | null) {
