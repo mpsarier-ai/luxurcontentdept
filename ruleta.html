@@ -105,12 +105,12 @@ const show = id => { document.querySelectorAll('.screen').forEach(s => s.classLi
 const store = { get(k){ try { return localStorage.getItem(k) } catch { return null } }, set(k,v){ try { localStorage.setItem(k,v) } catch {} }, del(k){ try { localStorage.removeItem(k) } catch {} } };
 let PIN = store.get('ruleta_pin');
 
-/* ---- rueda: 10 segmentos, cada premio puede caer en varios ---- */
+/* ---- rueda: 12 segmentos intercalados (más $30.000 que tanks). La probabilidad real la decide ruleta_spin. ---- */
 const SEG = [
-  {p:'P10',  t:'10%'},        {p:'TANK', t:'TANK TOP'}, {p:'30K', t:'$30.000'}, {p:'P10', t:'10%'},
-  {p:'3X2',  t:'3X2 JEANS'},  {p:'TANK', t:'TANK TOP'}, {p:'P10', t:'10%'},     {p:'30K', t:'$30.000'},
-  {p:'3X2',  t:'3X2 JEANS'},  {p:'P10',  t:'10%'}];
-const FILL = ['#FBFAF7','#EECDCC','#3A2E2E','#FBFAF7','#C9868E','#EECDCC','#FBFAF7','#3A2E2E','#C9868E','#E3A7AE'];
+  {p:'P10', t:'10%'},       {p:'30K', t:'$30.000'},   {p:'TANK', t:'TANK TOP'}, {p:'P10', t:'10%'},
+  {p:'3X2', t:'3X2 JEANS'}, {p:'30K', t:'$30.000'},   {p:'P10', t:'10%'},       {p:'JEAN', t:'JEAN GRATIS'},
+  {p:'30K', t:'$30.000'},   {p:'TANK', t:'TANK TOP'}, {p:'P10', t:'10%'},       {p:'3X2', t:'3X2 JEANS'}];
+const FILL = ['#FBFAF7','#3A2E2E','#EECDCC','#FBFAF7','#C9868E','#3A2E2E','#FBFAF7','#E3A7AE','#3A2E2E','#EECDCC','#FBFAF7','#C9868E'];
 const N = SEG.length, A = 360 / N, R = 200;
 const g = $('wheel');
 SEG.forEach((s, i) => {
@@ -120,7 +120,7 @@ SEG.forEach((s, i) => {
   g.insertAdjacentHTML('beforeend',
     `<path d="M0 0 L${x0} ${y0} A${R} ${R} 0 0 1 ${x1} ${y1} Z" fill="${FILL[i]}" stroke="#1C1C1C" stroke-width="2"/>
      <text transform="rotate(${i*A-90}) translate(122 0)" text-anchor="middle" dominant-baseline="middle"
-       font-family="Poppins, sans-serif" font-weight="600" font-size="18" letter-spacing="1" fill="${dark ? '#FBFAF7' : '#1C1C1C'}">${s.t}</text>`);
+       font-family="Poppins, sans-serif" font-weight="600" font-size="${s.t.length>9?15:17}" letter-spacing="1" fill="${dark ? '#FBFAF7' : '#1C1C1C'}">${s.t}</text>`);
 });
 g.insertAdjacentHTML('beforeend', `<circle r="40" fill="#1C1C1C" stroke="#EECDCC" stroke-width="3"/>
   <text text-anchor="middle" dominant-baseline="middle" font-family="Montserrat, sans-serif" font-weight="600" font-size="15" fill="#EECDCC">LUXUR</text>`);
