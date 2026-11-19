@@ -48,6 +48,7 @@ input:focus{outline:none;border-color:var(--rp)}
 .small{font-size:12px;color:var(--gris);margin-top:12px;line-height:1.5}
 .legal{font-size:11px;color:#9b958c;margin-top:22px;line-height:1.5}
 .step{display:none}.step.on{display:block}
+body.embed .wrap{padding:22px 14px 20px}body.embed h1{font-size:30px}body.embed .eyebrow{margin-top:14px}body.embed .sub{font-size:13px;margin-top:8px}body.embed .cards{margin:20px 0 16px}body.embed .card{max-width:104px}body.embed .panel{padding:18px 16px}body.embed .legal{display:none}body.embed .logo{font-size:18px}
 </style>
 </head>
 <body>
@@ -75,7 +76,7 @@ input:focus{outline:none;border-color:var(--rp)}
       <div class="t" id="r-msg">es tuyo</div>
       <div class="code" id="r-code" title="toca para copiar">CODIGO</div>
       <div class="small" id="r-copy">toca el código para copiarlo</div>
-      <a class="btn rosa" id="r-go" href="#">usar mi descuento ahora</a>
+      <a class="btn rosa" id="r-go" href="#" target="_top">usar mi descuento ahora</a>
       <p class="small">válido hasta el jueves 26 de noviembre, en una compra, sobre la colección Black Friday elegible. no se acumula con otros descuentos.</p>
     </div>
   </div>
@@ -90,6 +91,7 @@ const $ = id => document.getElementById(id);
 const PCT = {P10:'10%',P15:'15%',P20:'20%'};
 const OTHERS = {P10:['15%','20%'],P15:['10%','20%'],P20:['10%','15%']};
 let busy = false, done = false;
+if (new URLSearchParams(location.search).get('embed')) document.body.classList.add('embed');
 
 document.querySelectorAll('.card').forEach(c => c.addEventListener('click', () => play(c)));
 
