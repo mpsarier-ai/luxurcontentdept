@@ -116,7 +116,7 @@ async function play(card){
   $('r-pct').textContent = pct + ' off';
   $('r-msg').textContent = data.repetido ? 'ya habías jugado, esta carta sigue siendo tuya ♡' : 'esta carta es tuya ♡';
   $('r-code').textContent = data.code;
-  $('r-go').href = 'https://luxurunited.com/discount/' + encodeURIComponent(data.code) + '?redirect=/collections/bf-2026-elegibles';
+  $('r-go').href = 'https://luxurunited.com/discount/' + encodeURIComponent(data.code) + '?redirect=/collections/black-friday-2026';
   $('s-email').classList.remove('on');
   setTimeout(() => $('s-res').classList.add('on'), 700);
 }
