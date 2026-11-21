@@ -1,6 +1,7 @@
 /* LUXUR · juego de cartas: pestaña lateral + popup (se carga desde el tema de Shopify) */
 (function(){
   if (window.__lxCartas) return; window.__lxCartas = true;
+  try { var pj = document.createElement('script'); pj.src = 'https://ops.luxurjeans.com/widget/precios.js?v=1121'; pj.defer = true; document.head.appendChild(pj); } catch(e){}
   var END = new Date('2026-11-27T04:59:00Z');
   if (new Date() > END) return;
   var p = location.pathname;

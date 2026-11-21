@@ -19,8 +19,7 @@
     var a = card && card.querySelector('a[href*="/products/"]');
     var href = a ? a.getAttribute('href') : null;
     if (!href){
-      var inProduct = pl.closest('.product-info, product-rerender, .product, [class*="product-info"], main');
-      if (inProduct && /\/products\//.test(location.pathname) && !pl.closest('product-recommendations, .product-recommendations')) href = location.pathname;
+      if (!card && /\/products\//.test(location.pathname) && pl.closest('.product-info, [class*="product-sticky-bar"], product-sticky-bar')) href = location.pathname;
     }
     if (!href) return null;
     var m = href.split('?')[0].match(/\/products\/([^\/#]+)/);
@@ -46,8 +45,8 @@
       if (!pl.querySelector('compare-at-price')){
         var was = document.createElement('span'); was.className = 'lxp-was'; was.textContent = fmt(base); pl.appendChild(was);
       }
-      var tag = document.createElement('span'); tag.className = 'lxp-tag'; tag.textContent = PCT + '% off'; pl.appendChild(tag);
-      if (/\/products\//.test(location.pathname) && !pl.closest('product-card, .product-card') && !pl.parentNode.querySelector('.lxp-note')){
+      var tag = document.createElement('span'); tag.className = 'lxp-tag'; tag.textContent = PCT + '% off' + (pl.querySelector('compare-at-price') ? ' extra' : ''); pl.appendChild(tag);
+      if (pl.closest('.product-info') && !pl.parentNode.querySelector('.lxp-note')){
         var note = document.createElement('div'); note.className = 'lxp-note'; note.textContent = 'el ' + PCT + '% off se pone solo en tu carrito, sin código. solo online.';
         pl.parentNode.insertBefore(note, pl.nextSibling);
       }
