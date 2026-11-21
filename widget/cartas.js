@@ -5,11 +5,11 @@
   var END = new Date('2026-11-27T04:59:00Z');
   if (new Date() > END) return;
   var p = location.pathname;
-  if (/\/(cart|checkouts?|account|pages\/luxur-club)/.test(p)) return;
+  if (/\/(cart|checkouts?|account|pages\/luxur-club|pages\/black-friday)/.test(p)) return;
   var GAME = 'https://ops.luxurjeans.com/cartas?embed=1';
   var now = new Date();
   var FINDE = now >= new Date('2026-11-20T05:00:00Z') && now < new Date('2026-11-23T04:59:00Z');
-  var SHOP = '/collections/black-friday-2026';
+  var SHOP = '/pages/black-friday';
   var css = '.lxk-tab{position:fixed;left:0;top:50%;z-index:2147483000;transform:translateY(-50%) rotate(180deg);writing-mode:vertical-rl;background:#1C1C1C;color:#FBFAF7;border:1px solid #E3A7AE;border-right:0;border-radius:14px 0 0 14px;padding:16px 9px;font:600 11px/1 Poppins,Helvetica,Arial,sans-serif;letter-spacing:.14em;text-transform:uppercase;cursor:pointer;box-shadow:0 8px 24px rgba(0,0,0,.25)}'
     + '.lxk-tab b{color:#E3A7AE;font-weight:600}'
     + '.lxk-ov{position:fixed;inset:0;z-index:2147483001;background:rgba(28,28,28,.72);display:none;align-items:center;justify-content:center;padding:12px}'
