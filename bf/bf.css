@@ -1,0 +1,47 @@
+/* LUXUR · página Black Friday (se carga desde una página de Shopify) */
+.main-page-title,.page-title,h1.title,.shopify-section--main-page .section-header,.shopify-section--main-page .page-header{display:none!important}
+.shopify-section--main-page .section-spacing{padding-top:0!important;padding-bottom:0!important}
+.lxb{--papel:#FBFAF7;--cream:#EDEBE6;--rosa:#EECDCC;--tinta:#1C1C1C;--gris:#5A5A5A;--linea:#BDBAB3;--suave:#E6E2DC;--calida:#3A2E2E;--rp:#C9868E;--rh:#E3A7AE;
+  width:100vw;position:relative;left:50%;margin-left:-50vw;background:var(--cream);color:var(--tinta);font-family:Poppins,Helvetica,Arial,sans-serif;text-align:left;overflow:hidden}
+.lxb *{box-sizing:border-box;margin:0;padding:0}
+.lxb a,.lxb a:hover,.lxb button{text-decoration:none!important;background-image:none!important}
+.lxb-hero{position:relative;background:radial-gradient(70% 55% at 50% 0%,rgba(227,167,174,.55),transparent 70%),radial-gradient(60% 40% at 50% 100%,rgba(201,134,142,.3),transparent 70%),var(--tinta);color:var(--papel);text-align:center;padding:64px 20px 56px}
+.lxb-k{font-weight:600;font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--rh)}
+.lxb-n{font-weight:300;font-size:clamp(120px,34vw,260px);line-height:.9;letter-spacing:-.04em;margin-top:10px;background:linear-gradient(180deg,var(--papel),var(--rosa) 60%,var(--rh));-webkit-background-clip:text;background-clip:text;color:transparent}
+.lxb-t{font-weight:300;font-size:clamp(28px,6vw,52px);line-height:1.05;letter-spacing:-.02em;margin-top:6px}
+.lxb-s{font-size:15px;line-height:1.55;color:#d8d2ca;max-width:420px;margin:16px auto 0}
+.lxb-clock{display:flex;justify-content:center;gap:10px;margin-top:28px}
+.lxb-clock div{min-width:68px;padding:12px 8px;border:1px solid rgba(227,167,174,.4);border-radius:16px}
+.lxb-clock b{display:block;font-weight:300;font-size:32px;line-height:1;letter-spacing:-.02em}
+.lxb-clock small{display:block;margin-top:6px;font-weight:600;font-size:9px;letter-spacing:.14em;text-transform:uppercase;color:var(--rh)}
+.lxb-btn{display:inline-block;margin-top:28px;padding:17px 34px;border-radius:999px;border:0;background:var(--rosa);color:var(--tinta)!important;font:600 12px/1 Poppins,Helvetica,Arial,sans-serif;letter-spacing:.14em;text-transform:uppercase;cursor:pointer}
+.lxb-cli{max-width:420px;margin:26px auto 0;padding:16px 18px;border:1px solid rgba(227,167,174,.4);border-radius:18px;font-size:14px;line-height:1.5;color:var(--papel)}
+.lxb-cli a{color:var(--rh)!important;text-decoration:underline!important}
+.lxb-rail{display:flex;gap:12px;overflow-x:auto;padding:28px 16px 6px;scroll-snap-type:x mandatory;scrollbar-width:none;max-width:1200px;margin:0 auto}
+.lxb-rail::-webkit-scrollbar{display:none}
+.lxb-step{flex:1 0 240px;scroll-snap-align:start;background:var(--papel);border-radius:20px;padding:20px}
+.lxb-step b{display:block;font-weight:300;font-size:40px;line-height:1;letter-spacing:-.02em;color:var(--rp)}
+.lxb-step p{margin-top:10px;font-size:15px;line-height:1.45}
+.lxb-step small{display:block;margin-top:6px;font-size:13px;line-height:1.45;color:var(--gris)}
+.lxb-bar{background:var(--cream);padding:18px 16px 12px;max-width:1200px;margin:0 auto}
+.lxb-h{font-weight:300;font-size:30px;line-height:1.1;letter-spacing:-.02em}
+.lxb-chips{display:flex;gap:8px;overflow-x:auto;margin-top:14px;scrollbar-width:none}
+.lxb-chips::-webkit-scrollbar{display:none}
+.lxb-chips button{flex:0 0 auto;padding:10px 16px;border-radius:999px;border:1px solid var(--linea);background:transparent;color:var(--tinta);font:600 11px/1 Poppins,Helvetica,Arial,sans-serif;letter-spacing:.14em;text-transform:uppercase;cursor:pointer}
+.lxb-chips button.on{background:var(--tinta);color:var(--papel);border-color:var(--tinta)}
+.lxb-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;padding:8px 16px 40px;max-width:1200px;margin:0 auto}
+@media(min-width:760px){.lxb-grid{grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}}
+@media(min-width:1080px){.lxb-grid{grid-template-columns:repeat(4,minmax(0,1fr))}}
+.lxb-card{display:block;background:var(--papel);border-radius:18px;overflow:hidden;color:var(--tinta)!important}
+.lxb-ph{position:relative;aspect-ratio:4/5;background:var(--suave);overflow:hidden}
+.lxb-ph img{width:100%;height:100%;object-fit:cover;display:block}
+.lxb-tag{position:absolute;left:10px;top:10px;padding:6px 10px;border-radius:999px;background:var(--tinta);color:var(--papel);font-weight:600;font-size:10px;letter-spacing:.14em;text-transform:uppercase}
+.lxb-out .lxb-ph img{filter:grayscale(1);opacity:.55}
+.lxb-out .lxb-tag{background:var(--gris)}
+.lxb-inf{padding:12px 12px 14px}
+.lxb-name{font-weight:600;font-size:10px;line-height:1.4;letter-spacing:.14em;text-transform:uppercase;color:var(--calida);min-height:2.8em}
+.lxb-pr{margin-top:8px;display:flex;align-items:baseline;gap:8px;flex-wrap:wrap}
+.lxb-pr b{font-weight:300;font-size:24px;line-height:1;letter-spacing:-.02em}
+.lxb-pr s{font-size:13px;color:var(--gris)}
+.lxb-empty{grid-column:1/-1;padding:40px 0;text-align:center;color:var(--gris);font-size:14px}
+.lxb-foot{padding:0 20px 56px;text-align:center;font-size:12px;line-height:1.6;color:var(--gris);max-width:520px;margin:0 auto}
