@@ -47,7 +47,7 @@
       }
       var tag = document.createElement('span'); tag.className = 'lxp-tag'; tag.textContent = PCT + '% off' + (pl.querySelector('compare-at-price') ? ' extra' : ''); pl.appendChild(tag);
       if (pl.closest('.product-info') && !pl.parentNode.querySelector('.lxp-note')){
-        var note = document.createElement('div'); note.className = 'lxp-note'; note.textContent = 'el ' + PCT + '% off se pone solo en tu carrito, sin código. solo online.';
+        var note = document.createElement('div'); note.className = 'lxp-note'; note.textContent = (new Date() >= new Date('2026-11-22T05:00:00Z') ? 'último día: ' : '') + 'el ' + PCT + '% off se pone solo en tu carrito, sin código. solo online' + (new Date() >= new Date('2026-11-22T05:00:00Z') ? ', hasta hoy a medianoche.' : '.');
         pl.parentNode.insertBefore(note, pl.nextSibling);
       }
     }

@@ -2,7 +2,7 @@
 (function(){
   var m = document.getElementById('lxbf-mount'); if (!m || window.__lxBF) return; window.__lxBF = true;
   // ventanas de descuento público: [inicio, fin, porcentaje, cierre en palabras]
-  var W = [['2026-11-20T05:00:00Z','2026-11-23T04:59:00Z',20,'hasta el domingo a medianoche']];
+  var W = [['2026-11-20T05:00:00Z','2026-11-22T05:00:00Z',20,'hasta el domingo a medianoche','black friday luxur ☆ solo online'],['2026-11-22T05:00:00Z','2026-11-23T04:59:00Z',20,'hasta hoy a medianoche','último día ☆ se acaba hoy a medianoche']];
   var NEXT = new Date('2026-11-27T05:00:00Z');
   var COL = 'black-friday-2026', now = new Date(), win = null;
   for (var i = 0; i < W.length; i++) if (now >= new Date(W[i][0]) && now < new Date(W[i][1])) win = W[i];
@@ -10,7 +10,7 @@
   function fmt(n){ return '$' + Math.round(n).toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.'); }
   function esc(s){ return String(s).replace(/[&<>"]/g, function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]; }); }
   var hero = win
-    ? '<div class="lxb-k">black friday luxur ☆ solo online</div><div class="lxb-n">' + PCT + '%</div><div class="lxb-t">off en toda la colección</div>'
+    ? '<div class="lxb-k">' + win[4] + '</div><div class="lxb-n">' + PCT + '%</div><div class="lxb-t">off en toda la colección</div>'
       + '<p class="lxb-s">sin código. se pone solo en tu carrito, ' + win[3] + '.</p>'
     : '<div class="lxb-k">black friday luxur</div><div class="lxb-t" style="margin-top:18px">llega el viernes 27</div>'
       + '<p class="lxb-s">el descuento más alto del año. deja tu jean elegido desde ya.</p>';
@@ -26,7 +26,7 @@
     + '<div id="lxb-shop"></div><div class="lxb-bar"><div class="lxb-h">' + (win ? 'todo esto tiene ' + PCT + '% off' : 'la colección') + '</div>'
     + '<div class="lxb-chips" id="lxbChips"><button type="button" class="on" data-f="all">todo</button><button type="button" data-f="LOW WIDE">low wide</button><button type="button" data-f="EXTRA LOW">extra low straight</button><button type="button" data-f="RELAXED">relaxed</button><button type="button" data-f="WIDE LEG">wide leg</button><button type="button" data-f="otros">más</button></div></div>'
     + '<div class="lxb-grid" id="lxbGrid"><div class="lxb-empty">cargando la colección…</div></div>'
-    + '<p class="lxb-foot">' + (win ? 'aplica en la colección black friday, solo en la tienda online. no se acumula con otros descuentos.' : '') + '</p></div>';
+    + '<p class="lxb-foot">' + (win ? 'aplica en la colección black friday, solo en la tienda online, ' + win[3] + '. no se acumula con otros descuentos.' : '') + '</p></div>';
   var root = document.getElementById('lxb');
   function tick(){
     var d = Math.max(0, END - new Date()), v = {D: Math.floor(d / 864e5), H: Math.floor(d / 36e5) % 24, M: Math.floor(d / 6e4) % 60, S: Math.floor(d / 1e3) % 60};
