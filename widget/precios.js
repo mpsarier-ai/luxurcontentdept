@@ -2,7 +2,7 @@
 (function(){
   if (window.__lxPrecios) return; window.__lxPrecios = true;
   // ventanas de descuento público: [inicio, fin, porcentaje]
-  var W = [['2026-11-20T05:00:00Z','2026-11-23T04:59:00Z',20]];
+  var W = [['2026-11-20T05:00:00Z','2026-11-23T04:59:00Z',20],['2026-11-23T18:20:00Z','2026-11-24T04:59:00Z',15]];
   var now = new Date(), PCT = 0;
   for (var i = 0; i < W.length; i++) if (now >= new Date(W[i][0]) && now < new Date(W[i][1])) PCT = W[i][2];
   if (!PCT) return;
@@ -47,7 +47,7 @@
       }
       var tag = document.createElement('span'); tag.className = 'lxp-tag'; tag.textContent = PCT + '% off' + (pl.querySelector('compare-at-price') ? ' extra' : ''); pl.appendChild(tag);
       if (pl.closest('.product-info') && !pl.parentNode.querySelector('.lxp-note')){
-        var note = document.createElement('div'); note.className = 'lxp-note'; note.textContent = (new Date() >= new Date('2026-11-22T05:00:00Z') ? 'último día: ' : '') + 'el ' + PCT + '% off se pone solo en tu carrito, sin código. solo online' + (new Date() >= new Date('2026-11-22T05:00:00Z') ? ', hasta hoy a medianoche.' : '.');
+        var note = document.createElement('div'); note.className = 'lxp-note'; note.textContent = 'solo hoy: el ' + PCT + '% off se pone solo en tu carrito, sin código. solo online, hasta medianoche.';
         pl.parentNode.insertBefore(note, pl.nextSibling);
       }
     }

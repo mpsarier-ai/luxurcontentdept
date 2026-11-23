@@ -2,7 +2,7 @@
 (function(){
   var m = document.getElementById('lxbf-mount'); if (!m || window.__lxBF) return; window.__lxBF = true;
   // ventanas de descuento público: [inicio, fin, porcentaje, cierre en palabras]
-  var W = [['2026-11-20T05:00:00Z','2026-11-22T05:00:00Z',20,'hasta el domingo a medianoche','black friday luxur ☆ solo online'],['2026-11-22T05:00:00Z','2026-11-23T04:59:00Z',20,'hasta hoy a medianoche','último día ☆ se acaba hoy a medianoche']];
+  var W = [['2026-11-20T05:00:00Z','2026-11-22T05:00:00Z',20,'hasta el domingo a medianoche','black friday luxur ☆ solo online',25],['2026-11-22T05:00:00Z','2026-11-23T04:59:00Z',20,'hasta hoy a medianoche','último día ☆ se acaba hoy a medianoche',25],['2026-11-23T18:20:00Z','2026-11-24T04:59:00Z',15,'hasta hoy a medianoche','solo hoy ☆ se acaba a medianoche',20]];
   var NEXT = new Date('2026-11-27T05:00:00Z');
   var COL = 'black-friday-2026', now = new Date(), win = null;
   for (var i = 0; i < W.length; i++) if (now >= new Date(W[i][0]) && now < new Date(W[i][1])) win = W[i];
@@ -15,7 +15,7 @@
     : '<div class="lxb-k">black friday luxur</div><div class="lxb-t" style="margin-top:18px">llega el viernes 27</div>'
       + '<p class="lxb-s">el descuento más alto del año. deja tu jean elegido desde ya.</p>';
   var clock = '<div class="lxb-clock"><div><b data-k="D">00</b><small>días</small></div><div><b data-k="H">00</b><small>horas</small></div><div><b data-k="M">00</b><small>min</small></div><div><b data-k="S">00</b><small>seg</small></div></div>';
-  var cli = win ? '<div class="lxb-cli">¿ya eres clienta? tienes <b>25%</b> entrando con tu correo o celular de siempre. <a href="/pages/luxur-club">entrar a la bóveda</a></div>' : '';
+  var cli = win ? '<div class="lxb-cli">¿ya eres clienta? tienes <b>' + win[5] + '%</b> entrando con tu correo o celular de siempre. <a href="/pages/luxur-club">entrar a la bóveda</a></div>' : '';
   var steps = win
     ? '<div class="lxb-rail"><div class="lxb-step"><b>1</b><p>elige tu jean</p><small>el precio que ves ya tiene el ' + PCT + '% off.</small></div>'
       + '<div class="lxb-step"><b>2</b><p>agrégalo al carrito</p><small>el descuento se pone solo, sin código.</small></div>'
