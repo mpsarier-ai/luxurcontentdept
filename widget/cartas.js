@@ -29,7 +29,7 @@
     + '.lxk-x{position:absolute;top:10px;right:10px;z-index:2;width:36px;height:36px;border-radius:999px;border:0;background:rgba(251,250,247,.14);color:#FBFAF7;font:300 22px/36px Poppins,Arial,sans-serif;cursor:pointer;padding:0}';
   var st = document.createElement('style'); st.textContent = css; document.head.appendChild(st);
   var tab = document.createElement('button'); tab.type = 'button'; tab.className = 'lxk-tab'; tab.setAttribute('aria-label', 'Jugar cartas LUXUR');
-  tab.innerHTML = HOY ? '15% off <b>\u2661 solo hoy</b>' : LAST ? '20% off <b>\u2661 se acaba hoy</b>' : FINDE ? '20% off en todo <b>\u2661 este fin de semana</b>' : 'elige tu carta <b>\u2661 hasta 20% off</b>';
+  tab.innerHTML = HOY ? '15% off <b>\u2661 solo hoy</b>' : LAST ? '20% off <b>\u2661 se acaba hoy</b>' : FINDE ? '20% off en todo <b>\u2661 este fin de semana</b>' : 'elige tu carta <b>\u2661 hasta 25% off</b>';
   if (FINDE) tab.setAttribute('aria-label', HOY ? '15% off solo hoy' : '20% off en todo este fin de semana');
   var ov = document.createElement('div'); ov.className = 'lxk-ov'; ov.setAttribute('role', 'dialog'); ov.setAttribute('aria-modal', 'true');
   ov.innerHTML = '<div class="lxk-box"><button type="button" class="lxk-x" aria-label="Cerrar">\u00d7</button></div>';
@@ -40,8 +40,9 @@
     else box.insertAdjacentHTML('beforeend', '<div class="k">' + (LAST ? '\u00faltimo d\u00eda \u2606 se acaba hoy a medianoche' : 'solo este fin de semana') + '</div><div class="n">20%</div><div class="t">' + (LAST ? 'off, y ma\u00f1ana ya no est\u00e1' : 'off en todo, sin c\u00f3digo') + '</div><div class="s">' + (LAST ? 'sin c\u00f3digo, se pone solo en tu carrito. <span id="lxk-cd"></span>' : 'se pone solo en tu carrito. hasta el domingo a medianoche.') + '</div><a class="b" href="' + SHOP + '">' + (LAST ? 'comprar antes de medianoche' : 'comprar ahora') + '</a><div class="c">\u00bfya eres clienta? tienes <b>25%</b> entrando con tu correo o celular de siempre. <a href="/pages/luxur-club">entrar a la b\u00f3veda</a></div>');
   }
   function bar(){
-    if (!FINDE) return;
-    var as = document.querySelectorAll('a[href*="ops.luxurjeans.com/cartas"]');
+    var as0 = document.querySelectorAll('a[href*="ops.luxurjeans.com/cartas"]');
+    if (!FINDE){ for (var j = 0; j < as0.length; j++){ if (as0[j].closest('.lxk-ov')) continue; if (/20% OFF/.test(as0[j].textContent)) as0[j].textContent = as0[j].textContent.replace('20% OFF', '25% OFF'); } return; }
+    var as = as0;
     for (var i = 0; i < as.length; i++){ if (as[i].closest('.lxk-ov')) continue; as[i].href = SHOP; as[i].removeAttribute('target'); as[i].textContent = HOY ? 'SOLO HOY \u2661 15% OFF SIN C\u00d3DIGO, HASTA MEDIANOCHE' : LAST ? '\u00daLTIMO D\u00cdA \u2661 20% OFF SE ACABA HOY A MEDIANOCHE' : '20% OFF EN TODO ESTE FIN DE SEMANA \u2661 SIN C\u00d3DIGO'; }
   }
   function open(){ if (!loaded){ var f = document.createElement('iframe'); f.src = GAME; f.title = 'Juego de cartas LUXUR'; box.appendChild(f); loaded = true; } ov.classList.add('on'); }

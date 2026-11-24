@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Cartas LUXUR</title>
-<meta name="description" content="elige una carta y descubre tu descuento LUXUR, hasta 20% off">
+<meta name="description" content="elige una carta y descubre tu descuento LUXUR, hasta 25% off">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Montserrat:wght@500;600;700&display=swap" rel="stylesheet">
 <style>
@@ -56,7 +56,7 @@ body.embed .wrap{padding:22px 14px 20px}body.embed h1{font-size:30px}body.embed 
   <div class="logo">LUXUR</div>
   <div class="eyebrow">juego de cartas ☆ solo por estos días</div>
   <h1>elige una carta,<br><em>tu descuento te espera</em></h1>
-  <p class="sub">hay tres cartas boca abajo. una es tuya, y detrás hay hasta 20% off en jeans LUXUR.</p>
+  <p class="sub">hay tres cartas boca abajo. una es tuya, y detrás hay hasta 25% off en jeans LUXUR.</p>
 
   <div class="cards" id="cards">
     <div class="card" data-i="0"><div class="face back"><div class="m">LUXUR</div><div class="s">♡</div></div><div class="face front"><div class="pct">?</div><div class="off">OFF</div></div></div>
@@ -88,8 +88,8 @@ import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 const supabase = createClient("https://nrpgtlcdvtesjbxpkxha.supabase.co",
   "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5ycGd0bGNkdnRlc2pieHBreGhhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg3ODkzNTAsImV4cCI6MjA5NDM2NTM1MH0.ntRHkFobaVK6RW9EYRwoww1ATr8N0zHMzXHM__5x8E0");
 const $ = id => document.getElementById(id);
-const PCT = {P10:'10%',P15:'15%',P20:'20%'};
-const OTHERS = {P10:['15%','20%'],P15:['10%','20%'],P20:['10%','15%']};
+const PCT = {P10:'10%',P15:'15%',P20:'20%',P25:'25%'};
+const OTHERS = {P10:['15%','20%'],P15:['20%','25%'],P20:['15%','25%'],P25:['15%','20%']};
 let busy = false, done = false;
 if (new URLSearchParams(location.search).get('embed')) document.body.classList.add('embed');
 
