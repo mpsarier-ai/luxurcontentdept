@@ -6,7 +6,9 @@
   var now = new Date(), PCT = 0;
   for (var i = 0; i < W.length; i++) if (now >= new Date(W[i][0]) && now < new Date(W[i][1])) PCT = W[i][2];
   if (!PCT) return;
-  var COL = 'black-friday-2026', KEY = 'lxp_handles_v1', set = null;
+  var COLS = [['black-friday-2026', PCT]];
+  if (now >= new Date('2026-11-26T14:00:00Z') && now < new Date('2026-11-27T04:59:00Z')) COLS.push(['black-friday-25', 25]);
+  var KEY = 'lxp_handles_v2', set = null;
   var css = 'price-list .lxp-now{color:#C9868E!important;font-weight:600}'
     + 'price-list .lxp-was{text-decoration:line-through;opacity:.6;margin-left:.45em;font-weight:400}'
     + 'price-list .lxp-tag{display:inline-block;margin-left:.5em;padding:2px 8px;border-radius:999px;background:#1C1C1C;color:#FBFAF7;font:600 10px/1.6 Poppins,Helvetica,Arial,sans-serif;letter-spacing:.14em;text-transform:uppercase;vertical-align:middle;white-space:nowrap}'
@@ -34,9 +36,10 @@
       var sp = pl.querySelector('sale-price'); if (!sp) continue;
       if (sp.getAttribute('data-lxp') === '1') continue;
       var h = handleOf(pl); if (!h || !set[h]) continue;
+      var P = set[h];
       var base = num(sp.lastChild && sp.lastChild.nodeType === 3 ? sp.lastChild.textContent : sp.textContent);
       if (!base) continue;
-      var now_ = base * (100 - PCT) / 100;
+      var now_ = base * (100 - P) / 100;
       var sr = sp.querySelector('.sr-only');
       sp.textContent = ''; if (sr) sp.appendChild(sr);
       sp.appendChild(document.createTextNode(fmt(now_)));
@@ -45,9 +48,9 @@
       if (!pl.querySelector('compare-at-price')){
         var was = document.createElement('span'); was.className = 'lxp-was'; was.textContent = fmt(base); pl.appendChild(was);
       }
-      var tag = document.createElement('span'); tag.className = 'lxp-tag'; tag.textContent = PCT + '% off' + (pl.querySelector('compare-at-price') ? ' extra' : ''); pl.appendChild(tag);
+      var tag = document.createElement('span'); tag.className = 'lxp-tag'; tag.textContent = P + '% off' + (pl.querySelector('compare-at-price') ? ' extra' : ''); pl.appendChild(tag);
       if (pl.closest('.product-info') && !pl.parentNode.querySelector('.lxp-note')){
-        var note = document.createElement('div'); note.className = 'lxp-note'; note.textContent = 'solo hoy: el ' + PCT + '% off se pone solo en tu carrito, sin código. solo online, hasta medianoche.';
+        var note = document.createElement('div'); note.className = 'lxp-note'; note.textContent = 'solo hoy: el ' + P + '% off se pone solo en tu carrito, sin código. solo online, hasta medianoche.';
         pl.parentNode.insertBefore(note, pl.nextSibling);
       }
     }
@@ -58,11 +61,14 @@
     paint();
     new MutationObserver(later).observe(document.documentElement, {childList: true, subtree: true, characterData: true});
   }
-  function load(page, acc){
-    return fetch('/collections/' + COL + '/products.json?limit=250&page=' + page).then(function(r){ return r.json(); }).then(function(j){
-      var ps = j.products || []; for (var i = 0; i < ps.length; i++) acc[ps[i].handle] = 1;
-      return ps.length === 250 ? load(page + 1, acc) : acc;
+  function load1(col, pct, page, acc){
+    return fetch('/collections/' + col + '/products.json?limit=250&page=' + page).then(function(r){ return r.json(); }).then(function(j){
+      var ps = j.products || []; for (var i = 0; i < ps.length; i++) if (!acc[ps[i].handle] || acc[ps[i].handle] < pct) acc[ps[i].handle] = pct;
+      return ps.length === 250 ? load1(col, pct, page + 1, acc) : acc;
     });
+  }
+  function load(page, acc){
+    return COLS.reduce(function(pr, c){ return pr.then(function(a){ return load1(c[0], c[1], 1, a).catch(function(){ return a; }); }); }, Promise.resolve(acc));
   }
   try { var c = JSON.parse(sessionStorage.getItem(KEY) || 'null'); if (c && c.t > Date.now() - 6e5) set = c.s; } catch(e){}
   function go(){ if (document.body) start(); else document.addEventListener('DOMContentLoaded', start); }

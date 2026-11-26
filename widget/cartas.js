@@ -1,7 +1,7 @@
 /* LUXUR · juego de cartas: pestaña lateral + popup (se carga desde el tema de Shopify) */
 (function(){
   if (window.__lxCartas) return; window.__lxCartas = true;
-  try { var pj = document.createElement('script'); pj.src = 'https://ops.luxurjeans.com/widget/precios.js?v=1126'; pj.defer = true; document.head.appendChild(pj); } catch(e){}
+  try { var pj = document.createElement('script'); pj.src = 'https://ops.luxurjeans.com/widget/precios.js?v=1126b'; pj.defer = true; document.head.appendChild(pj); } catch(e){}
   var END = new Date('2026-11-27T04:59:00Z');
   if (new Date() > END) return;
   var p = location.pathname;
@@ -38,7 +38,7 @@
   var box = ov.firstChild, loaded = false;
   if (FINDE){
     box.className = 'lxk-box lxk-promo'; loaded = true;
-    if (HOY) box.insertAdjacentHTML('beforeend', '<div class="k">solo hoy \u2606 hasta medianoche</div><div class="n">' + HP + '%</div><div class="t">off en toda la colecci\u00f3n</div><div class="s">sin c\u00f3digo, se pone solo en tu carrito. solo online.</div><a class="b" href="' + SHOP + '">comprar ahora</a><div class="c">\u00bfya eres clienta? tienes <b>' + HC + ' entrando con tu correo o celular de siempre. <a href="/pages/luxur-club">entrar a la b\u00f3veda</a></div>');
+    if (HOY) box.insertAdjacentHTML('beforeend', '<div class="k">solo hoy \u2606 hasta medianoche</div><div class="n">' + HP + '%</div><div class="t">off en toda la colecci\u00f3n' + (JUE ? '<br>y 25% en \u00faltimas unidades' : '') + '</div><div class="s">sin c\u00f3digo, se pone solo en tu carrito. solo online.</div><a class="b" href="' + SHOP + '">comprar ahora</a><div class="c">\u00bfya eres clienta? tienes <b>' + HC + ' entrando con tu correo o celular de siempre. <a href="/pages/luxur-club">entrar a la b\u00f3veda</a></div>');
     else box.insertAdjacentHTML('beforeend', '<div class="k">' + (LAST ? '\u00faltimo d\u00eda \u2606 se acaba hoy a medianoche' : 'solo este fin de semana') + '</div><div class="n">20%</div><div class="t">' + (LAST ? 'off, y ma\u00f1ana ya no est\u00e1' : 'off en todo, sin c\u00f3digo') + '</div><div class="s">' + (LAST ? 'sin c\u00f3digo, se pone solo en tu carrito. <span id="lxk-cd"></span>' : 'se pone solo en tu carrito. hasta el domingo a medianoche.') + '</div><a class="b" href="' + SHOP + '">' + (LAST ? 'comprar antes de medianoche' : 'comprar ahora') + '</a><div class="c">\u00bfya eres clienta? tienes <b>25%</b> entrando con tu correo o celular de siempre. <a href="/pages/luxur-club">entrar a la b\u00f3veda</a></div>');
   }
   function bar(){

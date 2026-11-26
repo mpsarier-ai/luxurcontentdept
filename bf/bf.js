@@ -7,10 +7,11 @@
   var COL = 'black-friday-2026', now = new Date(), win = null;
   for (var i = 0; i < W.length; i++) if (now >= new Date(W[i][0]) && now < new Date(W[i][1])) win = W[i];
   var PCT = win ? win[2] : 0, END = win ? new Date(win[1]) : NEXT;
+  var COL25 = (now >= new Date('2026-11-26T14:00:00Z') && now < new Date('2026-11-27T04:59:00Z')) ? 'black-friday-25' : null;
   function fmt(n){ return '$' + Math.round(n).toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.'); }
   function esc(s){ return String(s).replace(/[&<>"]/g, function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]; }); }
   var hero = win
-    ? '<div class="lxb-k">' + win[4] + '</div><div class="lxb-n">' + PCT + '%</div><div class="lxb-t">off en toda la colección</div>'
+    ? '<div class="lxb-k">' + win[4] + '</div><div class="lxb-n">' + PCT + '%</div><div class="lxb-t">off en toda la colección' + (COL25 ? '<br><em style="font-style:normal;color:#E3A7AE">y 25% en últimas unidades</em>' : '') + '</div>'
       + '<p class="lxb-s">sin código. se pone solo en tu carrito, ' + win[3] + '.</p>'
     : '<div class="lxb-k">black friday luxur</div><div class="lxb-t" style="margin-top:18px">llega el viernes 27</div>'
       + '<p class="lxb-s">el descuento más alto del año. deja tu jean elegido desde ya.</p>';
@@ -23,8 +24,8 @@
     : '';
   m.outerHTML = '<div class="lxb" id="lxb"><section class="lxb-hero">' + hero + clock
     + '<div><a class="lxb-btn" href="#lxb-shop">' + (win ? 'comprar ahora' : 'ver la colección') + '</a></div>' + cli + '</section>' + steps
-    + '<div id="lxb-shop"></div><div class="lxb-bar"><div class="lxb-h">' + (win ? 'todo esto tiene ' + PCT + '% off' : 'la colección') + '</div>'
-    + '<div class="lxb-chips" id="lxbChips"><button type="button" class="on" data-f="all">todo</button><button type="button" data-f="LOW WIDE">low wide</button><button type="button" data-f="EXTRA LOW">extra low straight</button><button type="button" data-f="RELAXED">relaxed</button><button type="button" data-f="WIDE LEG">wide leg</button><button type="button" data-f="otros">más</button></div></div>'
+    + '<div id="lxb-shop"></div><div class="lxb-bar"><div class="lxb-h">' + (win ? (COL25 ? 'todo en descuento hoy' : 'todo esto tiene ' + PCT + '% off') : 'la colección') + '</div>'
+    + '<div class="lxb-chips" id="lxbChips"><button type="button" class="on" data-f="all">todo</button>' + (COL25 ? '<button type="button" data-f="p25">25% off</button>' : '') + '<button type="button" data-f="LOW WIDE">low wide</button><button type="button" data-f="EXTRA LOW">extra low straight</button><button type="button" data-f="RELAXED">relaxed</button><button type="button" data-f="WIDE LEG">wide leg</button><button type="button" data-f="otros">más</button></div></div>'
     + '<div class="lxb-grid" id="lxbGrid"><div class="lxb-empty">cargando la colección…</div></div>'
     + '<p class="lxb-foot">' + (win ? 'aplica en la colección black friday, solo en la tienda online, ' + win[3] + '. no se acumula con otros descuentos.' : '') + '</p></div>';
   var root = document.getElementById('lxb');
@@ -40,11 +41,11 @@
   function draw(){
     var g = document.getElementById('lxbGrid'), h = '';
     for (var i = 0; i < all.length; i++){
-      var p = all[i]; if (f !== 'all' && p.fit !== f) continue;
-      var nowp = p.price * (100 - PCT) / 100, was = PCT ? p.price : (p.cmp > p.price ? p.cmp : 0);
+      var p = all[i]; if (f === 'p25' ? p.pct !== 25 : (f !== 'all' && p.fit !== f)) continue;
+      var PP = p.pct || PCT, nowp = p.price * (100 - PP) / 100, was = PP ? p.price : (p.cmp > p.price ? p.cmp : 0);
       h += '<a class="lxb-card' + (p.ok ? '' : ' lxb-out') + '" href="/products/' + encodeURIComponent(p.handle) + '"><div class="lxb-ph">'
         + (p.img ? '<img loading="lazy" src="' + esc(img(p.img)) + '" alt="' + esc(p.title) + '">' : '')
-        + (p.ok ? (PCT ? '<span class="lxb-tag">' + PCT + '% off</span>' : '') : '<span class="lxb-tag">agotado</span>')
+        + (p.ok ? (PP ? '<span class="lxb-tag">' + PP + '% off</span>' : '') : '<span class="lxb-tag">agotado</span>')
         + '</div><div class="lxb-inf"><div class="lxb-name">' + esc(p.title) + '</div><div class="lxb-pr"><b>' + fmt(nowp) + '</b>' + (was ? '<s>' + fmt(was) + '</s>' : '') + '</div></div></a>';
     }
     g.innerHTML = h || '<div class="lxb-empty">no hay piezas en este fit por ahora.</div>';
@@ -53,17 +54,18 @@
     var b = e.target.closest('button'); if (!b) return; f = b.getAttribute('data-f');
     var bs = this.querySelectorAll('button'); for (var i = 0; i < bs.length; i++) bs[i].classList.toggle('on', bs[i] === b); draw();
   });
-  function load(page){
-    return fetch('/collections/' + COL + '/products.json?limit=250&page=' + page).then(function(r){ return r.json(); }).then(function(j){
+  function load(page, col, pct){
+    col = col || COL;
+    return fetch('/collections/' + col + '/products.json?limit=250&page=' + page).then(function(r){ return r.json(); }).then(function(j){
       var ps = j.products || [];
       for (var i = 0; i < ps.length; i++){
         var p = ps[i], vs = p.variants || [], ok = false, price = 0, cmp = 0;
         for (var k = 0; k < vs.length; k++){ if (vs[k].available) ok = true; var pr = parseFloat(vs[k].price); if (!price || pr < price){ price = pr; cmp = parseFloat(vs[k].compare_at_price || 0); } }
         if (!price) continue;
-        all.push({title: p.title, handle: p.handle, img: p.images && p.images[0] ? p.images[0].src : '', price: price, cmp: cmp, ok: ok, fit: fit(p.title)});
+        all.push({pct: pct || 0, title: p.title, handle: p.handle, img: p.images && p.images[0] ? p.images[0].src : '', price: price, cmp: cmp, ok: ok, fit: fit(p.title)});
       }
-      return ps.length === 250 ? load(page + 1) : null;
+      return ps.length === 250 ? load(page + 1, col, pct) : null;
     });
   }
-  load(1).then(function(){ all.sort(function(a, b){ return (b.ok - a.ok); }); draw(); }).catch(function(){ document.getElementById('lxbGrid').innerHTML = '<div class="lxb-empty"><a href="/collections/' + COL + '">ver la colección</a></div>'; });
+  (COL25 ? load(1, COL25, 25).catch(function(){}) : Promise.resolve()).then(function(){ return load(1); }).then(function(){ all.sort(function(a, b){ return (b.ok - a.ok) || ((b.pct || 0) - (a.pct || 0)); }); draw(); }).catch(function(){ document.getElementById('lxbGrid').innerHTML = '<div class="lxb-empty"><a href="/collections/' + COL + '">ver la colección</a></div>'; });
 })();
