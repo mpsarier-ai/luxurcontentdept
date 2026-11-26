@@ -2,7 +2,7 @@
 (function(){
   if (window.__lxPrecios) return; window.__lxPrecios = true;
   // ventanas de descuento público: [inicio, fin, porcentaje]
-  var W = [['2026-11-20T05:00:00Z','2026-11-23T04:59:00Z',20],['2026-11-23T18:20:00Z','2026-11-24T04:59:00Z',15]];
+  var W = [['2026-11-20T05:00:00Z','2026-11-23T04:59:00Z',20],['2026-11-23T18:20:00Z','2026-11-24T04:59:00Z',15],['2026-11-26T14:00:00Z','2026-11-27T04:59:00Z',20]];
   var now = new Date(), PCT = 0;
   for (var i = 0; i < W.length; i++) if (now >= new Date(W[i][0]) && now < new Date(W[i][1])) PCT = W[i][2];
   if (!PCT) return;
