@@ -12,7 +12,7 @@
       var mount = function(){
         var mn = document.querySelector('main'); if (!mn || document.getElementById('lxbf-home')) return;
         var w = document.createElement('div'); w.id = 'lxbf-home'; w.innerHTML = '<div id="lxbf-mount"></div>'; mn.insertBefore(w, mn.firstChild);
-        var bs = document.createElement('script'); bs.src = 'https://ops.luxurjeans.com/bf/bf.js?v=1626'; document.body.appendChild(bs);
+        var bs = document.createElement('script'); bs.src = 'https://ops.luxurjeans.com/bf/bf.js?v=1827'; document.body.appendChild(bs);
       };
       if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', mount); else mount();
     }

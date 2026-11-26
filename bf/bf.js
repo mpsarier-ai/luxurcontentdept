@@ -29,7 +29,7 @@
     + '<div id="lxb-shop"></div><div class="lxb-bar"><div class="lxb-h">' + (win ? (COL25 ? 'todo en descuento hoy' : 'todo esto tiene ' + PCT + '% off') : 'la colección') + '</div>'
     + '<div class="lxb-chips" id="lxbChips"><button type="button" class="on" data-f="all">todo</button>' + (COL25 ? '<button type="button" data-f="p25">25% off</button>' : '') + '<button type="button" data-f="LOW WIDE">low wide</button><button type="button" data-f="EXTRA LOW">extra low straight</button><button type="button" data-f="RELAXED">relaxed</button><button type="button" data-f="WIDE LEG">wide leg</button><button type="button" data-f="otros">más</button></div></div>'
     + '<div class="lxb-grid" id="lxbGrid"><div class="lxb-empty">cargando la colección…</div></div>'
-    + '<p class="lxb-foot">' + (win ? 'aplica en la colección black friday, solo en la tienda online, ' + win[3] + '. no se acumula con otros descuentos.' : '') + '</p></div>';
+    + '<p class="lxb-foot">' + (win ? 'aplica en la colección black friday, solo en la tienda online, ' + win[3] + '. no se acumula con otros descuentos. ' : '') + '<a href="/pages/politicas-black-friday" style="color:inherit;text-decoration:underline">políticas de black friday y cambios</a></p></div>';
   var root = document.getElementById('lxb');
   function tick(){
     var d = Math.max(0, END - new Date()), v = {D: Math.floor(d / 864e5), H: Math.floor(d / 36e5) % 24, M: Math.floor(d / 6e4) % 60, S: Math.floor(d / 1e3) % 60};
