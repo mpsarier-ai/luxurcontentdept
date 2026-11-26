@@ -2,13 +2,13 @@
 (function(){
   if (window.__lxPrecios) return; window.__lxPrecios = true;
   // ventanas de descuento público: [inicio, fin, porcentaje]
-  var W = [['2026-11-20T05:00:00Z','2026-11-23T04:59:00Z',20],['2026-11-23T18:20:00Z','2026-11-24T04:59:00Z',15],['2026-11-26T14:00:00Z','2026-11-27T04:59:00Z',20],['2026-11-27T05:00:00Z','2026-11-28T04:59:00Z',30]];
+  var W = [['2026-11-20T05:00:00Z','2026-11-23T04:59:00Z',20],['2026-11-23T18:20:00Z','2026-11-24T04:59:00Z',15],['2026-11-26T14:00:00Z','2026-11-27T01:00:00Z',20],['2026-11-27T01:00:00Z','2026-11-28T04:59:00Z',30]];
   var now = new Date(), PCT = 0;
   for (var i = 0; i < W.length; i++) if (now >= new Date(W[i][0]) && now < new Date(W[i][1])) PCT = W[i][2];
   if (!PCT) return;
   var COLS = [['black-friday-2026', PCT]];
-  if (now >= new Date('2026-11-26T14:00:00Z') && now < new Date('2026-11-27T04:59:00Z')) { COLS.push(['black-friday-25', 25]); COLS.push(['black-friday-20b', 20]); }
-  else if (now >= new Date('2026-11-27T05:00:00Z') && now < new Date('2026-11-28T04:59:00Z')) { COLS.push(['black-friday-25', 30]); COLS.push(['black-friday-20b', 30]); }
+  if (now >= new Date('2026-11-26T14:00:00Z') && now < new Date('2026-11-27T01:00:00Z')) { COLS.push(['black-friday-25', 25]); COLS.push(['black-friday-20b', 20]); }
+  else if (now >= new Date('2026-11-27T01:00:00Z') && now < new Date('2026-11-28T04:59:00Z')) { COLS.push(['black-friday-25', 30]); COLS.push(['black-friday-20b', 30]); }
   var KEY = 'lxp_handles_v3_' + PCT, set = null;
   var css = 'price-list .lxp-now{color:#C9868E!important;font-weight:600}'
     + 'price-list .lxp-was{text-decoration:line-through;opacity:.6;margin-left:.45em;font-weight:400}'
@@ -51,7 +51,7 @@
       }
       var tag = document.createElement('span'); tag.className = 'lxp-tag'; tag.textContent = P + '% off' + (pl.querySelector('compare-at-price') ? ' extra' : ''); pl.appendChild(tag);
       if (pl.closest('.product-info') && !pl.parentNode.querySelector('.lxp-note')){
-        var note = document.createElement('div'); note.className = 'lxp-note'; note.textContent = 'solo hoy: el ' + P + '% off se pone solo en tu carrito, sin código. solo online, hasta medianoche.';
+        var note = document.createElement('div'); note.className = 'lxp-note'; note.textContent = (new Date() < new Date('2026-11-27T01:00:00Z') ? 'solo hoy: el ' + P + '% off se pone solo en tu carrito, sin código. solo online, hasta las 8 p. m. (después sube a 30%).' : new Date() < new Date('2026-11-27T05:00:00Z') ? 'black friday: el 30% off se pone solo en tu carrito, sin código. solo online, hasta mañana a medianoche.' : 'black friday: el 30% off se pone solo en tu carrito, sin código. solo online, hasta hoy a medianoche.');
         pl.parentNode.insertBefore(note, pl.nextSibling);
       }
     }
