@@ -67,5 +67,5 @@
       return ps.length === 250 ? load(page + 1, col, pct) : null;
     });
   }
-  (COL25 ? load(1, COL25, 25).catch(function(){}) : Promise.resolve()).then(function(){ return load(1); }).then(function(){ all.sort(function(a, b){ return (b.ok - a.ok) || ((b.pct || 0) - (a.pct || 0)); }); draw(); }).catch(function(){ document.getElementById('lxbGrid').innerHTML = '<div class="lxb-empty"><a href="/collections/' + COL + '">ver la colección</a></div>'; });
+  (COL25 ? load(1, COL25, 25).catch(function(){}).then(function(){ return load(1, 'black-friday-20b', 20).catch(function(){}); }) : Promise.resolve()).then(function(){ return load(1); }).then(function(){ all.sort(function(a, b){ return (b.ok - a.ok) || ((b.pct || 0) - (a.pct || 0)); }); draw(); }).catch(function(){ document.getElementById('lxbGrid').innerHTML = '<div class="lxb-empty"><a href="/collections/' + COL + '">ver la colección</a></div>'; });
 })();

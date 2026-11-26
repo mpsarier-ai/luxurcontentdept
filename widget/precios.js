@@ -7,8 +7,8 @@
   for (var i = 0; i < W.length; i++) if (now >= new Date(W[i][0]) && now < new Date(W[i][1])) PCT = W[i][2];
   if (!PCT) return;
   var COLS = [['black-friday-2026', PCT]];
-  if (now >= new Date('2026-11-26T14:00:00Z') && now < new Date('2026-11-27T04:59:00Z')) COLS.push(['black-friday-25', 25]);
-  var KEY = 'lxp_handles_v2', set = null;
+  if (now >= new Date('2026-11-26T14:00:00Z') && now < new Date('2026-11-27T04:59:00Z')) { COLS.push(['black-friday-25', 25]); COLS.push(['black-friday-20b', 20]); }
+  var KEY = 'lxp_handles_v3', set = null;
   var css = 'price-list .lxp-now{color:#C9868E!important;font-weight:600}'
     + 'price-list .lxp-was{text-decoration:line-through;opacity:.6;margin-left:.45em;font-weight:400}'
     + 'price-list .lxp-tag{display:inline-block;margin-left:.5em;padding:2px 8px;border-radius:999px;background:#1C1C1C;color:#FBFAF7;font:600 10px/1.6 Poppins,Helvetica,Arial,sans-serif;letter-spacing:.14em;text-transform:uppercase;vertical-align:middle;white-space:nowrap}'
