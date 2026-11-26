@@ -2,21 +2,23 @@
 (function(){
   var m = document.getElementById('lxbf-mount'); if (!m || window.__lxBF) return; window.__lxBF = true;
   // ventanas de descuento público: [inicio, fin, porcentaje, cierre en palabras]
-  var W = [['2026-11-20T05:00:00Z','2026-11-22T05:00:00Z',20,'hasta el domingo a medianoche','black friday luxur ☆ solo online',25],['2026-11-22T05:00:00Z','2026-11-23T04:59:00Z',20,'hasta hoy a medianoche','último día ☆ se acaba hoy a medianoche',25],['2026-11-23T18:20:00Z','2026-11-24T04:59:00Z',15,'hasta hoy a medianoche','solo hoy ☆ se acaba a medianoche',20],['2026-11-26T14:00:00Z','2026-11-27T04:59:00Z',20,'hasta hoy a medianoche','solo hoy ☆ se acaba a medianoche','30% desde las 7 p. m.']];
+  var W = [['2026-11-20T05:00:00Z','2026-11-22T05:00:00Z',20,'hasta el domingo a medianoche','black friday luxur ☆ solo online',25],['2026-11-22T05:00:00Z','2026-11-23T04:59:00Z',20,'hasta hoy a medianoche','último día ☆ se acaba hoy a medianoche',25],['2026-11-23T18:20:00Z','2026-11-24T04:59:00Z',15,'hasta hoy a medianoche','solo hoy ☆ se acaba a medianoche',20],['2026-11-26T14:00:00Z','2026-11-27T04:59:00Z',20,'hasta hoy a medianoche','solo hoy ☆ se acaba a medianoche','30% desde las 7 p. m.'],['2026-11-27T05:00:00Z','2026-11-28T04:59:00Z',30,'hasta hoy a medianoche','black friday ☆ solo hoy',null]];
   var NEXT = new Date('2026-11-27T05:00:00Z');
   var COL = 'black-friday-2026', now = new Date(), win = null;
   for (var i = 0; i < W.length; i++) if (now >= new Date(W[i][0]) && now < new Date(W[i][1])) win = W[i];
   var PCT = win ? win[2] : 0, END = win ? new Date(win[1]) : NEXT;
   var COL25 = (now >= new Date('2026-11-26T14:00:00Z') && now < new Date('2026-11-27T04:59:00Z')) ? 'black-friday-25' : null;
+  var VIE = now >= new Date('2026-11-27T05:00:00Z') && now < new Date('2026-11-28T04:59:00Z');
+  var EXTRA = COL25 ? [['black-friday-25', 25], ['black-friday-20b', 20]] : VIE ? [['black-friday-25', 30], ['black-friday-20b', 30]] : [];
   function fmt(n){ return '$' + Math.round(n).toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.'); }
   function esc(s){ return String(s).replace(/[&<>"]/g, function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]; }); }
   var hero = win
-    ? '<div class="lxb-k">' + win[4] + '</div><div class="lxb-n">' + PCT + '%</div><div class="lxb-t">off en toda la colección' + (COL25 ? '<br><em style="font-style:normal;color:#E3A7AE">y 25% en últimas unidades</em>' : '') + '</div>'
+    ? '<div class="lxb-k">' + win[4] + '</div><div class="lxb-n">' + PCT + '%</div><div class="lxb-t">off en toda la ' + (VIE ? 'tienda' : 'colección') + (COL25 ? '<br><em style="font-style:normal;color:#E3A7AE">y 25% en últimas unidades</em>' : '') + '</div>'
       + '<p class="lxb-s">sin código. se pone solo en tu carrito, ' + win[3] + '.</p>'
     : '<div class="lxb-k">black friday luxur</div><div class="lxb-t" style="margin-top:18px">llega el viernes 27</div>'
       + '<p class="lxb-s">el descuento más alto del año. deja tu jean elegido desde ya.</p>';
   var clock = '<div class="lxb-clock"><div><b data-k="D">00</b><small>días</small></div><div><b data-k="H">00</b><small>horas</small></div><div><b data-k="M">00</b><small>min</small></div><div><b data-k="S">00</b><small>seg</small></div></div>';
-  var cli = win ? '<div class="lxb-cli">¿ya eres clienta? tienes <b>' + (typeof win[5] === 'number' ? win[5] + '%' : win[5]) + '</b> entrando con tu correo o celular de siempre. <a href="/pages/luxur-club">entrar a la bóveda</a></div>' : '';
+  var cli = (win && win[5]) ? '<div class="lxb-cli">¿ya eres clienta? tienes <b>' + (typeof win[5] === 'number' ? win[5] + '%' : win[5]) + '</b> entrando con tu correo o celular de siempre. <a href="/pages/luxur-club">entrar a la bóveda</a></div>' : '';
   var steps = win
     ? '<div class="lxb-rail"><div class="lxb-step"><b>1</b><p>elige tu jean</p><small>el precio que ves ya tiene el ' + PCT + '% off.</small></div>'
       + '<div class="lxb-step"><b>2</b><p>agrégalo al carrito</p><small>el descuento se pone solo, sin código.</small></div>'
@@ -67,5 +69,5 @@
       return ps.length === 250 ? load(page + 1, col, pct) : null;
     });
   }
-  (COL25 ? load(1, COL25, 25).catch(function(){}).then(function(){ return load(1, 'black-friday-20b', 20).catch(function(){}); }) : Promise.resolve()).then(function(){ return load(1); }).then(function(){ all.sort(function(a, b){ return (b.ok - a.ok) || ((b.pct || 0) - (a.pct || 0)); }); draw(); }).catch(function(){ document.getElementById('lxbGrid').innerHTML = '<div class="lxb-empty"><a href="/collections/' + COL + '">ver la colección</a></div>'; });
+  EXTRA.reduce(function(pr, e){ return pr.then(function(){ return load(1, e[0], e[1]).catch(function(){}); }); }, Promise.resolve()).then(function(){ return load(1); }).then(function(){ all.sort(function(a, b){ return (b.ok - a.ok) || ((b.pct || 0) - (a.pct || 0)); }); draw(); }).catch(function(){ document.getElementById('lxbGrid').innerHTML = '<div class="lxb-empty"><a href="/collections/' + COL + '">ver la colección</a></div>'; });
 })();
