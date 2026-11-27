@@ -2,6 +2,8 @@
 (function(){
   if (window.__lxCartas) return; window.__lxCartas = true;
   try { var pj = document.createElement('script'); pj.src = 'https://ops.luxurjeans.com/widget/precios.js?v=1626'; pj.defer = true; document.head.appendChild(pj); } catch(e){}
+  /* black friday: sin barra de envío gratis (vie 27 a dom 29) */
+  try { var sn = new Date(); if (sn >= new Date('2026-11-26T14:00:00Z') && sn < new Date('2026-11-30T05:00:00Z')){ var ss = document.createElement('style'); ss.textContent = 'dynamic-shipping-bar,.dynamic-shipping-bar{display:none!important}'; document.head.appendChild(ss); } } catch(e){}
   /* home en modo black friday: jue 26 y vie 27 */
   try {
     var hn = new Date();
