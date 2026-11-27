@@ -2,14 +2,15 @@
 (function(){
   var m = document.getElementById('lxbf-mount'); if (!m || window.__lxBF) return; window.__lxBF = true;
   // ventanas de descuento público: [inicio, fin, porcentaje, cierre en palabras]
-  var W = [['2026-11-20T05:00:00Z','2026-11-22T05:00:00Z',20,'hasta el domingo a medianoche','black friday luxur ☆ solo online',25],['2026-11-22T05:00:00Z','2026-11-23T04:59:00Z',20,'hasta hoy a medianoche','último día ☆ se acaba hoy a medianoche',25],['2026-11-23T18:20:00Z','2026-11-24T04:59:00Z',15,'hasta hoy a medianoche','solo hoy ☆ se acaba a medianoche',20],['2026-11-26T14:00:00Z','2026-11-27T01:00:00Z',20,'hasta las 8 p. m.','a las 8 p. m. empieza el 30%','30% desde las 6 p. m.'],['2026-11-27T01:00:00Z','2026-11-28T04:59:00Z',30,'hasta el viernes a medianoche','black friday ☆ 30% en toda la tienda',null]];
+  var W = [['2026-11-20T05:00:00Z','2026-11-22T05:00:00Z',20,'hasta el domingo a medianoche','black friday luxur ☆ solo online',25],['2026-11-22T05:00:00Z','2026-11-23T04:59:00Z',20,'hasta hoy a medianoche','último día ☆ se acaba hoy a medianoche',25],['2026-11-23T18:20:00Z','2026-11-24T04:59:00Z',15,'hasta hoy a medianoche','solo hoy ☆ se acaba a medianoche',20],['2026-11-26T14:00:00Z','2026-11-27T01:00:00Z',20,'hasta las 8 p. m.','a las 8 p. m. empieza el 30%','30% desde las 6 p. m.'],['2026-11-27T01:00:00Z','2026-11-28T04:59:00Z',30,'hasta el viernes a medianoche','black friday ☆ 30% en toda la tienda',null],['2026-11-28T05:00:00Z','2026-11-30T04:59:00Z',20,'hasta el domingo a medianoche','black friday weekend ☆ solo online',null]];
   var NEXT = new Date('2026-11-27T01:00:00Z');
   var COL = 'black-friday-2026', now = new Date(), win = null;
   for (var i = 0; i < W.length; i++) if (now >= new Date(W[i][0]) && now < new Date(W[i][1])) win = W[i];
   var PCT = win ? win[2] : 0, END = win ? new Date(win[1]) : NEXT;
   var COL25 = (now >= new Date('2026-11-26T14:00:00Z') && now < new Date('2026-11-27T01:00:00Z')) ? 'black-friday-25' : null;
-  var VIE = now >= new Date('2026-11-27T01:00:00Z') && now < new Date('2026-11-28T04:59:00Z');
-  var EXTRA = COL25 ? [['black-friday-25', 25], ['black-friday-20b', 20]] : VIE ? [['black-friday-25', 30], ['black-friday-20b', 30]] : [];
+  var VIE = now >= new Date('2026-11-27T01:00:00Z') && now < new Date('2026-11-30T04:59:00Z');
+  var WK = now >= new Date('2026-11-28T05:00:00Z');
+  var EXTRA = COL25 ? [['black-friday-25', 25], ['black-friday-20b', 20]] : VIE ? [['black-friday-25', WK ? 20 : 30], ['black-friday-20b', WK ? 20 : 30]] : [];
   function fmt(n){ return '$' + Math.round(n).toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.'); }
   function esc(s){ return String(s).replace(/[&<>"]/g, function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]; }); }
   var hero = win

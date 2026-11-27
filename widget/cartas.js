@@ -1,35 +1,36 @@
 /* LUXUR · juego de cartas: pestaña lateral + popup (se carga desde el tema de Shopify) */
 (function(){
   if (window.__lxCartas) return; window.__lxCartas = true;
-  try { var pj = document.createElement('script'); pj.src = 'https://ops.luxurjeans.com/widget/precios.js?v=1626'; pj.defer = true; document.head.appendChild(pj); } catch(e){}
+  try { var pj = document.createElement('script'); pj.src = 'https://ops.luxurjeans.com/widget/precios.js?v=1028'; pj.defer = true; document.head.appendChild(pj); } catch(e){}
   /* black friday: sin barra de envío gratis (vie 27 a dom 29) */
   try { var sn = new Date(); if (sn >= new Date('2026-11-26T14:00:00Z') && sn < new Date('2026-11-30T05:00:00Z')){ var ss = document.createElement('style'); ss.textContent = 'dynamic-shipping-bar,.dynamic-shipping-bar{display:none!important}'; document.head.appendChild(ss); } } catch(e){}
   /* home en modo black friday: jue 26 y vie 27 */
   try {
     var hn = new Date();
-    if (location.pathname === '/' && hn >= new Date('2026-11-26T14:00:00Z') && hn < new Date('2026-11-28T04:59:00Z')){
+    if (location.pathname === '/' && hn >= new Date('2026-11-26T14:00:00Z') && hn < new Date('2026-11-30T04:59:00Z')){
       var hs = document.createElement('style'); hs.textContent = 'main > .shopify-section{display:none!important}#lxbf-home{display:block}'; document.head.appendChild(hs);
       var hl = document.createElement('link'); hl.rel = 'stylesheet'; hl.href = 'https://ops.luxurjeans.com/bf/bf.css?v=1626'; document.head.appendChild(hl);
       if (!document.querySelector('link[href*="family=Poppins"]')){ var gf = document.createElement('link'); gf.rel = 'stylesheet'; gf.href = 'https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap'; document.head.appendChild(gf); }
       var mount = function(){
         var mn = document.querySelector('main'); if (!mn || document.getElementById('lxbf-home')) return;
         var w = document.createElement('div'); w.id = 'lxbf-home'; w.innerHTML = '<div id="lxbf-mount"></div>'; mn.insertBefore(w, mn.firstChild);
-        var bs = document.createElement('script'); bs.src = 'https://ops.luxurjeans.com/bf/bf.js?v=1827'; document.body.appendChild(bs);
+        var bs = document.createElement('script'); bs.src = 'https://ops.luxurjeans.com/bf/bf.js?v=1028'; document.body.appendChild(bs);
       };
       if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', mount); else mount();
     }
   } catch(e){}
-  var END = new Date('2026-11-28T04:59:00Z');
+  var END = new Date('2026-11-30T04:59:00Z');
   if (new Date() > END) return;
   var p = location.pathname;
   if (/\/(cart|checkouts?|account|pages\/luxur-club|pages\/black-friday)/.test(p)) return;
   var GAME = 'https://ops.luxurjeans.com/cartas?embed=1';
   var now = new Date();
-  var VIE = now >= new Date('2026-11-27T01:00:00Z') && now < new Date('2026-11-28T04:59:00Z');
+  var VIE = now >= new Date('2026-11-27T01:00:00Z') && now < new Date('2026-11-30T04:59:00Z');
+  var WK = now >= new Date('2026-11-28T05:00:00Z');
   var JUE = now >= new Date('2026-11-26T14:00:00Z') && now < new Date('2026-11-27T01:00:00Z');
-  var VT = now < new Date('2026-11-27T05:00:00Z') ? 'hasta mañana a medianoche' : 'solo hoy';
+  var VT = WK ? 'hasta el domingo a medianoche' : now < new Date('2026-11-27T05:00:00Z') ? 'hasta mañana a medianoche' : 'solo hoy';
   var HOY = VIE || JUE || (now >= new Date('2026-11-23T18:20:00Z') && now < new Date('2026-11-24T04:59:00Z'));
-  var HP = VIE ? '30' : JUE ? '20' : '15', HC = VIE ? '' : JUE ? '30%</b> desde las 6 p. m.' : '20%</b>';
+  var HP = VIE ? (WK ? '20' : '30') : JUE ? '20' : '15', HC = VIE ? '' : JUE ? '30%</b> desde las 6 p. m.' : '20%</b>';
   var FINDE = HOY || (now >= new Date('2026-11-20T05:00:00Z') && now < new Date('2026-11-23T04:59:00Z'));
   var SHOP = '/pages/black-friday';
   var LAST = !HOY && FINDE && now >= new Date('2026-11-22T05:00:00Z');
@@ -50,7 +51,7 @@
     + '.lxk-x{position:absolute;top:10px;right:10px;z-index:2;width:36px;height:36px;border-radius:999px;border:0;background:rgba(251,250,247,.14);color:#FBFAF7;font:300 22px/36px Poppins,Arial,sans-serif;cursor:pointer;padding:0}';
   var st = document.createElement('style'); st.textContent = css; document.head.appendChild(st);
   var tab = document.createElement('button'); tab.type = 'button'; tab.className = 'lxk-tab'; tab.setAttribute('aria-label', 'Jugar cartas LUXUR');
-  tab.innerHTML = VIE ? 'black friday <b>\u2661 30% off</b>' : HOY ? HP + '% off <b>\u2661 solo hoy</b>' : LAST ? '20% off <b>\u2661 se acaba hoy</b>' : FINDE ? '20% off en todo <b>\u2661 este fin de semana</b>' : 'elige tu carta <b>\u2661 hasta 25% off</b>';
+  tab.innerHTML = VIE ? 'black friday <b>\u2661 ' + HP + '% off</b>' : HOY ? HP + '% off <b>\u2661 solo hoy</b>' : LAST ? '20% off <b>\u2661 se acaba hoy</b>' : FINDE ? '20% off en todo <b>\u2661 este fin de semana</b>' : 'elige tu carta <b>\u2661 hasta 25% off</b>';
   if (FINDE) tab.setAttribute('aria-label', HOY ? HP + '% off solo hoy' : '20% off en todo este fin de semana');
   var ov = document.createElement('div'); ov.className = 'lxk-ov'; ov.setAttribute('role', 'dialog'); ov.setAttribute('aria-modal', 'true');
   ov.innerHTML = '<div class="lxk-box"><button type="button" class="lxk-x" aria-label="Cerrar">\u00d7</button></div>';
@@ -64,7 +65,7 @@
     var as0 = document.querySelectorAll('a[href*="ops.luxurjeans.com/cartas"]');
     if (!FINDE){ for (var j = 0; j < as0.length; j++){ if (as0[j].closest('.lxk-ov')) continue; if (/20% OFF/.test(as0[j].textContent)) as0[j].textContent = as0[j].textContent.replace('20% OFF', '25% OFF'); } return; }
     var as = as0;
-    for (var i = 0; i < as.length; i++){ if (as[i].closest('.lxk-ov')) continue; as[i].href = SHOP; as[i].removeAttribute('target'); as[i].textContent = VIE ? 'BLACK FRIDAY \u2661 30% OFF EN TODA LA TIENDA, ' + VT.toUpperCase() : HOY ? 'SOLO HOY \u2661 ' + HP + '% OFF SIN C\u00d3DIGO, HASTA ' + (JUE ? 'LAS 8 P. M.' : 'MEDIANOCHE') : LAST ? '\u00daLTIMO D\u00cdA \u2661 20% OFF SE ACABA HOY A MEDIANOCHE' : '20% OFF EN TODO ESTE FIN DE SEMANA \u2661 SIN C\u00d3DIGO'; }
+    for (var i = 0; i < as.length; i++){ if (as[i].closest('.lxk-ov')) continue; as[i].href = SHOP; as[i].removeAttribute('target'); as[i].textContent = VIE ? 'BLACK FRIDAY \u2661 ' + HP + '% OFF EN TODA LA TIENDA, ' + VT.toUpperCase() : HOY ? 'SOLO HOY \u2661 ' + HP + '% OFF SIN C\u00d3DIGO, HASTA ' + (JUE ? 'LAS 8 P. M.' : 'MEDIANOCHE') : LAST ? '\u00daLTIMO D\u00cdA \u2661 20% OFF SE ACABA HOY A MEDIANOCHE' : '20% OFF EN TODO ESTE FIN DE SEMANA \u2661 SIN C\u00d3DIGO'; }
   }
   function open(){ if (!loaded){ var f = document.createElement('iframe'); f.src = GAME; f.title = 'Juego de cartas LUXUR'; box.appendChild(f); loaded = true; } ov.classList.add('on'); }
   function close(){ ov.classList.remove('on'); }
@@ -73,7 +74,7 @@
   document.addEventListener('keydown', function(e){ if (e.key === 'Escape') close(); });
   function mount(){
     document.body.appendChild(tab); document.body.appendChild(ov); bar(); setTimeout(bar, 1500);
-    var K = VIE ? 'lxk_seen_v27' : JUE ? 'lxk_seen_j26' : HOY ? 'lxk_seen_l23' : LAST ? 'lxk_seen_last' : FINDE ? 'lxk_seen_finde' : 'lxk_seen';
+    var K = WK ? 'lxk_seen_wk' : VIE ? 'lxk_seen_v27' : JUE ? 'lxk_seen_j26' : HOY ? 'lxk_seen_l23' : LAST ? 'lxk_seen_last' : FINDE ? 'lxk_seen_finde' : 'lxk_seen';
     if (LAST){ var cd = document.getElementById('lxk-cd'), E = new Date('2026-11-23T04:59:00Z'); var tk = function(){ var d = Math.max(0, E - new Date()), h = Math.floor(d / 36e5), m = Math.floor(d / 6e4) % 60; if (cd) cd.textContent = 'quedan ' + h + ' h ' + (m < 10 ? '0' : '') + m + ' min.'; }; tk(); setInterval(tk, 30000); }
     var seen = false; try { seen = sessionStorage.getItem(K) === '1'; } catch(e){}
     if (!seen){ setTimeout(function(){ open(); try { sessionStorage.setItem(K, '1'); } catch(e){} }, 2500); }
